@@ -1,4 +1,3 @@
-
 /**
  * DQ Tools — Auth System (dq-auth.js)
  * Uses Firebase Auth (email/password + Google) + Supabase for data storage.
@@ -210,7 +209,7 @@ async function dqSaveProfile(uid, data) {
     await sbSave(uid, 'profile', data);
   } catch (_) {}
 }
-async async function dqLoadProfile(uid) {
+async function dqLoadProfile(uid) {
   // Try Supabase first for freshest data
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${uid}&data_key=eq.profile&select=payload`, {
