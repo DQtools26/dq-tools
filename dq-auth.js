@@ -143,8 +143,7 @@ async function sbSave(userId, key, payload) {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': 'return=minimal,resolution=merge-duplicates',
-      'x-upsert': 'true'
+      'Prefer': 'resolution=merge-duplicates'
     },
     body: JSON.stringify({
       user_id: userId,
