@@ -11,6 +11,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
+  <script src="dq-auth.js" defer></script>
   <title>MHS Course Planner — Moberly Spartans</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -407,6 +408,34 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
 .path-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
 .pleg-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text2);}
 .pleg-dot{width:10px;height:10px;border-radius:2px;}
+
+/* ── DQ Auth Button (in navbar) ── */
+#dq-auth-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(14,19,32,0.8); border: 1px solid #2a4468;
+  border-radius: 100px; padding: 4px 10px 4px 5px;
+  font-family: 'Outfit', sans-serif; font-size: .68rem; font-weight: 700;
+  color: #7a9abf; cursor: pointer; transition: all .18s;
+  white-space: nowrap; flex-shrink: 0; margin-left: auto;
+}
+#dq-auth-btn:hover { border-color: #3a7fff; color: #e8eef8; }
+#dq-auth-btn.logged-in { border-color: rgba(77,232,136,.35); color: #e8eef8; }
+#dq-auth-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg,#2dcc6f,#3a7fff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; overflow: hidden; flex-shrink: 0;
+}
+#dq-auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#dq-user-dropdown {
+  position: fixed; top: 58px; right: 16px; z-index: 9001;
+  background: #0e1320; border: 1px solid #2a4468; border-radius: 14px;
+  padding: 6px; width: 220px; font-family: 'Outfit', sans-serif;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+  display: none; flex-direction: column; gap: 2px;
+}
+#dq-user-dropdown.open { display: flex; }
+
 </style>
 </head>
 <body>
@@ -441,6 +470,9 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
   <div class="nav-btn" onclick="togglePathsView()" id="nav-paths-btn" title="Course Paths">🗺️ Paths</div>
   <div class="nav-btn" onclick="toggleReqsView()" id="nav-reqs-btn" title="Requirements Tracker">✅ Reqs</div>
   <div class="nav-btn" onclick="goTo(6)" id="nav-sum-btn" title="Jump to Summary">📋 Summary</div>
+<button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+    <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+  </button>
 </nav>
 <div id="app"></div>
 <div id="plan-overlay"></div>
@@ -2461,6 +2493,25 @@ function reqAdd(id, grade) {
   updateNavCred();
   renderReqsPage();
 }
+
+// ── DQ Account: auto-save & load ──
+function dqGetCPData(){return{name:state.name,startGrade:state.startGrade,got8thHonors:state.got8thHonors,mapProficient:state.mapProficient,teacherRecLA:state.teacherRecLA,teacherRecMath:state.teacherRecMath,teacherRecSci:state.teacherRecSci,maccEligible:state.maccEligible,actScore:state.actScore,prior8thMath:state.prior8thMath,completedMath:state.completedMath,completedSci:state.completedSci,completedLA:state.completedLA,choices:state.choices,currentStep:typeof currentStep!=='undefined'?currentStep:0};}
+function dqRestoreCP(data){
+  if(!data||!data.choices)return;
+  Object.assign(state,{name:data.name||'',startGrade:data.startGrade||9,got8thHonors:data.got8thHonors||false,mapProficient:data.mapProficient||false,teacherRecLA:data.teacherRecLA||false,teacherRecMath:data.teacherRecMath||false,teacherRecSci:data.teacherRecSci||false,maccEligible:data.maccEligible||false,actScore:data.actScore||0,prior8thMath:data.prior8thMath||'none',completedMath:data.completedMath||[],completedSci:data.completedSci||[],completedLA:data.completedLA||[],choices:data.choices||{9:{},10:{},11:{},12:{}}});
+  if(typeof renderStep==='function')renderStep(data.currentStep||0);
+  DQAuth.toast('✓ Your course plan has been restored!');
+}
+let _cpST;
+function dqCPAutoSave(){clearTimeout(_cpST);_cpST=setTimeout(()=>{if(typeof DQAuth!=='undefined')DQAuth.saveData('courseplanner',dqGetCPData());},1500);}
+const _origSetChoice=setChoice;
+function setChoice(grade,id,credits){_origSetChoice(grade,id,credits);dqCPAutoSave();}
+window.addEventListener('dq:authready',async({detail:{user}})=>{
+  if(!user)return;
+  const saved=await DQAuth.loadData('courseplanner');
+  if(saved)dqRestoreCP(saved);
+});
+
 </script>
 <style>
   .dq-watermark { position: fixed; bottom: 8px; left: 12px; font-family: 'Outfit', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; color: #1a5c36; text-transform: uppercase; pointer-events: none; z-index: 998; white-space: nowrap; }
