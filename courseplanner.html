@@ -2546,8 +2546,11 @@ setInterval(function() {
   }
 }, 3000);
 
+let _cpRestored = false;
 window.addEventListener('dq:authready', async ({ detail: { user } }) => {
   if (!user) return;
+  if (_cpRestored) return; // only restore once
+  _cpRestored = true;
   const saved = await DQAuth.loadData('courseplanner');
   if (saved) dqRestoreCP(saved);
   _cpLastSave = JSON.stringify(dqGetCPData());
