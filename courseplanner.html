@@ -2494,29 +2494,63 @@ function reqAdd(id, grade) {
   renderReqsPage();
 }
 
+
+
+
 // ── DQ Account: auto-save & load ──
-let _dqCPReady = false; // only auto-save after user interaction, not during restore
-function dqGetCPData(){return{name:state.name,startGrade:state.startGrade,got8thHonors:state.got8thHonors,mapProficient:state.mapProficient,teacherRecLA:state.teacherRecLA,teacherRecMath:state.teacherRecMath,teacherRecSci:state.teacherRecSci,maccEligible:state.maccEligible,actScore:state.actScore,prior8thMath:state.prior8thMath,completedMath:state.completedMath,completedSci:state.completedSci,completedLA:state.completedLA,choices:state.choices,currentStep:typeof currentStep!=='undefined'?currentStep:0};}
-function dqRestoreCP(data){
-  if(!data||!data.choices)return;
-  _dqCPReady=false;
-  Object.assign(state,{name:data.name||'',startGrade:data.startGrade||9,got8thHonors:data.got8thHonors||false,mapProficient:data.mapProficient||false,teacherRecLA:data.teacherRecLA||false,teacherRecMath:data.teacherRecMath||false,teacherRecSci:data.teacherRecSci||false,maccEligible:data.maccEligible||false,actScore:data.actScore||0,prior8thMath:data.prior8thMath||'none',completedMath:data.completedMath||[],completedSci:data.completedSci||[],completedLA:data.completedLA||[],choices:data.choices||{9:{},10:{},11:{},12:{}}});
-  if(typeof goTo==='function')goTo(data.currentStep||0);
-  setTimeout(()=>{ _dqCPReady=true; },500);
+function dqGetCPData() {
+  return {
+    name: state.name, startGrade: state.startGrade,
+    got8thHonors: state.got8thHonors, mapProficient: state.mapProficient,
+    teacherRecLA: state.teacherRecLA, teacherRecMath: state.teacherRecMath,
+    teacherRecSci: state.teacherRecSci, maccEligible: state.maccEligible,
+    actScore: state.actScore, prior8thMath: state.prior8thMath,
+    completedMath: state.completedMath, completedSci: state.completedSci,
+    completedLA: state.completedLA, choices: state.choices,
+    currentStep: typeof currentStep !== 'undefined' ? currentStep : 0
+  };
+}
+
+function dqRestoreCP(data) {
+  if (!data || !data.choices) return;
+  Object.assign(state, {
+    name: data.name || '',
+    startGrade: data.startGrade || 9,
+    got8thHonors: !!data.got8thHonors,
+    mapProficient: !!data.mapProficient,
+    teacherRecLA: !!data.teacherRecLA,
+    teacherRecMath: !!data.teacherRecMath,
+    teacherRecSci: !!data.teacherRecSci,
+    maccEligible: !!data.maccEligible,
+    actScore: data.actScore || 0,
+    prior8thMath: data.prior8thMath || 'none',
+    completedMath: data.completedMath || [],
+    completedSci: data.completedSci || [],
+    completedLA: data.completedLA || [],
+    choices: data.choices || { 9:{}, 10:{}, 11:{}, 12:{} }
+  });
+  if (typeof goTo === 'function') goTo(data.currentStep || 0);
   DQAuth.toast('✓ Your course plan has been restored!');
 }
-let _cpST;
-function dqCPAutoSave(){
-  if(!_dqCPReady)return;
-  clearTimeout(_cpST);
-  _cpST=setTimeout(()=>{if(typeof DQAuth!=='undefined')DQAuth.saveData('courseplanner',dqGetCPData());},2000);
-}
-const _origSetChoice=setChoice;
-setChoice=function(grade,id,credits){_origSetChoice(grade,id,credits);dqCPAutoSave();};
-window.addEventListener('dq:authready',async({detail:{user}})=>{
-  if(!user){ _dqCPReady=true; return; }
-  const saved=await DQAuth.loadData('courseplanner');
-  if(saved){ dqRestoreCP(saved); }else{ _dqCPReady=true; }
+
+// Poll for changes every 3 seconds and save if state changed
+let _cpLastSave = '';
+setInterval(function() {
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+  const current = JSON.stringify(dqGetCPData());
+  if (current !== _cpLastSave && _cpLastSave !== '') {
+    _cpLastSave = current;
+    DQAuth.saveData('courseplanner', dqGetCPData());
+  } else if (_cpLastSave === '') {
+    _cpLastSave = current;
+  }
+}, 3000);
+
+window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+  if (!user) return;
+  const saved = await DQAuth.loadData('courseplanner');
+  if (saved) dqRestoreCP(saved);
+  _cpLastSave = JSON.stringify(dqGetCPData());
 });
 
 </script>
