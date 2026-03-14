@@ -137,18 +137,19 @@ const CSS = `
 
 // ─── SUPABASE HELPERS ────────────────────────────────────────────────
 async function sbSave(userId, key, payload) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?on_conflict=user_id,data_key`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data`, {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=minimal'
+      'Prefer': 'return=minimal,resolution=merge-duplicates',
+      'x-upsert': 'true'
     },
     body: JSON.stringify({
       user_id: userId,
       data_key: key,
-      payload: JSON.stringify(payload),
+      payload: typeof payload === 'string' ? payload : JSON.stringify(payload),
       saved_at: Date.now()
     })
   });
@@ -206,16 +207,7 @@ async function saveProfile(uid, data) {
   try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
   // Also save to Supabase for cross-device sync
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/user_data?on_conflict=user_id,data_key`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal'
-      },
-      body: JSON.stringify({ user_id: uid, data_key: 'profile', payload: JSON.stringify(data), saved_at: Date.now() })
-    });
+    await sbSave(uid, 'profile', data);
   } catch (_) {}
 }
 async function loadProfile(uid) {
