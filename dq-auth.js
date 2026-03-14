@@ -1,5 +1,5 @@
 
-/**
+/** @version 2
  * DQ Tools — Auth System (dq-auth.js)
  * Uses Firebase Auth (email/password + Google) + Supabase for data storage.
  */
