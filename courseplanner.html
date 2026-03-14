@@ -2261,21 +2261,6 @@ function attachEvents(step) {
 }
 
 // ── INIT ──────────────────────────────────
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const loader = document.getElementById('loading');
-    loader.style.opacity = '0';
-    setTimeout(()=>loader.style.display='none', 500);
-    renderStep();
-    window._cpPageReady = true;
-    // Try restore now if auth already fired
-    if (window._cpPendingRestore) {
-      window._cpPendingRestore();
-      window._cpPendingRestore = null;
-    }
-  }, 900);
-});
-
 // ── DQ Account: save/load ──────────────────────────────
 function dqGetCPData() {
   return {
@@ -2285,52 +2270,64 @@ function dqGetCPData() {
     teacherRecSci: state.teacherRecSci, maccEligible: state.maccEligible,
     actScore: state.actScore, prior8thMath: state.prior8thMath,
     completedMath: state.completedMath, completedSci: state.completedSci,
-    completedLA: state.completedLA, choices: state.choices,
-    currentStep: typeof currentStep !== 'undefined' ? currentStep : 0
+    completedLA: state.completedLA, choices: state.choices
   };
 }
 
-function dqRestoreCP(data) {
-  if (!data || !data.choices) return;
-  // Mark session as restored so we never restore again this session
-  sessionStorage.setItem('cp_restored', '1');
-  Object.assign(state, {
-    name: data.name || '', startGrade: data.startGrade || 9,
-    got8thHonors: !!data.got8thHonors, mapProficient: !!data.mapProficient,
-    teacherRecLA: !!data.teacherRecLA, teacherRecMath: !!data.teacherRecMath,
-    teacherRecSci: !!data.teacherRecSci, maccEligible: !!data.maccEligible,
-    actScore: data.actScore || 0, prior8thMath: data.prior8thMath || 'none',
-    completedMath: data.completedMath || [], completedSci: data.completedSci || [],
-    completedLA: data.completedLA || [], choices: data.choices || {9:{},10:{},11:{},12:{}}
-  });
-  renderStep();
-  if (data.currentStep > 1) goTo(data.currentStep);
-  DQAuth.toast('✓ Course plan restored!');
+// Silently load saved state into state object BEFORE renderStep runs
+// This way the page renders correctly from the start — no reset, no conflict
+async function dqLoadBeforeRender() {
+  try {
+    if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+    const saved = await DQAuth.loadData('courseplanner');
+    if (!saved || !saved.choices) return;
+    Object.assign(state, {
+      name: saved.name || '', startGrade: saved.startGrade || 9,
+      got8thHonors: !!saved.got8thHonors, mapProficient: !!saved.mapProficient,
+      teacherRecLA: !!saved.teacherRecLA, teacherRecMath: !!saved.teacherRecMath,
+      teacherRecSci: !!saved.teacherRecSci, maccEligible: !!saved.maccEligible,
+      actScore: saved.actScore || 0, prior8thMath: saved.prior8thMath || 'none',
+      completedMath: saved.completedMath || [], completedSci: saved.completedSci || [],
+      completedLA: saved.completedLA || [], choices: saved.choices || {9:{},10:{},11:{},12:{}}
+    });
+  } catch(e) {}
 }
 
-// Auto-save every 4s if anything changed
+// Auto-save every 5s if state changed
 let _cpLastSave = '';
 setInterval(function() {
-  if (!window._cpPageReady) return;
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
   const cur = JSON.stringify(dqGetCPData());
   if (cur !== _cpLastSave) {
     _cpLastSave = cur;
     DQAuth.saveData('courseplanner', dqGetCPData());
   }
-}, 4000);
+}, 5000);
 
-window.addEventListener('dq:authready', async ({ detail: { user } }) => {
-  if (!user) return;
-  // If already restored this browser session, don't restore again
-  if (sessionStorage.getItem('cp_restored') === '1') return;
-  const saved = await DQAuth.loadData('courseplanner');
-  if (!saved) return;
-  if (window._cpPageReady) {
-    dqRestoreCP(saved);
-  } else {
-    window._cpPendingRestore = () => dqRestoreCP(saved);
-  }
+window.addEventListener('load', () => {
+  // Wait for auth to be ready, load state, THEN show page
+  const startPage = () => {
+    setTimeout(() => {
+      const loader = document.getElementById('loading');
+      loader.style.opacity = '0';
+      setTimeout(()=>loader.style.display='none', 500);
+      renderStep();
+      _cpLastSave = JSON.stringify(dqGetCPData());
+    }, 900);
+  };
+
+  // If auth fires before load, it stored the saved data already
+  // If auth fires after, we wait up to 2s then start anyway
+  let started = false;
+  const start = () => { if (!started) { started = true; startPage(); } };
+
+  window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+    if (user) await dqLoadBeforeRender();
+    start();
+  });
+
+  // Fallback: start after 2s even if auth never fires
+  setTimeout(start, 2000);
 });
 
 // ── ELECTIVE SEARCH ───────────────────────────────────────────
