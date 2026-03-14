@@ -625,7 +625,7 @@ const TOOLS = {
   ai: {
     icon:'🤖', name:'AI Disclaimer',
     tagline:"Full transparency about how and where AI is used across DQ Tools — what's AI-assisted, how it works, and what to keep in mind.",
-    url:'https://sites.google.com/view/tools-dairyqueen/it-is-ai',
+    url:'termsandpolicies.html',
     features:[
       {icon:'🔍', text:'Clear breakdown of which features use AI and how those systems work under the hood.'},
       {icon:'📋', text:'What AI-generated content means for accuracy and how to interpret results responsibly.'},
@@ -659,3 +659,26 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLaunch(
 </script>
 </body>
 </html>
+<!-- DQ Tools Floating Menu -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+  .fab-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; z-index: 999; }
+  .fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 8px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.28s ease, transform 0.28s ease; }
+  .fab-wrap:hover .fab-menu { opacity: 1; transform: translateY(0); pointer-events: all; }
+  .fab-wrap:hover .fab-btn { transform: scale(1.1); background: #2ea85a; }
+  .fab-link { display: block; padding: 6px 14px; background: #28a45a; color: #fff; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background 0.15s, transform 0.15s; font-family: 'Outfit', sans-serif; box-shadow: 0 2px 8px rgba(40,164,90,0.28); }
+  .fab-link:hover { background: #1f8a48; transform: translateX(-2px); }
+  .fab-btn { width: 42px; height: 42px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(40,164,90,0.45); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; }
+</style>
+
+<div class="fab-wrap">
+  <div class="fab-menu">
+    <a class="fab-link" href="mathcalc.html">MathCalc</a>
+    <a class="fab-link" href="gpareview.html">GPA Review</a>
+    <a class="fab-link" href="courseplanner.html">Course Planner</a>
+    <a class="fab-link" href="dqtable.html">DQtable</a>
+    <a class="fab-link" href="index.html">Home</a>
+    <a class="fab-link" href="termsandpolicies.html">Terms & Policies</a>
+  </div>
+  <button class="fab-btn">☰</button>
+</div>
