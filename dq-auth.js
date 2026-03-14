@@ -1,5 +1,4 @@
-
-/** @version 2
+/**
  * DQ Tools — Auth System (dq-auth.js)
  * Uses Firebase Auth (email/password + Google) + Supabase for data storage.
  */
@@ -207,7 +206,7 @@ async function dqSaveProfile(uid, data) {
   try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
   // Also save to Supabase for cross-device sync
   try {
-    await sbSave(uid, 'profile', data);
+    await sbSave(uid, 'profile', typeof data === 'string' ? JSON.parse(data) : data);
   } catch (_) {}
 }
 async function dqLoadProfile(uid) {
@@ -219,7 +218,10 @@ async function dqLoadProfile(uid) {
     if (res.ok) {
       const rows = await res.json();
       if (rows.length) {
-        const data = JSON.parse(rows[0].payload);
+        let data = rows[0].payload;
+        // Handle both single and double stringified payloads
+        if (typeof data === 'string') data = JSON.parse(data);
+        if (typeof data === 'string') data = JSON.parse(data);
         // Update local cache
         try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
         return data;
