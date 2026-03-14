@@ -11,7 +11,67 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
-  <script src="dq-auth.js" defer></script>
+  <script src="dq-auth.js" defer>
+// ── DQ Account: auto-save & load ──
+function dqGetCPData() {
+  return {
+    name: state.name, startGrade: state.startGrade,
+    got8thHonors: state.got8thHonors, mapProficient: state.mapProficient,
+    teacherRecLA: state.teacherRecLA, teacherRecMath: state.teacherRecMath,
+    teacherRecSci: state.teacherRecSci, maccEligible: state.maccEligible,
+    actScore: state.actScore, prior8thMath: state.prior8thMath,
+    completedMath: state.completedMath, completedSci: state.completedSci,
+    completedLA: state.completedLA, choices: state.choices,
+    currentStep: typeof currentStep !== 'undefined' ? currentStep : 0
+  };
+}
+
+function dqRestoreCP(data) {
+  if (!data || !data.choices) return;
+  Object.assign(state, {
+    name: data.name || '',
+    startGrade: data.startGrade || 9,
+    got8thHonors: !!data.got8thHonors,
+    mapProficient: !!data.mapProficient,
+    teacherRecLA: !!data.teacherRecLA,
+    teacherRecMath: !!data.teacherRecMath,
+    teacherRecSci: !!data.teacherRecSci,
+    maccEligible: !!data.maccEligible,
+    actScore: data.actScore || 0,
+    prior8thMath: data.prior8thMath || 'none',
+    completedMath: data.completedMath || [],
+    completedSci: data.completedSci || [],
+    completedLA: data.completedLA || [],
+    choices: data.choices || { 9:{}, 10:{}, 11:{}, 12:{} }
+  });
+  // Only jump to saved step if it's beyond welcome
+  if (data.currentStep > 0 && typeof goTo === 'function') goTo(data.currentStep);
+}
+
+// Save every 4 seconds if anything changed
+let _cpLastSave = '';
+let _cpRestored = false;
+setInterval(function() {
+  if (!_cpRestored) return;
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+  const current = JSON.stringify(dqGetCPData());
+  if (current !== _cpLastSave) {
+    _cpLastSave = current;
+    DQAuth.saveData('courseplanner', dqGetCPData());
+  }
+}, 4000);
+
+// Restore ONCE on page load only
+window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+  if (_cpRestored) return;
+  _cpRestored = true;
+  if (!user) return;
+  const saved = await DQAuth.loadData('courseplanner');
+  if (saved) dqRestoreCP(saved);
+  _cpLastSave = JSON.stringify(dqGetCPData());
+});
+
+</script>
   <title>MHS Course Planner — Moberly Spartans</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -2493,128 +2553,3 @@ function reqAdd(id, grade) {
   updateNavCred();
   renderReqsPage();
 }
-
-
-
-
-// ── DQ Account: auto-save & load ──
-function dqGetCPData() {
-  return {
-    name: state.name, startGrade: state.startGrade,
-    got8thHonors: state.got8thHonors, mapProficient: state.mapProficient,
-    teacherRecLA: state.teacherRecLA, teacherRecMath: state.teacherRecMath,
-    teacherRecSci: state.teacherRecSci, maccEligible: state.maccEligible,
-    actScore: state.actScore, prior8thMath: state.prior8thMath,
-    completedMath: state.completedMath, completedSci: state.completedSci,
-    completedLA: state.completedLA, choices: state.choices,
-    currentStep: typeof currentStep !== 'undefined' ? currentStep : 0
-  };
-}
-
-function dqRestoreCP(data) {
-  if (!data || !data.choices) return;
-  Object.assign(state, {
-    name: data.name || '',
-    startGrade: data.startGrade || 9,
-    got8thHonors: !!data.got8thHonors,
-    mapProficient: !!data.mapProficient,
-    teacherRecLA: !!data.teacherRecLA,
-    teacherRecMath: !!data.teacherRecMath,
-    teacherRecSci: !!data.teacherRecSci,
-    maccEligible: !!data.maccEligible,
-    actScore: data.actScore || 0,
-    prior8thMath: data.prior8thMath || 'none',
-    completedMath: data.completedMath || [],
-    completedSci: data.completedSci || [],
-    completedLA: data.completedLA || [],
-    choices: data.choices || { 9:{}, 10:{}, 11:{}, 12:{} }
-  });
-  if (typeof goTo === 'function') goTo(data.currentStep || 0);
-  DQAuth.toast('✓ Your course plan has been restored!');
-}
-
-// Poll for changes every 3 seconds and save if state changed
-let _cpLastSave = '';
-setInterval(function() {
-  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
-  const current = JSON.stringify(dqGetCPData());
-  if (current !== _cpLastSave && _cpLastSave !== '') {
-    _cpLastSave = current;
-    DQAuth.saveData('courseplanner', dqGetCPData());
-  } else if (_cpLastSave === '') {
-    _cpLastSave = current;
-  }
-}, 3000);
-
-let _cpRestored = false;
-window.addEventListener('dq:authready', async ({ detail: { user } }) => {
-  if (!user) return;
-  if (_cpRestored) return; // only restore once
-  _cpRestored = true;
-  const saved = await DQAuth.loadData('courseplanner');
-  if (saved) dqRestoreCP(saved);
-  _cpLastSave = JSON.stringify(dqGetCPData());
-});
-
-</script>
-<style>
-  .dq-watermark { position: fixed; bottom: 8px; left: 12px; font-family: 'Outfit', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; color: #1a5c36; text-transform: uppercase; pointer-events: none; z-index: 998; white-space: nowrap; }
-</style>
-<div class="dq-watermark">© 2026 DQtools by E. S.</div>
-</body>
-</html><!-- DQ Tools Floating Menu -->
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-  .fab-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; z-index: 999; }
-  .fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 8px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.28s ease, transform 0.28s ease; }
-  .fab-wrap:hover .fab-menu { opacity: 1; transform: translateY(0); pointer-events: all; }
-  .fab-wrap:hover .fab-btn { transform: scale(1.1); background: #2ea85a; }
-  .fab-link { display: block; padding: 6px 14px; background: #28a45a; color: #fff; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background 0.15s, transform 0.15s; font-family: 'Outfit', sans-serif; box-shadow: 0 2px 8px rgba(40,164,90,0.28); }
-  .fab-link:hover { background: #1f8a48; transform: translateX(-2px); }
-  .fab-btn { width: 42px; height: 42px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(40,164,90,0.45); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; }
-</style>
-
-<!-- DQ Tools Floating Menu -->
-<style>
-  .fab2-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 999; }
-  .fab2-toggle { width: 34px; height: 34px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(40,164,90,0.4); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; flex-shrink: 0; }
-  .fab2-toggle:hover { background: #2ea85a; transform: scale(1.08); }
-  .fab2-toggle.open { transform: rotate(45deg) scale(1.08); background: #1f8a48; }
-  .fab2-items { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.32s ease, opacity 0.25s ease; }
-  .fab2-items.open { max-height: 300px; opacity: 1; }
-  .fab2-item { display: flex; align-items: center; position: relative; }
-  .fab2-label { background: #18181f; color: #c8f0d8; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 6px; white-space: nowrap; border: 1px solid #2e2e42; opacity: 0; transform: translateX(6px); transition: opacity 0.15s, transform 0.15s; pointer-events: none; margin-right: 7px; }
-  .fab2-item:hover .fab2-label { opacity: 1; transform: translateX(0); }
-  .fab2-icon { width: 30px; height: 30px; border-radius: 50%; background: #28a45a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; text-decoration: none; box-shadow: 0 2px 8px rgba(40,164,90,0.3); transition: background 0.15s, transform 0.15s; flex-shrink: 0; }
-  .fab2-icon:hover { background: #1f8a48; transform: scale(1.12); }
-</style>
-
-<div class="fab2-wrap">
-  <div class="fab2-items" id="fab2menu">
-    <div class="fab2-item">
-      <span class="fab2-label">Terms & Policies</span>
-      <a class="fab2-icon" href="termsandpolicies.html">📋</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">Home</span>
-      <a class="fab2-icon" href="index.html">🏠</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">DQtable</span>
-      <a class="fab2-icon" href="dqtable.html">⚗️</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">Course Planner</span>
-      <a class="fab2-icon" href="courseplanner.html">📅</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">GPA Review</span>
-      <a class="fab2-icon" href="gpareview.html">🎓</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">MathCalc</span>
-      <a class="fab2-icon" href="mathcalc.html">🧮</a>
-    </div>
-  </div>
-  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
-</div>
