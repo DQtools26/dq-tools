@@ -1,0 +1,3112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoCalc by MathCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0e;--bg2:#111118;--surface:#18181f;--surface2:#20202a;--surface3:#28283a;
+  --border:#2e2e42;--border2:#3e3e58;
+  --text:#f0f0f8;--text2:#9090b8;--text3:#555570;
+  --green:#3db870;--green2:#5dd890;--green-dim:#0e2a1a;--green-glow:rgba(61,184,112,0.3);
+  --amber:#e89020;--amber-dim:#2a1a06;
+  --purple:#9966ff;--teal:#22c5b0;
+  --red:#e03030;--red2:#ff5555;--red-dim:#2a0e0e;
+  --blue:#2255cc;--blue2:#4488ff;--blue-dim:#0a1530;
+  --rounding: 1; /* decimal places, controlled by settings */
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* RIBBON */
+#ribbon{position:fixed;top:0;left:0;right:0;z-index:300;background:rgba(10,10,14,0.98);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+#ribbon-tabs{display:flex;align-items:center;height:38px;padding:0 12px;border-bottom:1px solid var(--border);gap:2px;}
+.ribbon-logo{display:flex;align-items:center;gap:8px;padding-right:14px;margin-right:6px;border-right:1px solid var(--border);height:38px;cursor:pointer;}
+.ribbon-logo-name{font-size:.9rem;font-weight:900;color:var(--green2);}
+.ribbon-logo-sub{font-size:.55rem;color:var(--text3);font-weight:600;letter-spacing:.05em;}
+.rtab{padding:0 14px;height:38px;display:flex;align-items:center;font-size:.73rem;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.02em;white-space:nowrap;}
+.rtab:hover{color:var(--text);}
+.rtab.active{color:var(--green2);border-bottom-color:var(--green);}
+
+#ribbon-body{height:58px;display:flex;align-items:center;padding:0 12px;gap:10px;overflow-x:auto;background:var(--bg2);}
+#ribbon-body::-webkit-scrollbar{display:none;}
+.rgrp{display:flex;align-items:center;gap:6px;padding-right:12px;border-right:1px solid var(--border);flex-shrink:0;}
+.rgrp:last-child{border-right:none;}
+.rbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 9px;border-radius:7px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;font-size:.65rem;font-weight:600;transition:all .15s;min-width:46px;white-space:nowrap;}
+.rbtn:hover{background:var(--surface2);color:var(--text);}
+.rbtn.active{background:var(--green-dim);color:var(--green2);}
+.rbtn .ri{font-size:1.3rem;line-height:1;}
+.rsm{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;font-size:.71rem;font-weight:700;transition:all .15s;white-space:nowrap;}
+.rsm:hover{border-color:var(--green);color:var(--green2);}
+.rsm.active{background:var(--green-dim);border-color:var(--green);color:var(--green2);}
+.rdivider{width:1px;height:32px;background:var(--border);flex-shrink:0;}
+
+/* LAYOUT */
+#app{display:flex;margin-top:96px;min-height:calc(100vh - 96px);}
+#sidebar{width:256px;flex-shrink:0;position:fixed;top:96px;bottom:0;left:0;overflow-y:auto;background:var(--bg2);border-right:1px solid var(--border);z-index:50;}
+#sidebar::-webkit-scrollbar{width:3px;}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{margin-left:256px;flex:1;padding:20px;max-width:calc(100vw - 256px);}
+
+/* SIDEBAR */
+.sb-search{padding:10px;position:sticky;top:0;background:var(--bg2);z-index:1;border-bottom:1px solid var(--border);}
+.sb-search-box{display:flex;align-items:center;gap:7px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:7px 11px;}
+.sb-search-box input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:.8rem;}
+.sb-search-box input::placeholder{color:var(--text3);}
+.sb-sec{padding:10px 8px 4px;}
+.sb-sec-lbl{font-size:.56rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:5px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:all .14s;font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:1px;}
+.sb-item:hover{background:var(--surface2);color:var(--text);}
+.sb-item.active{background:var(--green-dim);color:var(--green2);}
+.sb-item .sbi{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+
+/* PAGES */
+.page{display:none;}
+.page.visible{display:block;animation:fadeUp .25s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* WELCOME */
+.welcome-wrap{max-width:760px;margin:0 auto;padding:20px 0;}
+.welcome-hero{text-align:center;padding:50px 30px;background:var(--surface);border:1px solid var(--border);border-radius:22px;margin-bottom:20px;position:relative;overflow:hidden;}
+.welcome-geo{position:absolute;inset:0;opacity:.035;background-image:linear-gradient(var(--green) 1px,transparent 1px),linear-gradient(90deg,var(--green) 1px,transparent 1px);background-size:38px 38px;}
+.welcome-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(61,184,112,.15) 0%,transparent 70%);pointer-events:none;}
+.wh-logo{font-size:3.2rem;font-weight:900;background:linear-gradient(135deg,var(--green2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;position:relative;}
+.wh-by{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;position:relative;}
+.wh-desc{font-size:1rem;color:var(--text2);max-width:440px;margin:0 auto 24px;line-height:1.6;position:relative;}
+.wh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;padding:11px 26px;border-radius:11px;font-size:.88rem;font-weight:800;cursor:pointer;border:none;font-family:inherit;box-shadow:0 4px 18px var(--green-glow);transition:all .2s;position:relative;}
+.wh-btn:hover{background:var(--green2);transform:translateY(-2px);}
+.wc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.wc{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;}
+.wc:hover{border-color:var(--green);background:var(--surface2);transform:translateY(-1px);}
+.wc-icon{font-size:1.8rem;margin-bottom:7px;}
+.wc-name{font-size:.82rem;font-weight:800;margin-bottom:3px;}
+.wc-desc{font-size:.68rem;color:var(--text3);line-height:1.4;}
+.wc-badge{display:inline-block;margin-top:7px;font-size:.58rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--green);background:var(--green-dim);padding:2px 8px;border-radius:20px;}
+
+/* LAUNCHER */
+.launcher-wrap{max-width:900px;margin:0 auto;}
+.launcher-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.launcher-title{font-size:1.2rem;font-weight:900;}
+.launcher-search-box{display:flex;align-items:center;gap:7px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:8px 13px;width:260px;}
+.launcher-search-box input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:.83rem;}
+.launcher-search-box input::placeholder{color:var(--text3);}
+.lcat{margin-bottom:22px;}
+.lcat-hdr{display:flex;align-items:center;gap:7px;margin-bottom:9px;font-size:.62rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--text3);}
+.lcat-line{flex:1;height:1px;background:var(--border);}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px;}
+.litem{background:var(--surface);border:1.5px solid var(--border);border-radius:11px;padding:13px 11px;cursor:pointer;transition:all .18s;}
+.litem:hover{border-color:var(--green);background:var(--surface2);transform:translateY(-2px);box-shadow:0 5px 18px rgba(61,184,112,.14);}
+.litem-icon{font-size:1.4rem;margin-bottom:5px;}
+.litem-name{font-size:.78rem;font-weight:800;margin-bottom:2px;}
+.litem-desc{font-size:.65rem;color:var(--text3);line-height:1.3;}
+
+/* TOOL PAGE */
+.tool-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.tool-back{display:flex;align-items:center;gap:5px;padding:6px 13px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.76rem;font-weight:700;color:var(--text2);background:transparent;font-family:inherit;transition:all .14s;}
+.tool-back:hover{border-color:var(--green);color:var(--green2);}
+.tool-title{font-size:1.15rem;font-weight:900;}
+.tool-switch{margin-left:auto;display:flex;align-items:center;gap:5px;padding:6px 13px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.76rem;font-weight:700;color:var(--text2);background:transparent;font-family:inherit;transition:all .14s;}
+.tool-switch:hover{border-color:var(--green);color:var(--green2);}
+.tool-layout{display:grid;grid-template-columns:1fr 310px;gap:18px;align-items:start;}
+.tool-main{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.tool-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;position:sticky;top:116px;}
+
+/* CANVAS */
+.canvas-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;display:flex;align-items:center;justify-content:center;position:relative;}
+canvas{display:block;max-width:100%;}
+
+/* INPUTS */
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:10px;}
+.field-lbl{font-size:.67rem;font-weight:700;color:var(--text2);}
+.field input,.field select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:inherit;font-size:.86rem;font-weight:600;outline:none;transition:border-color .14s;width:100%;}
+.field input:focus,.field select:focus{border-color:var(--green);}
+.field input.solved{border-color:var(--green);color:var(--green2);background:rgba(61,184,112,.08);}
+.field input.err{border-color:var(--red);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 20px;border-radius:9px;font-family:inherit;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .17s;border:none;}
+.btn-g{background:var(--green);color:#fff;box-shadow:0 2px 10px var(--green-glow);}
+.btn-g:hover{background:var(--green2);transform:translateY(-1px);box-shadow:0 4px 16px var(--green-glow);}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--green);color:var(--green2);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 13px;font-size:.76rem;}
+
+/* MODE TABS */
+.mode-tabs{display:flex;background:var(--surface2);border-radius:9px;padding:3px;margin-bottom:12px;}
+.mode-tab{flex:1;padding:6px;text-align:center;border-radius:6px;font-size:.73rem;font-weight:700;cursor:pointer;color:var(--text3);transition:all .14s;border:none;background:transparent;font-family:inherit;}
+.mode-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3);}
+
+/* SHAPE TABS */
+.shape-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.stab{padding:6px 13px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-size:.73rem;font-weight:700;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .14s;}
+.stab:hover{border-color:var(--green);color:var(--green2);}
+.stab.active{background:var(--green-dim);border-color:var(--green);color:var(--green2);}
+
+/* ANIM CONTROLS */
+.anim-bar{display:flex;align-items:center;gap:7px;margin-top:7px;}
+.anim-btn{padding:5px 11px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-family:inherit;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .14s;}
+.anim-btn:hover{border-color:var(--green);color:var(--green2);}
+.anim-track{flex:1;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.anim-fill{height:100%;background:var(--green);border-radius:2px;width:0%;transition:width .08s;}
+
+/* RESULTS PANEL */
+.panel-lbl{font-size:.6rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.res-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);gap:8px;}
+.res-row:last-child{border-bottom:none;}
+.res-name{font-size:.75rem;color:var(--text2);}
+.res-val{font-size:.87rem;font-weight:800;color:var(--text);font-family:'DM Mono',monospace;}
+.res-val.hi{color:var(--green2);}
+.fmt-toggle{display:flex;gap:4px;margin-bottom:10px;}
+.fmt-btn{flex:1;padding:5px;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--text3);font-family:inherit;transition:all .14s;}
+.fmt-btn.active{background:var(--green-dim);border-color:var(--green);color:var(--green2);}
+
+/* STEPS */
+.steps-wrap{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;}
+.steps-lbl{font-size:.6rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.step{display:flex;gap:8px;margin-bottom:8px;animation:stepIn .28s ease both;}
+@keyframes stepIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.step-n{width:19px;height:19px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green);color:var(--green2);font-size:.62rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-txt{font-size:.76rem;color:var(--text2);line-height:1.5;}
+.step-txt strong{color:var(--text);}
+.step-math{font-family:'DM Mono',monospace;color:var(--green2);background:var(--green-dim);padding:1px 5px;border-radius:3px;font-size:.8em;}
+
+/* CALLOUTS */
+.callout{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:9px;font-size:.78rem;line-height:1.5;margin-bottom:10px;border:1px solid transparent;}
+.callout.green{background:var(--green-dim);border-color:rgba(61,184,112,.25);color:#a0e0b8;}
+.callout.amber{background:var(--amber-dim);border-color:rgba(232,144,32,.25);color:#e8b060;}
+.callout.red{background:var(--red-dim);border-color:rgba(224,48,48,.25);color:var(--red2);}
+.callout.info{background:var(--blue-dim);border-color:rgba(34,85,204,.3);color:var(--blue2);}
+
+/* SOHCAHTOA cards */
+.soh-row{display:flex;gap:7px;margin-bottom:14px;}
+.soh-card{flex:1;padding:9px;background:var(--surface2);border:2px solid var(--border);border-radius:9px;text-align:center;transition:all .2s;}
+.soh-card.lit{border-color:var(--green);background:var(--green-dim);}
+.soh-name{font-size:.95rem;font-weight:900;}
+.soh-eq{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--text3);margin-top:2px;}
+
+/* CHOOSE CARDS */
+.choose-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.cc{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .18s;text-align:center;}
+.cc:hover{border-color:var(--green);}
+.cc.active{border-color:var(--green);background:var(--green-dim);}
+.cc-icon{font-size:1.8rem;margin-bottom:5px;}
+.cc-name{font-size:.82rem;font-weight:800;}
+.cc-formula{font-size:.64rem;font-family:'DM Mono',monospace;color:var(--text3);margin-top:3px;}
+
+/* FLOATING CALC */
+#fcalc{display:none;position:fixed;top:106px;right:18px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;width:296px;box-shadow:0 18px 50px rgba(0,0,0,.7);}
+#fcalc.open{display:block;animation:fadeUp .2s ease;}
+.calc-disp{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:10px;text-align:right;}
+.calc-expr{font-size:.68rem;color:var(--text3);min-height:14px;font-family:'DM Mono',monospace;}
+.calc-num{font-size:1.7rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;word-break:break-all;}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.cb{padding:9px 6px;border-radius:7px;border:none;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .12s;}
+.cb.num{background:var(--surface2);color:var(--text);}
+.cb.num:hover{background:var(--surface3);}
+.cb.op{background:var(--surface3);color:var(--text2);}
+.cb.op:hover{background:var(--border);color:var(--text);}
+.cb.fn{background:var(--surface3);color:var(--text3);font-size:.72rem;}
+.cb.fn:hover{background:var(--border);color:var(--text2);}
+.cb.eq{background:var(--green);color:#fff;}
+.cb.eq:hover{background:var(--green2);}
+.cb.clr{background:var(--red-dim);color:var(--red2);}
+.cb.w2{grid-column:span 2;}
+
+/* SETTINGS */
+#settings-panel{display:none;position:fixed;top:106px;right:18px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:300px;box-shadow:0 18px 50px rgba(0,0,0,.7);}
+#settings-panel.open{display:block;animation:fadeUp .2s ease;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-name{font-size:.82rem;font-weight:700;}
+.setting-desc{font-size:.68rem;color:var(--text3);}
+.setting-control select{background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:5px 9px;color:var(--text);font-family:inherit;font-size:.78rem;outline:none;}
+
+/* EXPORT */
+#export-panel{display:none;position:fixed;top:106px;right:18px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:320px;box-shadow:0 18px 50px rgba(0,0,0,.7);}
+#export-panel.open{display:block;animation:fadeUp .2s ease;}
+
+.overlay{display:none;position:fixed;inset:0;z-index:350;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);}
+.overlay.open{display:block;}
+
+/* FOOTER */
+#footer{text-align:center;padding:22px;font-size:.66rem;color:var(--text3);border-top:1px solid var(--border);margin-top:40px;}
+#footer a{color:var(--green);text-decoration:none;}
+#footer a:hover{text-decoration:underline;}
+
+@media(max-width:860px){.tool-layout{grid-template-columns:1fr;}.tool-panel{position:static;}}
+@media(max-width:680px){#sidebar{display:none;}#main{margin-left:0;}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ RIBBON ══════════════ -->
+<div id="ribbon">
+  <div id="ribbon-tabs">
+    <div class="ribbon-logo" onclick="goWelcome()">
+      <span style="font-size:1.4rem">📐</span>
+      <div><div class="ribbon-logo-name">GeoCalc</div><div class="ribbon-logo-sub">by MathCalc</div></div>
+    </div>
+    <div class="rtab active" id="rt-home" onclick="switchRTab('home',this)">Home</div>
+    <div class="rtab" id="rt-triangle" onclick="switchRTab('triangle',this)">Triangles</div>
+    <div class="rtab" id="rt-coord" onclick="switchRTab('coord',this)">Coordinate</div>
+    <div class="rtab" id="rt-shapes" onclick="switchRTab('shapes',this)">Shapes</div>
+    <div class="rtab" id="rt-angles" onclick="switchRTab('angles',this)">Angles</div>
+    <div class="rtab" id="rt-transform" onclick="switchRTab('transform',this)">Transform</div>
+    <div class="rtab" id="rt-calc" onclick="switchRTab('calc',this)">Calculator</div>
+    <div class="rtab" id="rt-file" onclick="switchRTab('file',this)">File</div>
+  </div>
+  <div id="ribbon-body">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<div id="sidebar">
+  <div class="sb-search">
+    <div class="sb-search-box">
+      <span style="color:var(--text3);font-size:.9rem;">🔍</span>
+      <input type="text" placeholder="Search tools…" oninput="sbSearch(this.value)">
+    </div>
+  </div>
+  <div id="sb-content"></div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+<div id="main">
+
+  <!-- WELCOME -->
+  <div id="pg-welcome" class="page visible">
+    <div class="welcome-wrap">
+      <div class="welcome-hero">
+        <div class="welcome-geo"></div>
+        <div class="welcome-glow"></div>
+        <div class="wh-logo">📐 GeoCalc</div>
+        <div class="wh-by">by MathCalc &nbsp;·&nbsp; DQtools</div>
+        <div class="wh-desc">Welcome to GeoCalc! Your complete geometry toolkit with animated visuals, step-by-step solutions, and every shape calculator you need. We hope you enjoy it!</div>
+        <button class="wh-btn" onclick="goLauncher()">🚀 Open All Calculators →</button>
+      </div>
+      <div class="wc-grid">
+        <div class="wc" onclick="launch('pythagorean')"><div class="wc-icon">📐</div><div class="wc-name">Triangle Tools</div><div class="wc-desc">Pythagorean theorem, trig, law of sines & cosines</div><div class="wc-badge">7 tools</div></div>
+        <div class="wc" onclick="launch('circle')"><div class="wc-icon">🔵</div><div class="wc-name">Circle Tools</div><div class="wc-desc">Area, circumference, arc, sector, chord</div><div class="wc-badge">2 tools</div></div>
+        <div class="wc" onclick="launch('polygon')"><div class="wc-icon">🔷</div><div class="wc-name">Polygons</div><div class="wc-desc">Rectangle, square, parallelogram, trapezoid…</div><div class="wc-badge">5 tools</div></div>
+        <div class="wc" onclick="launch('distance')"><div class="wc-icon">📍</div><div class="wc-name">Coordinate Geometry</div><div class="wc-desc">Distance, midpoint, slope, line equations</div><div class="wc-badge">5 tools</div></div>
+        <div class="wc" onclick="launch('transform')"><div class="wc-icon">🔄</div><div class="wc-name">Transformations</div><div class="wc-desc">Reflection, rotation, translation, dilation with editable points</div><div class="wc-badge">4 in 1</div></div>
+        <div class="wc" onclick="launch('angle-rel')"><div class="wc-icon">∠</div><div class="wc-name">Angle Tools</div><div class="wc-desc">Relationships, elevation/depression, polygon angles, unit converter</div><div class="wc-badge">4 tools</div></div>
+        <div class="wc" onclick="toggleCalc()"><div class="wc-icon">🔢</div><div class="wc-name">Scientific Calculator</div><div class="wc-desc">Always accessible — trig, logs, memory, more</div><div class="wc-badge">ribbon</div></div>
+      </div>
+      <div class="callout info">💡 Use the <strong>sidebar</strong> or <strong>ribbon tabs</strong> to jump between any calculator. The scientific calculator is always available in the Ribbon → Calculator tab.</div>
+    </div>
+  </div>
+
+  <!-- LAUNCHER -->
+  <div id="pg-launcher" class="page">
+    <div class="launcher-wrap">
+      <div class="launcher-top">
+        <div class="launcher-title">📐 All Calculators</div>
+        <div class="launcher-search-box">
+          <span style="color:var(--text3)">🔍</span>
+          <input type="text" placeholder="Search…" oninput="launcherSearch(this.value)">
+        </div>
+      </div>
+      <div id="launcher-body"></div>
+    </div>
+  </div>
+
+  <!-- TOOL -->
+  <div id="pg-tool" class="page">
+    <div class="tool-hdr">
+      <button class="tool-back" onclick="goLauncher()">← Back</button>
+      <span class="tool-title" id="tool-title"></span>
+      <button class="tool-switch" onclick="goLauncher()">⇄ Switch Calc</button>
+    </div>
+    <div id="tool-body"></div>
+  </div>
+
+</div>
+</div>
+
+<div id="footer">
+  <div style="margin-bottom:5px;">
+    <a href="mathcalc.html" target="_blank">← Back to MathCalc</a>
+    &nbsp;·&nbsp;<a href="#" onclick="goWelcome()">GeoCalc Home</a>
+    &nbsp;·&nbsp;<a href="#" onclick="toggleCalc()">🔢 Scientific Calculator</a>
+  </div>
+  ©2026 DQtools · All rights reserved
+</div>
+
+<!-- ══════════════ FLOATING CALC ══════════════ -->
+<div id="fcalc">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <span style="font-size:.78rem;font-weight:800;color:var(--text2);">🔢 Scientific Calculator</span>
+    <button onclick="closeAll()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;">✕</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:8px;">
+    <button class="rsm active" id="cdeg" onclick="cMode('deg')">DEG</button>
+    <button class="rsm" id="crad" onclick="cMode('rad')">RAD</button>
+    <div style="flex:1"></div>
+    <span style="font-size:.68rem;color:var(--text3);align-self:center;" id="cmem">M:0</span>
+  </div>
+  <div class="calc-disp"><div class="calc-expr" id="cexpr"></div><div class="calc-num" id="cnum">0</div></div>
+  <div class="cgrid">
+    <button class="cb fn" onclick="cFn('mc')">MC</button><button class="cb fn" onclick="cFn('mr')">MR</button><button class="cb fn" onclick="cFn('m+')">M+</button><button class="cb fn" onclick="cFn('m-')">M−</button>
+    <button class="cb fn" onclick="cFn('sin')">sin</button><button class="cb fn" onclick="cFn('cos')">cos</button><button class="cb fn" onclick="cFn('tan')">tan</button><button class="cb fn" onclick="cFn('sqrt')">√</button>
+    <button class="cb fn" onclick="cFn('asin')">sin⁻¹</button><button class="cb fn" onclick="cFn('acos')">cos⁻¹</button><button class="cb fn" onclick="cFn('atan')">tan⁻¹</button><button class="cb fn" onclick="cFn('sq')">x²</button>
+    <button class="cb fn" onclick="cIn('π')">π</button><button class="cb fn" onclick="cIn('e')">e</button><button class="cb fn" onclick="cFn('log')">log</button><button class="cb fn" onclick="cFn('ln')">ln</button>
+    <button class="cb clr" onclick="cClear()">C</button><button class="cb op" onclick="cDel()">⌫</button><button class="cb op" onclick="cIn('%')">%</button><button class="cb op" onclick="cIn('÷')">÷</button>
+    <button class="cb num" onclick="cIn('7')">7</button><button class="cb num" onclick="cIn('8')">8</button><button class="cb num" onclick="cIn('9')">9</button><button class="cb op" onclick="cIn('×')">×</button>
+    <button class="cb num" onclick="cIn('4')">4</button><button class="cb num" onclick="cIn('5')">5</button><button class="cb num" onclick="cIn('6')">6</button><button class="cb op" onclick="cIn('−')">−</button>
+    <button class="cb num" onclick="cIn('1')">1</button><button class="cb num" onclick="cIn('2')">2</button><button class="cb num" onclick="cIn('3')">3</button><button class="cb op" onclick="cIn('+')">+</button>
+    <button class="cb num" onclick="cIn('(')">( </button><button class="cb num" onclick="cIn('0')">0</button><button class="cb num" onclick="cIn('.')">.</button><button class="cb eq" onclick="cEq()">=</button>
+    <button class="cb fn w2" onclick="cIn(')')"> )</button><button class="cb fn" onclick="cFn('pow')">xʸ</button><button class="cb fn" onclick="cFn('cbrt')">∛</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <span style="font-size:.88rem;font-weight:800;">⚙️ Settings</span>
+    <button onclick="closeAll()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;">✕</button>
+  </div>
+  <div class="setting-row">
+    <div><div class="setting-name">Decimal Places</div><div class="setting-desc">Round results to this precision</div></div>
+    <div class="setting-control">
+      <select id="setting-rounding" onchange="applySettings()">
+        <option value="1" selected>1 (0.0)</option>
+        <option value="2">2 (0.00)</option>
+        <option value="3">3 (0.000)</option>
+        <option value="4">4 (0.0000)</option>
+        <option value="6">6 (0.000000)</option>
+      </select>
+    </div>
+  </div>
+  <div class="setting-row">
+    <div><div class="setting-name">Angle Unit</div><div class="setting-desc">Default angle mode</div></div>
+    <div class="setting-control">
+      <select id="setting-angle" onchange="applySettings()">
+        <option value="deg" selected>Degrees</option>
+        <option value="rad">Radians</option>
+      </select>
+    </div>
+  </div>
+  <div class="setting-row">
+    <div><div class="setting-name">Show Exact Form</div><div class="setting-desc">Show radical / fraction form</div></div>
+    <div class="setting-control">
+      <select id="setting-exact">
+        <option value="1" selected>Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT -->
+<div id="export-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <span style="font-size:.88rem;font-weight:800;">💾 File</span>
+    <button onclick="closeAll()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;">✕</button>
+  </div>
+  <div style="margin-bottom:10px;">
+    <div style="font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Save Code</div>
+    <div style="display:flex;gap:7px;">
+      <input id="save-code" style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:.76rem;outline:none;" readonly placeholder="Calculate something first">
+      <button class="btn btn-ghost btn-sm" onclick="copySave()">Copy</button>
+    </div>
+    <div style="font-size:.64rem;color:var(--text3);margin-top:4px;">Copy this to restore your work later</div>
+  </div>
+  <div style="margin-bottom:12px;">
+    <div style="font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Load Code</div>
+    <div style="display:flex;gap:7px;">
+      <input id="load-code" style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:.76rem;outline:none;" placeholder="Paste save code">
+      <button class="btn btn-g btn-sm" onclick="loadSave()">Load</button>
+    </div>
+  </div>
+  <button class="btn btn-g btn-full" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════
+let SETTINGS = { rounding: 1, angle: 'deg', exact: true };
+
+function applySettings() {
+  SETTINGS.rounding = parseInt(document.getElementById('setting-rounding').value);
+  SETTINGS.angle = document.getElementById('setting-angle').value;
+  SETTINGS.exact = document.getElementById('setting-exact').value === '1';
+  // update calc mode
+  if(SETTINGS.angle === 'rad') cMode('rad'); else cMode('deg');
+}
+
+function R(n) {
+  if(isNaN(n)||!isFinite(n)) return '—';
+  const factor = Math.pow(10, SETTINGS.rounding);
+  return (Math.round(n * factor) / factor).toFixed(SETTINGS.rounding);
+}
+
+function toRad(v) { return SETTINGS.angle === 'deg' ? v * Math.PI / 180 : v; }
+function toDeg(v) { return SETTINGS.angle === 'deg' ? v * 180 / Math.PI : v; }
+
+function toRadical(n) {
+  if(!SETTINGS.exact) return R(n);
+  const n2 = n * n;
+  if(Math.abs(n2 - Math.round(n2)) < 0.0001) {
+    const sq = Math.round(n2);
+    if(Math.abs(Math.sqrt(sq) - n) < 0.0001) return R(n);
+    for(let w = 2; w <= 100; w++) {
+      if(sq % w === 0) {
+        const outer = Math.sqrt(sq / w);
+        if(Math.abs(outer - Math.round(outer)) < 0.0001) {
+          const o = Math.round(outer);
+          return o === 1 ? `√${w}` : `${o}√${w}`;
+        }
+      }
+    }
+  }
+  return R(n);
+}
+
+function toFraction(n) {
+  if(Math.abs(n - Math.round(n)) < 0.00001) return String(Math.round(n));
+  for(let d = 2; d <= 64; d++) {
+    const num = Math.round(n * d);
+    if(Math.abs(num / d - n) < 0.0001) {
+      const g = gcd(Math.abs(num), d);
+      return `${num/g}/${d/g}`;
+    }
+  }
+  return R(n);
+}
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+function mkSteps(arr) {
+  return arr.map((s, i) => `<div class="step" style="animation-delay:${i*0.08}s">
+    <div class="step-n">${i+1}</div>
+    <div class="step-txt">${s.t}<br><span class="step-math">${s.m}</span></div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// TOOL DATA
+// ══════════════════════════════════════════════════════
+const TOOLS = [
+  { id:'pythagorean',   name:'Pythagorean Theorem',      icon:'📐', cat:'Triangle Tools',     desc:'a²+b²=c² — animated, radical form' },
+  { id:'special',       name:'Special Right Triangles',  icon:'🔺', cat:'Triangle Tools',     desc:'45-45-90 and 30-60-90 with steps' },
+  { id:'sohcahtoa',     name:'SOHCAHTOA / Trig',         icon:'📏', cat:'Triangle Tools',     desc:'Sine, cosine, tangent solver' },
+  { id:'tri-area',      name:'Triangle Area',            icon:'△',  cat:'Triangle Tools',     desc:'½bh, Heron\'s, SAS trig method' },
+  { id:'law-sines',     name:'Law of Sines',             icon:'∠',  cat:'Triangle Tools',     desc:'a/sin(A) = b/sin(B) = c/sin(C)' },
+  { id:'law-cosines',   name:'Law of Cosines',           icon:'∠',  cat:'Triangle Tools',     desc:'c²=a²+b²−2ab·cos(C)' },
+  { id:'tri-classify',  name:'Triangle Classification',  icon:'🔍', cat:'Triangle Tools',     desc:'Scalene / isosceles / equilateral / right' },
+  { id:'distance',      name:'Distance Formula',         icon:'📍', cat:'Coordinate Geometry',desc:'Animated on coordinate plane' },
+  { id:'midpoint',      name:'Midpoint Formula',         icon:'⚡', cat:'Coordinate Geometry',desc:'((x₁+x₂)/2, (y₁+y₂)/2)' },
+  { id:'slope',         name:'Slope Calculator',         icon:'📈', cat:'Coordinate Geometry',desc:'m = rise/run, line equation' },
+  { id:'line-eq',       name:'Line Equation',            icon:'✏️', cat:'Coordinate Geometry',desc:'Point-slope + slope-intercept' },
+  { id:'circle-eq',     name:'Circle Equation',          icon:'⭕', cat:'Coordinate Geometry',desc:'(x−h)²+(y−k)²=r²' },
+  { id:'circle',        name:'Circle Calculator',        icon:'🔵', cat:'Circle Tools',       desc:'Area, circumference, arc, sector, chord' },
+  { id:'arc-sector',    name:'Arc & Sector',             icon:'🌙', cat:'Circle Tools',       desc:'Arc length, sector area, central angle' },
+  { id:'polygon',       name:'Quadrilateral Calculator', icon:'🔷', cat:'Polygon & Shapes',   desc:'Rect, square, parallelogram, rhombus' },
+  { id:'trapezoid',     name:'Trapezoid Calculator',     icon:'⬟', cat:'Polygon & Shapes',   desc:'Area, perimeter, midsegment' },
+  { id:'reg-polygon',   name:'Regular Polygon',          icon:'⬡', cat:'Polygon & Shapes',   desc:'Any n-sided regular polygon' },
+  { id:'transform',     name:'Transformations',          icon:'🔄', cat:'Transformations',    desc:'Reflection, rotation, translation, dilation' },
+  { id:'angle-rel',     name:'Angle Relationships',      icon:'∠',  cat:'Angle Tools',        desc:'Complementary, supplementary, vertical, adjacent' },
+  { id:'angle-elev',    name:'Angle of Elevation/Depression', icon:'📡', cat:'Angle Tools',   desc:'Height & distance from angles of elevation/depression' },
+  { id:'poly-angles',   name:'Polygon Angle Calculator', icon:'🔢', cat:'Angle Tools',        desc:'Interior & exterior angles for any polygon' },
+  { id:'angle-conv',    name:'Angle Unit Converter',     icon:'🔁', cat:'Angle Tools',        desc:'Degrees ↔ Radians ↔ Gradians' },
+];
+
+const CATS = ['Triangle Tools','Coordinate Geometry','Circle Tools','Polygon & Shapes','Transformations','Angle Tools'];
+const CAT_ICONS = { 'Triangle Tools':'📐','Coordinate Geometry':'📍','Circle Tools':'🔵','Polygon & Shapes':'🔷','Transformations':'🔄','Angle Tools':'∠' };
+
+// ══════════════════════════════════════════════════════
+// RIBBON TABS
+// ══════════════════════════════════════════════════════
+const RIBBON_CONTENT = {
+  home: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="goWelcome()"><span class="ri">👋</span>Welcome</button>
+      <button class="rbtn" onclick="goLauncher()"><span class="ri">🏠</span>All Calcs</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('pythagorean')"><span class="ri">📐</span>Pythagoras</button>
+      <button class="rbtn" onclick="launch('special')"><span class="ri">🔺</span>Sp. Right</button>
+      <button class="rbtn" onclick="launch('sohcahtoa')"><span class="ri">📏</span>SOHCAHTOA</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('circle')"><span class="ri">🔵</span>Circle</button>
+      <button class="rbtn" onclick="launch('polygon')"><span class="ri">🔷</span>Polygon</button>
+      <button class="rbtn" onclick="launch('distance')"><span class="ri">📍</span>Distance</button>
+      <button class="rbtn" onclick="launch('transform')"><span class="ri">🔄</span>Transform</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('angle-rel')"><span class="ri">∠</span>Angle Rel.</button>
+      <button class="rbtn" onclick="launch('angle-elev')"><span class="ri">📡</span>Elev/Depr</button>
+      <button class="rbtn" onclick="launch('poly-angles')"><span class="ri">🔢</span>Poly Angles</button>
+      <button class="rbtn" onclick="launch('angle-conv')"><span class="ri">🔁</span>Converter</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleCalc()">🔢 Sci Calc</button>
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+      <button class="rsm" onclick="toggleExport()">💾 File</button>
+    </div>`,
+  triangle: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('pythagorean')"><span class="ri">📐</span>Pythagorean</button>
+      <button class="rbtn" onclick="launch('special')"><span class="ri">🔺</span>Special Right</button>
+      <button class="rbtn" onclick="launch('sohcahtoa')"><span class="ri">📏</span>SOHCAHTOA</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('tri-area')"><span class="ri">△</span>Area</button>
+      <button class="rbtn" onclick="launch('law-sines')"><span class="ri">∠</span>Law of Sines</button>
+      <button class="rbtn" onclick="launch('law-cosines')"><span class="ri">∠</span>Law of Cosines</button>
+      <button class="rbtn" onclick="launch('tri-classify')"><span class="ri">🔍</span>Classify</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`,
+  coord: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('distance')"><span class="ri">📍</span>Distance</button>
+      <button class="rbtn" onclick="launch('midpoint')"><span class="ri">⚡</span>Midpoint</button>
+      <button class="rbtn" onclick="launch('slope')"><span class="ri">📈</span>Slope</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('line-eq')"><span class="ri">✏️</span>Line Eq.</button>
+      <button class="rbtn" onclick="launch('circle-eq')"><span class="ri">⭕</span>Circle Eq.</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`,
+  shapes: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('circle')"><span class="ri">🔵</span>Circle</button>
+      <button class="rbtn" onclick="launch('arc-sector')"><span class="ri">🌙</span>Arc/Sector</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('polygon')"><span class="ri">🔷</span>Rectangle</button>
+      <button class="rbtn" onclick="launch('trapezoid')"><span class="ri">⬟</span>Trapezoid</button>
+      <button class="rbtn" onclick="launch('reg-polygon')"><span class="ri">⬡</span>Reg. Polygon</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`,
+  transform: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('transform','reflection')"><span class="ri">↔️</span>Reflection</button>
+      <button class="rbtn" onclick="launch('transform','rotation')"><span class="ri">🔄</span>Rotation</button>
+      <button class="rbtn" onclick="launch('transform','translation')"><span class="ri">➡️</span>Translation</button>
+      <button class="rbtn" onclick="launch('transform','dilation')"><span class="ri">🔍</span>Dilation</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`,
+  angles: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="launch('angle-rel')"><span class="ri">∠</span>Relationships</button>
+      <button class="rbtn" onclick="launch('angle-elev')"><span class="ri">📡</span>Elev/Depress</button>
+      <button class="rbtn" onclick="launch('poly-angles')"><span class="ri">🔢</span>Polygon Angles</button>
+      <button class="rbtn" onclick="launch('angle-conv')"><span class="ri">🔁</span>Unit Convert</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`,
+  calc: `
+    <div class="rgrp">
+      <button class="rsm active" onclick="toggleCalc()">🔢 Open Calculator</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="cFnRibbon('sin')"><span class="ri" style="font-size:.9rem">sin</span>Sine</button>
+      <button class="rbtn" onclick="cFnRibbon('cos')"><span class="ri" style="font-size:.9rem">cos</span>Cosine</button>
+      <button class="rbtn" onclick="cFnRibbon('tan')"><span class="ri" style="font-size:.9rem">tan</span>Tangent</button>
+      <button class="rbtn" onclick="cFnRibbon('asin')"><span class="ri" style="font-size:.9rem">sin⁻¹</span>Arcsin</button>
+      <button class="rbtn" onclick="cFnRibbon('acos')"><span class="ri" style="font-size:.9rem">cos⁻¹</span>Arccos</button>
+      <button class="rbtn" onclick="cFnRibbon('atan')"><span class="ri" style="font-size:.9rem">tan⁻¹</span>Arctan</button>
+    </div>
+    <div class="rgrp">
+      <button class="rbtn" onclick="cFnRibbon('sqrt')"><span class="ri">√</span>Sqrt</button>
+      <button class="rbtn" onclick="cFnRibbon('sq')"><span class="ri">x²</span>Square</button>
+      <button class="rbtn" onclick="cFnRibbon('pi')"><span class="ri">π</span>Pi</button>
+      <button class="rbtn" onclick="cFnRibbon('log')"><span class="ri" style="font-size:.9rem">log</span>Log₁₀</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm active" id="cdeg-r" onclick="cMode('deg')">DEG</button>
+      <button class="rsm" id="crad-r" onclick="cMode('rad')">RAD</button>
+    </div>`,
+  file: `
+    <div class="rgrp">
+      <button class="rbtn" onclick="toggleExport()"><span class="ri">💾</span>Save/Load</button>
+      <button class="rbtn" onclick="window.print()"><span class="ri">🖨️</span>Print</button>
+    </div>
+    <div class="rgrp">
+      <button class="rsm" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>`
+};
+
+function switchRTab(name, el) {
+  document.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ribbon-body').innerHTML = RIBBON_CONTENT[name] || '';
+  if(name === 'calc') toggleCalc();
+  if(name === 'file') toggleExport();
+}
+
+// ══════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════
+function buildSidebar(filter='') {
+  const fl = filter.toLowerCase();
+  let html = '';
+  CATS.forEach(cat => {
+    const tools = TOOLS.filter(t => t.cat === cat && (!fl || t.name.toLowerCase().includes(fl) || t.desc.toLowerCase().includes(fl)));
+    if(!tools.length) return;
+    html += `<div class="sb-sec"><div class="sb-sec-lbl">${cat}</div>
+      ${tools.map(t => `<div class="sb-item" id="sbi-${t.id}" onclick="launch('${t.id}')">
+        <span class="sbi">${t.icon}</span>${t.name}</div>`).join('')}
+    </div>`;
+  });
+  document.getElementById('sb-content').innerHTML = html;
+}
+function sbSearch(v) { buildSidebar(v); }
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('visible'); });
+  const el = document.getElementById(id);
+  if(el) { el.classList.add('visible'); }
+  window.scrollTo(0, 0);
+}
+
+function goWelcome() { showPage('pg-welcome'); closeAll(); }
+function goLauncher() { buildLauncher(); showPage('pg-launcher'); closeAll(); }
+
+function launch(id, subtype) {
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+  const sbi = document.getElementById('sbi-' + id);
+  if(sbi) sbi.classList.add('active');
+  const tool = TOOLS.find(t => t.id === id);
+  document.getElementById('tool-title').textContent = (tool?.icon || '') + ' ' + (tool?.name || id);
+  document.getElementById('tool-body').innerHTML = buildTool(id, subtype);
+  showPage('pg-tool');
+  closeAll();
+  setTimeout(() => initTool(id, subtype), 30);
+}
+
+// ══════════════════════════════════════════════════════
+// LAUNCHER
+// ══════════════════════════════════════════════════════
+function buildLauncher(filter='') {
+  const fl = filter.toLowerCase();
+  let html = '';
+  CATS.forEach(cat => {
+    const tools = TOOLS.filter(t => t.cat === cat && (!fl || t.name.toLowerCase().includes(fl)));
+    if(!tools.length) return;
+    html += `<div class="lcat">
+      <div class="lcat-hdr"><span>${CAT_ICONS[cat]}</span>${cat}<div class="lcat-line"></div></div>
+      <div class="lgrid">${tools.map(t => `
+        <div class="litem" onclick="launch('${t.id}')">
+          <div class="litem-icon">${t.icon}</div>
+          <div class="litem-name">${t.name}</div>
+          <div class="litem-desc">${t.desc}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('launcher-body').innerHTML = html || '<div style="color:var(--text3);padding:20px;">No matches.</div>';
+}
+function launcherSearch(v) { buildLauncher(v); }
+
+// ══════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════
+function toggleCalc() {
+  const fc = document.getElementById('fcalc');
+  const ov = document.getElementById('overlay');
+  const open = fc.classList.toggle('open');
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('export-panel').classList.remove('open');
+  ov.classList.toggle('open', open);
+}
+function toggleSettings() {
+  const sp = document.getElementById('settings-panel');
+  const ov = document.getElementById('overlay');
+  const open = sp.classList.toggle('open');
+  document.getElementById('fcalc').classList.remove('open');
+  document.getElementById('export-panel').classList.remove('open');
+  ov.classList.toggle('open', open);
+}
+function toggleExport() {
+  const ep = document.getElementById('export-panel');
+  const ov = document.getElementById('overlay');
+  const open = ep.classList.toggle('open');
+  document.getElementById('fcalc').classList.remove('open');
+  document.getElementById('settings-panel').classList.remove('open');
+  ov.classList.toggle('open', open);
+}
+function closeAll() {
+  document.getElementById('fcalc').classList.remove('open');
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('export-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════
+// SCIENTIFIC CALCULATOR
+// ══════════════════════════════════════════════════════
+let cExpr = '', cModeVal = 'deg', cMemory = 0, cJustResult = false;
+
+function cMode(m) {
+  cModeVal = m;
+  ['cdeg','crad'].forEach(id => document.getElementById(id)?.classList.toggle('active', id.replace('c','') === m || id === 'c'+m));
+  document.getElementById('cdeg')?.classList.toggle('active', m==='deg');
+  document.getElementById('crad')?.classList.toggle('active', m==='rad');
+  document.getElementById('cdeg-r')?.classList.toggle('active', m==='deg');
+  document.getElementById('crad-r')?.classList.toggle('active', m==='rad');
+}
+function cUpdate() { document.getElementById('cnum').textContent = cExpr || '0'; }
+function cIn(c) {
+  if(cJustResult && /[0-9.(πe]/.test(c)) { cExpr = ''; cJustResult = false; }
+  cExpr += c; cUpdate();
+}
+function cClear() { cExpr = ''; cJustResult = false; cUpdate(); document.getElementById('cexpr').textContent = ''; }
+function cDel() { cExpr = cExpr.slice(0,-1); cUpdate(); }
+
+function cCalcFn(fn, val) {
+  const r = fn === 'deg' ? val * Math.PI / 180 : val;
+  const d = cModeVal === 'deg';
+  const toR = v => d ? v * Math.PI / 180 : v;
+  const toD = v => d ? v * 180 / Math.PI : v;
+  switch(fn) {
+    case 'sin': return Math.sin(toR(val));
+    case 'cos': return Math.cos(toR(val));
+    case 'tan': return Math.tan(toR(val));
+    case 'asin': return toD(Math.asin(val));
+    case 'acos': return toD(Math.acos(val));
+    case 'atan': return toD(Math.atan(val));
+    case 'sqrt': return Math.sqrt(val);
+    case 'cbrt': return Math.cbrt(val);
+    case 'sq': return val * val;
+    case 'log': return Math.log10(val);
+    case 'ln': return Math.log(val);
+    case 'pi': return Math.PI;
+    case 'e': return Math.E;
+    default: return NaN;
+  }
+}
+
+function cFn(fn) {
+  if(fn === 'mc') { cMemory = 0; document.getElementById('cmem').textContent = 'M:0'; return; }
+  if(fn === 'mr') { cExpr = String(cMemory); cUpdate(); return; }
+  if(fn === 'm+') { cMemory += parseFloat(cExpr)||0; document.getElementById('cmem').textContent = 'M:'+R(cMemory); return; }
+  if(fn === 'm-') { cMemory -= parseFloat(cExpr)||0; document.getElementById('cmem').textContent = 'M:'+R(cMemory); return; }
+  if(fn === 'pow') { cExpr += '**'; cUpdate(); return; }
+  const val = parseFloat(cExpr) || 0;
+  const res = cCalcFn(fn, val);
+  document.getElementById('cexpr').textContent = fn + '(' + (cExpr||'0') + ') =';
+  cExpr = String(parseFloat(res.toPrecision(10))); cJustResult = true; cUpdate();
+}
+
+function cFnRibbon(fn) { toggleCalc(); setTimeout(() => cFn(fn), 100); }
+
+function cEq() {
+  try {
+    let e = cExpr.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-').replace(/π/g,'Math.PI').replace(/e/g,'Math.E');
+    document.getElementById('cexpr').textContent = cExpr + ' =';
+    const r = Function('"use strict";return(' + e + ')')();
+    cExpr = String(parseFloat(r.toPrecision(10))); cJustResult = true; cUpdate();
+  } catch(err) { cExpr = 'Error'; cUpdate(); setTimeout(cClear, 1200); }
+}
+
+// ══════════════════════════════════════════════════════
+// CANVAS HELPERS
+// ══════════════════════════════════════════════════════
+function ctx(id) {
+  const c = document.getElementById(id);
+  return c ? c.getContext('2d') : null;
+}
+function clrCanvas(c, w, h) {
+  c.clearRect(0,0,w,h);
+  c.fillStyle = '#111118';
+  c.fillRect(0,0,w,h);
+}
+function drawGrid(c, w, h, step=40) {
+  c.strokeStyle = 'rgba(46,46,66,0.65)';
+  c.lineWidth = 1;
+  for(let x=0;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();}
+  for(let y=0;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();}
+}
+function drawCoordPlane(c, w, h, ox, oy, sc) {
+  drawGrid(c, w, h, sc);
+  c.strokeStyle = 'rgba(85,85,130,0.9)'; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(0,oy); c.lineTo(w,oy); c.stroke();
+  c.beginPath(); c.moveTo(ox,0); c.lineTo(ox,h); c.stroke();
+  // tick labels
+  c.fillStyle = 'rgba(80,80,110,0.85)'; c.font = '10px Outfit'; c.textAlign = 'center';
+  for(let x = ox%sc; x < w; x += sc) {
+    const v = Math.round((x-ox)/sc);
+    if(v !== 0) c.fillText(v, x, oy+13);
+  }
+  c.textAlign = 'right';
+  for(let y = oy%sc; y < h; y += sc) {
+    const v = -Math.round((y-oy)/sc);
+    if(v !== 0) c.fillText(v, ox-5, y+4);
+  }
+}
+function dot(c, x, y, r, color) {
+  c.fillStyle = color || '#3db870';
+  c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
+}
+
+// ══════════════════════════════════════════════════════
+// TOOL BUILDERS
+// ══════════════════════════════════════════════════════
+function buildTool(id, sub) {
+  switch(id) {
+    case 'pythagorean':  return buildPythagorean();
+    case 'special':      return buildSpecial();
+    case 'sohcahtoa':    return buildSOH();
+    case 'tri-area':     return buildTriArea();
+    case 'law-sines':    return buildSines();
+    case 'law-cosines':  return buildCosines();
+    case 'tri-classify': return buildTriClassify();
+    case 'distance':     return buildDistance();
+    case 'midpoint':     return buildMidpoint();
+    case 'slope':        return buildSlope();
+    case 'line-eq':      return buildLineEq();
+    case 'circle-eq':    return buildCircleEq();
+    case 'circle':       return buildCircle();
+    case 'arc-sector':   return buildArcSector();
+    case 'polygon':      return buildPolygon();
+    case 'trapezoid':    return buildTrapezoid();
+    case 'reg-polygon':  return buildRegPolygon();
+    case 'transform':    return buildTransform(sub);
+    case 'angle-rel':    return buildAngleRel();
+    case 'angle-elev':   return buildAngleElev();
+    case 'poly-angles':  return buildPolyAngles();
+    case 'angle-conv':   return buildAngleConv();
+    default: return '<div class="callout info">🚧 Coming soon!</div>';
+  }
+}
+
+function initTool(id, sub) {
+  switch(id) {
+    case 'pythagorean':  initPyth(); break;
+    case 'special':      initSpecial(); break;
+    case 'sohcahtoa':    initSOH(); break;
+    case 'tri-area':     initTriArea(); break;
+    case 'law-sines':    initSines(); break;
+    case 'law-cosines':  initCosines(); break;
+    case 'tri-classify': initTriClassify(); break;
+    case 'distance':     initDistance(); break;
+    case 'midpoint':     initMidpoint(); break;
+    case 'slope':        initSlope(); break;
+    case 'line-eq':      initLineEq(); break;
+    case 'circle-eq':    initCircleEq(); break;
+    case 'circle':       initCircle('basic'); break;
+    case 'arc-sector':   initCircle('arc'); break;
+    case 'polygon':      initPolygon('rect'); break;
+    case 'trapezoid':    drawTrap(); break;
+    case 'reg-polygon':  initRegPolygon(); break;
+    case 'transform':    initTransform(sub || 'reflection'); break;
+    case 'angle-rel':    initAngleRel(); break;
+    case 'angle-elev':   initAngleElev(); break;
+    case 'poly-angles':  initPolyAngles(); break;
+    case 'angle-conv':   initAngleConv(); break;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// PYTHAGOREAN THEOREM
+// ══════════════════════════════════════════════════════
+function buildPythagorean() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info">📐 <strong>a² + b² = c²</strong> — Enter any 2 values. Leave the unknown blank.</div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="pyth-c" width="480" height="260"></canvas></div>
+      <div class="anim-bar">
+        <button class="anim-btn" onclick="animPyth()">▶ Animate</button>
+        <button class="anim-btn" onclick="initPyth()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="pyth-prog"></div></div>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Leg A</div><input type="number" id="pa" placeholder="a" min="0"></div>
+        <div class="field"><div class="field-lbl">Leg B</div><input type="number" id="pb" placeholder="b" min="0"></div>
+        <div class="field"><div class="field-lbl">Hypotenuse C</div><input type="number" id="pc" placeholder="c" min="0"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcPyth()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div class="fmt-toggle">
+        <button class="fmt-btn active" id="pf-dec" onclick="setPFmt('dec')">Decimal</button>
+        <button class="fmt-btn" id="pf-rad" onclick="setPFmt('rad')">Radical</button>
+        <button class="fmt-btn" id="pf-frac" onclick="setPFmt('frac')">Fraction</button>
+      </div>
+      <div id="pyth-res"><div style="color:var(--text3);font-size:.76rem;">Enter 2 values and calculate.</div></div>
+      <div class="steps-wrap" id="pyth-steps-wrap" style="display:none;">
+        <div class="steps-lbl">Step-by-Step</div>
+        <div id="pyth-steps"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+let pFmt = 'dec', pData = null, pAnim = null, pPct = 0;
+
+function initPyth() {
+  if(pAnim) cancelAnimationFrame(pAnim);
+  pPct = 0; drawPyth(0);
+}
+
+function drawPyth(pct) {
+  const c = ctx('pyth-c'); if(!c) return;
+  const W=480, H=260;
+  clrCanvas(c, W, H); drawGrid(c, W, H);
+  const a = pData?.a||3, b = pData?.b||4, ch = pData?.c||5;
+  const maxS = Math.min((W-120)/(b||1), (H-80)/(a||1), 55);
+  const S = Math.min(maxS, 55);
+  const bx=80, by=H-50;
+  const P1={x:bx,y:by}, P2={x:bx+b*S,y:by}, P3={x:bx,y:by-a*S};
+
+  const tp = Math.min(1, pct * 3);   // triangle draws fast
+  const sp = Math.max(0, (pct-0.35) / 0.65); // squares after
+
+  // Squares on sides (OUTSIDE triangle - not overlapping)
+  if(sp > 0) {
+    const sq_a = Math.min(1, sp * 1.5);
+    // Square on side A (left side) - drawn to the LEFT of leg a
+    c.fillStyle = `rgba(153,102,255,${0.18*sq_a})`;
+    c.strokeStyle = `rgba(153,102,255,${0.55*sq_a})`;
+    c.lineWidth = 1.5;
+    const aLen = a*S*sq_a;
+    c.beginPath();
+    c.moveTo(P1.x, P1.y);
+    c.lineTo(P1.x - aLen, P1.y);
+    c.lineTo(P1.x - aLen, P1.y - a*S*sq_a);
+    c.lineTo(P1.x, P1.y - a*S*sq_a);
+    c.closePath(); c.fill(); c.stroke();
+    if(sq_a>0.7){c.fillStyle=`rgba(153,102,255,${sq_a*0.9})`;c.font='bold 11px Outfit';c.textAlign='center';c.fillText('a²',P1.x-aLen/2,P1.y-a*S*sq_a/2);}
+
+    // Square on side B (bottom) - drawn BELOW leg b
+    c.fillStyle = `rgba(68,136,255,${0.18*sq_a})`;
+    c.strokeStyle = `rgba(68,136,255,${0.55*sq_a})`;
+    c.beginPath();
+    c.moveTo(P1.x, P1.y);
+    c.lineTo(P2.x, P2.y);
+    c.lineTo(P2.x, P2.y + b*S*sq_a);
+    c.lineTo(P1.x, P1.y + b*S*sq_a);
+    c.closePath(); c.fill(); c.stroke();
+    if(sq_a>0.7){c.fillStyle=`rgba(68,136,255,${sq_a*0.9})`;c.font='bold 11px Outfit';c.textAlign='center';c.fillText('b²',(P1.x+P2.x)/2,P1.y+b*S*sq_a/2);}
+  }
+  if(sp > 0.3) {
+    const sq_c = Math.min(1, (sp-0.3)/0.7);
+    // Square on hypotenuse - ALWAYS outside triangle
+    // Vector from P3 to P2
+    const dx = P2.x-P3.x, dy = P2.y-P3.y;
+    const len = Math.sqrt(dx*dx+dy*dy);
+    // Two possible perpendicular directions
+    let nx = -dy/len, ny = dx/len;
+    // Triangle interior point is P1. Check which side P1 is on.
+    // If dot((P1-P3), normal) > 0, normal points toward P1, so flip it
+    const d1x=P1.x-P3.x, d1y=P1.y-P3.y;
+    if(d1x*nx+d1y*ny > 0) { nx=-nx; ny=-ny; }
+    c.fillStyle = `rgba(61,184,112,${0.18*sq_c})`;
+    c.strokeStyle = `rgba(61,184,112,${0.55*sq_c})`;
+    c.lineWidth = 1.5;
+    const slen = len * sq_c;
+    c.beginPath();
+    c.moveTo(P2.x, P2.y);
+    c.lineTo(P3.x, P3.y);
+    c.lineTo(P3.x + nx*slen, P3.y + ny*slen);
+    c.lineTo(P2.x + nx*slen, P2.y + ny*slen);
+    c.closePath(); c.fill(); c.stroke();
+    // label c²
+    if(sq_c > 0.7) {
+      const mx=(P2.x+P3.x)/2+nx*slen*0.55, my=(P2.y+P3.y)/2+ny*slen*0.55;
+      c.fillStyle=`rgba(61,184,112,${sq_c*0.9})`;c.font='bold 11px Outfit';c.textAlign='center';
+      c.fillText('c²',mx,my);
+    }
+  }
+
+  // Triangle
+  c.fillStyle = 'rgba(61,184,112,0.1)';
+  c.strokeStyle = '#3db870'; c.lineWidth = 2.5;
+  c.beginPath();
+  c.moveTo(P1.x, P1.y);
+  if(tp > 0) c.lineTo(P1.x + (P2.x-P1.x)*Math.min(1,tp*2), P1.y);
+  if(tp > 0.5) c.lineTo(P3.x, P3.y-(P3.y-P1.y)*(1-(tp-0.5)*2));
+  if(tp >= 1) { c.closePath(); c.fill(); }
+  c.stroke();
+
+  // Right angle box
+  if(tp >= 1) {
+    const sq=12; c.strokeStyle='rgba(61,184,112,0.7)'; c.lineWidth=1.5;
+    c.beginPath(); c.moveTo(P1.x+sq,P1.y); c.lineTo(P1.x+sq,P1.y-sq); c.lineTo(P1.x,P1.y-sq); c.stroke();
+  }
+
+  // Labels
+  if(tp > 0.5) {
+    c.fillStyle='#f0f0f8'; c.font='bold 13px Outfit'; c.textAlign='center';
+    c.fillText('a='+R(a), P3.x-28, (P1.y+P3.y)/2);
+    c.fillText('b='+R(b), (P1.x+P2.x)/2, P2.y+18);
+  }
+  if(tp >= 1) {
+    c.fillStyle='#3db870'; c.font='bold 14px Outfit';
+    c.fillText('c='+R(ch), (P2.x+P3.x)/2+22, (P2.y+P3.y)/2-10);
+    // Angle labels
+    c.fillStyle='#e89020'; c.font='12px Outfit';
+    const angA = Math.atan2(b,a)*180/Math.PI;
+    const angB = 90-angA;
+    c.fillText(R(angA)+'°', P1.x+30, P1.y-12);
+    c.fillText(R(angB)+'°', P2.x-28, P2.y-14);
+    c.fillText('90°', P1.x-20, P1.y-18);
+  }
+
+  document.getElementById('pyth-prog') && (document.getElementById('pyth-prog').style.width=(pct*100)+'%');
+}
+
+function animPyth() {
+  if(pAnim) cancelAnimationFrame(pAnim);
+  pPct = 0;
+  const step = () => { pPct = Math.min(1, pPct+0.011); drawPyth(pPct); if(pPct<1) pAnim=requestAnimationFrame(step); };
+  step();
+}
+
+function setPFmt(f) {
+  pFmt=f;
+  ['dec','rad','frac'].forEach(x => document.getElementById('pf-'+x)?.classList.toggle('active', x===f));
+  if(pData) showPythResults(pData);
+}
+
+function calcPyth() {
+  const a=parseFloat(document.getElementById('pa').value);
+  const b=parseFloat(document.getElementById('pb').value);
+  const ch=parseFloat(document.getElementById('pc').value);
+  const res=document.getElementById('pyth-res');
+  const aK=!isNaN(a)&&a>0, bK=!isNaN(b)&&b>0, cK=!isNaN(ch)&&ch>0;
+
+  let ra,rb,rc,solved='';
+  if(aK&&bK&&!cK) { ra=a;rb=b;rc=Math.sqrt(a*a+b*b);solved='c'; }
+  else if(aK&&!bK&&cK) {
+    if(ch<=a){res.innerHTML='<div class="callout red">⚠ Hypotenuse must be greater than leg a!</div>';return;}
+    ra=a;rc=ch;rb=Math.sqrt(ch*ch-a*a);solved='b';
+  }
+  else if(!aK&&bK&&cK) {
+    if(ch<=b){res.innerHTML='<div class="callout red">⚠ Hypotenuse must be greater than leg b!</div>';return;}
+    rb=b;rc=ch;ra=Math.sqrt(ch*ch-b*b);solved='a';
+  }
+  else if(aK&&bK&&cK) {
+    if(Math.abs(a*a+b*b-ch*ch)>0.01) { res.innerHTML='<div class="callout amber">⚠ These values don\'t satisfy a²+b²=c². Check your inputs.</div>'; return; }
+    ra=a;rb=b;rc=ch;
+  }
+  else { res.innerHTML='<div class="callout red">⚠ Enter at least 2 values.</div>'; return; }
+
+  if(ra<=0||rb<=0){res.innerHTML='<div class="callout red">⚠ Side lengths must be positive.</div>';return;}
+  pData={a:ra,b:rb,c:rc,solved};
+  // update inputs
+  ['pa','pb','pc'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.value=[ra,rb,rc][i].toFixed(SETTINGS.rounding);
+    el.className=el.className.replace(/solved|err/g,'').trim();
+    if(['a','b','c'][i]===solved) el.classList.add('solved');
+  });
+  showPythResults(pData);
+  animPyth();
+}
+
+function showPythResults({a,b,c,solved}) {
+  const fmt=v=>pFmt==='rad'?toRadical(v):pFmt==='frac'?toFraction(v):R(v);
+  const angA=Math.atan2(a,b)*180/Math.PI, angB=90-angA;
+  document.getElementById('pyth-res').innerHTML=`
+    <div class="res-row"><span class="res-name">Leg A</span><span class="res-val ${solved==='a'?'hi':''}">${fmt(a)}</span></div>
+    <div class="res-row"><span class="res-name">Leg B</span><span class="res-val ${solved==='b'?'hi':''}">${fmt(b)}</span></div>
+    <div class="res-row"><span class="res-name">Hypotenuse C</span><span class="res-val ${solved==='c'?'hi':''}">${fmt(c)}</span></div>
+    <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(a+b+c)}</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(0.5*a*b)}</span></div>
+    <div class="res-row"><span class="res-name">Angle A</span><span class="res-val">${R(angA)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle B</span><span class="res-val">${R(angB)}°</span></div>`;
+  const sw=document.getElementById('pyth-steps-wrap');sw.style.display='block';
+  document.getElementById('pyth-steps').innerHTML=mkSteps([
+    {t:'Start with <strong>Pythagorean Theorem</strong>',m:'a² + b² = c²'},
+    {t:`Substitute known values`,m:`${R(a)}² + ${R(b)}² = c²`},
+    {t:'Square each leg',m:`${R(a*a)} + ${R(b*b)} = ${R(a*a+b*b)}`},
+    {t:'Take the square root',m:`c = √${R(a*a+b*b)} = ${toRadical(c)} ≈ ${R(c)}`},
+  ]);
+}
+
+// ══════════════════════════════════════════════════════
+// SPECIAL RIGHT TRIANGLES
+// ══════════════════════════════════════════════════════
+function buildSpecial() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="choose-grid">
+        <div class="cc active" id="srt45" onclick="selectSRT('45')">
+          <div class="cc-icon">🔺</div><div class="cc-name">45-45-90</div>
+          <div class="cc-formula">Ratio: 1 : 1 : √2</div>
+        </div>
+        <div class="cc" id="srt30" onclick="selectSRT('30')">
+          <div class="cc-icon">🔺</div><div class="cc-name">30-60-90</div>
+          <div class="cc-formula">Ratio: 1 : √3 : 2</div>
+        </div>
+      </div>
+      <div class="canvas-wrap" style="height:240px;"><canvas id="srt-c" width="480" height="240"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animSRT()">▶ Animate</button>
+        <button class="anim-btn" onclick="initSpecial()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="srt-prog"></div></div>
+      </div>
+      <div style="height:12px;"></div>
+      <div id="srt-inputs"></div>
+      <button class="btn btn-g btn-full" onclick="calcSRT()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="srt-res"><div style="color:var(--text3);font-size:.76rem;">Select a type, enter a value, calculate.</div></div>
+      <div class="steps-wrap" id="srt-steps-wrap" style="display:none;">
+        <div class="steps-lbl">Step-by-Step</div>
+        <div id="srt-steps"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+let srtType='45', srtAnim=null, srtPct=0;
+
+function initSpecial() {
+  // Always populate inputs for the current type first, then draw
+  selectSRT(srtType || '45');
+}
+
+function selectSRT(type) {
+  srtType=type;
+  document.getElementById('srt45')?.classList.toggle('active',type==='45');
+  document.getElementById('srt30')?.classList.toggle('active',type==='30');
+  const inp=document.getElementById('srt-inputs');
+  if(!inp) return;
+  if(type==='45') {
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Enter <strong>any one</strong> value — leg or hypotenuse.</div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">Leg (x)</div><input type="number" id="srt-leg" placeholder="x" min="0"></div>
+        <div class="field"><div class="field-lbl">Hypotenuse (x√2)</div><input type="number" id="srt-hyp" placeholder="x√2" min="0"></div>
+      </div>`;
+  } else {
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Enter <strong>any one</strong> value — short leg, long leg, or hypotenuse.</div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Short Leg (x) — 30°</div><input type="number" id="srt-s" placeholder="x" min="0"></div>
+        <div class="field"><div class="field-lbl">Long Leg (x√3) — 60°</div><input type="number" id="srt-l" placeholder="x√3" min="0"></div>
+        <div class="field"><div class="field-lbl">Hypotenuse (2x)</div><input type="number" id="srt-h" placeholder="2x" min="0"></div>
+      </div>`;
+  }
+  if(srtAnim) cancelAnimationFrame(srtAnim);
+  srtPct=0;
+  drawSRT(0);
+}
+
+function drawSRT(pct) {
+  const c=ctx('srt-c'); if(!c) return;
+  const W=480,H=240; clrCanvas(c,W,H); drawGrid(c,W,H);
+  if(srtType==='45') {
+    const side=140, bx=100, by=H-45;
+    const p=pct;
+    c.fillStyle='rgba(61,184,112,0.1)'; c.strokeStyle='#3db870'; c.lineWidth=2.5;
+    c.beginPath(); c.moveTo(bx,by);
+    c.lineTo(bx+side*Math.min(1,p*2), by);
+    if(p>0.5) { c.lineTo(bx, by-side*Math.min(1,(p-0.5)*2)); }
+    if(p>=1) { c.closePath(); c.fill(); }
+    c.stroke();
+    // right angle
+    if(p>=1) {
+      const sq=12; c.strokeStyle='rgba(61,184,112,0.7)'; c.lineWidth=1.5;
+      c.beginPath(); c.moveTo(bx+sq,by); c.lineTo(bx+sq,by-sq); c.lineTo(bx,by-sq); c.stroke();
+      // angle arcs
+      c.strokeStyle='#e89020'; c.lineWidth=1.5;
+      c.beginPath(); c.arc(bx+side,by,22,-Math.PI,-(3*Math.PI/4)); c.stroke();
+      c.beginPath(); c.arc(bx,by-side,22,Math.PI/4,Math.PI/2); c.stroke();
+    }
+    if(p>0.3) {
+      c.fillStyle='#9090b8'; c.font='bold 13px Outfit'; c.textAlign='center';
+      c.fillText('x',(bx+bx+side)/2,by+18);
+      c.fillText('x',bx-20,(by+by-side)/2);
+    }
+    if(p>=1) {
+      c.fillStyle='#3db870'; c.font='bold 14px Outfit';
+      c.fillText('x√2', bx+side/2+20, by-side/2-12);
+      c.fillStyle='#e89020'; c.font='12px Outfit';
+      c.fillText('45°',bx+side-28,by-14);
+      c.fillText('45°',bx+14,by-side+22);
+      c.fillText('90°',bx-22,by-14);
+    }
+  } else {
+    // 30-60-90
+    const sh=90, lo=sh*Math.sqrt(3), hy=sh*2;
+    const sc=1.1, bx=80, by=H-45;
+    const p=pct;
+    c.fillStyle='rgba(61,184,112,0.1)'; c.strokeStyle='#3db870'; c.lineWidth=2.5;
+    c.beginPath(); c.moveTo(bx,by);
+    c.lineTo(bx+lo*sc*Math.min(1,p*2),by);
+    if(p>0.5) { c.lineTo(bx, by-sh*sc*Math.min(1,(p-0.5)*2)); }
+    if(p>=1) { c.closePath(); c.fill(); }
+    c.stroke();
+    if(p>=1) {
+      const sq=12; c.strokeStyle='rgba(61,184,112,0.7)'; c.lineWidth=1.5;
+      c.beginPath(); c.moveTo(bx+sq,by); c.lineTo(bx+sq,by-sq); c.lineTo(bx,by-sq); c.stroke();
+    }
+    if(p>0.3) {
+      c.fillStyle='#9090b8'; c.font='bold 13px Outfit'; c.textAlign='center';
+      c.fillText('x√3',(bx+bx+lo*sc)/2,by+18);
+      c.fillText('x',bx-20,(by+by-sh*sc)/2);
+    }
+    if(p>=1) {
+      c.fillStyle='#3db870'; c.font='bold 14px Outfit';
+      c.fillText('2x',bx+lo*sc/2+22,(by+by-sh*sc)/2-15);
+      c.fillStyle='#e89020'; c.font='12px Outfit';
+      c.fillText('60°',bx+16,by-18);
+      c.fillText('30°',bx+lo*sc-30,by-16);
+      c.fillText('90°',bx-22,by-14);
+    }
+  }
+  document.getElementById('srt-prog') && (document.getElementById('srt-prog').style.width=(pct*100)+'%');
+}
+
+function animSRT() {
+  if(srtAnim) cancelAnimationFrame(srtAnim); srtPct=0;
+  const s=()=>{srtPct=Math.min(1,srtPct+0.013);drawSRT(srtPct);if(srtPct<1)srtAnim=requestAnimationFrame(s);};s();
+}
+
+function calcSRT() {
+  const res=document.getElementById('srt-res');
+  const sw=document.getElementById('srt-steps-wrap');
+  if(srtType==='45') {
+    const leg=parseFloat(document.getElementById('srt-leg')?.value);
+    const hyp=parseFloat(document.getElementById('srt-hyp')?.value);
+    let x;
+    if(!isNaN(leg)&&leg>0) x=leg;
+    else if(!isNaN(hyp)&&hyp>0) x=hyp/Math.sqrt(2);
+    else {res.innerHTML='<div class="callout red">⚠ Enter leg or hypotenuse.</div>';return;}
+    const h=x*Math.sqrt(2);
+    res.innerHTML=`
+      <div class="res-row"><span class="res-name">Leg 1 (x)</span><span class="res-val hi">${R(x)}</span></div>
+      <div class="res-row"><span class="res-name">Leg 2 (x)</span><span class="res-val">${R(x)}</span></div>
+      <div class="res-row"><span class="res-name">Hypotenuse (x√2)</span><span class="res-val hi">${R(h)} <small style="color:var(--text3)">(${toRadical(h)})</small></span></div>
+      <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(0.5*x*x)}</span></div>
+      <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(x*(2+Math.sqrt(2)))}</span></div>`;
+    sw.style.display='block';
+    document.getElementById('srt-steps').innerHTML=mkSteps([
+      {t:'<strong>45-45-90</strong> ratio: x : x : x√2',m:`legs are equal; hypotenuse = leg × √2`},
+      {t:`x = ${R(x)}`,m:`hypotenuse = ${R(x)} × √2 = ${R(h)} (${toRadical(h)})`},
+      {t:'Area = ½ × leg × leg',m:`A = ½ × ${R(x)} × ${R(x)} = ${R(0.5*x*x)}`},
+    ]);
+  } else {
+    const sv=parseFloat(document.getElementById('srt-s')?.value);
+    const lv=parseFloat(document.getElementById('srt-l')?.value);
+    const hv=parseFloat(document.getElementById('srt-h')?.value);
+    let x;
+    if(!isNaN(sv)&&sv>0) x=sv;
+    else if(!isNaN(lv)&&lv>0) x=lv/Math.sqrt(3);
+    else if(!isNaN(hv)&&hv>0) x=hv/2;
+    else {res.innerHTML='<div class="callout red">⚠ Enter one value.</div>';return;}
+    const sh=x, lo=x*Math.sqrt(3), hy=2*x;
+    res.innerHTML=`
+      <div class="res-row"><span class="res-name">Short Leg (x) — 30°</span><span class="res-val hi">${R(sh)}</span></div>
+      <div class="res-row"><span class="res-name">Long Leg (x√3) — 60°</span><span class="res-val hi">${R(lo)} <small style="color:var(--text3)">(${toRadical(lo)})</small></span></div>
+      <div class="res-row"><span class="res-name">Hypotenuse (2x)</span><span class="res-val hi">${R(hy)}</span></div>
+      <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(0.5*sh*lo)}</span></div>
+      <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(sh*(3+Math.sqrt(3)))}</span></div>`;
+    sw.style.display='block';
+    document.getElementById('srt-steps').innerHTML=mkSteps([
+      {t:'<strong>30-60-90</strong> ratio: x : x√3 : 2x',m:`short leg × √3 = long leg; short leg × 2 = hypotenuse`},
+      {t:`x (short leg) = ${R(sh)}`,m:`long leg = ${R(sh)} × √3 = ${R(lo)}`},
+      {t:`Hypotenuse = 2 × x`,m:`hyp = 2 × ${R(sh)} = ${R(hy)}`},
+      {t:'Area = ½ × short × long',m:`A = ½ × ${R(sh)} × ${R(lo)} = ${R(0.5*sh*lo)}`},
+    ]);
+  }
+  animSRT();
+}
+
+// ══════════════════════════════════════════════════════
+// SOHCAHTOA
+// ══════════════════════════════════════════════════════
+function buildSOH() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="soh-row">
+        <div class="soh-card" id="sc-sin"><div class="soh-name" style="color:#4488ff">SOH</div><div class="soh-eq">sin θ = Opp/Hyp</div></div>
+        <div class="soh-card" id="sc-cos"><div class="soh-name" style="color:#9966ff">CAH</div><div class="soh-eq">cos θ = Adj/Hyp</div></div>
+        <div class="soh-card" id="sc-tan"><div class="soh-name" style="color:#e89020">TOA</div><div class="soh-eq">tan θ = Opp/Adj</div></div>
+      </div>
+      <div class="canvas-wrap" style="height:240px;"><canvas id="soh-c" width="480" height="240"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animSOH()">▶ Animate</button>
+        <button class="anim-btn" onclick="initSOH()">↺ Reset</button>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="callout info" style="font-size:.76rem;">Enter any 2 known values (angle θ + 1 side, or 2 sides). Leave unknowns blank.</div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">Angle θ (degrees)</div><input type="number" id="soh-ang" placeholder="θ°" min="0" max="90"></div>
+        <div class="field"><div class="field-lbl">Hypotenuse</div><input type="number" id="soh-hyp" placeholder="hyp" min="0"></div>
+        <div class="field"><div class="field-lbl">Opposite Side</div><input type="number" id="soh-opp" placeholder="opp" min="0"></div>
+        <div class="field"><div class="field-lbl">Adjacent Side</div><input type="number" id="soh-adj" placeholder="adj" min="0"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcSOH()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="soh-res"><div style="color:var(--text3);font-size:.76rem;">Enter 2 values and calculate.</div></div>
+      <div class="steps-wrap" id="soh-steps-wrap" style="display:none;">
+        <div class="steps-lbl">Step-by-Step</div>
+        <div id="soh-steps"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+let sohAnim=null, sohPct=0, sohData=null;
+
+function initSOH() {
+  if(sohAnim) cancelAnimationFrame(sohAnim);
+  sohPct=0; drawSOH(0);
+}
+
+function drawSOH(pct) {
+  const c=ctx('soh-c'); if(!c) return;
+  const W=480,H=240; clrCanvas(c,W,H); drawGrid(c,W,H);
+  const theta=(sohData?.theta||35)*Math.PI/180;
+  const hyp=sohData?.hyp||8;
+  const S=28;
+  const bx=80,by=H-40;
+  const adj=hyp*Math.cos(theta)*S, opp=hyp*Math.sin(theta)*S;
+  const P1={x:bx,y:by},P2={x:bx+adj,y:by},P3={x:bx+adj,y:by-opp};
+
+  const tp=Math.min(1,pct*2.5);
+  c.fillStyle='rgba(61,184,112,0.08)'; c.strokeStyle='#3db870'; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(P1.x,P1.y);
+  c.lineTo(P1.x+(P2.x-P1.x)*Math.min(1,tp),P1.y);
+  if(tp>0.4) {
+    c.lineTo(P3.x,P3.y+(P2.y-P3.y)*(1-Math.min(1,(tp-0.4)/0.6)));
+    if(tp>=1) { c.closePath(); c.fill(); }
+  }
+  c.stroke();
+
+  if(pct>0.3) {
+    // right angle box
+    const sq=12; c.strokeStyle='rgba(61,184,112,0.7)'; c.lineWidth=1.5;
+    c.beginPath(); c.moveTo(P2.x-sq,P2.y); c.lineTo(P2.x-sq,P2.y-sq); c.lineTo(P2.x,P2.y-sq); c.stroke();
+    // angle arc at theta
+    c.strokeStyle='#e89020'; c.lineWidth=1.5;
+    c.beginPath(); c.arc(P1.x,P1.y,26,0,-theta,true); c.stroke();
+    c.fillStyle='#e89020'; c.font='12px Outfit'; c.textAlign='left';
+    c.fillText('θ',P1.x+22,P1.y-8);
+  }
+  if(pct>=1) {
+    c.textAlign='center';
+    c.fillStyle='#4488ff'; c.font='bold 13px Outfit';
+    c.fillText('Adj',(P1.x+P2.x)/2,by+18);
+    c.fillStyle='#9966ff';
+    c.fillText('Opp',P3.x+36,(P2.y+P3.y)/2);
+    c.fillStyle='#3db870';
+    const mx=(P1.x+P3.x)/2, my=(P1.y+P3.y)/2;
+    c.fillText('Hyp',mx-20,my-10);
+  }
+}
+
+function animSOH() {
+  if(sohAnim) cancelAnimationFrame(sohAnim); sohPct=0;
+  const s=()=>{sohPct=Math.min(1,sohPct+0.014);drawSOH(sohPct);if(sohPct<1)sohAnim=requestAnimationFrame(s);};s();
+}
+
+function calcSOH() {
+  const angIn=parseFloat(document.getElementById('soh-ang').value);
+  const hypIn=parseFloat(document.getElementById('soh-hyp').value);
+  const oppIn=parseFloat(document.getElementById('soh-opp').value);
+  const adjIn=parseFloat(document.getElementById('soh-adj').value);
+  const aK=!isNaN(angIn)&&angIn>0&&angIn<90;
+  const hK=!isNaN(hypIn)&&hypIn>0;
+  const oK=!isNaN(oppIn)&&oppIn>0;
+  const jK=!isNaN(adjIn)&&adjIn>0;
+  const res=document.getElementById('soh-res');
+  const sw=document.getElementById('soh-steps-wrap');
+
+  const known=[aK,hK,oK,jK].filter(Boolean).length;
+  if(known<2){res.innerHTML='<div class="callout red">⚠ Enter at least 2 values.</div>';return;}
+
+  let theta,hyp,opp,adj,steps=[],method='';
+  if(aK&&hK) {
+    theta=angIn; hyp=hypIn; opp=hyp*Math.sin(theta*Math.PI/180); adj=hyp*Math.cos(theta*Math.PI/180); method='SOH,CAH';
+    steps=[{t:'Using SOH: opp = hyp × sin(θ)',m:`opp = ${R(hyp)} × sin(${R(theta)}°) = ${R(opp)}`},{t:'Using CAH: adj = hyp × cos(θ)',m:`adj = ${R(hyp)} × cos(${R(theta)}°) = ${R(adj)}`}];
+  } else if(aK&&oK) {
+    theta=angIn; opp=oppIn; hyp=opp/Math.sin(theta*Math.PI/180); adj=opp/Math.tan(theta*Math.PI/180); method='SOH';
+    steps=[{t:'SOH: hyp = opp / sin(θ)',m:`hyp = ${R(opp)} / sin(${R(theta)}°) = ${R(hyp)}`},{t:'TOA: adj = opp / tan(θ)',m:`adj = ${R(opp)} / tan(${R(theta)}°) = ${R(adj)}`}];
+  } else if(aK&&jK) {
+    theta=angIn; adj=adjIn; hyp=adj/Math.cos(theta*Math.PI/180); opp=adj*Math.tan(theta*Math.PI/180); method='CAH';
+    steps=[{t:'CAH: hyp = adj / cos(θ)',m:`hyp = ${R(adj)} / cos(${R(theta)}°) = ${R(hyp)}`},{t:'TOA: opp = adj × tan(θ)',m:`opp = ${R(adj)} × tan(${R(theta)}°) = ${R(opp)}`}];
+  } else if(oK&&hK) {
+    opp=oppIn; hyp=hypIn; if(opp>hyp){res.innerHTML='<div class="callout red">⚠ Opposite cannot be larger than hypotenuse.</div>';return;}
+    theta=Math.asin(opp/hyp)*180/Math.PI; adj=Math.sqrt(hyp*hyp-opp*opp); method='SOH';
+    steps=[{t:'SOH: θ = arcsin(opp/hyp)',m:`θ = arcsin(${R(opp)}/${R(hyp)}) = ${R(theta)}°`},{t:'Pythagorean: adj = √(hyp²−opp²)',m:`adj = √(${R(hyp*hyp)}−${R(opp*opp)}) = ${R(adj)}`}];
+  } else if(jK&&hK) {
+    adj=adjIn; hyp=hypIn; if(adj>hyp){res.innerHTML='<div class="callout red">⚠ Adjacent cannot be larger than hypotenuse.</div>';return;}
+    theta=Math.acos(adj/hyp)*180/Math.PI; opp=Math.sqrt(hyp*hyp-adj*adj); method='CAH';
+    steps=[{t:'CAH: θ = arccos(adj/hyp)',m:`θ = arccos(${R(adj)}/${R(hyp)}) = ${R(theta)}°`},{t:'Pythagorean: opp = √(hyp²−adj²)',m:`opp = √(${R(hyp*hyp)}−${R(adj*adj)}) = ${R(opp)}`}];
+  } else if(oK&&jK) {
+    opp=oppIn; adj=adjIn; theta=Math.atan(opp/adj)*180/Math.PI; hyp=Math.sqrt(opp*opp+adj*adj); method='TOA';
+    steps=[{t:'TOA: θ = arctan(opp/adj)',m:`θ = arctan(${R(opp)}/${R(adj)}) = ${R(theta)}°`},{t:'Pythagorean: hyp = √(opp²+adj²)',m:`hyp = ${R(hyp)}`}];
+  } else {
+    res.innerHTML='<div class="callout red">⚠ Cannot determine unique solution from these inputs.</div>';return;
+  }
+
+  // highlight SOHCAHTOA cards
+  ['sc-sin','sc-cos','sc-tan'].forEach(id=>document.getElementById(id)?.classList.remove('lit'));
+  if(method.includes('SOH')) document.getElementById('sc-sin')?.classList.add('lit');
+  if(method.includes('CAH')) document.getElementById('sc-cos')?.classList.add('lit');
+  if(method.includes('TOA')) document.getElementById('sc-tan')?.classList.add('lit');
+
+  sohData={theta,hyp,opp,adj};
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Angle θ</span><span class="res-val hi">${R(theta)}°</span></div>
+    <div class="res-row"><span class="res-name">Other Angle</span><span class="res-val">${R(90-theta)}°</span></div>
+    <div class="res-row"><span class="res-name">Opposite</span><span class="res-val">${R(opp)}</span></div>
+    <div class="res-row"><span class="res-name">Adjacent</span><span class="res-val">${R(adj)}</span></div>
+    <div class="res-row"><span class="res-name">Hypotenuse</span><span class="res-val hi">${R(hyp)}</span></div>
+    <div class="res-row"><span class="res-name">sin θ</span><span class="res-val">${R(Math.sin(theta*Math.PI/180))}</span></div>
+    <div class="res-row"><span class="res-name">cos θ</span><span class="res-val">${R(Math.cos(theta*Math.PI/180))}</span></div>
+    <div class="res-row"><span class="res-name">tan θ</span><span class="res-val">${R(Math.tan(theta*Math.PI/180))}</span></div>`;
+  sw.style.display='block';
+  document.getElementById('soh-steps').innerHTML=mkSteps(steps);
+  animSOH();
+}
+
+// ══════════════════════════════════════════════════════
+// TRIANGLE AREA
+// ══════════════════════════════════════════════════════
+function buildTriArea() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setTriAreaMode('bh',this)">½ base × height</button>
+        <button class="mode-tab" onclick="setTriAreaMode('heron',this)">Heron's Formula</button>
+        <button class="mode-tab" onclick="setTriAreaMode('sas',this)">SAS (trig)</button>
+      </div>
+      <div class="canvas-wrap" style="height:220px;"><canvas id="triarea-c" width="480" height="220"></canvas></div>
+      <div style="height:12px;"></div>
+      <div id="triarea-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcTriArea()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="triarea-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="triarea-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="triarea-steps"></div></div>
+    </div>
+  </div>`;
+}
+
+let triAreaMode='bh';
+function setTriAreaMode(m,btn) {
+  triAreaMode=m;
+  document.querySelectorAll('#pg-tool .mode-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const inp=document.getElementById('triarea-inp'); if(!inp) return;
+  if(m==='bh') {
+    inp.innerHTML=`<div class="row2"><div class="field"><div class="field-lbl">Base (b)</div><input type="number" id="ta-b" placeholder="b" min="0"></div><div class="field"><div class="field-lbl">Height (h)</div><input type="number" id="ta-h" placeholder="h" min="0"></div></div>`;
+  } else if(m==='heron') {
+    inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Side a</div><input type="number" id="ta-a" placeholder="a" min="0"></div><div class="field"><div class="field-lbl">Side b</div><input type="number" id="ta-bb" placeholder="b" min="0"></div><div class="field"><div class="field-lbl">Side c</div><input type="number" id="ta-c" placeholder="c" min="0"></div></div>`;
+  } else {
+    inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Side a</div><input type="number" id="ta-sa" placeholder="a" min="0"></div><div class="field"><div class="field-lbl">Side b</div><input type="number" id="ta-sb" placeholder="b" min="0"></div><div class="field"><div class="field-lbl">Included Angle C (°)</div><input type="number" id="ta-C" placeholder="C°" min="0"></div></div>`;
+  }
+  drawTriAreaCanvas();
+}
+function initTriArea() {
+  const btn=document.querySelector('#pg-tool .mode-tab');
+  if(btn) setTriAreaMode('bh',btn);
+}
+function drawTriAreaCanvas() {
+  const c=ctx('triarea-c'); if(!c) return;
+  const W=480,H=220; clrCanvas(c,W,H); drawGrid(c,W,H);
+  c.fillStyle='rgba(61,184,112,0.1)'; c.strokeStyle='#3db870'; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(80,H-40); c.lineTo(380,H-40); c.lineTo(200,H-190); c.closePath(); c.fill(); c.stroke();
+  c.setLineDash([4,4]); c.strokeStyle='rgba(68,136,255,0.5)'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(200,H-40); c.lineTo(200,H-190); c.stroke(); c.setLineDash([]);
+  c.fillStyle='#4488ff'; c.font='13px Outfit'; c.textAlign='center'; c.fillText('h',214,(H-40+H-190)/2);
+  c.fillStyle='#9090b8'; c.fillText('b',(80+380)/2,H-24);
+}
+function calcTriArea() {
+  const res=document.getElementById('triarea-res'); const sw=document.getElementById('triarea-sw');
+  let area, steps=[];
+  if(triAreaMode==='bh') {
+    const b=parseFloat(document.getElementById('ta-b')?.value), h=parseFloat(document.getElementById('ta-h')?.value);
+    if(isNaN(b)||b<=0||isNaN(h)||h<=0){res.innerHTML='<div class="callout red">⚠ Enter positive base and height.</div>';return;}
+    area=0.5*b*h; steps=[{t:'Formula: A = ½ × b × h',m:`A = ½ × ${R(b)} × ${R(h)} = ${R(area)}`}];
+  } else if(triAreaMode==='heron') {
+    const a=parseFloat(document.getElementById('ta-a')?.value),b=parseFloat(document.getElementById('ta-bb')?.value),c2=parseFloat(document.getElementById('ta-c')?.value);
+    if([a,b,c2].some(v=>isNaN(v)||v<=0)){res.innerHTML='<div class="callout red">⚠ Enter all three sides.</div>';return;}
+    if(a+b<=c2||a+c2<=b||b+c2<=a){res.innerHTML='<div class="callout red">⚠ Triangle Inequality violated — these sides cannot form a triangle!</div>';return;}
+    const s=(a+b+c2)/2; area=Math.sqrt(s*(s-a)*(s-b)*(s-c2));
+    steps=[{t:'Semi-perimeter s = (a+b+c)/2',m:`s = (${R(a)}+${R(b)}+${R(c2)})/2 = ${R(s)}`},{t:"Heron's formula",m:`A = √(s·(s-a)·(s-b)·(s-c)) = ${R(area)}`}];
+  } else {
+    const a=parseFloat(document.getElementById('ta-sa')?.value),b=parseFloat(document.getElementById('ta-sb')?.value),C=parseFloat(document.getElementById('ta-C')?.value);
+    if([a,b,C].some(v=>isNaN(v)||v<=0)){res.innerHTML='<div class="callout red">⚠ Enter two sides and included angle.</div>';return;}
+    area=0.5*a*b*Math.sin(C*Math.PI/180);
+    steps=[{t:'SAS formula: A = ½ × a × b × sin(C)',m:`A = ½ × ${R(a)} × ${R(b)} × sin(${R(C)}°) = ${R(area)}`}];
+  }
+  res.innerHTML=`<div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div>`;
+  sw.style.display='block'; document.getElementById('triarea-steps').innerHTML=mkSteps(steps);
+}
+
+// ══════════════════════════════════════════════════════
+// LAW OF SINES
+// ══════════════════════════════════════════════════════
+function buildSines() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">📐 <strong>a/sin(A) = b/sin(B) = c/sin(C)</strong><br>Need at least one side+opposite angle pair, plus one more value.</div>
+      <div class="canvas-wrap" style="height:220px;"><canvas id="sins-c" width="480" height="220"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Side a</div><input type="number" id="si-a" placeholder="a"></div>
+        <div class="field"><div class="field-lbl">Side b</div><input type="number" id="si-b" placeholder="b"></div>
+        <div class="field"><div class="field-lbl">Side c</div><input type="number" id="si-c" placeholder="c"></div>
+        <div class="field"><div class="field-lbl">Angle A (°)</div><input type="number" id="si-A" placeholder="A°"></div>
+        <div class="field"><div class="field-lbl">Angle B (°)</div><input type="number" id="si-B" placeholder="B°"></div>
+        <div class="field"><div class="field-lbl">Angle C (°)</div><input type="number" id="si-C" placeholder="C°"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcSines()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="sins-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="sins-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="sins-steps"></div></div>
+    </div>
+  </div>`;
+}
+function initSines() { drawTriOnCanvas('sins-c', null); }
+function drawTriOnCanvas(canvasId, data) {
+  const c=ctx(canvasId); if(!c) return;
+  const W=480,H=220; clrCanvas(c,W,H); drawGrid(c,W,H);
+  if(!data) { c.strokeStyle='rgba(85,85,112,0.4)'; c.lineWidth=1.5; c.setLineDash([5,5]); c.beginPath(); c.moveTo(80,H-45); c.lineTo(380,H-45); c.lineTo(200,H-180); c.closePath(); c.stroke(); c.setLineDash([]); return; }
+  const {a,b,c:cv,A,B,C}=data;
+  const sc=Math.min(200/Math.max(a,b,cv),22);
+  const bx=90,by=H-40;
+  const Ar=A*Math.PI/180;
+  const Cx=bx+cv*sc, Cy=by;
+  const Ax=bx+b*Math.cos(Ar)*sc, Ay=by-b*Math.sin(Ar)*sc;
+  c.fillStyle='rgba(61,184,112,0.09)'; c.strokeStyle='#3db870'; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(bx,by); c.lineTo(Cx,Cy); c.lineTo(Ax,Ay); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='#9090b8'; c.font='12px Outfit'; c.textAlign='center';
+  c.fillText('c='+R(cv),(bx+Cx)/2,by+16);
+  c.fillText('b='+R(b),(bx+Ax)/2-12,(by+Ay)/2);
+  c.fillStyle='#3db870'; c.fillText('a='+R(a),(Cx+Ax)/2+12,(Cy+Ay)/2);
+  c.fillStyle='#e89020'; c.font='11px Outfit';
+  c.fillText('A='+R(A)+'°',bx+22,by-14);
+  c.fillText('B='+R(B)+'°',Cx-30,Cy-14);
+  c.fillText('C='+R(C)+'°',Ax,Ay-14);
+}
+function calcSines() {
+  let a=parseFloat(document.getElementById('si-a').value)||null;
+  let b=parseFloat(document.getElementById('si-b').value)||null;
+  let cv=parseFloat(document.getElementById('si-c').value)||null;
+  let A=parseFloat(document.getElementById('si-A').value)||null;
+  let B=parseFloat(document.getElementById('si-B').value)||null;
+  let C=parseFloat(document.getElementById('si-C').value)||null;
+  const res=document.getElementById('sins-res'); const sw=document.getElementById('sins-sw');
+  const steps=[];
+
+  // Fill angles if possible
+  const angCount=[A,B,C].filter(v=>v!==null).length;
+  if(angCount===2){if(!A)A=180-B-C;else if(!B)B=180-A-C;else C=180-A-B;}
+
+  // Use law of sines to fill sides
+  // Find a side-angle pair
+  let ratio=null;
+  if(a&&A) ratio=a/Math.sin(A*Math.PI/180);
+  else if(b&&B) ratio=b/Math.sin(B*Math.PI/180);
+  else if(cv&&C) ratio=cv/Math.sin(C*Math.PI/180);
+
+  if(ratio===null){res.innerHTML='<div class="callout red">⚠ Need at least one side AND its opposite angle pair.</div>';return;}
+  
+  if(!a&&A){a=ratio*Math.sin(A*Math.PI/180);steps.push({t:'Law of Sines: a = ratio × sin(A)',m:`a = ${R(ratio)} × sin(${R(A)}°) = ${R(a)}`});}
+  if(!b&&B){b=ratio*Math.sin(B*Math.PI/180);steps.push({t:'Law of Sines: b = ratio × sin(B)',m:`b = ${R(ratio)} × sin(${R(B)}°) = ${R(b)}`});}
+  if(!cv&&C){cv=ratio*Math.sin(C*Math.PI/180);steps.push({t:'Law of Sines: c = ratio × sin(C)',m:`c = ${R(ratio)} × sin(${R(C)}°) = ${R(cv)}`});}
+  if(!A&&a){A=Math.asin(a/ratio)*180/Math.PI;}
+  if(!B&&b){B=Math.asin(b/ratio)*180/Math.PI;}
+  if(!C&&cv){C=Math.asin(cv/ratio)*180/Math.PI;}
+  // fill remaining angle
+  if(!A)A=180-B-C;if(!B)B=180-A-C;if(!C)C=180-A-B;
+
+  if(!a||!b||!cv||A+B+C<179){res.innerHTML='<div class="callout amber">⚠ Could not fully solve. Add more known values.</div>';return;}
+
+  const area=0.5*a*b*Math.sin(C*Math.PI/180);
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Side a</span><span class="res-val hi">${R(a)}</span></div>
+    <div class="res-row"><span class="res-name">Side b</span><span class="res-val hi">${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Side c</span><span class="res-val hi">${R(cv)}</span></div>
+    <div class="res-row"><span class="res-name">Angle A</span><span class="res-val">${R(A)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle B</span><span class="res-val">${R(B)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle C</span><span class="res-val">${R(C)}°</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(area)}</span></div>`;
+  sw.style.display='block'; document.getElementById('sins-steps').innerHTML=mkSteps(steps.length?steps:[{t:'Used a/sin(A) = b/sin(B) = c/sin(C)',m:`ratio = ${R(ratio)}`}]);
+  drawTriOnCanvas('sins-c',{a,b,c:cv,A,B,C});
+}
+
+// ══════════════════════════════════════════════════════
+// LAW OF COSINES
+// ══════════════════════════════════════════════════════
+function buildCosines() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">📐 <strong>c² = a² + b² − 2ab·cos(C)</strong><br>Enter SSS (3 sides) or SAS (2 sides + included angle).</div>
+      <div class="canvas-wrap" style="height:220px;"><canvas id="cosin-c" width="480" height="220"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Side a</div><input type="number" id="co-a" placeholder="a"></div>
+        <div class="field"><div class="field-lbl">Side b</div><input type="number" id="co-b" placeholder="b"></div>
+        <div class="field"><div class="field-lbl">Side c</div><input type="number" id="co-c" placeholder="c"></div>
+        <div class="field"><div class="field-lbl">Angle A (°)</div><input type="number" id="co-A" placeholder="A°"></div>
+        <div class="field"><div class="field-lbl">Angle B (°)</div><input type="number" id="co-B" placeholder="B°"></div>
+        <div class="field"><div class="field-lbl">Angle C (°)</div><input type="number" id="co-C" placeholder="C°"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcCosines()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="cosin-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="cosin-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="cosin-steps"></div></div>
+    </div>
+  </div>`;
+}
+function initCosines() { drawTriOnCanvas('cosin-c',null); }
+function calcCosines() {
+  let a=parseFloat(document.getElementById('co-a').value)||null;
+  let b=parseFloat(document.getElementById('co-b').value)||null;
+  let cv=parseFloat(document.getElementById('co-c').value)||null;
+  let A=parseFloat(document.getElementById('co-A').value)||null;
+  let B=parseFloat(document.getElementById('co-B').value)||null;
+  let C=parseFloat(document.getElementById('co-C').value)||null;
+  const res=document.getElementById('cosin-res'); const sw=document.getElementById('cosin-sw');
+  const steps=[];
+  if(a&&b&&cv&&!A&&!B&&!C) {
+    // SSS
+    A=Math.acos((b*b+cv*cv-a*a)/(2*b*cv))*180/Math.PI;
+    B=Math.acos((a*a+cv*cv-b*b)/(2*a*cv))*180/Math.PI;
+    C=180-A-B;
+    steps.push({t:'SSS: Find A using law of cosines',m:`A = arccos((b²+c²-a²)/(2bc)) = ${R(A)}°`});
+    steps.push({t:'Find B',m:`B = arccos((a²+c²-b²)/(2ac)) = ${R(B)}°`});
+    steps.push({t:'C = 180 - A - B',m:`C = ${R(C)}°`});
+  } else if(a&&b&&C) {
+    cv=Math.sqrt(a*a+b*b-2*a*b*Math.cos(C*Math.PI/180));
+    A=Math.acos((b*b+cv*cv-a*a)/(2*b*cv))*180/Math.PI;
+    B=180-A-C;
+    steps.push({t:'SAS: c² = a²+b²−2ab·cos(C)',m:`c = √(${R(a*a)}+${R(b*b)}−${R(2*a*b*Math.cos(C*Math.PI/180))}) = ${R(cv)}`});
+  } else if(a&&cv&&B) {
+    b=Math.sqrt(a*a+cv*cv-2*a*cv*Math.cos(B*Math.PI/180));
+    A=Math.acos((b*b+cv*cv-a*a)/(2*b*cv))*180/Math.PI;
+    C=180-A-B;
+    steps.push({t:'SAS: b² = a²+c²−2ac·cos(B)',m:`b = ${R(b)}`});
+  } else if(b&&cv&&A) {
+    a=Math.sqrt(b*b+cv*cv-2*b*cv*Math.cos(A*Math.PI/180));
+    B=Math.acos((a*a+cv*cv-b*b)/(2*a*cv))*180/Math.PI;
+    C=180-A-B;
+    steps.push({t:'SAS: a² = b²+c²−2bc·cos(A)',m:`a = ${R(a)}`});
+  } else {
+    res.innerHTML='<div class="callout red">⚠ Enter SSS (3 sides) or SAS (2 sides + included angle).</div>';return;
+  }
+  if(!a||!b||!cv){res.innerHTML='<div class="callout red">⚠ Could not solve with given inputs.</div>';return;}
+  const area=0.5*a*b*Math.sin(C*Math.PI/180);
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Side a</span><span class="res-val hi">${R(a)}</span></div>
+    <div class="res-row"><span class="res-name">Side b</span><span class="res-val hi">${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Side c</span><span class="res-val hi">${R(cv)}</span></div>
+    <div class="res-row"><span class="res-name">Angle A</span><span class="res-val">${R(A)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle B</span><span class="res-val">${R(B)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle C</span><span class="res-val">${R(C)}°</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(area)}</span></div>`;
+  sw.style.display='block'; document.getElementById('cosin-steps').innerHTML=mkSteps(steps);
+  drawTriOnCanvas('cosin-c',{a,b,c:cv,A,B,C});
+}
+
+// ══════════════════════════════════════════════════════
+// TRIANGLE CLASSIFY
+// ══════════════════════════════════════════════════════
+function buildTriClassify() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="canvas-wrap" style="height:220px;"><canvas id="triclass-c" width="480" height="220"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Side a</div><input type="number" id="tc-a" placeholder="a" min="0"></div>
+        <div class="field"><div class="field-lbl">Side b</div><input type="number" id="tc-b" placeholder="b" min="0"></div>
+        <div class="field"><div class="field-lbl">Side c</div><input type="number" id="tc-c" placeholder="c" min="0"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcTriClassify()">Classify ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Classification</div>
+      <div id="triclass-res"><div style="color:var(--text3);font-size:.76rem;">Enter 3 side lengths and classify.</div></div>
+    </div>
+  </div>`;
+}
+function initTriClassify() {
+  const c=ctx('triclass-c'); if(!c) return;
+  const W=480,H=220; clrCanvas(c,W,H); drawGrid(c,W,H);
+  c.strokeStyle='rgba(85,85,112,0.35)'; c.lineWidth=1.5; c.setLineDash([5,5]);
+  c.beginPath(); c.moveTo(80,H-45); c.lineTo(380,H-45); c.lineTo(200,H-185); c.closePath(); c.stroke(); c.setLineDash([]);
+  c.fillStyle='var(--text3)'; c.font='13px Outfit'; c.textAlign='center'; c.fillText('Enter sides to classify',W/2,H/2+5);
+}
+function calcTriClassify() {
+  const a=parseFloat(document.getElementById('tc-a').value),b=parseFloat(document.getElementById('tc-b').value),cv=parseFloat(document.getElementById('tc-c').value);
+  const res=document.getElementById('triclass-res');
+  if([a,b,cv].some(v=>isNaN(v)||v<=0)){res.innerHTML='<div class="callout red">⚠ Enter three positive side lengths.</div>';return;}
+  if(a+b<=cv||a+cv<=b||b+cv<=a){
+    res.innerHTML=`<div class="callout red">⚠ Triangle Inequality Violated!<br>The sum of any two sides must exceed the third.<br>${R(a)}+${R(b)}=${R(a+b)} vs ${R(cv)} — ${a+b>cv?'OK':'FAIL'}</div>`;return;
+  }
+  let typeSide=a===b&&b===cv?'Equilateral':(a===b||b===cv||a===cv)?'Isosceles':'Scalene';
+  const sides=[a,b,cv].sort((x,y)=>x-y);
+  const sq=sides[0]*sides[0]+sides[1]*sides[1],hypsq=sides[2]*sides[2];
+  let typeAngle=Math.abs(sq-hypsq)<0.001*hypsq?'Right':sq<hypsq?'Obtuse':'Acute';
+  const s=(a+b+cv)/2,area=Math.sqrt(s*(s-a)*(s-b)*(s-cv));
+  const A=Math.acos((b*b+cv*cv-a*a)/(2*b*cv))*180/Math.PI;
+  const B=Math.acos((a*a+cv*cv-b*b)/(2*a*cv))*180/Math.PI;
+  const C=180-A-B;
+  res.innerHTML=`
+    <div class="callout green">✅ Valid triangle!</div>
+    <div class="res-row"><span class="res-name">Type (sides)</span><span class="res-val hi">${typeSide}</span></div>
+    <div class="res-row"><span class="res-name">Type (angles)</span><span class="res-val hi">${typeAngle}</span></div>
+    <div class="res-row"><span class="res-name">Angle A</span><span class="res-val">${R(A)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle B</span><span class="res-val">${R(B)}°</span></div>
+    <div class="res-row"><span class="res-name">Angle C</span><span class="res-val">${R(C)}°</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(area)}</span></div>
+    <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(a+b+cv)}</span></div>`;
+  drawTriOnCanvas('triclass-c',{a,b,c:cv,A,B,C});
+}
+
+// ══════════════════════════════════════════════════════
+// DISTANCE
+// ══════════════════════════════════════════════════════
+function buildDistance() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">📍 d = √((x₂−x₁)² + (y₂−y₁)²)</div>
+      <div class="canvas-wrap" style="height:280px;"><canvas id="dist-c" width="480" height="280"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animDist()">▶ Animate</button>
+        <button class="anim-btn" onclick="initDistance()">↺ Reset</button>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">x₁</div><input type="number" id="d-x1" value="1" oninput="drawDistCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₁</div><input type="number" id="d-y1" value="2" oninput="drawDistCanvas()"></div>
+        <div class="field"><div class="field-lbl">x₂</div><input type="number" id="d-x2" value="5" oninput="drawDistCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₂</div><input type="number" id="d-y2" value="6" oninput="drawDistCanvas()"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcDistance()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="dist-res"><div style="color:var(--text3);font-size:.76rem;">Enter coordinates and calculate.</div></div>
+      <div class="steps-wrap" id="dist-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="dist-steps"></div></div>
+    </div>
+  </div>`;
+}
+
+let distAnimId=null;
+function initDistance() { if(distAnimId)cancelAnimationFrame(distAnimId); drawDistCanvas(); }
+function getDistVals(){return[parseFloat(document.getElementById('d-x1')?.value)||1,parseFloat(document.getElementById('d-y1')?.value)||2,parseFloat(document.getElementById('d-x2')?.value)||5,parseFloat(document.getElementById('d-y2')?.value)||6];}
+function drawDistCanvas(animPct=1) {
+  const c=ctx('dist-c'); if(!c) return;
+  const W=480,H=280; clrCanvas(c,W,H);
+  const [x1,y1,x2,y2]=getDistVals();
+  const allVals=[x1,y1,x2,y2];
+  const minV=Math.min(...allVals)-1, maxV=Math.max(...allVals)+1;
+  const range=Math.max(maxV-minV,6);
+  const sc=Math.min((W-60)/range,(H-60)/range,40);
+  const ox=W/2-(x1+x2)/2*sc, oy=H/2+(y1+y2)/2*sc;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  const px1=ox+x1*sc,py1=oy-y1*sc,px2=ox+x2*sc,py2=oy-y2*sc;
+  // dashed legs
+  c.setLineDash([5,4]); c.strokeStyle='rgba(68,136,255,0.55)'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(px1,py1); c.lineTo(px2,py1); c.lineTo(px2,py2); c.stroke(); c.setLineDash([]);
+  // labels on legs
+  c.fillStyle='#4488ff'; c.font='12px Outfit'; c.textAlign='center';
+  c.fillText('Δx='+(x2-x1),(px1+px2)/2,py1+(py2>py1?-8:14));
+  c.textAlign='left';
+  c.fillText('Δy='+(y2-y1),px2+6,(py1+py2)/2);
+  // main line animated
+  c.strokeStyle='#3db870'; c.lineWidth=3;
+  c.beginPath(); c.moveTo(px1,py1); c.lineTo(px1+(px2-px1)*animPct,py1+(py2-py1)*animPct); c.stroke();
+  // points
+  dot(c,px1,py1,5,'#4488ff'); dot(c,px2,py2,5,'#3db870');
+  c.fillStyle='#f0f0f8'; c.font='bold 11px Outfit'; c.textAlign='center';
+  c.fillText(`(${x1},${y1})`,px1,py1-12);
+  c.fillText(`(${x2},${y2})`,px2,py2-12);
+}
+function animDist(){
+  if(distAnimId)cancelAnimationFrame(distAnimId);let p=0;
+  const s=()=>{p=Math.min(1,p+0.018);drawDistCanvas(p);if(p<1)distAnimId=requestAnimationFrame(s);else calcDistance();};s();
+}
+function calcDistance(){
+  const [x1,y1,x2,y2]=getDistVals();
+  const dx=x2-x1,dy=y2-y1,d=Math.sqrt(dx*dx+dy*dy);
+  const res=document.getElementById('dist-res'); const sw=document.getElementById('dist-sw');
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Distance</span><span class="res-val hi">${R(d)} <small style="color:var(--text3)">(${toRadical(d)})</small></span></div>
+    <div class="res-row"><span class="res-name">Δx</span><span class="res-val">${R(dx)}</span></div>
+    <div class="res-row"><span class="res-name">Δy</span><span class="res-val">${R(dy)}</span></div>
+    <div class="res-row"><span class="res-name">Midpoint</span><span class="res-val">(${R((x1+x2)/2)}, ${R((y1+y2)/2)})</span></div>`;
+  sw.style.display='block'; document.getElementById('dist-steps').innerHTML=mkSteps([
+    {t:'d = √((x₂−x₁)² + (y₂−y₁)²)',m:`d = √((${x2}−${x1})²+(${y2}−${y1})²)`},
+    {t:'Square the differences',m:`d = √(${dx}²+${dy}²) = √(${dx*dx}+${dy*dy})`},
+    {t:'Evaluate',m:`d = √${dx*dx+dy*dy} = ${R(d)}`},
+  ]);
+  drawDistCanvas();
+}
+
+// ══════════════════════════════════════════════════════
+// MIDPOINT
+// ══════════════════════════════════════════════════════
+function buildMidpoint() {
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">⚡ M = ((x₁+x₂)/2 , (y₁+y₂)/2)</div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="mid-c" width="480" height="260"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">x₁</div><input type="number" id="m-x1" value="0" oninput="drawMidCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₁</div><input type="number" id="m-y1" value="0" oninput="drawMidCanvas()"></div>
+        <div class="field"><div class="field-lbl">x₂</div><input type="number" id="m-x2" value="6" oninput="drawMidCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₂</div><input type="number" id="m-y2" value="4" oninput="drawMidCanvas()"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcMidpoint()">Find Midpoint ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="mid-res"><div style="color:var(--text3);font-size:.76rem;">Enter coordinates and calculate.</div></div>
+    </div>
+  </div>`;
+}
+function initMidpoint(){drawMidCanvas();}
+function drawMidCanvas(){
+  const c=ctx('mid-c');if(!c)return;
+  const W=480,H=260;clrCanvas(c,W,H);
+  const x1=parseFloat(document.getElementById('m-x1')?.value)||0,y1=parseFloat(document.getElementById('m-y1')?.value)||0;
+  const x2=parseFloat(document.getElementById('m-x2')?.value)||6,y2=parseFloat(document.getElementById('m-y2')?.value)||4;
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  const all=[x1,y1,x2,y2,mx,my];
+  const minV=Math.min(...all)-1,maxV=Math.max(...all)+1,range=Math.max(maxV-minV,6);
+  const sc=Math.min((W-60)/range,(H-60)/range,40);
+  const ox=W/2-(x1+x2)/2*sc,oy=H/2+(y1+y2)/2*sc;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  const px1=ox+x1*sc,py1=oy-y1*sc,px2=ox+x2*sc,py2=oy-y2*sc;
+  const pmx=ox+mx*sc,pmy=oy-my*sc;
+  c.strokeStyle='#3db870';c.lineWidth=2;c.beginPath();c.moveTo(px1,py1);c.lineTo(px2,py2);c.stroke();
+  dot(c,px1,py1,5,'#4488ff');dot(c,px2,py2,5,'#4488ff');dot(c,pmx,pmy,7,'#3db870');
+  c.fillStyle='#f0f0f8';c.font='bold 11px Outfit';c.textAlign='center';
+  c.fillText(`(${x1},${y1})`,px1,py1-12);c.fillText(`(${x2},${y2})`,px2,py2-12);
+  c.fillStyle='#3db870';c.font='bold 12px Outfit';c.fillText(`M(${R(mx)},${R(my)})`,pmx,pmy-12);
+}
+function calcMidpoint(){
+  const x1=parseFloat(document.getElementById('m-x1').value)||0,y1=parseFloat(document.getElementById('m-y1').value)||0;
+  const x2=parseFloat(document.getElementById('m-x2').value)||6,y2=parseFloat(document.getElementById('m-y2').value)||4;
+  document.getElementById('mid-res').innerHTML=`
+    <div class="res-row"><span class="res-name">Midpoint X</span><span class="res-val hi">${R((x1+x2)/2)}</span></div>
+    <div class="res-row"><span class="res-name">Midpoint Y</span><span class="res-val hi">${R((y1+y2)/2)}</span></div>
+    <div class="res-row"><span class="res-name">Full Midpoint</span><span class="res-val">(${R((x1+x2)/2)}, ${R((y1+y2)/2)})</span></div>`;
+  drawMidCanvas();
+}
+
+// ══════════════════════════════════════════════════════
+// SLOPE
+// ══════════════════════════════════════════════════════
+function buildSlope(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">📈 m = (y₂−y₁)/(x₂−x₁) = rise/run</div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="slp-c" width="480" height="260"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">x₁</div><input type="number" id="sl-x1" value="1" oninput="drawSlopeCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₁</div><input type="number" id="sl-y1" value="2" oninput="drawSlopeCanvas()"></div>
+        <div class="field"><div class="field-lbl">x₂</div><input type="number" id="sl-x2" value="5" oninput="drawSlopeCanvas()"></div>
+        <div class="field"><div class="field-lbl">y₂</div><input type="number" id="sl-y2" value="8" oninput="drawSlopeCanvas()"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcSlope()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="slp-res"><div style="color:var(--text3);font-size:.76rem;">Enter coordinates and calculate.</div></div>
+      <div class="steps-wrap" id="slp-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="slp-steps"></div></div>
+    </div>
+  </div>`;
+}
+function initSlope(){drawSlopeCanvas();}
+function drawSlopeCanvas(){
+  const c=ctx('slp-c');if(!c)return;
+  const W=480,H=260;clrCanvas(c,W,H);
+  const x1=parseFloat(document.getElementById('sl-x1')?.value)||1,y1=parseFloat(document.getElementById('sl-y1')?.value)||2;
+  const x2=parseFloat(document.getElementById('sl-x2')?.value)||5,y2=parseFloat(document.getElementById('sl-y2')?.value)||8;
+  const all=[x1,y1,x2,y2];const minV=Math.min(...all)-1,maxV=Math.max(...all)+1,range=Math.max(maxV-minV,6);
+  const sc=Math.min((W-60)/range,(H-60)/range,38);
+  const ox=W/2-(x1+x2)/2*sc,oy=H/2+(y1+y2)/2*sc;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  const px1=ox+x1*sc,py1=oy-y1*sc,px2=ox+x2*sc,py2=oy-y2*sc;
+  c.setLineDash([5,4]);c.strokeStyle='rgba(153,102,255,0.6)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(px1,py1);c.lineTo(px2,py1);c.lineTo(px2,py2);c.stroke();c.setLineDash([]);
+  c.fillStyle='#9966ff';c.font='12px Outfit';c.textAlign='center';
+  c.fillText('run='+(x2-x1),(px1+px2)/2,py1+(y2>y1?14:-6));
+  c.textAlign='left';c.fillText('rise='+(y2-y1),px2+6,(py1+py2)/2);
+  c.strokeStyle='#3db870';c.lineWidth=2.5;c.beginPath();c.moveTo(px1,py1);c.lineTo(px2,py2);c.stroke();
+  dot(c,px1,py1,5,'#4488ff');dot(c,px2,py2,5,'#3db870');
+  c.fillStyle='#f0f0f8';c.font='bold 11px Outfit';c.textAlign='center';
+  c.fillText(`(${x1},${y1})`,px1,py1-12);c.fillText(`(${x2},${y2})`,px2,py2-12);
+}
+function calcSlope(){
+  const x1=parseFloat(document.getElementById('sl-x1').value),y1=parseFloat(document.getElementById('sl-y1').value);
+  const x2=parseFloat(document.getElementById('sl-x2').value),y2=parseFloat(document.getElementById('sl-y2').value);
+  if([x1,y1,x2,y2].some(isNaN)){document.getElementById('slp-res').innerHTML='<div class="callout red">⚠ Enter all 4 coordinates.</div>';return;}
+  const res=document.getElementById('slp-res');const sw=document.getElementById('slp-sw');
+  if(x2===x1){res.innerHTML='<div class="callout amber">⚠ Slope is <strong>undefined</strong> (vertical line).</div>';return;}
+  if(y2===y1){res.innerHTML=`<div class="callout info">Slope = <strong>0</strong> (horizontal line). y = ${R(y1)}</div>`;return;}
+  const m=(y2-y1)/(x2-x1),b=y1-m*x1;
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Slope (m)</span><span class="res-val hi">${R(m)}</span></div>
+    <div class="res-row"><span class="res-name">Direction</span><span class="res-val">${m>0?'↗ Positive':m<0?'↘ Negative':'→ Zero'}</span></div>
+    <div class="res-row"><span class="res-name">y-intercept</span><span class="res-val">${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Slope-Intercept</span><span class="res-val">y = ${R(m)}x + ${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Parallel slope</span><span class="res-val">${R(m)}</span></div>
+    <div class="res-row"><span class="res-name">Perpendicular slope</span><span class="res-val">${R(-1/m)}</span></div>`;
+  sw.style.display='block';document.getElementById('slp-steps').innerHTML=mkSteps([
+    {t:'m = (y₂−y₁)/(x₂−x₁)',m:`m = (${y2}−${y1})/(${x2}−${x1}) = ${y2-y1}/${x2-x1} = ${R(m)}`},
+    {t:'y-intercept: b = y₁−m·x₁',m:`b = ${y1}−${R(m)}×${x1} = ${R(b)}`},
+    {t:'Equation',m:`y = ${R(m)}x + ${R(b)}`},
+  ]);
+  drawSlopeCanvas();
+}
+
+// ══════════════════════════════════════════════════════
+// LINE EQUATION
+// ══════════════════════════════════════════════════════
+function buildLineEq(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setLineMode('two',this)">Two Points</button>
+        <button class="mode-tab" onclick="setLineMode('ps',this)">Point-Slope</button>
+        <button class="mode-tab" onclick="setLineMode('si',this)">Slope-Intercept</button>
+      </div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="line-c" width="480" height="260"></canvas></div>
+      <div style="height:12px;"></div>
+      <div id="line-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcLineEq()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="line-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+    </div>
+  </div>`;
+}
+let lineMode='two';
+function setLineMode(m,btn){
+  lineMode=m;document.querySelectorAll('#pg-tool .mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const inp=document.getElementById('line-inp');if(!inp)return;
+  if(m==='two'){inp.innerHTML=`<div class="row2"><div class="field"><div class="field-lbl">x₁</div><input type="number" id="le-x1" value="1"></div><div class="field"><div class="field-lbl">y₁</div><input type="number" id="le-y1" value="3"></div><div class="field"><div class="field-lbl">x₂</div><input type="number" id="le-x2" value="5"></div><div class="field"><div class="field-lbl">y₂</div><input type="number" id="le-y2" value="11"></div></div>`;}
+  else if(m==='ps'){inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">x₁</div><input type="number" id="le-x1" value="2"></div><div class="field"><div class="field-lbl">y₁</div><input type="number" id="le-y1" value="5"></div><div class="field"><div class="field-lbl">Slope (m)</div><input type="number" id="le-m" value="2"></div></div>`;}
+  else{inp.innerHTML=`<div class="row2"><div class="field"><div class="field-lbl">Slope (m)</div><input type="number" id="le-m" value="2"></div><div class="field"><div class="field-lbl">y-intercept (b)</div><input type="number" id="le-b" value="1"></div></div>`;}
+  drawLineCanvas(0,0);
+}
+function initLineEq(){const btn=document.querySelector('#pg-tool .mode-tab');if(btn)setLineMode('two',btn);}
+function drawLineCanvas(m,b){
+  const c=ctx('line-c');if(!c)return;
+  const W=480,H=260;clrCanvas(c,W,H);
+  const sc=30,ox=W/2,oy=H/2;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  if(m!==undefined&&b!==undefined&&!isNaN(m)){
+    c.strokeStyle='#3db870';c.lineWidth=2.5;
+    c.beginPath();
+    c.moveTo(0,oy-(m*(-ox/sc)+b)*sc);
+    c.lineTo(W,oy-(m*((W-ox)/sc)+b)*sc);
+    c.stroke();
+  }
+}
+function calcLineEq(){
+  const res=document.getElementById('line-res');
+  let m,b,x1,y1;
+  if(lineMode==='two'){
+    x1=parseFloat(document.getElementById('le-x1')?.value)||0;y1=parseFloat(document.getElementById('le-y1')?.value)||0;
+    const x2=parseFloat(document.getElementById('le-x2')?.value)||5,y2=parseFloat(document.getElementById('le-y2')?.value)||11;
+    if(x2===x1){res.innerHTML='<div class="callout amber">⚠ Vertical line: x = '+R(x1)+'</div>';return;}
+    m=(y2-y1)/(x2-x1);b=y1-m*x1;
+  }else if(lineMode==='ps'){
+    x1=parseFloat(document.getElementById('le-x1')?.value)||0;y1=parseFloat(document.getElementById('le-y1')?.value)||0;
+    m=parseFloat(document.getElementById('le-m')?.value)||0;b=y1-m*x1;
+  }else{
+    m=parseFloat(document.getElementById('le-m')?.value)||0;b=parseFloat(document.getElementById('le-b')?.value)||0;x1=0;y1=b;
+  }
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Slope (m)</span><span class="res-val hi">${R(m)}</span></div>
+    <div class="res-row"><span class="res-name">y-intercept</span><span class="res-val">${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Slope-Intercept</span><span class="res-val">y = ${R(m)}x + ${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Standard Form</span><span class="res-val">${R(-m)}x + y = ${R(b)}</span></div>
+    <div class="res-row"><span class="res-name">Point-Slope</span><span class="res-val">y−${R(y1)} = ${R(m)}(x−${R(x1)})</span></div>`;
+  drawLineCanvas(m,b);
+}
+
+// ══════════════════════════════════════════════════════
+// CIRCLE EQUATION
+// ══════════════════════════════════════════════════════
+function buildCircleEq(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">⭕ (x−h)² + (y−k)² = r²</div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="ceq-c" width="480" height="260"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Center h</div><input type="number" id="ceq-h" value="0" oninput="drawCircleEqCanvas()"></div>
+        <div class="field"><div class="field-lbl">Center k</div><input type="number" id="ceq-k" value="0" oninput="drawCircleEqCanvas()"></div>
+        <div class="field"><div class="field-lbl">Radius r</div><input type="number" id="ceq-r" value="3" oninput="drawCircleEqCanvas()"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcCircleEq()">Show Equation ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="ceq-res"><div style="color:var(--text3);font-size:.76rem;">Enter center and radius.</div></div>
+    </div>
+  </div>`;
+}
+function initCircleEq(){drawCircleEqCanvas();}
+function drawCircleEqCanvas(){
+  const c=ctx('ceq-c');if(!c)return;
+  const W=480,H=260;clrCanvas(c,W,H);
+  const h=parseFloat(document.getElementById('ceq-h')?.value)||0;
+  const k=parseFloat(document.getElementById('ceq-k')?.value)||0;
+  const r=parseFloat(document.getElementById('ceq-r')?.value)||3;
+  const sc=Math.min((W-40)/(2*Math.abs(h)+2*r+2),(H-40)/(2*Math.abs(k)+2*r+2),32);
+  const ox=W/2-h*sc,oy=H/2+k*sc;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  c.strokeStyle='#3db870';c.lineWidth=2.5;c.fillStyle='rgba(61,184,112,0.07)';
+  c.beginPath();c.arc(ox+h*sc,oy-k*sc,r*sc,0,Math.PI*2);c.fill();c.stroke();
+  dot(c,ox+h*sc,oy-k*sc,4,'#4488ff');
+  // radius line
+  c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(ox+h*sc,oy-k*sc);c.lineTo(ox+h*sc+r*sc,oy-k*sc);c.stroke();c.setLineDash([]);
+  c.fillStyle='#4488ff';c.font='12px Outfit';c.textAlign='center';c.fillText('r='+R(r),ox+h*sc+r*sc/2,oy-k*sc-8);
+}
+function calcCircleEq(){
+  const h=parseFloat(document.getElementById('ceq-h').value)||0;
+  const k=parseFloat(document.getElementById('ceq-k').value)||0;
+  const r=parseFloat(document.getElementById('ceq-r').value)||3;
+  if(r<=0){document.getElementById('ceq-res').innerHTML='<div class="callout red">⚠ Radius must be positive.</div>';return;}
+  document.getElementById('ceq-res').innerHTML=`
+    <div class="res-row"><span class="res-name">Standard Form</span><span class="res-val hi">(x−${h})²+(y−${k})²=${R(r*r)}</span></div>
+    <div class="res-row"><span class="res-name">Center</span><span class="res-val">(${h}, ${k})</span></div>
+    <div class="res-row"><span class="res-name">Radius</span><span class="res-val">${R(r)}</span></div>
+    <div class="res-row"><span class="res-name">Diameter</span><span class="res-val">${R(2*r)}</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(Math.PI*r*r)}</span></div>
+    <div class="res-row"><span class="res-name">Circumference</span><span class="res-val">${R(2*Math.PI*r)}</span></div>`;
+  drawCircleEqCanvas();
+}
+
+// ══════════════════════════════════════════════════════
+// CIRCLE CALCULATOR
+// ══════════════════════════════════════════════════════
+function buildCircle(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setCircMode('basic',this)">Basic</button>
+        <button class="mode-tab" onclick="setCircMode('arc',this)">Arc & Sector</button>
+        <button class="mode-tab" onclick="setCircMode('chord',this)">Chord</button>
+      </div>
+      <div class="canvas-wrap" style="height:240px;"><canvas id="circ-c" width="480" height="240"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animCircle()">▶ Animate</button>
+        <button class="anim-btn" onclick="resetCircle()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="circ-prog"></div></div>
+      </div>
+      <div style="height:12px;"></div>
+      <div id="circ-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcCircle()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="circ-res"><div style="color:var(--text3);font-size:.76rem;">Enter a value and calculate.</div></div>
+      <div class="steps-wrap" id="circ-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="circ-steps"></div></div>
+    </div>
+  </div>`;
+}
+
+let circMode2='basic', circAnimId2=null, circPct=0;
+function setCircMode(m,btn){
+  circMode2=m;document.querySelectorAll('#pg-tool .mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const inp=document.getElementById('circ-inp');if(!inp)return;
+  if(m==='basic'){
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Enter one value — radius, diameter, area, or circumference.</div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">Radius</div><input type="number" id="ci-r" placeholder="r" min="0"></div>
+        <div class="field"><div class="field-lbl">Diameter</div><input type="number" id="ci-d" placeholder="d" min="0"></div>
+        <div class="field"><div class="field-lbl">Area</div><input type="number" id="ci-a" placeholder="A" min="0"></div>
+        <div class="field"><div class="field-lbl">Circumference</div><input type="number" id="ci-c" placeholder="C" min="0"></div>
+      </div>`;
+  }else if(m==='arc'){
+    inp.innerHTML=`<div class="row2">
+      <div class="field"><div class="field-lbl">Radius (r)</div><input type="number" id="ci-r" placeholder="r" min="0"></div>
+      <div class="field"><div class="field-lbl">Central Angle (°)</div><input type="number" id="ci-ang" placeholder="θ°" min="0" max="360"></div>
+    </div>`;
+  }else{
+    inp.innerHTML=`<div class="row2">
+      <div class="field"><div class="field-lbl">Radius (r)</div><input type="number" id="ci-r" placeholder="r" min="0"></div>
+      <div class="field"><div class="field-lbl">Central Angle (°)</div><input type="number" id="ci-ang2" placeholder="θ°" min="0" max="360"></div>
+    </div>`;
+  }
+  resetCircle();
+}
+function initCircle(mode){
+  const btn=document.querySelector('#pg-tool .mode-tab');
+  if(btn){if(mode==='arc'){const tabs=document.querySelectorAll('#pg-tool .mode-tab');if(tabs[1])setCircMode('arc',tabs[1]);}else setCircMode('basic',btn);}
+}
+function drawCircleCanvas(pct){
+  const c=ctx('circ-c');if(!c)return;
+  const W=480,H=240;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const cx=W/2,cy=H/2,R2=95;
+  c.strokeStyle='#3db870';c.lineWidth=2.5;c.fillStyle='rgba(61,184,112,0.07)';
+  // draw arc up to pct
+  c.beginPath();c.arc(cx,cy,R2,-Math.PI/2,-Math.PI/2+pct*2*Math.PI);
+  if(pct>=1){c.closePath();c.fill();}
+  c.stroke();
+  // center dot
+  dot(c,cx,cy,3,'rgba(68,136,255,0.6)');
+  // radius line
+  c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+R2,cy);c.stroke();c.setLineDash([]);
+  c.fillStyle='#4488ff';c.font='12px Outfit';c.textAlign='center';c.fillText('r',cx+R2/2,cy-8);
+  // sector highlight
+  if(circMode2==='arc'&&pct>=1){
+    const ang=parseFloat(document.getElementById('ci-ang')?.value)||90;
+    c.fillStyle='rgba(153,102,255,0.2)';c.strokeStyle='rgba(153,102,255,0.8)';c.lineWidth=2;
+    c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,R2,-Math.PI/2,-Math.PI/2+ang*Math.PI/180);c.closePath();c.fill();c.stroke();
+  }
+  document.getElementById('circ-prog')&&(document.getElementById('circ-prog').style.width=(pct*100)+'%');
+}
+function animCircle(){if(circAnimId2)cancelAnimationFrame(circAnimId2);circPct=0;const s=()=>{circPct=Math.min(1,circPct+0.013);drawCircleCanvas(circPct);if(circPct<1)circAnimId2=requestAnimationFrame(s);};s();}
+function resetCircle(){if(circAnimId2)cancelAnimationFrame(circAnimId2);circPct=0;drawCircleCanvas(0);}
+
+function calcCircle(){
+  const res=document.getElementById('circ-res');const sw=document.getElementById('circ-sw');
+  if(circMode2==='basic'){
+    let r=parseFloat(document.getElementById('ci-r')?.value);
+    const d=parseFloat(document.getElementById('ci-d')?.value);
+    const area=parseFloat(document.getElementById('ci-a')?.value);
+    const circ=parseFloat(document.getElementById('ci-c')?.value);
+    if(!isNaN(d)&&d>0) r=d/2;
+    else if(!isNaN(area)&&area>0) r=Math.sqrt(area/Math.PI);
+    else if(!isNaN(circ)&&circ>0) r=circ/(2*Math.PI);
+    if(isNaN(r)||r<=0){res.innerHTML='<div class="callout red">⚠ Enter radius, diameter, area, or circumference.</div>';return;}
+    const A=Math.PI*r*r, C=2*Math.PI*r;
+    res.innerHTML=`
+      <div class="res-row"><span class="res-name">Radius</span><span class="res-val hi">${R(r)}</span></div>
+      <div class="res-row"><span class="res-name">Diameter</span><span class="res-val">${R(2*r)}</span></div>
+      <div class="res-row"><span class="res-name">Circumference</span><span class="res-val">${R(C)}</span></div>
+      <div class="res-row"><span class="res-name">Area</span><span class="res-val">${R(A)}</span></div>
+      <div class="res-row"><span class="res-name">Area (exact)</span><span class="res-val">${R(r*r)}π</span></div>`;
+    sw.style.display='block';document.getElementById('circ-steps').innerHTML=mkSteps([
+      {t:'Circumference = 2πr',m:`C = 2π × ${R(r)} = ${R(C)}`},
+      {t:'Area = πr²',m:`A = π × ${R(r)}² = ${R(A)}`},
+    ]);
+  }else if(circMode2==='arc'){
+    const r=parseFloat(document.getElementById('ci-r')?.value);
+    const ang=parseFloat(document.getElementById('ci-ang')?.value);
+    if(isNaN(r)||r<=0||isNaN(ang)||ang<=0){res.innerHTML='<div class="callout red">⚠ Enter radius and central angle.</div>';return;}
+    const arc=r*(ang*Math.PI/180);const sector=0.5*r*r*(ang*Math.PI/180);
+    res.innerHTML=`
+      <div class="res-row"><span class="res-name">Arc Length</span><span class="res-val hi">${R(arc)}</span></div>
+      <div class="res-row"><span class="res-name">Sector Area</span><span class="res-val hi">${R(sector)}</span></div>
+      <div class="res-row"><span class="res-name">Central Angle</span><span class="res-val">${R(ang)}°</span></div>
+      <div class="res-row"><span class="res-name">Arc as fraction</span><span class="res-val">${R(ang/360)} of circle</span></div>`;
+    sw.style.display='block';document.getElementById('circ-steps').innerHTML=mkSteps([
+      {t:'Arc Length = r × θ (radians)',m:`L = ${R(r)} × ${R(ang*Math.PI/180)} = ${R(arc)}`},
+      {t:'Sector Area = ½r²θ',m:`A = ½ × ${R(r*r)} × ${R(ang*Math.PI/180)} = ${R(sector)}`},
+    ]);
+  }else{
+    const r=parseFloat(document.getElementById('ci-r')?.value);
+    const ang=parseFloat(document.getElementById('ci-ang2')?.value)||90;
+    if(isNaN(r)||r<=0){res.innerHTML='<div class="callout red">⚠ Enter radius and angle.</div>';return;}
+    const chord=2*r*Math.sin(ang*Math.PI/360);
+    const distCenter=r*Math.cos(ang*Math.PI/360);
+    res.innerHTML=`
+      <div class="res-row"><span class="res-name">Chord Length</span><span class="res-val hi">${R(chord)}</span></div>
+      <div class="res-row"><span class="res-name">Distance to Center</span><span class="res-val">${R(distCenter)}</span></div>
+      <div class="res-row"><span class="res-name">Formula</span><span class="res-val" style="font-size:.72rem;">2r·sin(θ/2)</span></div>`;
+  }
+  animCircle();
+}
+
+// ══════════════════════════════════════════════════════
+// ARC & SECTOR (redirects to circle arc mode)
+// ══════════════════════════════════════════════════════
+function buildArcSector(){return buildCircle();}
+
+// ══════════════════════════════════════════════════════
+// POLYGON
+// ══════════════════════════════════════════════════════
+function buildPolygon(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="shape-tabs">
+        <button class="stab active" onclick="setPolyShape('rect',this)">Rectangle</button>
+        <button class="stab" onclick="setPolyShape('square',this)">Square</button>
+        <button class="stab" onclick="setPolyShape('parallelogram',this)">Parallelogram</button>
+        <button class="stab" onclick="setPolyShape('rhombus',this)">Rhombus</button>
+      </div>
+      <div class="canvas-wrap" style="height:220px;"><canvas id="poly-c" width="480" height="220"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animPoly()">▶ Animate</button>
+        <button class="anim-btn" onclick="resetPoly()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="poly-prog"></div></div>
+      </div>
+      <div style="height:12px;"></div>
+      <div id="poly-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcPoly()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="poly-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="poly-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="poly-steps"></div></div>
+    </div>
+  </div>`;
+}
+
+let polyShape='rect', polyAnimId=null, polyPct=0;
+function setPolyShape(s,btn){
+  polyShape=s;document.querySelectorAll('#pg-tool .stab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const inp=document.getElementById('poly-inp');if(!inp)return;
+  if(s==='rect'){inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Length (L)</div><input type="number" id="po-l" placeholder="L" min="0"></div><div class="field"><div class="field-lbl">Width (W)</div><input type="number" id="po-w" placeholder="W" min="0"></div><div class="field"><div class="field-lbl">Diagonal (opt)</div><input type="number" id="po-d" placeholder="d"></div></div>`;}
+  else if(s==='square'){inp.innerHTML=`<div class="row2"><div class="field"><div class="field-lbl">Side (s)</div><input type="number" id="po-s" placeholder="s" min="0"></div><div class="field"><div class="field-lbl">OR Diagonal</div><input type="number" id="po-d" placeholder="d"></div></div>`;}
+  else if(s==='parallelogram'){inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Base (b)</div><input type="number" id="po-b" placeholder="b" min="0"></div><div class="field"><div class="field-lbl">Height (h)</div><input type="number" id="po-h" placeholder="h" min="0"></div><div class="field"><div class="field-lbl">Side (s)</div><input type="number" id="po-s2" placeholder="s" min="0"></div></div>`;}
+  else{inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Side (a)</div><input type="number" id="po-a" placeholder="a" min="0"></div><div class="field"><div class="field-lbl">Diagonal 1 (d₁)</div><input type="number" id="po-d1" placeholder="d₁" min="0"></div><div class="field"><div class="field-lbl">Diagonal 2 (d₂)</div><input type="number" id="po-d2" placeholder="d₂" min="0"></div></div>`;}
+  resetPoly();
+}
+function initPolygon(s){const btn=document.querySelector('#pg-tool .stab');if(btn)setPolyShape(s||'rect',btn);}
+
+function drawPolyCanvas(pct){
+  const c=ctx('poly-c');if(!c)return;
+  const W=480,H=220;clrCanvas(c,W,H);drawGrid(c,W,H);
+  c.strokeStyle='#3db870';c.lineWidth=2.5;c.fillStyle='rgba(61,184,112,0.1)';
+  const p=pct;
+  if(polyShape==='rect'){
+    const lw=280*p,lh=130*p,bx=(W-280)/2,by=(H-130)/2;
+    c.beginPath();c.rect(bx,by,lw,lh);c.fill();c.stroke();
+    if(p>0.5){c.setLineDash([5,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(bx,by);c.lineTo(bx+280,by+130);c.stroke();c.setLineDash([]);c.strokeStyle='#3db870';c.lineWidth=2.5;}
+    if(p>0.3){c.fillStyle='#9090b8';c.font='13px Outfit';c.textAlign='center';c.fillText('L',bx+140,by+lh+16);c.textAlign='right';c.fillText('W',bx-6,by+lh/2+4);}
+  }else if(polyShape==='square'){
+    const sw=180*p,bx=(W-180)/2,by=(H-180)/2;
+    c.beginPath();c.rect(bx,by,sw,sw);c.fill();c.stroke();
+    if(p>0.4){c.setLineDash([5,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(bx,by);c.lineTo(bx+180,by+180);c.stroke();c.setLineDash([]);}
+    if(p>0.3){c.fillStyle='#9090b8';c.font='13px Outfit';c.textAlign='center';c.fillText('s',bx+90,by+sw+16);}
+    if(p>=1){c.fillStyle='#3db870';c.fillText('s√2',bx+100,by+80);}
+  }else if(polyShape==='parallelogram'){
+    const bw=260,bh=120,skew=50;
+    const bx=70,by=(H-bh)/2;
+    c.beginPath();c.moveTo(bx+skew*p,by);c.lineTo(bx+bw*p+skew*p,by);c.lineTo(bx+bw*p,by+bh*p);c.lineTo(bx,by+bh*p);c.closePath();c.fill();c.stroke();
+    if(p>0.5){c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(bx+skew*p,by+bh*p);c.lineTo(bx+skew*p,by);c.stroke();c.setLineDash([]);c.fillStyle='#4488ff';c.font='12px Outfit';c.textAlign='center';c.fillText('h',bx+skew*p+14,(by+by+bh*p)/2);}
+    if(p>0.3){c.fillStyle='#9090b8';c.fillText('b',bx+bw*p/2+skew*p/2,by+bh*p+16);}
+  }else{
+    // rhombus
+    const cx=W/2,cy=H/2,rx=130*p,ry=95*p;
+    c.beginPath();c.moveTo(cx,cy-ry);c.lineTo(cx+rx,cy);c.lineTo(cx,cy+ry);c.lineTo(cx-rx,cy);c.closePath();c.fill();c.stroke();
+    if(p>0.5){c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(cx-rx,cy);c.lineTo(cx+rx,cy);c.stroke();c.beginPath();c.moveTo(cx,cy-ry);c.lineTo(cx,cy+ry);c.stroke();c.setLineDash([]);c.fillStyle='#4488ff';c.font='12px Outfit';c.textAlign='center';c.fillText('d₁',cx+rx/2,cy-6);c.fillText('d₂',cx+4,cy-ry/2);}
+  }
+  document.getElementById('poly-prog')&&(document.getElementById('poly-prog').style.width=(pct*100)+'%');
+}
+function animPoly(){if(polyAnimId)cancelAnimationFrame(polyAnimId);polyPct=0;const s=()=>{polyPct=Math.min(1,polyPct+0.018);drawPolyCanvas(polyPct);if(polyPct<1)polyAnimId=requestAnimationFrame(s);};s();}
+function resetPoly(){if(polyAnimId)cancelAnimationFrame(polyAnimId);polyPct=0;drawPolyCanvas(0);}
+
+function calcPoly(){
+  const res=document.getElementById('poly-res');const sw=document.getElementById('poly-sw');
+  let area,perim,diag,steps=[];
+  if(polyShape==='rect'){
+    let L=parseFloat(document.getElementById('po-l')?.value);let W2=parseFloat(document.getElementById('po-w')?.value);const d=parseFloat(document.getElementById('po-d')?.value);
+    if(!isNaN(d)&&d>0){if(!isNaN(L)&&L>0)W2=Math.sqrt(d*d-L*L);else if(!isNaN(W2)&&W2>0)L=Math.sqrt(d*d-W2*W2);}
+    if(isNaN(L)||L<=0||isNaN(W2)||W2<=0){res.innerHTML='<div class="callout red">⚠ Enter Length and Width (or use diagonal to find a missing side).</div>';return;}
+    area=L*W2;perim=2*(L+W2);diag=Math.sqrt(L*L+W2*W2);
+    steps=[{t:'Area = L × W',m:`A = ${R(L)} × ${R(W2)} = ${R(area)}`},{t:'Perimeter = 2(L+W)',m:`P = 2(${R(L)}+${R(W2)}) = ${R(perim)}`},{t:'Diagonal = √(L²+W²)',m:`d = √(${R(L*L)}+${R(W2*W2)}) = ${R(diag)}`}];
+    res.innerHTML=`<div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div><div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(perim)}</span></div><div class="res-row"><span class="res-name">Diagonal</span><span class="res-val">${R(diag)} <small style="color:var(--text3)">(${toRadical(diag)})</small></span></div>`;
+  }else if(polyShape==='square'){
+    let s=parseFloat(document.getElementById('po-s')?.value);const d=parseFloat(document.getElementById('po-d')?.value);
+    if(!isNaN(d)&&d>0)s=d/Math.sqrt(2);
+    if(isNaN(s)||s<=0){res.innerHTML='<div class="callout red">⚠ Enter side or diagonal.</div>';return;}
+    area=s*s;perim=4*s;diag=s*Math.sqrt(2);
+    steps=[{t:'Area = s²',m:`A = ${R(s)}² = ${R(area)}`},{t:'Perimeter = 4s',m:`P = 4 × ${R(s)} = ${R(perim)}`},{t:'Diagonal = s√2',m:`d = ${R(s)} × √2 = ${R(diag)} (${toRadical(diag)})`}];
+    res.innerHTML=`<div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div><div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(perim)}</span></div><div class="res-row"><span class="res-name">Diagonal</span><span class="res-val">${R(diag)} <small style="color:var(--text3)">(${toRadical(diag)})</small></span></div>`;
+  }else if(polyShape==='parallelogram'){
+    const b=parseFloat(document.getElementById('po-b')?.value),h=parseFloat(document.getElementById('po-h')?.value),s2=parseFloat(document.getElementById('po-s2')?.value);
+    if(isNaN(b)||b<=0||isNaN(h)||h<=0){res.innerHTML='<div class="callout red">⚠ Enter base and height.</div>';return;}
+    area=b*h;
+    const side=isNaN(s2)||s2<=0?h:s2;
+    perim=2*(b+side);
+    steps=[{t:'Area = base × height',m:`A = ${R(b)} × ${R(h)} = ${R(area)}`},{t:'Perimeter = 2(b+s)',m:`P = 2(${R(b)}+${R(side)}) = ${R(perim)}`}];
+    res.innerHTML=`<div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div><div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(perim)}</span></div>`;
+  }else{
+    // rhombus
+    const a=parseFloat(document.getElementById('po-a')?.value),d1=parseFloat(document.getElementById('po-d1')?.value),d2=parseFloat(document.getElementById('po-d2')?.value);
+    let side=a;
+    if(isNaN(d1)||isNaN(d2)||d1<=0||d2<=0){res.innerHTML='<div class="callout red">⚠ Enter both diagonals.</div>';return;}
+    if(isNaN(a)||a<=0) side=Math.sqrt((d1/2)**2+(d2/2)**2);
+    area=0.5*d1*d2;perim=4*side;
+    steps=[{t:'Area = ½ × d₁ × d₂',m:`A = ½ × ${R(d1)} × ${R(d2)} = ${R(area)}`},{t:'Side = √((d₁/2)²+(d₂/2)²)',m:`s = ${R(side)}, Perimeter = 4s = ${R(perim)}`}];
+    res.innerHTML=`<div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div><div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(perim)}</span></div><div class="res-row"><span class="res-name">Side Length</span><span class="res-val">${R(side)}</span></div>`;
+  }
+  sw.style.display='block';document.getElementById('poly-steps').innerHTML=mkSteps(steps);
+  animPoly();
+}
+
+// ══════════════════════════════════════════════════════
+// TRAPEZOID
+// ══════════════════════════════════════════════════════
+function buildTrapezoid(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="callout info" style="font-size:.76rem;">⬟ Area = ½(b₁+b₂) × h</div>
+      <div class="canvas-wrap" style="height:220px;"><canvas id="trap-c" width="480" height="220"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Base 1 (b₁)</div><input type="number" id="tr-b1" placeholder="b₁" oninput="drawTrap()" min="0"></div>
+        <div class="field"><div class="field-lbl">Base 2 (b₂)</div><input type="number" id="tr-b2" placeholder="b₂" oninput="drawTrap()" min="0"></div>
+        <div class="field"><div class="field-lbl">Height (h)</div><input type="number" id="tr-h" placeholder="h" oninput="drawTrap()" min="0"></div>
+        <div class="field"><div class="field-lbl">Leg 1 (opt)</div><input type="number" id="tr-l1" placeholder="leg 1"></div>
+        <div class="field"><div class="field-lbl">Leg 2 (opt)</div><input type="number" id="tr-l2" placeholder="leg 2"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcTrapezoid()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="trap-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="trap-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="trap-steps"></div></div>
+    </div>
+  </div>`;
+}
+function drawTrap(){
+  const c=ctx('trap-c');if(!c)return;
+  const W=480,H=220;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const b1=parseFloat(document.getElementById('tr-b1')?.value)||8,b2=parseFloat(document.getElementById('tr-b2')?.value)||5,h=parseFloat(document.getElementById('tr-h')?.value)||4;
+  const sc=Math.min((W-100)/b1,40);const hh=Math.min(h*sc,120);
+  const bx=(W-b1*sc)/2,by=H-40;
+  const off=(b1-b2)*sc/2;
+  c.fillStyle='rgba(61,184,112,0.1)';c.strokeStyle='#3db870';c.lineWidth=2.5;
+  c.beginPath();c.moveTo(bx,by);c.lineTo(bx+b1*sc,by);c.lineTo(bx+b1*sc-off,by-hh);c.lineTo(bx+off,by-hh);c.closePath();c.fill();c.stroke();
+  c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(bx+off,by);c.lineTo(bx+off,by-hh);c.stroke();c.setLineDash([]);
+  c.fillStyle='#9090b8';c.font='13px Outfit';c.textAlign='center';
+  c.fillText('b₁='+R(b1),(bx+bx+b1*sc)/2,by+16);
+  c.fillText('b₂='+R(b2),(bx+off+bx+off+b2*sc)/2,by-hh-8);
+  c.fillStyle='#4488ff';c.fillText('h',bx+off+12,(by+by-hh)/2);
+}
+function calcTrapezoid(){
+  const b1=parseFloat(document.getElementById('tr-b1').value),b2=parseFloat(document.getElementById('tr-b2').value),h=parseFloat(document.getElementById('tr-h').value);
+  const l1=parseFloat(document.getElementById('tr-l1').value),l2=parseFloat(document.getElementById('tr-l2').value);
+  const res=document.getElementById('trap-res');const sw=document.getElementById('trap-sw');
+  if(isNaN(b1)||b1<=0||isNaN(b2)||b2<=0||isNaN(h)||h<=0){res.innerHTML='<div class="callout red">⚠ Enter both bases and height.</div>';return;}
+  const area=0.5*(b1+b2)*h;const mid=(b1+b2)/2;
+  const perim=(!isNaN(l1)&&!isNaN(l2)&&l1>0&&l2>0)?b1+b2+l1+l2:null;
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div>
+    <div class="res-row"><span class="res-name">Midsegment</span><span class="res-val">${R(mid)}</span></div>
+    <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${perim?R(perim):'Enter legs'}</span></div>`;
+  sw.style.display='block';document.getElementById('trap-steps').innerHTML=mkSteps([
+    {t:'Area = ½(b₁+b₂) × h',m:`A = ½(${R(b1)}+${R(b2)}) × ${R(h)}`},
+    {t:'Simplify',m:`A = ½ × ${R(b1+b2)} × ${R(h)} = ${R(area)}`},
+    {t:'Midsegment = (b₁+b₂)/2',m:`M = ${R(mid)}`},
+  ]);
+  drawTrap();
+}
+
+// ══════════════════════════════════════════════════════
+// REGULAR POLYGON
+// ══════════════════════════════════════════════════════
+function buildRegPolygon(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="canvas-wrap" style="height:240px;"><canvas id="rpoly-c" width="480" height="240"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animRegPoly()">▶ Animate</button>
+        <button class="anim-btn" onclick="initRegPolygon()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="rpoly-prog"></div></div>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Number of Sides (n)</div><input type="number" id="rp-n" value="6" min="3" max="20" oninput="drawRegPolyCanvas(1)"></div>
+        <div class="field"><div class="field-lbl">Side Length (s)</div><input type="number" id="rp-s" placeholder="s" min="0"></div>
+        <div class="field"><div class="field-lbl">Apothem (opt)</div><input type="number" id="rp-a" placeholder="a"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcRegPolygon()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="rpoly-res"><div style="color:var(--text3);font-size:.76rem;">Enter values and calculate.</div></div>
+      <div class="steps-wrap" id="rpoly-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="rpoly-steps"></div></div>
+    </div>
+  </div>`;
+}
+let rpolyAnim=null,rpolyPct=0;
+function initRegPolygon(){drawRegPolyCanvas(1);}
+function drawRegPolyCanvas(pct){
+  const c=ctx('rpoly-c');if(!c)return;
+  const W=480,H=240;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const n=parseInt(document.getElementById('rp-n')?.value)||6;
+  const r=95*Math.min(pct||0,1);const cx=W/2,cy=H/2;
+  c.fillStyle='rgba(61,184,112,0.09)';c.strokeStyle='#3db870';c.lineWidth=2.5;
+  c.beginPath();
+  for(let i=0;i<=n;i++){const a=-Math.PI/2+2*Math.PI*i/n;const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);i===0?c.moveTo(x,y):c.lineTo(x,y);}
+  c.closePath();c.fill();c.stroke();
+  // apothem
+  if(pct>=1){
+    const am=-Math.PI/2+Math.PI/n;const ax=cx+r*Math.cos(am)*Math.cos(Math.PI/n),ay=cy+r*Math.sin(am)*Math.cos(Math.PI/n);
+    c.setLineDash([4,4]);c.strokeStyle='rgba(68,136,255,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(cx,cy);c.lineTo(ax,ay);c.stroke();c.setLineDash([]);
+    c.fillStyle='#4488ff';c.font='12px Outfit';c.textAlign='center';c.fillText('a',(cx+ax)/2+10,(cy+ay)/2-2);
+    const names={3:'Triangle',4:'Square',5:'Pentagon',6:'Hexagon',7:'Heptagon',8:'Octagon',9:'Nonagon',10:'Decagon',12:'Dodecagon'};
+    c.fillStyle='#9090b8';c.font='13px Outfit';c.fillText(names[n]||n+'-gon',cx,cy+r+18);
+  }
+  document.getElementById('rpoly-prog')&&(document.getElementById('rpoly-prog').style.width=((pct||0)*100)+'%');
+}
+function animRegPoly(){if(rpolyAnim)cancelAnimationFrame(rpolyAnim);rpolyPct=0;const s=()=>{rpolyPct=Math.min(1,rpolyPct+0.018);drawRegPolyCanvas(rpolyPct);if(rpolyPct<1)rpolyAnim=requestAnimationFrame(s);};s();}
+function calcRegPolygon(){
+  const n=parseInt(document.getElementById('rp-n').value)||6;
+  const sv=parseFloat(document.getElementById('rp-s').value),av=parseFloat(document.getElementById('rp-a').value);
+  const res=document.getElementById('rpoly-res');const sw=document.getElementById('rpoly-sw');
+  let s,apothem;
+  if(!isNaN(sv)&&sv>0){s=sv;apothem=s/(2*Math.tan(Math.PI/n));}
+  else if(!isNaN(av)&&av>0){apothem=av;s=2*apothem*Math.tan(Math.PI/n);}
+  else{res.innerHTML='<div class="callout red">⚠ Enter side length or apothem.</div>';return;}
+  const perim=n*s,area=0.5*perim*apothem;
+  const intAng=(n-2)*180/n,extAng=360/n;
+  const names={3:'Triangle',4:'Square',5:'Pentagon',6:'Hexagon',7:'Heptagon',8:'Octagon',9:'Nonagon',10:'Decagon',12:'Dodecagon'};
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Shape</span><span class="res-val hi">${names[n]||n+'-gon'}</span></div>
+    <div class="res-row"><span class="res-name">Side Length</span><span class="res-val">${R(s)}</span></div>
+    <div class="res-row"><span class="res-name">Apothem</span><span class="res-val">${R(apothem)}</span></div>
+    <div class="res-row"><span class="res-name">Perimeter</span><span class="res-val">${R(perim)}</span></div>
+    <div class="res-row"><span class="res-name">Area</span><span class="res-val hi">${R(area)}</span></div>
+    <div class="res-row"><span class="res-name">Interior Angle</span><span class="res-val">${R(intAng)}°</span></div>
+    <div class="res-row"><span class="res-name">Exterior Angle</span><span class="res-val">${R(extAng)}°</span></div>`;
+  sw.style.display='block';document.getElementById('rpoly-steps').innerHTML=mkSteps([
+    {t:`Interior angle = (n−2)×180/n`,m:`= (${n}−2)×180/${n} = ${R(intAng)}°`},
+    {t:'Apothem = s / (2·tan(π/n))',m:`a = ${R(s)} / (2·tan(π/${n})) = ${R(apothem)}`},
+    {t:'Area = ½ × Perimeter × Apothem',m:`A = ½ × ${R(perim)} × ${R(apothem)} = ${R(area)}`},
+  ]);
+  animRegPoly();
+}
+
+// ══════════════════════════════════════════════════════
+// TRANSFORMATIONS  (editable triangle points)
+// ══════════════════════════════════════════════════════
+let transformType2='reflection', transAnimId=null, transPct=0, transResult=null;
+let userShape=[[-2,-1],[2,-1],[0,2]]; // default editable triangle
+
+function getTransShape(){
+  const pts=[];
+  for(let i=1;i<=3;i++){
+    const x=parseFloat(document.getElementById('tx'+i)?.value);
+    const y=parseFloat(document.getElementById('ty'+i)?.value);
+    if(isNaN(x)||isNaN(y)) return null;
+    pts.push([x,y]);
+  }
+  return pts;
+}
+
+function buildTransform(sub){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="shape-tabs">
+        <button class="stab ${(!sub||sub==='reflection')?'active':''}" onclick="setTransform('reflection',this)">Reflection</button>
+        <button class="stab ${sub==='rotation'?'active':''}" onclick="setTransform('rotation',this)">Rotation</button>
+        <button class="stab ${sub==='translation'?'active':''}" onclick="setTransform('translation',this)">Translation</button>
+        <button class="stab ${sub==='dilation'?'active':''}" onclick="setTransform('dilation',this)">Dilation</button>
+      </div>
+      <div class="canvas-wrap" style="height:260px;"><canvas id="trans-c" width="480" height="260"></canvas></div>
+      <div class="anim-bar" style="margin-top:7px;">
+        <button class="anim-btn" onclick="animTransform()">▶ Animate</button>
+        <button class="anim-btn" onclick="resetTrans()">↺ Reset</button>
+        <div class="anim-track"><div class="anim-fill" id="trans-prog"></div></div>
+      </div>
+      <div style="height:10px;"></div>
+      <div style="font-size:.67rem;font-weight:700;color:var(--text2);margin-bottom:6px;">✏️ Triangle Vertices (editable)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div class="field"><div class="field-lbl">A: x₁</div><input type="number" id="tx1" value="-2" oninput="liveTransDraw()"></div>
+        <div class="field"><div class="field-lbl">A: y₁</div><input type="number" id="ty1" value="-1" oninput="liveTransDraw()"></div>
+        <div></div>
+        <div class="field"><div class="field-lbl">B: x₂</div><input type="number" id="tx2" value="2" oninput="liveTransDraw()"></div>
+        <div class="field"><div class="field-lbl">B: y₂</div><input type="number" id="ty2" value="-1" oninput="liveTransDraw()"></div>
+        <div></div>
+        <div class="field"><div class="field-lbl">C: x₃</div><input type="number" id="tx3" value="0" oninput="liveTransDraw()"></div>
+        <div class="field"><div class="field-lbl">C: y₃</div><input type="number" id="ty3" value="2" oninput="liveTransDraw()"></div>
+        <div></div>
+      </div>
+      <div id="trans-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcTransform()">Apply Transform ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="trans-res"><div style="color:var(--text3);font-size:.76rem;">Edit vertices, configure transform, then apply.</div></div>
+    </div>
+  </div>`;
+}
+
+function liveTransDraw(){
+  const pts=getTransShape();
+  if(pts) drawTransCanvas(pts,null,0);
+}
+
+function setTransform(type, btn){
+  transformType2=type;
+  document.querySelectorAll('#pg-tool .stab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const inp=document.getElementById('trans-inp');if(!inp)return;
+  if(type==='reflection'){
+    inp.innerHTML=`<div class="field"><div class="field-lbl">Line of Reflection</div><select id="trans-axis" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:inherit;font-size:.86rem;outline:none;width:100%;"><option value="x">x-axis  (y = 0)</option><option value="y">y-axis  (x = 0)</option><option value="y=x">y = x</option><option value="y=-x">y = −x</option></select></div>`;
+  }else if(type==='rotation'){
+    inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Angle (°) CCW</div><input type="number" id="trans-ang" value="90"></div><div class="field"><div class="field-lbl">Center X</div><input type="number" id="trans-cx" value="0"></div><div class="field"><div class="field-lbl">Center Y</div><input type="number" id="trans-cy" value="0"></div></div>`;
+  }else if(type==='translation'){
+    inp.innerHTML=`<div class="row2"><div class="field"><div class="field-lbl">Translate X (→)</div><input type="number" id="trans-tx" value="3"></div><div class="field"><div class="field-lbl">Translate Y (↑)</div><input type="number" id="trans-ty" value="2"></div></div>`;
+  }else{
+    inp.innerHTML=`<div class="row3"><div class="field"><div class="field-lbl">Scale Factor</div><input type="number" id="trans-sf" value="2" min="0.01"></div><div class="field"><div class="field-lbl">Center X</div><input type="number" id="trans-cx" value="0"></div><div class="field"><div class="field-lbl">Center Y</div><input type="number" id="trans-cy" value="0"></div></div>`;
+  }
+  transResult=null; transPct=0;
+  const pts=getTransShape()||userShape;
+  drawTransCanvas(pts,null,0);
+}
+
+function resetTrans(){
+  if(transAnimId)cancelAnimationFrame(transAnimId);
+  transResult=null; transPct=0;
+  const pts=getTransShape()||userShape;
+  drawTransCanvas(pts,null,0);
+  document.getElementById('trans-res').innerHTML='<div style="color:var(--text3);font-size:.76rem;">Edit vertices, configure transform, then apply.</div>';
+}
+
+function initTransform(sub){ setTransform(sub||transformType2||'reflection',null); }
+
+function applyTransformPts(pts){
+  if(transformType2==='reflection'){
+    const ax=document.getElementById('trans-axis')?.value||'x';
+    return pts.map(([x,y])=>ax==='x'?[x,-y]:ax==='y'?[-x,y]:ax==='y=x'?[y,x]:[-y,-x]);
+  }else if(transformType2==='rotation'){
+    const ang=(parseFloat(document.getElementById('trans-ang')?.value)||90)*Math.PI/180;
+    const cx=parseFloat(document.getElementById('trans-cx')?.value)||0,cy=parseFloat(document.getElementById('trans-cy')?.value)||0;
+    return pts.map(([x,y])=>{const dx=x-cx,dy=y-cy;return[cx+dx*Math.cos(ang)-dy*Math.sin(ang),cy+dx*Math.sin(ang)+dy*Math.cos(ang)];});
+  }else if(transformType2==='translation'){
+    const tx=parseFloat(document.getElementById('trans-tx')?.value)||0,ty=parseFloat(document.getElementById('trans-ty')?.value)||0;
+    return pts.map(([x,y])=>[x+tx,y+ty]);
+  }else{
+    const sf=parseFloat(document.getElementById('trans-sf')?.value)||2;
+    const cx=parseFloat(document.getElementById('trans-cx')?.value)||0,cy=parseFloat(document.getElementById('trans-cy')?.value)||0;
+    return pts.map(([x,y])=>[cx+(x-cx)*sf,cy+(y-cy)*sf]);
+  }
+}
+
+function drawTransCanvas(orig, trans, pct){
+  const c=ctx('trans-c');if(!c)return;
+  const W=480,H=260;clrCanvas(c,W,H);
+  const all=[...orig,...(trans||orig)].flat();
+  const minV=Math.min(...all)-2,maxV=Math.max(...all)+2,range=Math.max(maxV-minV,8);
+  const sc=Math.min((W-60)/range,(H-60)/range,35);
+  const allPts=[...orig,...(trans||[])];
+  const avgX=allPts.reduce((s,[x])=>s+x,0)/allPts.length;
+  const avgY=allPts.reduce((s,[,y])=>s+y,0)/allPts.length;
+  const ox=W/2-avgX*sc, oy=H/2+avgY*sc;
+  drawCoordPlane(c,W,H,ox,oy,sc);
+  // original shape (blue)
+  c.strokeStyle='rgba(68,136,255,0.8)';c.lineWidth=2;c.fillStyle='rgba(68,136,255,0.1)';
+  c.beginPath();orig.forEach(([x,y],i)=>i===0?c.moveTo(ox+x*sc,oy-y*sc):c.lineTo(ox+x*sc,oy-y*sc));
+  c.closePath();c.fill();c.stroke();
+  orig.forEach(([x,y],i)=>{
+    dot(c,ox+x*sc,oy-y*sc,5,'#4488ff');
+    c.fillStyle='#88aaff';c.font='bold 11px Outfit';c.textAlign='center';
+    c.fillText(`${['A','B','C'][i]}(${x},${y})`,ox+x*sc,oy-y*sc-12);
+  });
+  // transformed shape (green, animated)
+  if(trans&&pct>0){
+    const interp=orig.map(([x,y],i)=>[x+(trans[i][0]-x)*pct,y+(trans[i][1]-y)*pct]);
+    c.strokeStyle='#3db870';c.lineWidth=2.5;c.fillStyle=`rgba(61,184,112,${0.13*pct})`;
+    c.beginPath();interp.forEach(([x,y],i)=>i===0?c.moveTo(ox+x*sc,oy-y*sc):c.lineTo(ox+x*sc,oy-y*sc));
+    c.closePath();c.fill();c.stroke();
+    if(pct>=1){
+      trans.forEach(([x,y],i)=>{
+        dot(c,ox+x*sc,oy-y*sc,5,'#3db870');
+        c.fillStyle='#3db870';c.font='bold 11px Outfit';c.textAlign='center';
+        c.fillText(`${["A'","B'","C'"][i]}(${R(x)},${R(y)})`,ox+x*sc,oy-y*sc-12);
+      });
+    }
+  }
+  document.getElementById('trans-prog')&&(document.getElementById('trans-prog').style.width=(pct*100)+'%');
+}
+
+function animTransform(){
+  if(transAnimId)cancelAnimationFrame(transAnimId);
+  const pts=getTransShape()||userShape;
+  if(!transResult) transResult=applyTransformPts(pts);
+  transPct=0;
+  const s=()=>{transPct=Math.min(1,transPct+0.014);drawTransCanvas(pts,transResult,transPct);if(transPct<1)transAnimId=requestAnimationFrame(s);};s();
+}
+
+function calcTransform(){
+  const pts=getTransShape();
+  if(!pts){document.getElementById('trans-res').innerHTML='<div class="callout red">⚠ Enter all 3 triangle vertex coordinates.</div>';return;}
+  transResult=applyTransformPts(pts);
+  animTransform();
+  const tnames={reflection:'Reflection',rotation:'Rotation',translation:'Translation',dilation:'Dilation'};
+  const labels=['A','B','C'];
+  document.getElementById('trans-res').innerHTML=`
+    <div class="callout green">✅ ${tnames[transformType2]} applied!</div>
+    ${pts.map(([x,y],i)=>`<div class="res-row"><span class="res-name">${labels[i]} → ${labels[i]}'</span><span class="res-val" style="font-size:.75rem;">(${x},${y}) → <span style="color:var(--green2)">(${R(transResult[i][0])},${R(transResult[i][1])})</span></span></div>`).join('')}
+    <div class="res-row" style="margin-top:6px;"><span class="res-name">Transform</span><span class="res-val">${tnames[transformType2]}</span></div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// ANGLE RELATIONSHIPS
+// ══════════════════════════════════════════════════════
+function buildAngleRel(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setAngleRelMode('comp',this)">Complementary</button>
+        <button class="mode-tab" onclick="setAngleRelMode('supp',this)">Supplementary</button>
+        <button class="mode-tab" onclick="setAngleRelMode('vert',this)">Vertical / Adjacent</button>
+      </div>
+      <div class="canvas-wrap" style="height:230px;"><canvas id="arel-c" width="480" height="230"></canvas></div>
+      <div style="height:12px;"></div>
+      <div id="arel-inp"></div>
+      <button class="btn btn-g btn-full" onclick="calcAngleRel()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="arel-res"><div style="color:var(--text3);font-size:.76rem;">Enter an angle to find its relationship.</div></div>
+      <div class="steps-wrap" id="arel-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="arel-steps"></div></div>
+    </div>
+  </div>`;
+}
+let arelMode='comp';
+function setAngleRelMode(m,btn){
+  arelMode=m;
+  document.querySelectorAll('#pg-tool .mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const inp=document.getElementById('arel-inp');if(!inp)return;
+  if(m==='comp'){
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Complementary angles sum to <strong>90°</strong>. Enter one angle to find the other.</div>
+      <div class="row2"><div class="field"><div class="field-lbl">Angle A (°)</div><input type="number" id="ar-a" placeholder="e.g. 35" min="0" max="90"></div>
+      <div class="field"><div class="field-lbl">Angle B (°)</div><input type="number" id="ar-b" placeholder="= 90 − A" min="0" max="90"></div></div>`;
+  }else if(m==='supp'){
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Supplementary angles sum to <strong>180°</strong>. Enter one angle to find the other.</div>
+      <div class="row2"><div class="field"><div class="field-lbl">Angle A (°)</div><input type="number" id="ar-a" placeholder="e.g. 110" min="0" max="180"></div>
+      <div class="field"><div class="field-lbl">Angle B (°)</div><input type="number" id="ar-b" placeholder="= 180 − A" min="0" max="180"></div></div>`;
+  }else{
+    inp.innerHTML=`<div class="callout info" style="font-size:.76rem;">Vertical angles are <strong>equal</strong>. Adjacent angles are supplementary.</div>
+      <div class="row2"><div class="field"><div class="field-lbl">Angle 1 (°)</div><input type="number" id="ar-a" placeholder="e.g. 55" min="0" max="180"></div>
+      <div class="field"><div class="field-lbl">Angle 2 (°)</div><input type="number" id="ar-b" placeholder="optional"></div></div>`;
+  }
+  drawAngleRelCanvas();
+}
+function initAngleRel(){ const btn=document.querySelector('#pg-tool .mode-tab'); if(btn) setAngleRelMode('comp',btn); }
+function drawAngleRelCanvas(a1,a2){
+  const c=ctx('arel-c');if(!c)return;
+  const W=480,H=230;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const cx=W/2,cy=H/2;
+  if(arelMode==='comp'){
+    const ang=a1||35;const rad=ang*Math.PI/180;
+    c.strokeStyle='rgba(85,85,112,0.4)';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+130,cy);c.stroke();
+    c.beginPath();c.moveTo(cx,cy);c.lineTo(cx,cy-130);c.stroke();
+    c.strokeStyle='#4488ff';c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,80,-Math.PI/2,-Math.PI/2+rad);c.stroke();
+    c.fillStyle='#4488ff';c.font='bold 13px Outfit';c.textAlign='center';c.fillText(R(ang)+'°',cx+50,cy-50);
+    c.strokeStyle='#3db870';c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,80,-Math.PI/2+rad,0);c.stroke();
+    c.fillStyle='#3db870';c.fillText(R(90-ang)+'°',cx+80,cy-30);
+    c.strokeStyle='#3db870';c.lineWidth=2;c.beginPath();
+    c.moveTo(cx+130*Math.cos(-Math.PI/2+rad),cy+130*Math.sin(-Math.PI/2+rad));c.lineTo(cx,cy);c.stroke();
+    // right angle box
+    c.strokeStyle='rgba(255,255,255,0.3)';c.lineWidth=1.2;
+    c.beginPath();c.moveTo(cx+14,cy);c.lineTo(cx+14,cy-14);c.lineTo(cx,cy-14);c.stroke();
+  }else if(arelMode==='supp'){
+    const ang=a1||110;const rad=ang*Math.PI/180;
+    c.strokeStyle='rgba(85,85,112,0.4)';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(cx-140,cy);c.lineTo(cx+140,cy);c.stroke();
+    c.strokeStyle='#4488ff';c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,80,Math.PI-rad,0);c.stroke();
+    const mid1=(Math.PI-rad/2); c.fillStyle='#4488ff';c.font='bold 13px Outfit';c.textAlign='center';
+    c.fillText(R(ang)+'°',cx+85*Math.cos(Math.PI-rad/2)+5,cy-85*Math.sin(Math.PI-rad/2));
+    c.strokeStyle='#3db870';c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,80,0,Math.PI-rad,true);c.stroke();
+    c.fillStyle='#3db870';c.fillText(R(180-ang)+'°',cx+75*Math.cos(-rad/2+0.2),cy-75*Math.sin(-rad/2+0.2));
+    c.strokeStyle='#3db870';c.lineWidth=2;c.beginPath();
+    c.moveTo(cx,cy);c.lineTo(cx+130*Math.cos(Math.PI-rad),cy-130*Math.sin(Math.PI-rad));c.stroke();
+  }else{
+    const ang=a1||55;const rad=ang*Math.PI/180;
+    c.strokeStyle='rgba(85,85,112,0.5)';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(cx-130,cy+90);c.lineTo(cx+130,cy-90);c.stroke();
+    c.beginPath();c.moveTo(cx-130,cy-90);c.lineTo(cx+130,cy+90);c.stroke();
+    c.strokeStyle='#4488ff';c.lineWidth=2;c.beginPath();c.arc(cx,cy,40,Math.PI-rad,0);c.stroke();
+    c.strokeStyle='#4488ff';c.lineWidth=2;c.beginPath();c.arc(cx,cy,40,-rad,Math.PI-rad,true);c.stroke();
+    c.strokeStyle='#3db870';c.lineWidth=2;c.beginPath();c.arc(cx,cy,55,0,Math.PI-rad);c.stroke();
+    c.strokeStyle='#3db870';c.lineWidth=2;c.beginPath();c.arc(cx,cy,55,Math.PI,2*Math.PI-rad);c.stroke();
+    c.fillStyle='#4488ff';c.font='bold 12px Outfit';c.textAlign='center';
+    c.fillText(R(ang)+'°',cx-60,cy+35);c.fillText(R(ang)+'°',cx+60,cy-35);
+    c.fillStyle='#3db870';c.fillText(R(180-ang)+'°',cx+70,cy+22);c.fillText(R(180-ang)+'°',cx-65,cy-22);
+  }
+}
+function calcAngleRel(){
+  const a=parseFloat(document.getElementById('ar-a')?.value),b=parseFloat(document.getElementById('ar-b')?.value);
+  const res=document.getElementById('arel-res');const sw=document.getElementById('arel-sw');
+  if(arelMode==='comp'){
+    let A=a,B=b;
+    if(!isNaN(A)&&A>=0) B=90-A; else if(!isNaN(B)&&B>=0) A=90-B;
+    else{res.innerHTML='<div class="callout red">⚠ Enter one angle (0°–90°).</div>';return;}
+    if(A<0||B<0){res.innerHTML='<div class="callout red">⚠ Angle exceeds 90° — complementary angles must be between 0° and 90°.</div>';return;}
+    res.innerHTML=`<div class="callout green">✅ Complementary Pair</div>
+      <div class="res-row"><span class="res-name">Angle A</span><span class="res-val hi">${R(A)}°</span></div>
+      <div class="res-row"><span class="res-name">Angle B (complement)</span><span class="res-val hi">${R(B)}°</span></div>
+      <div class="res-row"><span class="res-name">Sum</span><span class="res-val">90°</span></div>`;
+    sw.style.display='block';document.getElementById('arel-steps').innerHTML=mkSteps([
+      {t:'Complementary angles add to 90°',m:`A + B = 90°`},
+      {t:`Substitute: ${R(A)} + B = 90°`,m:`B = 90° − ${R(A)} = ${R(B)}°`},
+    ]);drawAngleRelCanvas(A);
+  }else if(arelMode==='supp'){
+    let A=a,B=b;
+    if(!isNaN(A)&&A>=0) B=180-A; else if(!isNaN(B)&&B>=0) A=180-B;
+    else{res.innerHTML='<div class="callout red">⚠ Enter one angle (0°–180°).</div>';return;}
+    if(A<0||B<0){res.innerHTML='<div class="callout red">⚠ Angle exceeds 180°.</div>';return;}
+    res.innerHTML=`<div class="callout green">✅ Supplementary Pair</div>
+      <div class="res-row"><span class="res-name">Angle A</span><span class="res-val hi">${R(A)}°</span></div>
+      <div class="res-row"><span class="res-name">Angle B (supplement)</span><span class="res-val hi">${R(B)}°</span></div>
+      <div class="res-row"><span class="res-name">Sum</span><span class="res-val">180°</span></div>`;
+    sw.style.display='block';document.getElementById('arel-steps').innerHTML=mkSteps([
+      {t:'Supplementary angles add to 180°',m:`A + B = 180°`},
+      {t:`B = 180° − ${R(A)}`,m:`B = ${R(B)}°`},
+    ]);drawAngleRelCanvas(A);
+  }else{
+    const A=!isNaN(a)&&a>0?a:(!isNaN(b)&&b>0?b:55);
+    res.innerHTML=`<div class="callout green">✅ Intersecting Lines</div>
+      <div class="res-row"><span class="res-name">Angle 1 & 3 (vertical)</span><span class="res-val hi">${R(A)}°</span></div>
+      <div class="res-row"><span class="res-name">Angle 2 & 4 (vertical)</span><span class="res-val hi">${R(180-A)}°</span></div>
+      <div class="res-row"><span class="res-name">Adjacent angles</span><span class="res-val">Supplementary (sum = 180°)</span></div>
+      <div class="res-row"><span class="res-name">All 4 angles sum</span><span class="res-val">360°</span></div>`;
+    sw.style.display='block';document.getElementById('arel-steps').innerHTML=mkSteps([
+      {t:'Vertical angles are congruent (equal)',m:`∠1 = ∠3 = ${R(A)}°`},
+      {t:'Adjacent angles are supplementary',m:`∠1 + ∠2 = 180°   →   ∠2 = ${R(180-A)}°`},
+      {t:'∠2 and ∠4 are also vertical (equal)',m:`∠2 = ∠4 = ${R(180-A)}°`},
+    ]);drawAngleRelCanvas(A);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ANGLE OF ELEVATION & DEPRESSION
+// ══════════════════════════════════════════════════════
+function buildAngleElev(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setElevMode('elev',this)">Elevation</button>
+        <button class="mode-tab" onclick="setElevMode('depr',this)">Depression</button>
+      </div>
+      <div class="canvas-wrap" style="height:230px;"><canvas id="elev-c" width="480" height="230"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="callout info" style="font-size:.76rem;">Enter any <strong>2 of 3</strong> values — angle, distance (horizontal), height.</div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Angle θ (°)</div><input type="number" id="el-ang" placeholder="θ°" min="0" max="89"></div>
+        <div class="field"><div class="field-lbl">Horizontal Distance</div><input type="number" id="el-d" placeholder="d" min="0"></div>
+        <div class="field"><div class="field-lbl">Height / Depth</div><input type="number" id="el-h" placeholder="h" min="0"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcAngleElev()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="elev-res"><div style="color:var(--text3);font-size:.76rem;">Enter 2 values and calculate.</div></div>
+      <div class="steps-wrap" id="elev-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="elev-steps"></div></div>
+    </div>
+  </div>`;
+}
+let elevMode='elev';
+function setElevMode(m,btn){
+  elevMode=m;document.querySelectorAll('#pg-tool .mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  drawElevCanvas(30,60,30*Math.tan(30*Math.PI/180));
+}
+function initAngleElev(){const btn=document.querySelector('#pg-tool .mode-tab');if(btn)setElevMode('elev',btn);}
+function drawElevCanvas(ang,dist,h){
+  const c=ctx('elev-c');if(!c)return;
+  const W=480,H=230;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const bx=60,by=elevMode==='elev'?H-50:60;
+  const sc=Math.min((W-120)/(dist||60),100);
+  const px2=bx+dist*sc;
+  const py2=elevMode==='elev'?by-h*sc:by+h*sc;
+  // ground line
+  c.strokeStyle='rgba(85,85,130,0.5)';c.lineWidth=1.5;c.beginPath();c.moveTo(bx-10,by);c.lineTo(px2+20,by);c.stroke();
+  if(elevMode==='depr'){c.beginPath();c.moveTo(px2-20,py2);c.lineTo(W,py2);c.stroke();}
+  // vertical height line
+  c.setLineDash([5,4]);c.strokeStyle='rgba(68,136,255,0.6)';c.lineWidth=1.5;c.beginPath();c.moveTo(px2,by);c.lineTo(px2,py2);c.stroke();c.setLineDash([]);
+  // diagonal (line of sight)
+  c.strokeStyle='#3db870';c.lineWidth=2.5;c.beginPath();c.moveTo(bx,by);c.lineTo(px2,py2);c.stroke();
+  // horizontal dist line
+  c.strokeStyle='#9966ff';c.lineWidth=2;c.beginPath();c.moveTo(bx,by);c.lineTo(px2,by);c.stroke();
+  // angle arc
+  const dir=elevMode==='elev'?-1:1;
+  c.strokeStyle='#e89020';c.lineWidth=1.8;c.beginPath();c.arc(bx,by,36,0,Math.atan2(-dir*h*sc,dist*sc),elevMode==='elev');c.stroke();
+  c.fillStyle='#e89020';c.font='bold 12px Outfit';c.textAlign='left';c.fillText(R(ang)+'°',bx+30,by+(elevMode==='elev'?-12:16));
+  // labels
+  c.fillStyle='#9966ff';c.font='13px Outfit';c.textAlign='center';c.fillText('d='+R(dist),(bx+px2)/2,by+18);
+  c.fillStyle='#4488ff';c.textAlign='left';c.fillText('h='+R(h),px2+8,(by+py2)/2);
+  // observer/object dots
+  dot(c,bx,by,5,'#e89020');dot(c,px2,py2,5,'#3db870');
+  c.fillStyle='#f0f0f8';c.font='11px Outfit';c.textAlign='center';
+  c.fillText(elevMode==='elev'?'Observer':'Object',bx,by+18);
+  c.fillText(elevMode==='elev'?'Object':'Observer',px2,py2+(elevMode==='elev'?-14:16));
+}
+function calcAngleElev(){
+  const ang=parseFloat(document.getElementById('el-ang').value);
+  const dist=parseFloat(document.getElementById('el-d').value);
+  const h=parseFloat(document.getElementById('el-h').value);
+  const res=document.getElementById('elev-res');const sw=document.getElementById('elev-sw');
+  const aK=!isNaN(ang)&&ang>0&&ang<90,dK=!isNaN(dist)&&dist>0,hK=!isNaN(h)&&h>0;
+  let A,D,H2,steps=[];
+  if(aK&&dK){A=ang;D=dist;H2=D*Math.tan(A*Math.PI/180);steps=[{t:'tan θ = h / d  →  h = d × tan θ',m:`h = ${R(D)} × tan(${R(A)}°) = ${R(H2)}`}];}
+  else if(aK&&hK){A=ang;H2=h;D=H2/Math.tan(A*Math.PI/180);steps=[{t:'tan θ = h / d  →  d = h / tan θ',m:`d = ${R(H2)} / tan(${R(A)}°) = ${R(D)}`}];}
+  else if(dK&&hK){D=dist;H2=h;A=Math.atan(H2/D)*180/Math.PI;steps=[{t:'θ = arctan(h / d)',m:`θ = arctan(${R(H2)}/${R(D)}) = ${R(A)}°`}];}
+  else{res.innerHTML='<div class="callout red">⚠ Enter at least 2 values.</div>';return;}
+  const slant=Math.sqrt(D*D+H2*H2);
+  steps.push({t:'Slant distance (line of sight) = √(d²+h²)',m:`slant = √(${R(D*D)}+${R(H2*H2)}) = ${R(slant)}`});
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Angle θ</span><span class="res-val hi">${R(A)}°</span></div>
+    <div class="res-row"><span class="res-name">Horizontal Distance (d)</span><span class="res-val hi">${R(D)}</span></div>
+    <div class="res-row"><span class="res-name">Height / Depth (h)</span><span class="res-val hi">${R(H2)}</span></div>
+    <div class="res-row"><span class="res-name">Slant Distance</span><span class="res-val">${R(slant)}</span></div>
+    <div class="res-row"><span class="res-name">Type</span><span class="res-val">${elevMode==='elev'?'Elevation ↗':'Depression ↘'}</span></div>`;
+  sw.style.display='block';document.getElementById('elev-steps').innerHTML=mkSteps(steps);
+  drawElevCanvas(A,D,H2);
+}
+
+// ══════════════════════════════════════════════════════
+// POLYGON ANGLE CALCULATOR
+// ══════════════════════════════════════════════════════
+function buildPolyAngles(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="canvas-wrap" style="height:230px;"><canvas id="pang-c" width="480" height="230"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="callout info" style="font-size:.76rem;">Works for any polygon — regular or irregular.</div>
+      <div class="row3">
+        <div class="field"><div class="field-lbl">Number of Sides (n)</div><input type="number" id="pn-n" value="5" min="3" max="20" oninput="drawPolyAngCanvas()"></div>
+        <div class="field"><div class="field-lbl">One Interior Angle (opt)</div><input type="number" id="pn-int" placeholder="°"></div>
+        <div class="field"><div class="field-lbl">One Exterior Angle (opt)</div><input type="number" id="pn-ext" placeholder="°"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="calcPolyAngles()">Calculate ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="pang-res"><div style="color:var(--text3);font-size:.76rem;">Enter number of sides to see all angle properties.</div></div>
+      <div class="steps-wrap" id="pang-sw" style="display:none;"><div class="steps-lbl">Steps</div><div id="pang-steps"></div></div>
+    </div>
+  </div>`;
+}
+function initPolyAngles(){drawPolyAngCanvas();}
+function drawPolyAngCanvas(){
+  const c=ctx('pang-c');if(!c)return;
+  const W=480,H=230;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const n=parseInt(document.getElementById('pn-n')?.value)||5;
+  const r=88,cx=W/2,cy=H/2;
+  // draw polygon
+  c.fillStyle='rgba(61,184,112,0.09)';c.strokeStyle='#3db870';c.lineWidth=2.5;
+  c.beginPath();
+  for(let i=0;i<n;i++){const a=-Math.PI/2+2*Math.PI*i/n;i===0?c.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):c.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
+  c.closePath();c.fill();c.stroke();
+  // show exterior angle at first vertex
+  const a0=-Math.PI/2, a1=-Math.PI/2+2*Math.PI/n;
+  const prevA=-Math.PI/2-2*Math.PI/n;
+  const vx=cx+r*Math.cos(a0),vy=cy+r*Math.sin(a0);
+  // extend the side outward
+  c.strokeStyle='rgba(232,144,32,0.5)';c.lineWidth=1.5;c.setLineDash([4,3]);
+  c.beginPath();c.moveTo(vx,vy);c.lineTo(vx+45*Math.cos(prevA+Math.PI),vy+45*Math.sin(prevA+Math.PI));c.stroke();c.setLineDash([]);
+  // interior angle arc
+  c.strokeStyle='#9966ff';c.lineWidth=1.8;c.beginPath();c.arc(vx,vy,28,prevA,a1,false);c.stroke();
+  c.fillStyle='#9966ff';c.font='11px Outfit';c.textAlign='center';c.fillText('int',vx-18,vy+20);
+  // exterior angle arc
+  const extAng=360/n;const intAng=(n-2)*180/n;
+  c.strokeStyle='#e89020';c.lineWidth=1.8;c.beginPath();c.arc(vx,vy,18,a1,prevA+Math.PI,false);c.stroke();
+  c.fillStyle='#e89020';c.fillText('ext',vx+22,vy-12);
+  c.fillStyle='#9090b8';c.font='12px Outfit';c.fillText(`${n}-gon`,cx,cy+r+18);
+}
+function calcPolyAngles(){
+  let n=parseInt(document.getElementById('pn-n').value)||5;
+  const intIn=parseFloat(document.getElementById('pn-int').value),extIn=parseFloat(document.getElementById('pn-ext').value);
+  const res=document.getElementById('pang-res');const sw=document.getElementById('pang-sw');
+  // let them solve for n from angle if provided and n blank
+  if(!isNaN(intIn)&&intIn>0&&(isNaN(n)||n<3)){n=Math.round(360/(180-intIn));}
+  if(!isNaN(extIn)&&extIn>0&&(isNaN(n)||n<3)){n=Math.round(360/extIn);}
+  if(isNaN(n)||n<3){res.innerHTML='<div class="callout red">⚠ Enter number of sides (≥3).</div>';return;}
+  const intAng=(n-2)*180/n, extAng=360/n, sumInt=(n-2)*180, sumExt=360;
+  const names={3:'Triangle',4:'Quadrilateral',5:'Pentagon',6:'Hexagon',7:'Heptagon',8:'Octagon',9:'Nonagon',10:'Decagon',12:'Dodecagon'};
+  // check provided angle consistency
+  let warn='';
+  if(!isNaN(intIn)&&intIn>0&&Math.abs(intIn-intAng)>0.5) warn=`<div class="callout amber">⚠ Note: ${n}-gon interior angle is ${R(intAng)}°, not ${R(intIn)}°. Showing values for n=${n}.</div>`;
+  res.innerHTML=`${warn}
+    <div class="res-row"><span class="res-name">Shape</span><span class="res-val hi">${names[n]||n+'-gon'}</span></div>
+    <div class="res-row"><span class="res-name">Each Interior Angle</span><span class="res-val hi">${R(intAng)}°</span></div>
+    <div class="res-row"><span class="res-name">Each Exterior Angle</span><span class="res-val hi">${R(extAng)}°</span></div>
+    <div class="res-row"><span class="res-name">Sum of Interior Angles</span><span class="res-val">${R(sumInt)}°</span></div>
+    <div class="res-row"><span class="res-name">Sum of Exterior Angles</span><span class="res-val">360° (always)</span></div>
+    <div class="res-row"><span class="res-name">Diagonals</span><span class="res-val">${n*(n-3)/2}</span></div>`;
+  sw.style.display='block';document.getElementById('pang-steps').innerHTML=mkSteps([
+    {t:'Sum of interior angles = (n−2) × 180°',m:`= (${n}−2) × 180° = ${R(sumInt)}°`},
+    {t:'Each interior angle (regular polygon)',m:`= ${R(sumInt)}° ÷ ${n} = ${R(intAng)}°`},
+    {t:'Each exterior angle = 360° / n',m:`= 360° ÷ ${n} = ${R(extAng)}°`},
+    {t:'Interior + Exterior = 180° (linear pair)',m:`${R(intAng)}° + ${R(extAng)}° = 180° ✓`},
+    {t:'Number of diagonals = n(n−3)/2',m:`= ${n}(${n}−3)/2 = ${n*(n-3)/2}`},
+  ]);
+  document.getElementById('pn-n').value=n;
+  drawPolyAngCanvas();
+}
+
+// ══════════════════════════════════════════════════════
+// ANGLE UNIT CONVERTER
+// ══════════════════════════════════════════════════════
+function buildAngleConv(){
+  return `<div class="tool-layout">
+    <div class="tool-main">
+      <div class="canvas-wrap" style="height:210px;"><canvas id="aconv-c" width="480" height="210"></canvas></div>
+      <div style="height:12px;"></div>
+      <div class="callout info" style="font-size:.76rem;">🔁 Enter any value — all others update automatically.</div>
+      <div class="row2">
+        <div class="field"><div class="field-lbl">Degrees (°)</div><input type="number" id="ac-deg" placeholder="0–360°" oninput="convFrom('deg')"></div>
+        <div class="field"><div class="field-lbl">Radians (rad)</div><input type="number" id="ac-rad" placeholder="0–2π" oninput="convFrom('rad')"></div>
+        <div class="field"><div class="field-lbl">Gradians (grad)</div><input type="number" id="ac-grad" placeholder="0–400g" oninput="convFrom('grad')"></div>
+        <div class="field"><div class="field-lbl">Turns (rev)</div><input type="number" id="ac-turn" placeholder="0–1 turn" oninput="convFrom('turn')"></div>
+      </div>
+      <button class="btn btn-g btn-full" onclick="convFrom('deg')">Convert All ▶</button>
+    </div>
+    <div class="tool-panel">
+      <div class="panel-lbl">Results</div>
+      <div id="aconv-res"><div style="color:var(--text3);font-size:.76rem;">Type any value to convert.</div></div>
+      <div class="steps-wrap" id="aconv-sw" style="display:none;"><div class="steps-lbl">Formulas</div><div id="aconv-steps"></div></div>
+    </div>
+  </div>`;
+}
+function initAngleConv(){ drawAngleConvCanvas(0); }
+function drawAngleConvCanvas(deg){
+  const c=ctx('aconv-c');if(!c)return;
+  const W=480,H=210;clrCanvas(c,W,H);drawGrid(c,W,H);
+  const cx=W/2,cy=H/2,r=80;
+  // full circle
+  c.strokeStyle='rgba(85,85,112,0.35)';c.lineWidth=1.5;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.stroke();
+  // filled sector
+  const rad=deg*Math.PI/180;
+  c.fillStyle='rgba(61,184,112,0.18)';c.strokeStyle='#3db870';c.lineWidth=2.5;
+  c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+rad);c.closePath();c.fill();c.stroke();
+  // angle text
+  c.fillStyle='#3db870';c.font='bold 14px Outfit';c.textAlign='center';c.fillText(R(deg)+'°',cx,cy+6);
+  // axis labels
+  c.fillStyle='rgba(80,80,110,0.7)';c.font='11px Outfit';
+  c.fillText('0°',cx+r+16,cy+4);c.fillText('90°',cx-2,cy-r-10);c.fillText('180°',cx-r-22,cy+4);c.fillText('270°',cx-2,cy+r+14);
+}
+function convFrom(src){
+  let deg=0;
+  const dv=parseFloat(document.getElementById('ac-deg')?.value);
+  const rv=parseFloat(document.getElementById('ac-rad')?.value);
+  const gv=parseFloat(document.getElementById('ac-grad')?.value);
+  const tv=parseFloat(document.getElementById('ac-turn')?.value);
+  if(src==='deg'&&!isNaN(dv)) deg=dv;
+  else if(src==='rad'&&!isNaN(rv)) deg=rv*180/Math.PI;
+  else if(src==='grad'&&!isNaN(gv)) deg=gv*0.9;
+  else if(src==='turn'&&!isNaN(tv)) deg=tv*360;
+  else return;
+  const rad2=deg*Math.PI/180, grad=deg/0.9, turn=deg/360;
+  // Update all fields
+  if(src!=='deg') document.getElementById('ac-deg').value=parseFloat(deg.toPrecision(8));
+  if(src!=='rad') document.getElementById('ac-rad').value=parseFloat(rad2.toPrecision(8));
+  if(src!=='grad') document.getElementById('ac-grad').value=parseFloat(grad.toPrecision(8));
+  if(src!=='turn') document.getElementById('ac-turn').value=parseFloat(turn.toPrecision(8));
+  const res=document.getElementById('aconv-res');const sw=document.getElementById('aconv-sw');
+  const commonAngles={0:'0',30:'π/6',45:'π/4',60:'π/3',90:'π/2',120:'2π/3',135:'3π/4',150:'5π/6',180:'π',270:'3π/2',360:'2π'};
+  const exact=commonAngles[Math.round(deg)]?`  (${commonAngles[Math.round(deg)]})` :'';
+  res.innerHTML=`
+    <div class="res-row"><span class="res-name">Degrees</span><span class="res-val hi">${R(deg)}°</span></div>
+    <div class="res-row"><span class="res-name">Radians</span><span class="res-val hi">${parseFloat(rad2.toPrecision(6))}${exact}</span></div>
+    <div class="res-row"><span class="res-name">Gradians</span><span class="res-val">${parseFloat(grad.toPrecision(6))} grad</span></div>
+    <div class="res-row"><span class="res-name">Turns</span><span class="res-val">${parseFloat(turn.toPrecision(6))} rev</span></div>
+    <div class="res-row"><span class="res-name">Arc minutes</span><span class="res-val">${R(deg*60)}'</span></div>
+    <div class="res-row"><span class="res-name">Arc seconds</span><span class="res-val">${R(deg*3600)}"</span></div>`;
+  sw.style.display='block';document.getElementById('aconv-steps').innerHTML=mkSteps([
+    {t:'Degrees → Radians: × π/180',m:`${R(deg)}° × π/180 = ${parseFloat(rad2.toPrecision(6))} rad`},
+    {t:'Degrees → Gradians: × 400/360',m:`${R(deg)}° ÷ 0.9 = ${parseFloat(grad.toPrecision(6))} grad`},
+    {t:'Degrees → Turns: ÷ 360',m:`${R(deg)}° ÷ 360 = ${parseFloat(turn.toPrecision(6))} rev`},
+  ]);
+  drawAngleConvCanvas(((deg%360)+360)%360);
+}
+
+// ══════════════════════════════════════════════════════
+// SAVE/LOAD
+// ══════════════════════════════════════════════════════
+function copySave(){
+  const el=document.getElementById('save-code');
+  if(el.value){navigator.clipboard?.writeText(el.value).catch(()=>{});el.style.borderColor='var(--green)';}
+}
+function loadSave(){
+  const code=document.getElementById('load-code').value.trim();
+  if(!code){return;}
+  try{const d=JSON.parse(atob(code));console.log('Loaded:',d);}catch(e){alert('Invalid code.');}
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  buildSidebar();
+  buildLauncher();
+  // Set default ribbon
+  document.getElementById('ribbon-body').innerHTML=RIBBON_CONTENT.home;
+  showPage('pg-welcome');
+});
+</script>
+</body>
+</html>
+<!-- DQ Tools Floating Menu -->
+<style>
+  .fab2-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 999; }
+  .fab2-toggle { width: 34px; height: 34px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(40,164,90,0.4); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; flex-shrink: 0; }
+  .fab2-toggle:hover { background: #2ea85a; transform: scale(1.08); }
+  .fab2-toggle.open { transform: rotate(45deg) scale(1.08); background: #1f8a48; }
+  .fab2-items { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.32s ease, opacity 0.25s ease; }
+  .fab2-items.open { max-height: 300px; opacity: 1; }
+  .fab2-item { display: flex; align-items: center; position: relative; }
+  .fab2-label { background: #18181f; color: #c8f0d8; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 6px; white-space: nowrap; border: 1px solid #2e2e42; opacity: 0; transform: translateX(6px); transition: opacity 0.15s, transform 0.15s; pointer-events: none; margin-right: 7px; }
+  .fab2-item:hover .fab2-label { opacity: 1; transform: translateX(0); }
+  .fab2-icon { width: 30px; height: 30px; border-radius: 50%; background: #28a45a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; text-decoration: none; box-shadow: 0 2px 8px rgba(40,164,90,0.3); transition: background 0.15s, transform 0.15s; flex-shrink: 0; }
+  .fab2-icon:hover { background: #1f8a48; transform: scale(1.12); }
+</style>
+
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item">
+      <span class="fab2-label">Terms & Policies</span>
+      <a class="fab2-icon" href="termsandpolicies.html">📋</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">Home</span>
+      <a class="fab2-icon" href="index.html">🏠</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">DQtable</span>
+      <a class="fab2-icon" href="dqtable.html">⚗️</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">Course Planner</span>
+      <a class="fab2-icon" href="courseplanner.html">📅</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">GPA Review</span>
+      <a class="fab2-icon" href="gpareview.html">🎓</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">MathCalc</span>
+      <a class="fab2-icon" href="mathcalc.html">🧮</a>
+    </div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
