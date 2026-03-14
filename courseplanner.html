@@ -409,33 +409,16 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
 .pleg-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text2);}
 .pleg-dot{width:10px;height:10px;border-radius:2px;}
 
-/* ── DQ Auth Button ── */
 #dq-auth-btn {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(14,19,32,0.8); border: 1px solid #2a4468;
-  border-radius: 100px; padding: 4px 10px 4px 5px;
-  font-family: 'Outfit', sans-serif; font-size: .68rem; font-weight: 700;
-  color: #7a9abf; cursor: pointer; transition: all .18s;
-  white-space: nowrap; flex-shrink: 0; margin-left: 8px;
+  display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;
+  border-radius:100px;padding:4px 10px 4px 5px;font-family:'Outfit',sans-serif;font-size:.68rem;
+  font-weight:700;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;margin-left:8px;
 }
-#dq-auth-btn:hover { border-color: #3a7fff; color: #e8eef8; }
-#dq-auth-btn.logged-in { border-color: rgba(77,232,136,.35); color: #e8eef8; }
-#dq-auth-avatar {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: linear-gradient(135deg,#2dcc6f,#3a7fff);
-  display: flex; align-items: center; justify-content: center;
-  font-size: .75rem; overflow: hidden; flex-shrink: 0;
-}
-#dq-auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
-#dq-user-dropdown {
-  position: fixed; top: 58px; right: 16px; z-index: 9001;
-  background: #0e1320; border: 1px solid #2a4468; border-radius: 14px;
-  padding: 6px; width: 220px; font-family: 'Outfit', sans-serif;
-  box-shadow: 0 8px 32px rgba(0,0,0,.6);
-  display: none; flex-direction: column; gap: 2px;
-}
-#dq-user-dropdown.open { display: flex; }
-
+#dq-auth-btn:hover{border-color:#3a7fff;color:#e8eef8;}
+#dq-auth-btn.logged-in{border-color:rgba(77,232,136,.35);color:#e8eef8;}
+#dq-auth-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0;}
+#dq-auth-avatar img{width:100%;height:100%;object-fit:cover;}
 </style>
 </head>
 <body>
@@ -470,9 +453,7 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
   <div class="nav-btn" onclick="togglePathsView()" id="nav-paths-btn" title="Course Paths">🗺️ Paths</div>
   <div class="nav-btn" onclick="toggleReqsView()" id="nav-reqs-btn" title="Requirements Tracker">✅ Reqs</div>
   <div class="nav-btn" onclick="goTo(6)" id="nav-sum-btn" title="Jump to Summary">📋 Summary</div>
-<button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
-    <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
-  </button>
+<button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)"><div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span></button>
 </nav>
 <div id="app"></div>
 <div id="plan-overlay"></div>
@@ -2286,9 +2267,16 @@ window.addEventListener('load', () => {
     loader.style.opacity = '0';
     setTimeout(()=>loader.style.display='none', 500);
     renderStep();
+    // NOW it's safe to restore — page is fully initialized
+    window._cpPageReady = true;
+    if (window._cpPendingRestore) {
+      window._cpPendingRestore();
+      window._cpPendingRestore = null;
+    }
   }, 900);
 });
-// ── DQ Account: auto-save & load ──
+
+// DQ Account save/load
 function dqGetCPData() {
   return {
     name: state.name, startGrade: state.startGrade,
@@ -2312,25 +2300,31 @@ function dqRestoreCP(data) {
     completedMath: data.completedMath || [], completedSci: data.completedSci || [],
     completedLA: data.completedLA || [], choices: data.choices || {9:{},10:{},11:{},12:{}}
   });
-  if (data.currentStep > 1 && typeof goTo === 'function') {
-    setTimeout(() => goTo(data.currentStep), 1100);
-  }
+  renderStep();
+  if (data.currentStep > 1) goTo(data.currentStep);
+  DQAuth.toast('✓ Your course plan has been restored!');
 }
-let _cpLastSave = '', _cpRestored = false;
+// Auto-save every 4s if anything changed
+let _cpLastSave = '';
 setInterval(function() {
-  if (!_cpRestored || typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+  if (!window._cpPageReady) return;
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
   const cur = JSON.stringify(dqGetCPData());
   if (cur !== _cpLastSave) { _cpLastSave = cur; DQAuth.saveData('courseplanner', dqGetCPData()); }
 }, 4000);
+// Auth restore — wait for page to be ready first
 window.addEventListener('dq:authready', async ({ detail: { user } }) => {
-  if (_cpRestored) return;
-  _cpRestored = true;
   if (!user) return;
   const saved = await DQAuth.loadData('courseplanner');
-  if (saved) dqRestoreCP(saved);
-  setTimeout(() => { _cpLastSave = JSON.stringify(dqGetCPData()); }, 1200);
+  if (!saved) return;
+  if (window._cpPageReady) {
+    // Page already loaded, restore now
+    dqRestoreCP(saved);
+  } else {
+    // Page not ready yet, queue the restore
+    window._cpPendingRestore = () => dqRestoreCP(saved);
+  }
 });
-
 
 // ── ELECTIVE SEARCH ───────────────────────────────────────────
 function filterElecs(inputId, grade) {
