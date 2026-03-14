@@ -199,11 +199,42 @@ async function sbGetAllKeys(userId) {
   return rows.map(r => ({ key: r.data_key, savedAt: r.saved_at }));
 }
 
-// Profile stored in localStorage (no billing needed for this)
-function saveProfile(uid, data) {
+// Profile stored in Supabase for cross-device sync
+// Falls back to localStorage if Supabase fails
+async function saveProfile(uid, data) {
+  // Always save to localStorage as instant cache
   try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
+  // Also save to Supabase for cross-device sync
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/user_data?on_conflict=user_id,data_key`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({ user_id: uid, data_key: 'profile', payload: JSON.stringify(data), saved_at: Date.now() })
+    });
+  } catch (_) {}
 }
-function loadProfile(uid) {
+async function loadProfile(uid) {
+  // Try Supabase first for freshest data
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${uid}&data_key=eq.profile&select=payload`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows.length) {
+        const data = JSON.parse(rows[0].payload);
+        // Update local cache
+        try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
+        return data;
+      }
+    }
+  } catch (_) {}
+  // Fall back to localStorage cache
   try { const v = localStorage.getItem(`dq_profile_${uid}`); return v ? JSON.parse(v) : null; } catch (_) { return null; }
 }
 
@@ -377,7 +408,7 @@ async function initFirebase() {
     onAuthStateChanged(_auth, async user => {
       _user = user;
       if (user) {
-        _profile = loadProfile(user.uid);
+        _profile = await loadProfile(user.uid);
         if (!_profile) {
           _profile = {
             displayName: user.displayName || user.email.split('@')[0],
@@ -581,7 +612,7 @@ window.DQAuth = {
   updateProfile(updates) {
     if (!_user) return;
     _profile = { ..._profile, ...updates };
-    saveProfile(_user.uid, _profile);
+    saveProfile(_user.uid, _profile); // async, fire and forget
     updateNavBtn(_user);
   },
 
