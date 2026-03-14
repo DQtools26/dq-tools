@@ -329,74 +329,77 @@ body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--te
 </div>
 
 <script>
-const PRESET_AVATARS = ['🧪','🎓','📐','🧮','⚗️','🔬','📊','🌟','🦊','🐺','🦁','🐉','🚀','⚡','🌙','🔥'];
+const PRESETS = ['🧪','🎓','📐','🧮','⚗️','🔬','📊','🌟','🦊','🐺','🦁','🐉','🚀','⚡','🌙','🔥'];
 const DATA_LABELS = {
-  gpa: { icon: '🎓', label: 'GPA Review', desc: 'Saved GPA data and course grades' },
-  courseplanner: { icon: '📅', label: 'Course Planner', desc: '4-year course schedule' },
-  geocalc_prefs: { icon: '📐', label: 'GeoCalc', desc: 'Decimal preference' },
-  algicalc_prefs: { icon: '📊', label: 'AlgCalc', desc: 'Settings and preferences' },
-  mathcalc_prefs: { icon: '🧮', label: 'MathCalc', desc: 'Settings and preferences' },
-  dqtable_prefs: { icon: '⚗️', label: 'DQtable', desc: 'Settings and preferences' },
+  gpa:            { icon:'🎓', label:'GPA Review',     desc:'Saved GPA data and course grades' },
+  courseplanner:  { icon:'📅', label:'Course Planner', desc:'4-year course schedule' },
+  geocalc_prefs:  { icon:'📐', label:'GeoCalc',        desc:'Decimal preference' },
+  algicalc_prefs: { icon:'📊', label:'AlgCalc',        desc:'Settings and preferences' },
+  mathcalc_prefs: { icon:'🧮', label:'MathCalc',       desc:'Settings and preferences' },
+  dqtable_prefs:  { icon:'⚗️', label:'DQtable',        desc:'Settings and preferences' },
 };
 
-// Wait for auth to be ready
-window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+window.addEventListener('dq:authready', ({ detail: { user } }) => {
   if (!user) {
     document.getElementById('not-logged-in').classList.add('show');
     return;
   }
   document.getElementById('logged-in-view').classList.add('show');
-  populateProfile(user);
+  fillProfile(user);
   loadDataList();
 });
 
-function populateProfile(user) {
-  const profile = DQAuth.getProfile();
-  const name = profile?.displayName || user.displayName || user.email.split('@')[0];
+// Fallback if event already fired
+setTimeout(() => {
+  if (typeof DQAuth === 'undefined') return;
+  const user = DQAuth.getUser();
+  const mainShown = document.getElementById('logged-in-view').classList.contains('show');
+  const guestShown = document.getElementById('not-logged-in').classList.contains('show');
+  if (!mainShown && !guestShown) {
+    if (user) {
+      document.getElementById('logged-in-view').classList.add('show');
+      fillProfile(user);
+      loadDataList();
+    } else {
+      document.getElementById('not-logged-in').classList.add('show');
+    }
+  }
+}, 3000);
 
+function fillProfile(user) {
+  const p = DQAuth.getProfile();
+  const name = p?.displayName || user.displayName || user.email.split('@')[0];
   document.getElementById('profile-name-display').textContent = name;
   document.getElementById('profile-email-display').textContent = user.email;
   document.getElementById('edit-name').value = name;
   document.getElementById('edit-email').value = user.email;
-
+  document.getElementById('act-uid').textContent = user.uid;
+  document.getElementById('resend-btn').style.display = user.emailVerified ? 'none' : 'inline-flex';
   const vEl = document.getElementById('profile-verified');
   vEl.innerHTML = user.emailVerified
     ? '<span class="verified">✓ Email verified</span>'
     : '<span class="unverified">⚠ Email not verified</span>';
-
-  document.getElementById('resend-btn').style.display = user.emailVerified ? 'none' : 'inline-flex';
-
-  // Big avatar
+  if (p?.createdAt) document.getElementById('act-created').textContent = new Date(p.createdAt).toLocaleDateString();
+  document.getElementById('act-login').textContent = new Date().toLocaleDateString();
+  // Avatar
   const av = document.getElementById('big-avatar');
-  if (profile?.photoType === 'upload' && profile?.photoURL) {
-    av.innerHTML = `<img src="${profile.photoURL}" alt="avatar">`;
-  } else if (profile?.photoType === 'emoji' && profile?.photoURL) {
-    av.textContent = profile.photoURL;
-  } else if (user.photoURL) {
-    av.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
+  if (p?.photoType === 'upload' && p?.photoURL) {
+    av.innerHTML = `<img src="${p.photoURL}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
+  } else if (p?.photoType === 'emoji' && p?.photoURL) {
+    av.textContent = p.photoURL; av.style.fontSize = '2rem';
+  } else if (p?.photoType === 'google' && user?.photoURL) {
+    av.innerHTML = `<img src="${user.photoURL}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
   } else {
     av.textContent = name[0]?.toUpperCase() || '?';
+    av.style.fontSize = '1.6rem'; av.style.fontWeight = '900'; av.style.color = '#090c12';
   }
-
-  // Extra info
-  if (profile?.createdAt) {
-    document.getElementById('act-created').textContent = new Date(profile.createdAt).toLocaleDateString();
-  }
-  if (profile?.lastLogin) {
-    document.getElementById('act-login').textContent = new Date(profile.lastLogin).toLocaleDateString();
-  }
-  document.getElementById('act-uid').textContent = user.uid;
-
-  // Build emoji grid
-  const grid = document.getElementById('emoji-grid');
-  grid.innerHTML = PRESET_AVATARS.map(e =>
-    `<button class="emoji-opt ${profile?.photoURL === e ? 'selected' : ''}" onclick="selectEmoji('${e}')">${e}</button>`
+  // Emoji grid
+  document.getElementById('emoji-grid').innerHTML = PRESETS.map(e =>
+    `<button class="emoji-opt ${p?.photoURL === e ? 'selected' : ''}" onclick="pickEmoji('${e}')">${e}</button>`
   ).join('');
 }
 
-function toggleAvatarPicker() {
-  document.getElementById('avatar-picker').classList.toggle('open');
-}
+function toggleAvatarPicker() { document.getElementById('avatar-picker').classList.toggle('open'); }
 function toggleExtra() {
   const el = document.getElementById('extra-info');
   const btn = document.querySelector('.show-more-btn');
@@ -404,64 +407,45 @@ function toggleExtra() {
   btn.textContent = el.classList.contains('open') ? 'Show less ▴' : 'Show more info ▾';
 }
 
-async function selectEmoji(emoji) {
+function pickEmoji(emoji) {
+  DQAuth.updateProfile({ photoType: 'emoji', photoURL: emoji });
+  const av = document.getElementById('big-avatar');
+  av.textContent = emoji; av.style.fontSize = '2rem'; av.innerHTML = emoji;
   document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
   event.target.classList.add('selected');
-  document.getElementById('big-avatar').textContent = emoji;
   document.getElementById('avatar-picker').classList.remove('open');
-  // Save to Firestore
-  const user = DQAuth.getUser();
-  const db = DQAuth.getDB();
-  if (user && db) {
-    try {
-      const { doc, setDoc } = window._DQFire;
-      await setDoc(doc(db, 'users', user.uid, 'meta', 'profile'),
-        { photoType: 'emoji', photoURL: emoji }, { merge: true });
-      DQAuth.toast('✓ Avatar updated!');
-    } catch (_) {}
-  }
+  DQAuth.toast('✓ Avatar updated!');
 }
 
-async function handleAvatarUpload(e) {
+function handleAvatarUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
   if (file.size > 500000) { document.getElementById('upload-status').textContent = '⚠ Max 500KB'; return; }
   document.getElementById('upload-status').textContent = 'Saving…';
   const reader = new FileReader();
-  reader.onload = async (ev) => {
-    const dataURL = ev.target.result;
+  reader.onload = ev => {
+    const url = ev.target.result;
+    DQAuth.updateProfile({ photoType: 'upload', photoURL: url });
     const av = document.getElementById('big-avatar');
-    av.innerHTML = `<img src="${dataURL}" alt="avatar">`;
+    av.innerHTML = `<img src="${url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
     document.getElementById('avatar-picker').classList.remove('open');
-    const user = DQAuth.getUser();
-    const db = DQAuth.getDB();
-    if (user && db) {
-      try {
-        const { doc, setDoc } = window._DQFire;
-        await setDoc(doc(db, 'users', user.uid, 'meta', 'profile'),
-          { photoType: 'upload', photoURL: dataURL }, { merge: true });
-        DQAuth.toast('✓ Avatar updated!');
-        document.getElementById('upload-status').textContent = '';
-      } catch (_) { document.getElementById('upload-status').textContent = '⚠ Save failed'; }
-    }
+    document.getElementById('upload-status').textContent = '';
+    DQAuth.toast('✓ Avatar updated!');
   };
   reader.readAsDataURL(file);
 }
 
-async function saveName() {
+function saveName() {
   const name = document.getElementById('edit-name').value.trim();
   const st = document.getElementById('name-status');
   if (!name) { st.textContent = 'Please enter a name.'; st.className = 'status-msg status-err'; return; }
-  const user = DQAuth.getUser();
-  const db = DQAuth.getDB();
-  try {
-    const { updateProfile, doc, setDoc } = window._DQFire;
-    await updateProfile(user, { displayName: name });
-    if (db) await setDoc(doc(db, 'users', user.uid, 'meta', 'profile'), { displayName: name }, { merge: true });
-    document.getElementById('profile-name-display').textContent = name;
-    st.textContent = '✓ Name updated!'; st.className = 'status-msg status-ok';
-    setTimeout(() => st.textContent = '', 3000);
-  } catch (_) { st.textContent = 'Failed to update name.'; st.className = 'status-msg status-err'; }
+  DQAuth.updateProfile({ displayName: name });
+  document.getElementById('profile-name-display').textContent = name;
+  if (window._DQFire && DQAuth.getUser()) {
+    window._DQFire.updateProfile(DQAuth.getUser(), { displayName: name }).catch(()=>{});
+  }
+  st.textContent = '✓ Name updated!'; st.className = 'status-msg status-ok';
+  setTimeout(() => st.textContent = '', 3000);
 }
 
 function checkNewPw(pw) {
@@ -478,9 +462,9 @@ function toggleNewPw() {
 async function changePassword() {
   const pw = document.getElementById('new-pass').value;
   const st = document.getElementById('pw-status');
-  if (pw.length < 8) { st.textContent = 'Password must be at least 8 characters.'; st.className = 'status-msg status-err'; return; }
-  if (!/[A-Z]/.test(pw)) { st.textContent = 'Needs at least one uppercase letter.'; st.className = 'status-msg status-err'; return; }
-  if (!/[0-9]/.test(pw)) { st.textContent = 'Needs at least one number.'; st.className = 'status-msg status-err'; return; }
+  if (pw.length < 8) { st.textContent = 'At least 8 characters.'; st.className = 'status-msg status-err'; return; }
+  if (!/[A-Z]/.test(pw)) { st.textContent = 'Needs one uppercase letter.'; st.className = 'status-msg status-err'; return; }
+  if (!/[0-9]/.test(pw)) { st.textContent = 'Needs one number.'; st.className = 'status-msg status-err'; return; }
   try {
     const { updatePassword } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     await updatePassword(DQAuth.getUser(), pw);
@@ -489,26 +473,28 @@ async function changePassword() {
     st.textContent = '✓ Password updated!'; st.className = 'status-msg status-ok';
     setTimeout(() => st.textContent = '', 3000);
   } catch (e) {
-    const msg = e.code === 'auth/requires-recent-login'
-      ? 'Please sign out and sign back in before changing your password.'
-      : 'Failed to update password.';
-    st.textContent = msg; st.className = 'status-msg status-err';
+    st.textContent = e.code === 'auth/requires-recent-login'
+      ? 'Sign out and back in first, then try again.' : 'Failed to update password.';
+    st.className = 'status-msg status-err';
   }
 }
 
 async function loadDataList() {
   const keys = await DQAuth.getAllDataKeys();
   const list = document.getElementById('data-list');
-  if (!keys.length) { list.innerHTML = '<div class="data-empty">No saved data yet. Use the tools and your progress will appear here.</div>'; return; }
+  if (!keys.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:.78rem;">No saved data yet. Use the tools and your progress will appear here.</div>';
+    return;
+  }
   list.innerHTML = keys.map(({ key, savedAt }) => {
-    const meta = DATA_LABELS[key] || { icon: '📁', label: key, desc: 'Saved data' };
+    const m = DATA_LABELS[key] || { icon:'📁', label:key, desc:'Saved data' };
     const date = savedAt ? new Date(savedAt).toLocaleDateString() : '—';
-    return `<div class="data-item">
-      <span class="data-icon">${meta.icon}</span>
-      <div class="data-info">
-        <div class="data-name">${meta.label}</div>
-        <div class="data-desc">${meta.desc}</div>
-        <div class="data-date">Last saved: ${date}</div>
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+      <span style="font-size:1.3rem">${m.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:.8rem;font-weight:800;color:var(--text)">${m.label}</div>
+        <div style="font-size:.66rem;color:var(--text2);margin-top:1px">${m.desc}</div>
+        <div style="font-size:.59rem;color:var(--text3);margin-top:2px">Last saved: ${date}</div>
       </div>
       <button class="btn btn-danger btn-sm" onclick="deleteOne('${key}')">Delete</button>
     </div>`;
@@ -516,54 +502,38 @@ async function loadDataList() {
 }
 
 async function deleteOne(key) {
-  if (!confirm(`Delete your saved ${DATA_LABELS[key]?.label || key} data?`)) return;
-  await DQAuth.deleteData(key);
-  loadDataList();
+  if (!confirm(`Delete your ${DATA_LABELS[key]?.label || key} data?`)) return;
+  await DQAuth.deleteData(key); loadDataList();
 }
-
 async function deleteAllData() {
-  if (!confirm('Delete ALL saved tool data? This cannot be undone.')) return;
+  if (!confirm('Delete ALL saved data? Cannot be undone.')) return;
   if (!confirm('Are you absolutely sure?')) return;
   const keys = await DQAuth.getAllDataKeys();
   for (const { key } of keys) await DQAuth.deleteData(key);
   loadDataList();
 }
-
 async function exportData() {
   const keys = await DQAuth.getAllDataKeys();
   const out = {};
-  for (const { key } of keys) { out[key] = await DQAuth.loadData(key); }
-  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'dqtools-data.json';
-  a.click();
+  for (const { key } of keys) out[key] = await DQAuth.loadData(key);
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'dqtools-data.json'; a.click();
 }
-
 async function deleteAccount() {
   if (!confirm('DELETE YOUR ACCOUNT? This removes everything permanently.')) return;
-  if (!confirm('Last chance — this cannot be undone. Delete account?')) return;
+  if (!confirm('Last chance — cannot be undone. Delete account?')) return;
   const user = DQAuth.getUser();
-  const db = DQAuth.getDB();
   try {
-    // Delete all tool data
     const keys = await DQAuth.getAllDataKeys();
     for (const { key } of keys) await DQAuth.deleteData(key);
-    // Delete profile
-    if (db) {
-      const { doc, deleteDoc } = window._DQFire;
-      await deleteDoc(doc(db, 'users', user.uid, 'meta', 'profile'));
-    }
-    // Delete auth account
+    try { localStorage.removeItem(`dq_profile_${user.uid}`); } catch (_) {}
     const { deleteUser } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     await deleteUser(user);
     window.location.href = 'index.html';
   } catch (e) {
-    if (e.code === 'auth/requires-recent-login') {
-      alert('Please sign out and sign back in, then try deleting your account again.');
-    } else {
-      alert('Failed to delete account. Please try again.');
-    }
+    alert(e.code === 'auth/requires-recent-login'
+      ? 'Sign out and back in, then try again.' : 'Failed to delete account.');
   }
 }
 </script>
