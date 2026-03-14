@@ -2267,8 +2267,8 @@ window.addEventListener('load', () => {
     loader.style.opacity = '0';
     setTimeout(()=>loader.style.display='none', 500);
     renderStep();
-    // NOW it's safe to restore — page is fully initialized
     window._cpPageReady = true;
+    // Try restore now if auth already fired
     if (window._cpPendingRestore) {
       window._cpPendingRestore();
       window._cpPendingRestore = null;
@@ -2276,7 +2276,7 @@ window.addEventListener('load', () => {
   }, 900);
 });
 
-// DQ Account save/load
+// ── DQ Account: save/load ──────────────────────────────
 function dqGetCPData() {
   return {
     name: state.name, startGrade: state.startGrade,
@@ -2289,8 +2289,11 @@ function dqGetCPData() {
     currentStep: typeof currentStep !== 'undefined' ? currentStep : 0
   };
 }
+
 function dqRestoreCP(data) {
   if (!data || !data.choices) return;
+  // Mark session as restored so we never restore again this session
+  sessionStorage.setItem('cp_restored', '1');
   Object.assign(state, {
     name: data.name || '', startGrade: data.startGrade || 9,
     got8thHonors: !!data.got8thHonors, mapProficient: !!data.mapProficient,
@@ -2302,26 +2305,30 @@ function dqRestoreCP(data) {
   });
   renderStep();
   if (data.currentStep > 1) goTo(data.currentStep);
-  DQAuth.toast('✓ Your course plan has been restored!');
+  DQAuth.toast('✓ Course plan restored!');
 }
+
 // Auto-save every 4s if anything changed
 let _cpLastSave = '';
 setInterval(function() {
   if (!window._cpPageReady) return;
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
   const cur = JSON.stringify(dqGetCPData());
-  if (cur !== _cpLastSave) { _cpLastSave = cur; DQAuth.saveData('courseplanner', dqGetCPData()); }
+  if (cur !== _cpLastSave) {
+    _cpLastSave = cur;
+    DQAuth.saveData('courseplanner', dqGetCPData());
+  }
 }, 4000);
-// Auth restore — wait for page to be ready first
+
 window.addEventListener('dq:authready', async ({ detail: { user } }) => {
   if (!user) return;
+  // If already restored this browser session, don't restore again
+  if (sessionStorage.getItem('cp_restored') === '1') return;
   const saved = await DQAuth.loadData('courseplanner');
   if (!saved) return;
   if (window._cpPageReady) {
-    // Page already loaded, restore now
     dqRestoreCP(saved);
   } else {
-    // Page not ready yet, queue the restore
     window._cpPendingRestore = () => dqRestoreCP(saved);
   }
 });
