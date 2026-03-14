@@ -2505,7 +2505,7 @@ function dqRestoreCP(data){
 let _cpST;
 function dqCPAutoSave(){clearTimeout(_cpST);_cpST=setTimeout(()=>{if(typeof DQAuth!=='undefined')DQAuth.saveData('courseplanner',dqGetCPData());},1500);}
 const _origSetChoice=setChoice;
-function setChoice(grade,id,credits){_origSetChoice(grade,id,credits);dqCPAutoSave();}
+setChoice=function(grade,id,credits){_origSetChoice(grade,id,credits);dqCPAutoSave();};
 window.addEventListener('dq:authready',async({detail:{user}})=>{
   if(!user)return;
   const saved=await DQAuth.loadData('courseplanner');
