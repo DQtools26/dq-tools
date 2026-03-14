@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHS Course Planner — Moberly Spartans</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0a0a0e;
+  --bg2:      #111118;
+  --surface:  #18181f;
+  --surface2: #20202a;
+  --surface3: #28283a;
+  --border:   #2e2e42;
+  --border2:  #3e3e58;
+  --text:     #f0f0f8;
+  --text2:    #9090b8;
+  --text3:    #555570;
+  /* Spartan colors: red, white, blue on black */
+  --red:      #e03030;
+  --red-dim:  #2a0e0e;
+  --red2:     #ff5555;
+  --blue:     #2255cc;
+  --blue2:    #4488ff;
+  --blue-dim: #0a1530;
+  --white:    #f0f0f8;
+  /* accent = blue for UI chrome */
+  --accent:   #2255cc;
+  --accent2:  #4488ff;
+  --green:    #3db870;
+  --green-dim:#0e2a1a;
+  --amber:    #e89020;
+  --amber-dim:#2a1a06;
+  --purple:   #9966ff;
+  --teal:     #22c5b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* LOADER */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s;}
+.loader-logo{font-size:2.2rem;font-weight:900;letter-spacing:-.04em;margin-bottom:18px;text-align:center;}
+.loader-logo span.r{color:var(--red2);} .loader-logo span.w{color:var(--white);} .loader-logo span.b{color:var(--blue2);}
+.loader-bar{width:200px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;margin:0 auto;}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--blue2));animation:load 1s ease-out forwards;}
+@keyframes load{from{width:0}to{width:100%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes sparkle{0%{transform:scale(0) rotate(0deg);opacity:0}50%{opacity:1}100%{transform:scale(1.5) rotate(180deg);opacity:0}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* PROGRESS BAR */
+#gbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:1001;background:var(--surface2);}
+#gfill{height:100%;background:linear-gradient(90deg,var(--red),var(--blue2));transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+/* NAVBAR */
+#navbar{position:fixed;top:3px;left:0;right:0;height:54px;background:rgba(10,10,14,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 20px;gap:14px;}
+.nav-logo{font-weight:900;font-size:.98rem;letter-spacing:-.02em;white-space:nowrap;}
+.nav-logo .nr{color:var(--red2);} .nav-logo .nb{color:var(--blue2);}
+.nav-sep{flex:1;}
+.nav-phase{font-size:.72rem;color:var(--text3);white-space:nowrap;}
+.nav-dots{display:flex;gap:4px;}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--surface3);transition:all .3s;}
+.nav-dot.done{background:var(--green);}
+.nav-dot.active{background:var(--blue2);transform:scale(1.3);box-shadow:0 0 6px var(--blue2);}
+.nav-cred{font-size:.72rem;font-weight:700;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;color:var(--text2);white-space:nowrap;}
+.nav-cred span{color:var(--blue2);}
+.nav-btn{padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:.68rem;font-weight:700;cursor:pointer;color:var(--text2);transition:all .17s;white-space:nowrap;user-select:none;}
+.nav-btn:hover{border-color:var(--blue2);color:var(--blue2);}
+.nav-btn.active{background:var(--blue);border-color:var(--blue2);color:white;}
+.nav-wiz-wrap{position:relative;}
+.nav-wiz-drop{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:5px;z-index:9999;min-width:215px;box-shadow:0 8px 32px rgba(0,0,0,.7);animation:slideDown .15s ease;}
+.nav-wiz-drop.open{display:block;}
+.nwd-item{padding:8px 12px;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .12s;white-space:nowrap;}
+.nwd-item:hover{background:var(--surface2);color:var(--text);}
+.nwd-sep{height:1px;background:var(--border);margin:4px 6px;}
+
+/* APP */
+#app{padding-top:68px;min-height:100vh;}
+.screen{display:none;max-width:740px;margin:0 auto;padding:28px 18px 100px;animation:screenIn .4s cubic-bezier(.2,0,0,1) both;}
+.screen.active{display:block;}
+@keyframes screenIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 36px;margin-bottom:14px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),transparent 40%,var(--blue) 100%);opacity:.7;}
+
+/* TYPOGRAPHY */
+.eyebrow{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--blue2);margin-bottom:6px;}
+.screen-title{font-size:1.9rem;font-weight:900;letter-spacing:-.04em;line-height:1.1;margin-bottom:7px;}
+.screen-sub{font-size:.87rem;color:var(--text2);line-height:1.55;margin-bottom:24px;}
+.grade-pill{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue2);background:rgba(34,85,204,.12);border:1px solid rgba(68,136,255,.25);border-radius:999px;padding:3px 10px;margin-bottom:6px;}
+
+/* CALLOUTS */
+.callout{border-radius:11px;padding:13px 16px;font-size:.82rem;line-height:1.5;margin-bottom:13px;display:flex;gap:11px;align-items:flex-start;}
+.callout.info{background:rgba(34,85,204,.1);border:1px solid rgba(68,136,255,.25);color:var(--blue2);}
+.callout.green{background:rgba(61,184,112,.1);border:1px solid rgba(61,184,112,.3);color:var(--green);}
+.callout.amber{background:rgba(232,144,32,.1);border:1px solid rgba(232,144,32,.3);color:var(--amber);}
+.callout.red{background:rgba(224,48,48,.1);border:1px solid rgba(224,48,48,.3);color:var(--red2);}
+.ci{font-size:1rem;flex-shrink:0;margin-top:1px;}
+.callout b{font-weight:700;}
+
+/* SCHEDULE GAUGE */
+.gauge{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:14px 18px;margin-bottom:18px;}
+.gauge-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.gauge-title{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+.gauge-num{font-size:.95rem;font-weight:800;}
+.gauge-num .gn{color:var(--text);}
+.gauge-num .gm{color:var(--text3);font-size:.72rem;}
+.gauge-num.over .gn{color:var(--red2);}
+.gauge-num.full .gn{color:var(--green);}
+.gauge-slots{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;}
+.gslot{height:26px;border-radius:5px;background:var(--surface3);border:1px solid var(--border);transition:all .3s cubic-bezier(.4,0,.2,1);}
+.gslot.half{background:linear-gradient(90deg,var(--blue) 50%,var(--surface3) 50%);border-color:var(--blue2);}
+.gslot.filled{background:var(--blue);border-color:var(--blue2);box-shadow:0 0 6px rgba(68,136,255,.3);animation:slotPop .25s ease;}
+.gslot.over{background:var(--red);border-color:var(--red2);animation:shake .35s ease;}
+@keyframes slotPop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.gauge-legend{display:flex;gap:12px;margin-top:7px;font-size:.66rem;color:var(--text3);}
+.gauge-legend span{display:flex;align-items:center;gap:4px;}
+.gld{width:8px;height:8px;border-radius:2px;}
+
+/* SUBSTEP PILLS */
+.substep-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+.spill{padding:6px 13px;border-radius:999px;font-size:.7rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text3);cursor:pointer;transition:all .17s;white-space:nowrap;user-select:none;}
+.spill:hover{border-color:var(--border2);color:var(--text2);}
+.spill.active{background:var(--blue);border-color:var(--blue2);color:white;}
+.spill.sdone{background:var(--green-dim);border-color:rgba(61,184,112,.4);color:var(--green);}
+
+/* SECTION HEAD */
+.sh{font-size:.67rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sh:first-child{margin-top:0;}
+.sh-req{margin-left:auto;font-size:.6rem;padding:2px 7px;border-radius:999px;background:var(--amber-dim);color:var(--amber);border:1px solid rgba(232,144,32,.3);}
+.sh-req.met{background:var(--green-dim);color:var(--green);border-color:rgba(61,184,112,.3);}
+
+/* PATHWAY CARD */
+.pathway{background:linear-gradient(135deg,rgba(34,85,204,.07),rgba(224,48,48,.04));border:1px solid rgba(68,136,255,.2);border-radius:15px;padding:18px 20px;margin-bottom:16px;}
+.pathway-title{font-size:.67rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue2);margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+.psteps{display:flex;flex-direction:column;gap:5px;}
+.pstep{display:flex;align-items:flex-start;gap:9px;font-size:.79rem;line-height:1.4;}
+.pdot{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:900;flex-shrink:0;margin-top:1px;transition:all .3s;}
+.pdot.done{background:var(--green);border-color:var(--green);color:white;}
+.pdot.cur{background:var(--blue);border-color:var(--blue2);color:white;box-shadow:0 0 7px rgba(68,136,255,.5);}
+.pdot.fut{color:var(--text3);}
+.ptext{flex:1;}
+.pgrade{color:var(--text3);font-weight:700;font-size:.65rem;letter-spacing:.04em;}
+.pcourse{color:var(--text);}
+.pcourse.done-c{color:var(--green);text-decoration:line-through;opacity:.7;}
+.pcourse.cur-c{color:var(--text);font-weight:600;}
+.pcourse.fut-c{color:var(--text3);}
+.pnote{color:var(--text3);font-size:.7rem;}
+
+/* COURSE OPTIONS */
+.copts{display:flex;flex-direction:column;gap:7px;margin-bottom:4px;}
+.copt{position:relative;background:var(--surface2);border:2px solid var(--border);border-radius:13px;padding:14px 16px;cursor:pointer;transition:all .18s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:12px;user-select:none;}
+.copt:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.copt.sel{border-color:var(--blue);background:rgba(34,85,204,.08);}
+.copt.locked{opacity:.33;cursor:not-allowed;pointer-events:none;}
+.copt.rec{border-color:var(--green);}
+.copt.rec.sel{background:rgba(61,184,112,.07);}
+.cchk{width:20px;height:20px;border-radius:5px;border:2px solid var(--border2);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:.7rem;color:white;}
+.copt.sel .cchk{background:var(--blue);border-color:var(--blue2);animation:chkPop .22s ease;}
+@keyframes chkPop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.cbody{flex:1;}
+.cname{font-size:.9rem;font-weight:600;color:var(--text);line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.csub{font-size:.72rem;color:var(--text3);margin-top:2px;line-height:1.35;}
+.clock{font-size:.68rem;color:var(--text3);font-style:italic;margin-top:2px;}
+.ccred{font-size:.7rem;font-weight:800;color:var(--text3);white-space:nowrap;padding:3px 9px;background:var(--surface3);border-radius:999px;border:1px solid var(--border);flex-shrink:0;}
+.copt.sel .ccred{color:var(--blue2);border-color:var(--blue);}
+.tag{font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;}
+.tag-h{background:rgba(153,102,255,.15);color:#aa88ff;border:1px solid rgba(153,102,255,.3);}
+.tag-dc{background:rgba(34,197,176,.12);color:var(--teal);border:1px solid rgba(34,197,176,.25);}
+.tag-ap{background:rgba(232,144,32,.12);color:var(--amber);border:1px solid rgba(232,144,32,.25);}
+.tag-rec{background:rgba(61,184,112,.12);color:var(--green);border:1px solid rgba(61,184,112,.25);}
+.tag-half{background:var(--surface3);color:var(--text3);border:1px solid var(--border);}
+
+/* VARIABLE CREDIT CHOOSER */
+.vchoose{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.vbtn{padding:4px 11px;border-radius:999px;font-size:.7rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface3);color:var(--text3);cursor:pointer;transition:all .15s;user-select:none;}
+.vbtn:hover{border-color:var(--border2);color:var(--text2);}
+.vbtn.vsel{background:var(--blue);border-color:var(--blue2);color:white;}
+
+/* COLLAPSIBLE ELECTIVE GROUPS */
+.egroup{margin-bottom:7px;}
+.ehead{background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .17s;user-select:none;}
+.ehead:hover{border-color:var(--border2);}
+.ehead.open{border-radius:11px 11px 0 0;border-bottom-color:transparent;background:var(--surface3);}
+.eicon{font-size:.95rem;}
+.elabel{flex:1;font-size:.86rem;font-weight:600;color:var(--text);}
+.ecnt{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface3);color:var(--text3);}
+.ecnt.has{background:rgba(34,85,204,.15);color:var(--blue2);border:1px solid rgba(68,136,255,.25);}
+.earr{font-size:.68rem;color:var(--text3);transition:transform .2s;}
+.ehead.open .earr{transform:rotate(180deg);}
+.ebody{display:none;background:var(--surface2);border:1.5px solid var(--border);border-top:none;border-radius:0 0 11px 11px;padding:7px 9px 11px;}
+.ebody.open{display:block;animation:slideDown .2s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* FORM FIELDS */
+.qfield{margin-bottom:20px;}
+.qlabel{font-size:.84rem;font-weight:600;margin-bottom:9px;color:var(--text);display:block;}
+.qsub{font-size:.73rem;color:var(--text3);margin-top:-5px;margin-bottom:9px;display:block;}
+.chiprow{display:flex;flex-wrap:wrap;gap:7px;}
+.chiprow input{display:none;}
+.chiprow label{padding:8px 17px;background:var(--surface2);border:1.5px solid var(--border);border-radius:999px;font-size:.81rem;font-weight:500;cursor:pointer;transition:all .17s;color:var(--text2);}
+.chiprow label:hover{border-color:var(--border2);color:var(--text);}
+.chiprow input:checked+label{background:var(--blue);border-color:var(--blue2);color:white;box-shadow:0 0 10px rgba(34,85,204,.3);}
+input[type=text]{width:100%;padding:11px 15px;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:.88rem;color:var(--text);transition:border .18s;}
+input[type=text]:focus{outline:none;border-color:var(--blue2);}
+hr{border:none;border-top:1px solid var(--border);margin:18px 0;}
+
+/* BUTTONS */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+.btn{padding:12px 24px;border-radius:11px;font-family:inherit;font-size:.86rem;font-weight:700;cursor:pointer;border:none;transition:all .17s;letter-spacing:.01em;}
+.btn-ghost{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#1133aa);color:white;box-shadow:0 4px 16px rgba(34,85,204,.35);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 7px 24px rgba(34,85,204,.45);}
+.btn-primary:active{transform:translateY(0);}
+.btn-red{background:linear-gradient(135deg,var(--red),#aa1111);color:white;box-shadow:0 4px 16px rgba(224,48,48,.3);}
+.btn-lg{padding:15px 34px;font-size:.96rem;border-radius:13px;}
+
+/* SUMMARY */
+.sum-hero{background:linear-gradient(135deg,var(--surface),var(--bg2));border:1px solid var(--border);border-radius:18px;padding:30px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;}
+.sum-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(224,48,48,.04),rgba(34,85,204,.06));pointer-events:none;}
+.sum-badge{font-size:2.8rem;margin-bottom:10px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.sum-name{font-size:1.5rem;font-weight:900;letter-spacing:-.04em;margin-bottom:3px;}
+.sum-sub{font-size:.86rem;color:var(--text2);margin-bottom:16px;}
+.verdict{display:inline-block;padding:7px 18px;border-radius:999px;font-size:.8rem;font-weight:800;letter-spacing:.03em;}
+.verdict.good{background:rgba(61,184,112,.14);color:var(--green);border:1px solid rgba(61,184,112,.3);}
+.verdict.warn{background:rgba(232,144,32,.14);color:var(--amber);border:1px solid rgba(232,144,32,.3);}
+.verdict.bad{background:rgba(224,48,48,.14);color:var(--red2);border:1px solid rgba(224,48,48,.3);}
+
+/* 4-YEAR VISUAL GRID (the visualizer) */
+.year-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+@media(max-width:520px){.year-grid{grid-template-columns:1fr;}}
+.yr-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.yr-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.yr-head.g9{background:linear-gradient(90deg,rgba(224,48,48,.22),transparent);}
+.yr-head.g10{background:linear-gradient(90deg,rgba(34,85,204,.22),transparent);}
+.yr-head.g11{background:linear-gradient(90deg,rgba(224,48,48,.15),rgba(34,85,204,.1));}
+.yr-head.g12{background:linear-gradient(90deg,rgba(34,85,204,.15),rgba(224,48,48,.1));}
+.yr-label{font-weight:800;font-size:.9rem;}
+.yr-cred{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:999px;}
+.yr-cred.ok{background:var(--green-dim);color:var(--green);}
+.yr-cred.over{background:var(--red-dim);color:var(--red2);}
+.yr-cred.empty{background:var(--surface3);color:var(--text3);}
+.yr-courses{padding:10px 14px;display:flex;flex-direction:column;gap:4px;}
+.yr-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;background:var(--surface2);border-radius:7px;font-size:.78rem;}
+.yr-rname{color:var(--text);flex:1;}
+.yr-rtags{display:flex;gap:3px;}
+.yr-rcr{font-size:.67rem;font-weight:700;color:var(--text3);}
+.yr-empty{font-size:.77rem;color:var(--text3);font-style:italic;padding:10px 14px;}
+
+/* REQ GRID */
+.req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:9px;margin-bottom:14px;}
+.req-item{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 15px;display:flex;gap:11px;align-items:center;}
+.rdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.rdot.met{background:var(--green);box-shadow:0 0 5px var(--green);animation:chkPop .3s ease;}
+.rdot.part{background:var(--amber);}
+.rdot.unmet{background:var(--red-dim);border:1px solid var(--red);}
+.rbody{flex:1;}
+.rlabel{font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;}
+.rprog{font-size:.86rem;font-weight:800;}
+.rprog.mc{color:var(--green);} .rprog.pc{color:var(--amber);} .rprog.uc{color:var(--red2);}
+
+/* EXPORT */
+textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px;font-family:'Courier New',monospace;font-size:.76rem;color:var(--text2);resize:vertical;margin-top:10px;display:none;}
+.cbtn{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);border-radius:7px;padding:7px 14px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .14s;}
+.cbtn:hover{border-color:var(--green);color:var(--green);}
+.cbtn.copied{border-color:var(--green);color:var(--green);background:var(--green-dim);}
+
+/* YEAR-SUM BLOCK (old style, kept for compat) */
+.ysb{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:10px;}
+.ysb-h{background:var(--surface2);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.ysb-t{font-weight:800;font-size:.93rem;}
+.ysb-c{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--surface3);}
+.ysb-c.ok{color:var(--green);background:var(--green-dim);}
+.ysb-c.over{color:var(--red2);background:var(--red-dim);}
+.ysb-courses{padding:10px 18px;display:flex;flex-direction:column;gap:5px;}
+.ysb-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 9px;background:var(--surface2);border-radius:7px;font-size:.8rem;}
+.ysb-empty{font-size:.78rem;color:var(--text3);font-style:italic;padding:10px 18px;}
+
+/* PLANNING GRID OVERLAY */
+#plan-overlay{display:none;position:fixed;inset:0;top:57px;background:var(--bg);z-index:90;overflow:auto;}
+#plan-overlay.open{display:block;animation:screenIn .3s ease both;}
+.plan-wrap{max-width:1100px;margin:0 auto;padding:20px 16px 80px;}
+.plan-title{font-size:1.15rem;font-weight:900;letter-spacing:-.03em;margin-bottom:3px;}
+.plan-sub{font-size:.8rem;color:var(--text3);margin-bottom:16px;}
+.plan-scroll{overflow-x:auto;}
+.plan-grid{display:grid;grid-template-columns:110px repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-width:560px;margin-bottom:18px;}
+.pgcol-head{background:var(--surface2);padding:11px 10px;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;}
+.pgcol-head.subj{color:var(--text3);text-align:left;}
+.pgcol-head.g9{color:var(--red2);} .pgcol-head.g10{color:var(--blue2);} .pgcol-head.g11{color:var(--green);} .pgcol-head.g12{color:var(--amber);}
+.pgcol-head:last-child{border-right:none;}
+.pgrow-label{background:var(--surface2);padding:9px 10px;font-size:.68rem;font-weight:700;color:var(--text2);border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:48px;}
+.pgcell{padding:6px 7px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:48px;}
+.pgcell:last-child{border-right:none;}
+.pgrow-last .pgrow-label,.pgrow-last .pgcell{border-bottom:none;}
+.pgchip{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:.65rem;font-weight:600;margin:1px;color:var(--text2);cursor:pointer;transition:all .14s;animation:chkPop .18s ease;background:var(--surface3);}
+.pgchip:hover{border-color:var(--red2);color:var(--red2);}
+.pgchip .pgrm{color:var(--text3);font-size:.56rem;opacity:.7;}
+.pgchip.h{border-color:rgba(153,102,255,.4);color:#aa88ff;background:rgba(153,102,255,.07);}
+.pgchip.dc{border-color:rgba(34,197,176,.3);color:var(--teal);background:rgba(34,197,176,.05);}
+.pgchip.ap{border-color:rgba(232,144,32,.3);color:var(--amber);background:rgba(232,144,32,.05);}
+.pgadd{display:inline-flex;align-items:center;gap:2px;background:transparent;border:1.5px dashed var(--border);border-radius:6px;padding:2px 7px;font-size:.63rem;color:var(--text3);cursor:pointer;margin:1px;transition:all .14s;user-select:none;}
+.pgadd:hover{border-color:var(--blue2);color:var(--blue2);background:rgba(34,85,204,.06);}
+.pgdrop{position:fixed;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:5px;z-index:9999;max-height:220px;overflow-y:auto;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.7);animation:slideDown .14s ease;}
+.pgdi{padding:6px 9px;border-radius:6px;font-size:.76rem;cursor:pointer;transition:background .1s;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.pgdi:hover{background:var(--surface2);}
+.pgdi.lk{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.pgdi .pgdi-cr{font-size:.66rem;color:var(--text3);}
+.plan-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:640px){.plan-bottom{grid-template-columns:1fr;}}
+.pbreq{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.pbreq-title{font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.pbreq-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.8rem;}
+.pbreq-row:last-child{border-bottom:none;}
+.pbreq-label{flex:1;color:var(--text2);font-size:.78rem;}
+.pbreq-prog{font-weight:800;min-width:48px;text-align:right;font-size:.8rem;}
+.pbreq-bar{width:60px;height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.pbreq-fill{height:100%;border-radius:2px;transition:width .4s;}
+.pbrec{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.pbrec-title{font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.pbrec-item{font-size:.79rem;color:var(--amber);padding:4px 0;display:flex;align-items:center;gap:6px;}
+.pbrec-item.met{color:var(--green);}
+@media(max-width:600px){.plan-grid{grid-template-columns:80px repeat(4,1fr);}}
+
+/* PATHS OVERLAY */
+/* REQUIREMENTS OVERLAY */
+#reqs-overlay{display:none;position:fixed;inset:0;top:57px;background:var(--bg);z-index:90;overflow:auto;}
+#reqs-overlay.open{display:block;animation:screenIn .3s ease both;}
+.reqs-wrap{max-width:760px;margin:0 auto;padding:20px 16px 80px;}
+.req-cat{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.req-cat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;}
+.req-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .3s;}
+.req-dot.met{background:var(--green);box-shadow:0 0 8px var(--green);}
+.req-dot.part{background:var(--amber);}
+.req-dot.unmet{background:var(--border2);}
+.req-cat-label{font-weight:800;font-size:.88rem;flex:1;}
+.req-cat-prog{font-size:.8rem;font-weight:700;}
+.req-cat-prog.met{color:var(--green);}
+.req-cat-prog.part{color:var(--amber);}
+.req-cat-prog.unmet{color:var(--text2);}
+.req-body{padding:0 10px 10px;}
+.req-note{font-size:.72rem;color:var(--text3);padding:4px 6px 6px;}
+.req-add-label{font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:8px 8px 3px;}
+.req-course-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;transition:background .12s;font-size:.8rem;}
+.req-course-row:hover:not(.selected){background:var(--surface2);}
+.req-course-row.selected{background:var(--green-dim);border:1px solid rgba(61,184,112,.15);cursor:default;}
+.rcr-name{flex:1;font-weight:600;}
+.rcr-grade{font-size:.68rem;color:var(--text3);}
+.rcr-cr{font-size:.72rem;font-weight:700;color:var(--blue2);white-space:nowrap;}
+.rcr-done{color:var(--green);font-size:.75rem;font-weight:700;}
+.rcr-lock{font-size:.68rem;color:var(--text3);}
+.req-search{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:9px 14px;font-size:.83rem;color:var(--text);outline:none;font-family:inherit;margin-bottom:12px;display:block;}
+.req-search:focus{border-color:var(--blue2);}
+/* ELECTIVE SEARCH */
+.elec-search{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:9px 14px;font-size:.83rem;color:var(--text);outline:none;font-family:inherit;margin-bottom:6px;display:block;}
+.elec-search:focus{border-color:var(--blue2);}
+/* PLAN GRID EXTRAS */
+.pgcr-edit{font-size:.62rem;background:rgba(68,136,255,.15);border-radius:3px;padding:1px 4px;cursor:pointer;margin:0 2px;color:var(--blue2);}
+.pgcr-edit:hover{background:rgba(68,136,255,.3);}
+.pgcr-disp{font-size:.62rem;opacity:.6;margin:0 2px;}
+.pgdrop-search{width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:5px 8px;font-size:.75rem;color:var(--text);outline:none;font-family:inherit;margin-bottom:3px;}
+.pgdrop-search:focus{border-color:var(--blue2);}
+.pglocked{opacity:.38;cursor:default;}
+/* PATHS EXTRAS */
+.path-connector-v{width:2px;height:22px;background:var(--border);margin:0 auto;transition:background .4s;}
+.path-col-label{font-size:.58rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;text-align:center;}
+.flow-node.available-next{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(68,136,255,.15);}
+
+#paths-overlay{display:none;position:fixed;inset:0;top:57px;background:var(--bg);z-index:90;overflow:auto;}
+#paths-overlay.open{display:block;animation:screenIn .3s ease both;}
+.paths-wrap{max-width:980px;margin:0 auto;padding:20px 16px 80px;}
+.paths-title{font-size:1.15rem;font-weight:900;letter-spacing:-.03em;margin-bottom:3px;}
+.paths-sub{font-size:.8rem;color:var(--text3);margin-bottom:18px;}
+.path-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.ptab{padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .17s;color:var(--text2);}
+.ptab:hover{border-color:var(--blue2);color:var(--blue2);}
+.ptab.active{background:var(--blue);border-color:var(--blue2);color:white;}
+.flow-node{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:2px solid var(--border);border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;min-width:155px;background:var(--surface);margin:3px;}
+.flow-node:hover{border-color:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(34,85,204,.2);}
+.flow-node.done{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+.flow-node.selected{border-color:var(--blue2);background:var(--blue-dim);color:var(--blue2);}
+.flow-node.locked{opacity:.38;cursor:default;pointer-events:none;}
+.flow-node.honors{border-style:dashed;}
+.flow-node.ap{border-color:var(--amber);}
+.fn-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;}
+.flow-node.done .fn-dot{background:var(--green);}
+.flow-node.selected .fn-dot{background:var(--blue2);}
+.flow-node.ap .fn-dot{background:var(--amber);}
+.fn-name{font-size:.77rem;line-height:1.2;}
+.fn-sub{font-size:.58rem;opacity:.7;margin-top:1px;}
+.flow-arr{color:var(--text3);font-size:1.1rem;padding:0 4px;align-self:center;margin-top:6px;}
+.flow-or{font-size:.7rem;color:var(--text3);align-self:center;margin:0 2px;margin-top:6px;}
+.path-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+.pleg-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text2);}
+.pleg-dot{width:10px;height:10px;border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="loading">
+  <div>
+    <div class="loader-logo"><span class="r">M</span><span class="w">H</span><span class="b">S</span> Course Planner</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+<div id="gbar"><div id="gfill" style="width:0%"></div></div>
+<nav id="navbar">
+  <div class="nav-logo"><span class="nr">M</span><span class="nb">H</span><span style="color:var(--white)">S</span> Planner</div>
+  <div class="nav-sep"></div>
+  <div class="nav-phase" id="nphase">Welcome</div>
+  <div class="nav-wiz-wrap" id="nav-wiz-wrap">
+    <div class="nav-btn" id="nav-wiz-btn" onclick="toggleWizDrop(event)">📝 Wizard ▾</div>
+    <div class="nav-wiz-drop" id="nav-wiz-drop">
+      <div class="nwd-item" onclick="closeWizDrop();goTo(0)">🏠 Welcome</div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(1)">👤 Profile / Setup</div>
+      <div class="nwd-sep"></div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(2)">9️⃣ Grade 9 — Freshman</div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(3)">🔟 Grade 10 — Sophomore</div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(4)">1️⃣1️⃣ Grade 11 — Junior</div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(5)">1️⃣2️⃣ Grade 12 — Senior</div>
+      <div class="nwd-sep"></div>
+      <div class="nwd-item" onclick="closeWizDrop();goTo(6)">📋 Summary</div>
+    </div>
+  </div>
+  <div class="nav-dots" id="ndots"></div>
+  <div class="nav-cred" id="ncred"><span>0</span> / 24 cr</div>
+  <div class="nav-btn" onclick="togglePlanView()" id="nav-plan-btn" title="Toggle Planning Grid">⊞ Plan</div>
+  <div class="nav-btn" onclick="togglePathsView()" id="nav-paths-btn" title="Course Paths">🗺️ Paths</div>
+  <div class="nav-btn" onclick="toggleReqsView()" id="nav-reqs-btn" title="Requirements Tracker">✅ Reqs</div>
+  <div class="nav-btn" onclick="goTo(6)" id="nav-sum-btn" title="Jump to Summary">📋 Summary</div>
+</nav>
+<div id="app"></div>
+<div id="plan-overlay"></div>
+<div id="paths-overlay"></div>
+<div id="reqs-overlay"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// COURSE CATALOG — exact from MHS course book 2026-27
+// Credits corrected per course descriptions
+// Variable-credit courses: credits = [min, max]
+// ══════════════════════════════════════════════════════
+
+// C(id, name, credits, grades[], subject, req, tags[], prereqs[], prereqNote, prereqSoft, variableNote)
+// credits: number for fixed, or [min,max] for variable
+const C = (id,name,cr,grades,subj,req,tags,prereqs,prereqNote,prereqSoft,varNote) => ({
+  id, name,
+  credits: cr,                    // number OR [min,max]
+  isVar: Array.isArray(cr),       // true = student picks credit amount
+  grade: grades, subject: subj, req: req||null,
+  tags: tags||[], prereqs: prereqs||[], prereqNote: prereqNote||'', prereqSoft: prereqSoft||'',
+  varNote: varNote||''
+});
+
+const COURSES = [
+  // ── LANGUAGE ARTS ──────────────────────────────
+  C('la1',    'Language Arts I',              1,    [9],           'LA','la'),
+  C('la1h',   'Language Arts I Honors',       1,    [9],           'LA','la', ['honors','rigorous']),
+  C('la2',    'Language Arts II',             1,    [10],          'LA','la', [], ['la1','la1h'], 'Pass LA I'),
+  C('la2h',   'Language Arts II Honors',      1,    [10],          'LA','la', ['honors','rigorous'], ['la1h'], '85%+ in LA I Honors, EOC Prof/Adv, teacher rec'),
+  C('la3',    'Language Arts III',            1,    [11],          'LA','la'),
+  C('la3h',   'Language Arts III Honors',     1,    [11],          'LA','la', ['honors','rigorous'], ['la2h'], '85%+ in LA II Honors, EOC Prof/Adv, teacher rec'),
+  C('la4a',   'LA IV-A (Fall)',               0.5,  [12],          'LA','la'),
+  C('la4b',   'LA IV-B (Spring)',             0.5,  [12],          'LA','la'),
+  C('engcomp','English Composition (DC)',     1,    [12],          'LA','la', ['dc','rigorous'], ['la3','la3h'], 'B or better in LA III — writing intensive'),
+  C('pubspk', 'Public Speaking (DC)',         0.5,  [11,12],       'LA','la', ['dc','rigorous'], [], 'If junior: must be in LA III Honors', 'MACC: 2.5 GPA'),
+  C('multlit','Multicultural Literature',     0.5,  [11,12],       'LA','la', [], [], 'If junior: must be in LA III Honors'),
+  C('crwrite','Creative Writing',             0.5,  [11,12],       'LA','la', [], [], 'If junior: must be in LA III Honors — writing intensive'),
+  C('myth',   'Mythology',                    0.5,  [11,12],       'LA','la', [], [], 'If junior: must be in LA III Honors'),
+  C('journ',  'Journalism I/II',              1,    [11,12],       'LA','la', [], [], 'Teacher rec from a LA teacher; writing intensive'),
+
+  // ── SOCIAL STUDIES ─────────────────────────────
+  C('wh',    'World History',                 1,    [9],           'SS','ss'),
+  C('ush',   'U.S. History from 1865',        1,    [10,11,12],    'SS','ss'),
+  C('gov',   'Government',                    1,    [11,12],       'SS','ss'),
+  C('apgov', 'AP Government',                 1,    [11,12],       'SS','ss', ['ap','rigorous']),
+  // US History DC counts as ELECTIVE, NOT SS credit per course book
+  C('apush',  'AP US History',                1,    [11,12],       'SS','ss', ['ap','rigorous'], ['ush'], 'Pass US History; Rigorous; AP Exam available'),
+  C('ushdc', 'US History (DC)',               1,    [12],          'SS',null, ['dc'], [], 'Elective credit only — NOT SS credit', 'MACC req'),
+  C('geo',   'Geography',                     0.5,  [9,10,11],     'SS',null, [], [], 'Elective credit — NOT SS credit'),
+  C('wc1',   'Western Civilization I (DC)',   0.5,  [11,12],       'SS',null, ['dc'], [], 'Elective credit — DC available', 'B avg recommended'),
+  C('wc2',   'Western Civilization II (DC)',  0.5,  [11,12],       'SS',null, ['dc'], [], 'Elective credit — can take independently', 'B avg recommended'),
+  C('coldwar','Cold War',                     0.5,  [11,12],       'SS',null, [], ['wh','ush'], 'Must have passed World History and U.S. History; elective'),
+  C('ci',    'Contemporary Issues',           0.5,  [11,12],       'SS',null),
+  C('psych', 'Psychology',                    0.5,  [11,12],       'SS',null),
+  C('socio', 'Sociology',                     0.5,  [11,12],       'SS',null),
+
+  // ── MATHEMATICS ────────────────────────────────
+  C('prealg', 'Pre-Algebra',                  1,    [9],           'Math','math'),
+  C('alg1',   'Algebra I',                    1,    [9,10],        'Math','math'),
+  C('geo_m',  'Geometry',                     1,    [9,10,11,12],    'Math','math', [], ['alg1'], 'Pass both semesters of Algebra I'),
+  C('geoh',   'Geometry Honors',              1,    [9,10,11,12],    'Math','math', ['honors','rigorous'], ['alg1'], 'Pass Alg I, teacher rec, Prof/Adv on Alg I EOC, 90% in 8th Alg I'),
+  C('alg2',   'Algebra II',                   1,    [9,10,11],       'Math','math', [], ['geo_m','geoh'], 'Pass Algebra I and Geometry'),
+  C('alg2h',  'Algebra II Honors',            1,    [9,10,11],       'Math','math', ['honors','rigorous'], ['geo_m','geoh'], 'Pass Alg I & Geo with B avg, teacher rec'),
+  C('mra',    'Math Reasoning & Analysis',    1,    [11,12],       'Math','math', [], ['alg1','geo_m'], 'Pass Algebra I and Geometry (applied algebra elective)'),
+  // Intermediate College Algebra: 0.5 cr, SEMESTER, Fall only — pairs with College Algebra spring
+  C('intcalg','Intermediate College Algebra', 0.5,  [11,12],       'Math','math', [], ['alg2','alg2h'], 'C avg in Alg I, II, Geo — bridges to College Algebra; pairs with Calc Algebra spring'),
+  // College Algebra DC: 0.5 cr semester
+  C('calcalg', 'College Algebra (DC)',        0.5,  [11,12],       'Math','math', ['dc','rigorous'], ['alg2','alg2h'], 'C avg in Alg I, II, Geo; 3.5 GPA + ACT Math 22 for DC', 'MACC: 3.5 GPA + ACT 22'),
+  // Trigonometry DC: 0.5 cr semester
+  C('trig',   'Trigonometry (DC)',            0.5,  [11,12],       'Math','math', ['dc','rigorous'], ['alg2','alg2h'], 'C avg in all required math; pairs with College Algebra for Calculus path', 'MACC: 3.5 GPA + ACT 22'),
+  // Stats DC: 0.5 cr semester
+  C('stats',  'Statistics (DC)',              0.5,  [11,12],       'Math','math', ['dc','rigorous'], ['alg2','alg2h'], 'Complete Algebra II with 70%+ both semesters; 3.25 GPA + ACT Math 22 for DC', 'MACC: 3.25 GPA'),
+  // AP Calculus: 1 cr year long
+  C('apcalc', 'Calculus AB (DC/AP)',          1,    [12],          'Math','math', ['ap','dc','rigorous'], ['calcalg','trig'], 'B avg in all math + College Algebra + Trig DC; or ACT Math 24+'),
+
+  // ── SCIENCE ────────────────────────────────────
+  C('physci',  'Physical Science',            1,    [9],           'Sci','sci'),
+  C('physcih', 'Physical Science Honors',     1,    [9],           'Sci','sci', ['honors','rigorous'], [], 'Teacher rec, top % local science exam, MAP Proficient, B+ in 8th math & science'),
+  // Earth Science: two separate semester courses (Fall/Spring)
+  C('earth1',  'Earth Science — Composition (Fall)',  0.5, [10,11,12], 'Sci','sci', [], ['physci','physcih'], 'Fall only; take once'),
+  C('earth2',  'Earth Science — Atmosphere (Spring)', 0.5, [10,11,12], 'Sci','sci', [], ['physci','physcih'], 'Spring only; take once'),
+  C('envchem', 'Environmental Chemistry',     0.5,  [10,11,12],    'Sci','sci', [], ['physci','physcih'], 'Take in opposite semester of Ecology'),
+  C('ecology', 'Ecology',                     0.5,  [10,11,12],    'Sci','sci', [], ['physci','physcih'], 'Take in opposite semester of Env. Chemistry'),
+  C('bio1',    'Biology I',                   1,    [10,11,12],    'Sci','sci', [], ['physci','physcih'], '80%+ in Phys Sci (or 70%+ Honors) with teacher rec'),
+  C('chem',    'Chemistry (DC)',              1,    [11,12],       'Sci','sci', ['dc','rigorous'], ['alg1'], 'B or higher in 2 yrs science; enrolled/passed in Alg II; DC: 2.5 GPA', 'MACC: 2.5 GPA'),
+  C('anatomy', 'Human Anatomy (DC)',          1,    [11,12],       'Sci','sci', ['dc','rigorous'], [], 'DC: 2.5 GPA', 'MACC: 2.5 GPA'),
+  C('bio2',    'Biology II (DC)',             1,    [11,12],       'Sci','sci', ['dc','rigorous'], ['bio1'], 'B in 2 yrs science + B in prior Life Science; DC: 2.5 GPA', 'MACC: 2.5 GPA'),
+  // Physics: grade 12, 1 credit year long
+  C('physics', 'Physics',                     1,    [12],          'Sci','sci', ['rigorous'], ['physci','physcih','bio1'], 'B in Physical Science AND Biology I; enrolled in Alg II or higher'),
+  // Robotics I: NOT a science credit (elective)
+  C('robo1',   'Robotics I (Science Elective)',1,   [9,10,11,12],  'Sci',null, [], [], 'Enrolled/passed Geometry w/ C+; elective credit (not science req)'),
+
+  // ── FOREIGN LANGUAGE ───────────────────────────
+  // Intro to FL: ½ OR 1 credit (semester or year)
+  C('intfl',  'Intro to Foreign Language',    [0.5,1],[9,10,11,12],'FL',null, [], [], 'Sem 1: Spanish/German; Sem 2: French/Italian; can take semester or full year'),
+  C('span1',  'Spanish I',                    1,    [9,10,11,12],  'FL',null, [], [], 'B avg in English required'),
+  C('span2',  'Spanish II',                   1,    [10,11,12],    'FL',null, ['honors','rigorous'], ['span1'], '80%+ in Spanish I, taken previous year, instructor approval'),
+  C('span3',  'Spanish III',                  1,    [11,12],       'FL',null, [], ['span2'], '90%+ in Spanish II or instructor approval'),
+
+  // ── FAMILY & CONSUMER SCIENCE ──────────────────
+  C('kitfund','Kitchen Fundamentals',         0.5,  [9,10,11,12],  'FCS','practical'),
+  C('wfoods', 'World Foods',                  0.5,  [9,10,11,12],  'FCS','practical', [], ['kitfund'], 'Passed Kitchen Fundamentals or has Food Handler Certificate'),
+  // Child Dev: each is 0.5 cr semester (course book says ½ credit semester)
+  C('chdev1', 'Child Development I',          0.5,  [10,11,12],    'FCS','practical'),
+  C('chdev2', 'Child Development II',         0.5,  [10,11,12],    'FCS','practical', [], ['chdev1'], 'Passed Child Development I'),
+  C('intdes', 'Interior Design',              0.5,  [9,10,11,12],  'FCS','practical'),
+
+  // ── FINE ARTS ──────────────────────────────────
+  C('art1',   'Art I / Intro to Art',         1,    [9,10,11,12],  'Arts','arts'),
+  C('art2',   'Art II',                       1,    [10,11,12],    'Arts','arts', [], ['art1'], 'Teacher approval; B+ recommended'),
+  C('art3',   'Art III',                      1,    [11,12],       'Arts','arts', [], ['art2'], 'Teacher approval; B+ recommended'),
+  C('art4',   'Art IV/V',                     1,    [11,12],       'Arts','arts', [], ['art3'], 'Teacher approval'),
+  // Ceramics/Sculpture: 0.5/semester OR 1/year
+  C('cerscu', 'Ceramics / Sculpture',         [0.5,1],[10,11,12],  'Arts','arts', [], [], 'Intro to Art recommended; ½ cr per semester, can take both'),
+  // Concert Choir: 1 cr year OR semester
+  C('choir',  'Concert Choir',                [0.5,1],[9,10,11,12],'Arts','arts'),
+  C('camch',  'Chamber Singers',              1,    [10,11,12],    'Arts','arts', [], [], 'Audition required; limited enrollment'),
+  C('band',   'Concert / Marching Band',      1,    [9,10,11,12],  'Arts','arts'),
+  C('jazz',   'Jazz Ensemble',                1,    [9,10,11,12],  'Arts','arts', [], [], 'Must be enrolled in Band; audition'),
+  // Music Appreciation: 0.5 or 1 (semester or year); can only take once
+  C('musapp', 'Music Appreciation',           [0.5,1],[9,10,11,12],'Arts','arts', [], [], 'Can only take once; Fall = history/theory; both semesters available'),
+  // Music Theory: semester or year
+  C('musth',  'Music Theory',                 [0.5,1],[10,11,12],  'Arts','arts'),
+  // Intro to Theatre: 0.5 or 1 (semester or year)
+  C('itheat', 'Intro to Theatre',             [0.5,1],[9,10,11,12],'Arts','arts', [], [], 'Must complete 1st sem to be in 2nd sem'),
+  // Theatre Arts: 0.5 or 1 semester (course book says "Semester Long Course" = 0.5 but can be yr)
+  C('tharts', 'Theatre Arts (Advanced)',      0.5,  [10,11,12],    'Arts','arts', [], ['itheat'], 'Intro to Theatre w/ C or better; teacher approval'),
+  // Acting for Musical Theatre: 0.5 or 1 (semester or year)
+  C('actmus', 'Acting for Musical Theatre',   [0.5,1],[9,10,11,12],'Arts','arts', [], [], 'Must complete 1st sem to be in 2nd; can take multiple times'),
+
+  // ── PHYSICAL EDUCATION ─────────────────────────
+  // PE: 0.5 cr semester — counts toward PE req
+  C('pe',     'Physical Education',           0.5,  [9],           'PE','pe', [], [], '9th grade required PE'),
+  // Health: 0.5 cr semester — counts toward Health req
+  C('health', 'Health & Family Education',    0.5,  [9,10,11,12],  'PE','health', [], [], 'Required ½ cr for graduation; CPR certification included'),
+  // Physical Conditioning: 0.5 OR 1 — counts toward PE req
+  C('phcon',  'Physical Conditioning',        [0.5,1],[9,10,11,12], 'PE','pe', [], [], 'Pass prev PE/PC w/ C+; teacher approval. Incoming 9th: 90% summer program req'),
+  // Aerobic Fitness: 0.5 cr — counts toward PE req
+  C('aero',   'Aerobic Fitness',              0.5,  [9,10,11,12],  'PE','pe', [], [], 'Pass 1 prev semester of PE w/ C+'),
+  // Lifetime Sport & Fitness: 0.5 cr — counts toward PE req
+  C('lsf',    'Lifetime Sport & Fitness',     0.5,  [10,11,12],    'PE','pe', [], ['pe'], 'Pass prev PE/PC w/ C+'),
+  // Team Sports: 0.5 cr — counts toward PE req
+  C('tsports','Team Sports',                  0.5,  [11,12],       'PE','pe', [], ['lsf'], 'Pass Lifetime Sport w/ C+, teacher approval'),
+
+  // ── JROTC ──────────────────────────────────────
+  // LET 1: 1 cr (elective)
+  C('let1',   'LET 1 — Intro Leadership',     1,    [9,10,11,12],  'JROTC',null),
+  // LET 2: 1 cr; earns 0.5 Health + 0.5 elective
+  C('let2',   'LET 2 — Intermediate',         1,    [10,11,12],    'JROTC',null, [], ['let1'], 'LET 1 + instructor permission; earns 0.5 Health cr!'),
+  C('let3',   'LET 3 — Applied',              1,    [11,12],       'JROTC',null, [], ['let2'], 'LET 2 + instructor permission'),
+  C('let4',   'LET 4 — Advanced',             1,    [12],          'JROTC',null, [], ['let3'], 'LET 3 + instructor permission'),
+  C('batst',  'Battalion Staff',              1,    [11,12],       'JROTC',null, [], ['let2'], 'Instructor permission'),
+  // All JROTC specials: 1 credit year-long
+  C('marks_r','Marksmanship — Air Rifle',     1,    [9,10,11,12],  'JROTC',null),
+  C('marks_a','Marksmanship — Archery',       1,    [9,10,11,12],  'JROTC',null),
+  C('vex_j',  'JROTC VEX Robotics',           1,    [9,10,11,12],  'JROTC',null),
+  C('crisis', 'Crisis Response',              1,    [10,11,12],    'JROTC',null),
+  // Drill earns 0.5 Fine Arts credit
+  C('drill',  'JROTC Drill (0.5 Fine Arts)',  1,    [9,10,11,12],  'JROTC','arts', [], [], 'Earns 0.5 Fine Arts credit'),
+
+  // ── ALTERNATIVE / SCHOOL COURSES ───────────────
+  // MACC Online: 0.5 or 1 (semester or year); 10-12
+  C('maccol', 'MACC Online (Dual Credit)',    [0.5,1],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  // Yearbook: 0.5 or 1 (semester or year)
+  C('yrbk',   'Yearbook Production I/II',    [0.5,1],[10,11,12],  'Alt',null),
+  C('cadet',  'Cadet Teaching',              1,    [12],          'Alt',null, [], [], '2.5 GPA, 95% attendance, teacher rec; earns A+ hours'),
+  // Credit Recovery: semester or year, 0.5 or 1
+  C('crecrv', 'Credit Recovery',             [0.5,1],[9,10,11,12],'Alt',null, [], [], 'Must have failed core w/ 40%+; by placement only'),
+  C('acadsk', 'Academic Skills',             [0.5,1],[9,10,11,12],'Alt',null, [], [], 'Counselor/admin recommendation; semester or year'),
+
+  // ── PERSONAL FINANCE ───────────────────────────
+  C('persfin','Personal Finance',             0.5,  [10,11,12],    'MATC','finance', [], [], 'Required for graduation'),
+
+  // ── MATC AGRICULTURE ───────────────────────────
+  C('anisci', 'Animal Science',               1,    [9,10,11,12],  'MATC','practical'),
+  C('hort',   'Horticulture',                 1,    [9,10,11,12],  'MATC','practical'),
+  C('consrv', 'Conservation & Natural Resources',1, [9,10,11,12],  'MATC','practical', [], [], 'Offered every other year (26-27)'),
+  // Ag Co-op: 1 or 2 credits
+  C('agcoop', 'Agricultural Cooperative Ed', [1,2], [11,12],       'MATC',null, [], [], '10-19 hrs/wk = 1cr; 20+ hrs/wk = 2cr; instructor approval'),
+
+  // ── MATC A&E DESIGN ────────────────────────────
+  C('intae',  'Intro to A&E Design',          1,    [10,11],       'MATC','practical', [], [], 'Good math background, basic geometry & computer skills'),
+  C('ae1',    'A&E Design I',                 [2,3],[11,12],       'MATC','practical', [], ['intae'], 'Good math/computer skills; 2 or 3 credits; DC available', '', '2 or 3 credit half-day program'),
+  C('ae2',    'A&E Design II',                [2,3],[12],          'MATC','practical', ['rigorous'], ['ae1'], 'C- or better in AE Design I each semester', '', '2 or 3 credit half-day program'),
+
+  // ── MATC AUTO TECH ─────────────────────────────
+  C('auttech','Automotive Technology',        3,    [11,12],       'MATC',null, ['rigorous'], [], 'Good math/science background; 3-credit half-day; offered 26-27', '', '3-credit half-day program'),
+
+  // ── MATC BUSINESS/TECH ─────────────────────────
+  C('compapp','Computer Applications',        1,    [9,10,11,12],  'MATC','practical'),
+  // Intro to Business: 0.5 per semester, DC available
+  C('intbus', 'Intro to Business',            0.5,  [9,10,11,12],  'MATC','practical', ['dc'], [], 'Either semester; DC available'),
+  // Intro to Graphic Arts: 0.5 per semester
+  C('intgraph','Intro to Graphic Arts',       0.5,  [9,10,11,12],  'MATC','practical', [], [], 'Computer Applications recommended'),
+  C('graphart','Graphic Arts I & II',         [1,2],[10,11,12],    'MATC','practical', ['rigorous'], ['intgraph'], 'B- in Intro to Graphic Arts each semester; 2-credit year program'),
+  C('digmed', 'Digital Media',                1,    [10,11,12],    'MATC','practical', [], ['compapp'], 'Both semesters of Computer Applications'),
+  C('digmedst','Digital Media Studio',        1,    [11,12],       'MATC',null, ['rigorous'], ['digmed'], 'B- in Digital Media both semesters'),
+  C('acct1',  'Accounting I',                 1,    [10,11,12],    'MATC','practical', ['dc'], [], 'DC available; strong math skills recommended'),
+  C('acct2',  'Accounting II',                1,    [11,12],       'MATC',null, ['rigorous'], ['acct1'], 'C or better in Accounting I each semester'),
+  C('acct3',  'Problems in Accounting',       1,    [12],          'MATC',null, [], ['acct2'], 'B or better in Accounting II'),
+  C('empess', 'Employment Essentials',        1,    [10,11,12],    'MATC','practical'),
+  C('buspr',  'Business Principles & Mgmt',   1,    [10,11,12],    'MATC','practical'),
+
+  // ── MATC BUILDING TECH ─────────────────────────
+  C('bldtech','Building Technology',          3,    [11,12],       'MATC',null, ['rigorous'], [], '3-credit half-day; offered 26-27', '', '3-credit half-day program'),
+
+  // ── MATC CIT ───────────────────────────────────
+  C('cit',    'Computer Information Technology',[2,3],[11,12],    'MATC','practical', ['rigorous'], ['compapp'], 'No computer violations; 2 or 3 credit year; offered 26-27', '', '2 or 3 credit half-day program'),
+
+  // ── MATC COLLISION REPAIR ──────────────────────
+  C('collrep','Collision Repair Technology',  3,    [11,12],       'MATC',null, ['rigorous'], [], '3-credit half-day; offered 26-27', '', '3-credit half-day program'),
+
+  // ── MATC EARLY CHILDHOOD ───────────────────────
+  C('ecc',    'Early Childhood Careers I/II', [2,3],[11,12],       'MATC','practical', [], [], 'Prior Child Dev recommended; 2 or 3 credit', '', '2 or 3 credit half-day program'),
+
+  // ── MATC MACHINE TOOL ──────────────────────────
+  C('intmt',  'Intro to Machine Tool',        1,    [10],          'MATC','practical'),
+  C('mtools', 'Machine Tool Technology I/II', [2,3],[11,12],       'MATC',null, ['rigorous'], ['intmt'], 'C- in Intro to Machine Tool; 2 or 3 credit', '', '2 or 3 credit half-day program'),
+
+  // ── MATC MARKETING ─────────────────────────────
+  C('mktg',   'Marketing',                    1,    [10,11,12],    'MATC','practical', [], [], 'Computer Applications recommended'),
+  C('advmktg','Advanced Marketing',           1,    [11,12],       'MATC',null, ['rigorous'], ['mktg'], 'Successful completion of Marketing'),
+  C('advmktg2','Advanced Marketing II',       1,    [12],          'MATC',null, [], ['advmktg'], 'Adv Marketing + instructor approval'),
+  // Marketing electives (semester)
+  C('advsales','Advertising & Sales Promotion',0.5, [10,11,12],    'MATC',null, [], ['mktg'], 'Marketing or Intro to Business prereq'),
+  C('entsp',  'Entertainment & Sports Mgmt',  0.5,  [10,11,12],    'MATC',null, [], ['mktg'], 'Marketing or Intro to Business prereq'),
+
+  // ── MATC MEDICAL ───────────────────────────────
+  C('medskil','Medical Skills',               0.5,  [10,11,12],    'MATC','practical'),
+  C('medterm','Medical Terminology',          0.5,  [10,11,12],    'MATC','practical'),
+  C('prepmed','Prep for Medical Professions', 2,    [11,12],       'MATC','practical', [], [], '2-hour block; interest in science/working with people'),
+  C('ccma',   'Certified Clinical Medical Asst',3,  [12],          'MATC',null, [], [], 'Prereqs: Prep for Med OR Anatomy AND Medical Skills; 3-credit', '', '3-credit half-day program'),
+
+  // ── MATC WELDING ───────────────────────────────
+  C('elec1',  'Electronics I',               1,    [10,11,12],    'MATC','practical'),
+  C('elec2',  'Electronics II',               1,    [11,12],       'MATC','practical', ['rigorous'], ['elec1'], 'B or better in Electronics I; Rigorous Course'),
+  C('intweld','Intro to Welding',             1,    [9,10,11,12],  'MATC','practical'),
+  C('weldfab','Welding (Fabrication/Mfg)',    [2,3],[11,12],       'MATC',null, ['rigorous'], ['intweld'], 'C- in Intro to Welding; 2 or 3 credit', '', '2 or 3 credit half-day program'),
+
+  // ── MATC FLEX ──────────────────────────────────
+  C('flex',   'FLEX (Work-Based Learning)',   [1,2],[12],          'MATC',null, [], [], 'Senior on track to graduate; employment secured; 1-2 credits', '', '1 or 2 credits based on hours worked'),
+
+  // ── LANDSCAPE/TURF ─────────────────────────────
+  C('landscp','Landscape & Turf Management',  2,    [10,11,12],    'MATC','practical', [], [], '2-credit year program; practical outdoor experience'),
+
+  // ── EMBEDDED CREDIT ────────────────────────────
+  C('emb_math','Embedded CTE Math',          [0.25,0.5],[11,12],  'MATC',null, [], [], 'Must be in 2-3 hr MATC block; 0.25/sem, max 1.0 cr over 2 years'),
+  C('emb_ca', 'Embedded CTE Comm Arts',      [0.25,0.5],[11,12],  'MATC',null, [], [], 'Must be in 2-3 hr MATC block; 0.25/sem, max 1.0 cr over 2 years'),
+];
+
+const courseMap = {};
+COURSES.forEach(c => courseMap[c.id] = c);
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const state = {
+  name: '', startGrade: 9,
+  got8thHonors: false, mapProficient: false,
+  teacherRecLA: false, teacherRecMath: false, teacherRecSci: false,
+  maccEligible: false, actScore: 0,
+  prior8thMath: 'none',  // none|prealg|alg1|geo
+  completedMath: [], completedSci: [], completedLA: [],
+  // choices[grade][id] = credits number (0 = unchecked, >0 = checked w/ that many credits)
+  choices: { 9:{}, 10:{}, 11:{}, 12:{} },
+  subStep: { 9:0, 10:0, 11:0, 12:0 },
+};
+
+function getChosenCredits(grade, id) {
+  return state.choices[grade][id] || 0;
+}
+function isCheckedGrade(grade, id) {
+  return getChosenCredits(grade, id) > 0;
+}
+function isChecked(id) {
+  return [9,10,11,12].some(g => isCheckedGrade(g, id));
+}
+function setChoice(grade, id, credits) {
+  state.choices[grade][id] = credits;
+  if (!credits) cascadeUncheck(grade, id);
+}
+function cascadeUncheck(grade, removedId) {
+  [9,10,11,12].forEach(g => {
+    Object.keys(state.choices[g]).forEach(id => {
+      if (!isCheckedGrade(g, id)) return;
+      const c = courseMap[id];
+      if (!c) return;
+      if (c.prereqs.includes(removedId)) {
+        const stillHas = c.prereqs.some(pid => pid !== removedId && isChecked(pid));
+        if (!stillHas) { setChoice(g, id, 0); }
+      }
+    });
+  });
+}
+
+function canTake(courseId, forGrade) {
+  const c = courseMap[courseId];
+  if (!c || !c.grade.includes(forGrade)) return false;
+  const priorChoices = {};
+  [9,10,11,12].filter(g => g < forGrade).forEach(g => {
+    Object.keys(state.choices[g]).forEach(id => {
+      if (state.choices[g][id] > 0) priorChoices[id] = true;
+    });
+  });
+  const completed = [...state.completedMath, ...state.completedSci, ...state.completedLA];
+  const m8 = state.prior8thMath;
+  const has8thAlg1 = m8 === 'alg1' || m8 === 'geo';
+  const has8thGeo  = m8 === 'geo';
+
+  function hasDone(id) {
+    if (priorChoices[id]) return true;
+    if (completed.includes(id)) return true;
+    if (id === 'alg1' && has8thAlg1) return true;
+    if (id === 'geo_m' && has8thGeo) return true;
+    if (id === 'geoh' && has8thGeo) return true;
+    return false;
+  }
+
+  if (c.prereqs.length > 0) {
+    const anyMet = c.prereqs.some(pid => hasDone(pid));
+    if (!anyMet) return false;
+  }
+
+  // Honors unlocking
+  if (c.id === 'la1h') return state.mapProficient && state.got8thHonors && state.teacherRecLA;
+  if (c.id === 'la2h') return hasDone('la1h') && state.teacherRecLA;
+  if (c.id === 'la3h') return hasDone('la2h') && state.teacherRecLA;
+  if (c.id === 'geoh')  return state.teacherRecMath && hasDone('alg1');
+  if (c.id === 'alg2h') return state.teacherRecMath && (hasDone('geo_m') || hasDone('geoh'));
+  if (c.id === 'physcih') return state.teacherRecSci;
+  if (c.id === 'apcalc') {
+    const calcPath = hasDone('calcalg') && hasDone('trig');
+    return calcPath || state.actScore >= 24;
+  }
+  // Pubspk junior: must be in LA III Honors (handled by note; unlock for 12th always)
+  if (c.id === 'pubspk' && forGrade === 11) return hasDone('la2h');
+
+  // MACC gated
+  if (c.prereqSoft && c.prereqSoft.includes('MACC') && !state.maccEligible) return false;
+  return true;
+}
+
+function getCredits(grade) {
+  let t = 0;
+  Object.keys(state.choices[grade]).forEach(id => { t += (state.choices[grade][id] || 0); });
+  return Math.round(t * 10) / 10;
+}
+function getTotalCredits() {
+  return Math.round([9,10,11,12].reduce((s,g) => s + getCredits(g), 0) * 10) / 10;
+}
+function getReqCredits(req) {
+  let t = 0;
+  [9,10,11,12].forEach(g => {
+    Object.keys(state.choices[g]).forEach(id => {
+      const c = courseMap[id];
+      if (c && c.req === req) t += (state.choices[g][id] || 0);
+    });
+  });
+  return Math.round(t * 10) / 10;
+}
+// Special: PE = req 'pe'; JROTC LET2 earns health credit
+function getEffectivePECredits() {
+  // All PE activity courses (pe, phcon, aero, lsf, tsports) now have req:'pe'
+  let t = getReqCredits('pe');
+  // JROTC: completing 2.5 years (LET 3 or 4) earns 1 additional PE credit
+  if (isChecked('let3') || isChecked('let4')) t = Math.max(t, 1);
+  return Math.min(t, 1);
+}
+function getEffectiveHealthCredits() {
+  let t = getReqCredits('health');
+  // LET2 earns 0.5 health
+  if (isChecked('let2') || isChecked('let3') || isChecked('let4')) t += 0.5;
+  // Crisis Response mentions CPR
+  return Math.min(t, 0.5);
+}
+// JROTC Drill earns 0.5 Fine Arts
+function getEffectiveArtsCredits() {
+  let t = getReqCredits('arts');
+  if (isChecked('drill')) t += 0.5; // drill listed with req:'arts' already
+  return t;
+}
+
+function getMissingReqs() {
+  const checks = [
+    {key:'la',   needed:4,   label:'Language Arts (4 cr)',        get:()=>getReqCredits('la')},
+    {key:'ss',   needed:3,   label:'Social Studies (3 cr)',        get:()=>getReqCredits('ss')},
+    {key:'math', needed:3,   label:'Mathematics (3 cr)',           get:()=>getReqCredits('math')},
+    {key:'sci',  needed:3,   label:'Science (3 cr)',               get:()=>getReqCredits('sci')},
+    {key:'arts', needed:1,   label:'Fine Arts (1 cr)',             get:()=>getReqCredits('arts')},
+    {key:'pe',   needed:1,   label:'PE (1 cr)',                    get:()=>getEffectivePECredits()},
+    {key:'health',needed:0.5,label:'Health (0.5 cr)',              get:()=>getEffectiveHealthCredits()},
+    {key:'prac', needed:1,   label:'Practical Arts (1 cr)',        get:()=>getReqCredits('practical')},
+    {key:'fin',  needed:0.5, label:'Personal Finance (0.5 cr)',   get:()=>getReqCredits('finance')},
+  ];
+  const out = [];
+  checks.forEach(r => { if (r.get() < r.needed) out.push({...r, have: r.get()}); });
+  const total = getTotalCredits();
+  if (total < 24) out.push({key:'total', needed:24, have:total, label:`Total Credits (${total}/24)`});
+  return out;
+}
+
+// ══════════════════════════════════════════
+// WIZARD
+// ══════════════════════════════════════════
+let currentStep = 0;
+const TOTAL_STEPS = 7; // 0=welcome,1=profile,2-5=grades,6=summary
+
+function updateNav() {
+  document.getElementById('gfill').style.width = Math.round(currentStep/(TOTAL_STEPS-1)*100)+'%';
+  const names = ['Welcome','Profile','Grade 9','Grade 10','Grade 11','Grade 12','Summary'];
+  document.getElementById('nphase').textContent = names[currentStep]||'';
+  // Update wizard button label
+  const wizBtn = document.getElementById('nav-wiz-btn');
+  if (wizBtn) wizBtn.textContent = '📝 ' + (names[currentStep]||'Wizard') + ' ▾';
+  const dots = document.getElementById('ndots');
+  dots.innerHTML = '';
+  for (let i=0;i<TOTAL_STEPS;i++) {
+    const d = document.createElement('div');
+    d.className='nav-dot'+(i<currentStep?' done':i===currentStep?' active':'');
+    dots.appendChild(d);
+  }
+  const _tc=getTotalCredits(); document.getElementById('ncred').innerHTML = `<span>${_tc}</span><span style="color:var(--text3);font-size:.68rem"> cr / 24</span>`;
+}
+
+function goTo(step) {
+  currentStep = Math.max(0, Math.min(TOTAL_STEPS-1, step));
+  renderStep();
+  // NO scroll to top — keep position unless it's a major step change
+}
+function next() {
+  currentStep = Math.min(TOTAL_STEPS-1, currentStep+1);
+  renderStep();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function back() {
+  currentStep = Math.max(0, currentStep-1);
+  renderStep();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderStep() {
+  updateNav();
+  const steps = [renderWelcome, renderProfile,
+    ()=>renderGrade(9), ()=>renderGrade(10), ()=>renderGrade(11), ()=>renderGrade(12),
+    renderSummary];
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  const screen = document.createElement('div');
+  screen.className = 'screen active';
+  screen.innerHTML = steps[currentStep]();
+  app.appendChild(screen);
+  attachEvents(currentStep);
+}
+
+function setSubStep(grade, sub) {
+  state.subStep[grade] = sub;
+  // Re-render only the card content, not the whole page — prevents scroll jump
+  const content = document.getElementById('substep-content');
+  const bar = document.getElementById('substep-bar');
+  if (content) {
+    content.style.opacity = '0';
+    setTimeout(() => {
+      content.innerHTML = buildSubstepContent(grade, sub);
+      rebuildSubstepBar(grade, sub, bar);
+      content.style.opacity = '1';
+      content.style.transition = 'opacity .25s';
+    }, 120);
+  } else {
+    renderStep();
+  }
+}
+
+function gradeBack(grade) {
+  const sub = state.subStep[grade] || 0;
+  if (sub > 0) setSubStep(grade, sub - 1);
+  else back();
+}
+function gradeFwd(grade) {
+  const sub = state.subStep[grade] || 0;
+  if (sub < GRADE_SUBSTEPS.length - 1) setSubStep(grade, sub + 1);
+  else next();
+}
+
+function rebuildSubstepBar(grade, sub, bar) {
+  if (!bar) return;
+  bar.innerHTML = GRADE_SUBSTEPS.map((ss,i) => {
+    const reqMet = ss.req ? getReqCredits(ss.req) >= ({la:4,math:3,sci:3,ss:3}[ss.req]||0) : false;
+    return `<div class="spill ${i===sub?'active':reqMet?'sdone':''}" onclick="setSubStep(${grade},${i})">${ss.icon} ${ss.label}</div>`;
+  }).join('');
+  // Also update the forward button label
+  const fwdBtn = document.getElementById('grade-fwd-btn');
+  if (fwdBtn) {
+    const fwdLabel = sub < GRADE_SUBSTEPS.length-1
+      ? GRADE_SUBSTEPS[sub+1].label + ' →'
+      : (grade < 12 ? 'Grade '+(grade+1)+' →' : 'See Summary →');
+    fwdBtn.textContent = fwdLabel;
+  }
+}
+
+// ── WELCOME ──────────────────────────────
+function renderWelcome() {
+  return `<div class="card">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2.4rem;margin-bottom:4px;animation:float 3s ease-in-out infinite">🏈</div>
+      <div style="font-size:.65rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--red2)">MOBERLY HIGH SCHOOL</div>
+      <div style="font-size:.58rem;letter-spacing:.1em;color:var(--text3);margin-top:2px">GO SPARTANS</div>
+    </div>
+    <div class="eyebrow">Moberly High School</div>
+    <div class="screen-title">Plan Your 4-Year<br>High School Journey 🎓</div>
+    <div class="screen-sub">Build your graduation plan step by step. Answer a few setup questions, then pick courses for each grade — we'll track credits, check prerequisites, and make sure you're on track.</div>
+    <div class="callout green"><span class="ci">🎓</span><div>You need <b>24 total credits</b> to graduate, including Language Arts (4), Math (3), Science (3), Social Studies (3), Fine Arts (1), PE (1), Health (½), Practical Arts (1), and Personal Finance (½).</div></div>
+    <div class="callout info"><span class="ci">✨</span><div><b>DC</b> = Dual Credit (earn college credit too). <b>AP</b> = Advanced Placement. <b>Honors</b> = accelerated curriculum. <b>Rigorous courses</b> count toward Latin Honors cords at graduation.</div></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-ghost" style="flex:1" onclick="next()">📋 Start Wizard →</button>
+      <button class="btn btn-primary" style="flex:1" onclick="next();setTimeout(()=>togglePlanView(),400)">⊞ Jump to Planning Grid</button>
+    </div>
+  </div>`;
+}
+
+// ── PROFILE ──────────────────────────────
+function renderProfile() {
+  const sg = state.startGrade;
+  return `<div class="card">
+    <div class="eyebrow">Step 1 of 6</div>
+    <div class="screen-title">About You</div>
+    <div class="screen-sub">These answers unlock the right courses for you. Be honest — they only help!</div>
+
+    <div class="qfield"><label class="qlabel">Your name (optional)</label>
+      <input type="text" id="pname" placeholder="e.g. Alex" value="${state.name}"></div>
+
+    <div class="qfield"><label class="qlabel">What grade are you entering this fall?</label>
+      <div class="chiprow">${[9,10,11,12].map(g=>`<input type="radio" name="sg" id="sg${g}" value="${g}" ${sg==g?'checked':''}><label for="sg${g}">Grade ${g}</label>`).join('')}</div>
+    </div>
+
+    <hr>
+    <div class="sh" style="margin-top:0">🔓 Math Starting Point</div>
+
+    <div class="qfield">
+      <label class="qlabel">What math did you complete in 8th grade (or before)?</label>
+      <span class="qsub">This is the biggest unlock — it moves your whole math sequence forward</span>
+      <div class="chiprow">
+        <input type="radio" name="m8" id="m80" value="none" ${state.prior8thMath==='none'?'checked':''}><label for="m80">Nothing yet</label>
+        <input type="radio" name="m8" id="m81" value="prealg" ${state.prior8thMath==='prealg'?'checked':''}><label for="m81">Pre-Algebra</label>
+        <input type="radio" name="m8" id="m82" value="alg1" ${state.prior8thMath==='alg1'?'checked':''}><label for="m82">✓ Algebra I</label>
+        <input type="radio" name="m8" id="m83" value="geo" ${state.prior8thMath==='geo'?'checked':''}><label for="m83">✓✓ Geometry</label>
+      </div>
+      <div id="m8note" style="margin-top:8px;font-size:.75rem;color:var(--green);display:${state.prior8thMath==='alg1'||state.prior8thMath==='geo'?'block':'none'}">
+        ${state.prior8thMath==='geo'
+          ? '🎉🎉 Geometry in 8th grade unlocks Algebra II (and Algebra II Honors with teacher rec) for 9th grade!'
+          : '🎉 Algebra I in 8th grade unlocks Geometry (and Geometry Honors with teacher rec) for 9th grade!'}
+      </div>
+    </div>
+
+    <hr>
+    <div class="sh" style="margin-top:0">🏆 Academic Profile</div>
+
+    <div class="qfield">
+      <label class="qlabel">Did you get 90%+ in 8th grade Language Arts?</label>
+      <span class="qsub">Needed for LA I Honors eligibility</span>
+      <div class="chiprow">
+        <input type="radio" name="la8" id="la8y" value="y" ${state.got8thHonors?'checked':''}><label for="la8y">Yes</label>
+        <input type="radio" name="la8" id="la8n" value="n" ${!state.got8thHonors?'checked':''}><label for="la8n">No / Not sure</label>
+      </div>
+    </div>
+
+    <div class="qfield">
+      <label class="qlabel">Were you MAP Proficient or Advanced in 8th grade ELA?</label>
+      <span class="qsub">Also required for LA I Honors</span>
+      <div class="chiprow">
+        <input type="radio" name="mapr" id="mapy" value="y" ${state.mapProficient?'checked':''}><label for="mapy">Yes</label>
+        <input type="radio" name="mapr" id="mapn" value="n" ${!state.mapProficient?'checked':''}><label for="mapn">No</label>
+      </div>
+    </div>
+
+    <div class="qfield">
+      <label class="qlabel">Do any teachers recommend you for Honors courses?</label>
+      <span class="qsub">Applies to LA Honors, Math Honors, and Science Honors</span>
+      <div class="chiprow">
+        <input type="radio" name="trec" id="trecy" value="y" ${state.teacherRecLA?'checked':''}><label for="trecy">Yes — at least one subject</label>
+        <input type="radio" name="trec" id="trecn" value="n" ${!state.teacherRecLA?'checked':''}><label for="trecn">No</label>
+      </div>
+    </div>
+
+    <div class="qfield">
+      <label class="qlabel">Do you meet MACC Dual Credit requirements?</label>
+      <span class="qsub">2.5+ GPA required for most DC courses; check with your counselor</span>
+      <div class="chiprow">
+        <input type="radio" name="macc" id="maccy" value="y" ${state.maccEligible?'checked':''}><label for="maccy">Yes / I plan to</label>
+        <input type="radio" name="macc" id="maccn" value="n" ${!state.maccEligible?'checked':''}><label for="maccn">No / Not yet</label>
+      </div>
+    </div>
+
+    <div id="prior-section" style="${sg>9?'':'display:none'}">
+      <hr>
+      <div class="sh" style="margin-top:0">📚 Courses Already Completed</div>
+      <div class="callout amber"><span class="ci">⚠️</span><div>Since you're entering Grade ${sg}, tell us what you've already done so later years unlock correctly.</div></div>
+
+      <div class="qfield">
+        <label class="qlabel">Highest math course completed (in high school, above 8th grade):</label>
+        <div class="chiprow">
+          <input type="radio" name="prmath" id="prm0" value="none" checked><label for="prm0">None (beyond 8th)</label>
+          <input type="radio" name="prmath" id="prm1" value="alg1"><label for="prm1">Algebra I</label>
+          <input type="radio" name="prmath" id="prm2" value="geo_m"><label for="prm2">Geometry</label>
+          <input type="radio" name="prmath" id="prm3" value="geoh"><label for="prm3">Geometry Honors</label>
+          <input type="radio" name="prmath" id="prm4" value="alg2"><label for="prm4">Algebra II</label>
+          <input type="radio" name="prmath" id="prm5" value="alg2h"><label for="prm5">Algebra II Honors</label>
+          <input type="radio" name="prmath" id="prm6" value="calcalg"><label for="prm6">College Algebra DC</label>
+        </div>
+      </div>
+
+      <div class="qfield">
+        <label class="qlabel">LA courses passed:</label>
+        <div class="chiprow">
+          <input type="checkbox" name="prla" id="pla1" value="la1"><label for="pla1">LA I</label>
+          <input type="checkbox" name="prla" id="pla1h" value="la1h"><label for="pla1h">LA I Honors</label>
+          <input type="checkbox" name="prla" id="pla2" value="la2"><label for="pla2">LA II</label>
+          <input type="checkbox" name="prla" id="pla2h" value="la2h"><label for="pla2h">LA II Honors</label>
+          <input type="checkbox" name="prla" id="pla3" value="la3"><label for="pla3">LA III</label>
+          <input type="checkbox" name="prla" id="pla3h" value="la3h"><label for="pla3h">LA III Honors</label>
+        </div>
+      </div>
+
+      <div class="qfield">
+        <label class="qlabel">Science courses passed:</label>
+        <div class="chiprow">
+          <input type="checkbox" name="prsci" id="psc1" value="physci"><label for="psc1">Phys. Science</label>
+          <input type="checkbox" name="prsci" id="psc1h" value="physcih"><label for="psc1h">Phys. Science Honors</label>
+          <input type="checkbox" name="prsci" id="psc2" value="bio1"><label for="psc2">Biology I</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="back()">← Back</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Continue →</button>
+    </div>
+  </div>`;
+}
+
+function saveProfile() {
+  state.name = document.getElementById('pname').value.trim();
+  const sg = document.querySelector('input[name="sg"]:checked');
+  if (sg) state.startGrade = parseInt(sg.value);
+
+  const m8 = document.querySelector('input[name="m8"]:checked');
+  state.prior8thMath = m8 ? m8.value : 'none';
+  state.completedMath = [];
+  if (state.prior8thMath === 'prealg') state.completedMath = ['prealg'];
+  if (state.prior8thMath === 'alg1')   state.completedMath = ['prealg','alg1'];
+  if (state.prior8thMath === 'geo')    state.completedMath = ['prealg','alg1','geo_m'];
+
+  const la8 = document.querySelector('input[name="la8"]:checked');
+  state.got8thHonors = la8?.value === 'y';
+  const mapr = document.querySelector('input[name="mapr"]:checked');
+  state.mapProficient = mapr?.value === 'y';
+  const trec = document.querySelector('input[name="trec"]:checked');
+  const hasRec = trec?.value === 'y';
+  state.teacherRecLA = state.teacherRecMath = state.teacherRecSci = hasRec;
+  const macc = document.querySelector('input[name="macc"]:checked');
+  state.maccEligible = macc?.value === 'y';
+
+  // Prior math (HS level)
+  const prm = document.querySelector('input[name="prmath"]:checked');
+  if (prm && prm.value !== 'none') {
+    const seq = ['alg1','geo_m','geoh','alg2','alg2h','calcalg'];
+    const idx = seq.indexOf(prm.value);
+    for (let i=0;i<=idx;i++) { if (!state.completedMath.includes(seq[i])) state.completedMath.push(seq[i]); }
+  }
+  state.completedLA = [];
+  document.querySelectorAll('input[name="prla"]:checked').forEach(cb => state.completedLA.push(cb.value));
+  state.completedSci = [];
+  document.querySelectorAll('input[name="prsci"]:checked').forEach(cb => state.completedSci.push(cb.value));
+
+  next();
+}
+
+// ── GRADE YEAR ───────────────────────────
+const GRADE_SUBSTEPS = [
+  {id:'la',   label:'Language Arts', icon:'📘', req:'la',   needed:4},
+  {id:'math', label:'Math',          icon:'📐', req:'math', needed:3},
+  {id:'sci',  label:'Science',       icon:'🔬', req:'sci',  needed:3},
+  {id:'ss',   label:'Social Studies',icon:'📗', req:'ss',   needed:3},
+  {id:'elec', label:'Electives',     icon:'🎨', req:null,   needed:0},
+];
+
+function renderGrade(grade) {
+  const label = {9:'Freshman',10:'Sophomore',11:'Junior',12:'Senior'}[grade];
+  const step = grade - 8;
+  const credits = getCredits(grade);
+  const isOver = credits > 7;
+  const isPast = grade < state.startGrade;
+  const sub = state.subStep[grade] || 0;
+
+  const slots = [];
+  for (let i=0;i<14;i++) {
+    const filled = (i/2) < credits;
+    const over = isOver && filled;
+    slots.push(`<div class="gslot ${over?'over':filled?'filled':''}"></div>`);
+  }
+
+  const pills = GRADE_SUBSTEPS.map((ss,i) => {
+    const met = ss.req ? getReqCredits(ss.req) >= ss.needed : false;
+    return `<div class="spill ${i===sub?'active':met?'sdone':''}" onclick="setSubStep(${grade},${i})">${ss.icon} ${ss.label}</div>`;
+  }).join('');
+
+  const content = buildSubstepContent(grade, sub);
+
+  const fwdLabel = sub < GRADE_SUBSTEPS.length-1
+    ? GRADE_SUBSTEPS[sub+1].label + ' →'
+    : (grade < 12 ? 'Grade '+(grade+1)+' →' : 'See Summary →');
+
+  return `<div class="card">
+    <div class="grade-pill">${label} Year</div>
+    <div class="eyebrow">${isPast ? 'Review: Already Completed' : 'Grade ' + grade + ' — Course Selection'}</div>
+    <div class="screen-title">Grade ${grade}</div>
+    <div class="screen-sub">Select courses for each grade — up to <b>7 credits/year</b>. 24 credits minimum to graduate, 28 maximum if every year is full.</div>
+
+    ${isPast?`<div class="callout amber"><span class="ci">⚠️</span><div>You're entering Grade ${state.startGrade}, so Grade ${grade} is already done. Check courses you <b>already completed</b> to unlock later years.</div></div>`:''}
+
+    <div class="gauge">
+      <div class="gauge-head">
+        <span class="gauge-title">📅 Grade ${grade} Schedule</span>
+        <span class="gauge-num ${isOver?'over':credits>=6?'full':''}">
+          <span class="gn">${credits}</span><span class="gm"> / 7 cr</span>
+        </span>
+      </div>
+      <div class="gauge-slots">${slots.join('')}</div>
+      <div class="gauge-legend">
+        <span><div class="gld" style="background:var(--blue)"></div>Filled</span>
+        <span><div class="gld" style="background:var(--surface3);border:1px solid var(--border)"></div>Open</span>
+        ${isOver?`<span><div class="gld" style="background:var(--red)"></div>Over!</span>`:''}
+      </div>
+    </div>
+    ${isOver?`<div class="callout red"><span class="ci">⚠️</span><div>Over 7 credits by <b>${(credits-7).toFixed(1)}</b>. Remove some courses.</div></div>`:''}
+
+    <div class="substep-bar" id="substep-bar">${pills}</div>
+    <div id="substep-content" style="transition:opacity .25s">${content}</div>
+
+    <div class="btn-row" id="grade-btn-row">
+      <button class="btn btn-ghost" onclick="gradeBack(${grade})">← Back</button>
+      <button class="btn btn-primary" id="grade-fwd-btn" onclick="gradeFwd(${grade})">${fwdLabel}</button>
+    </div>
+  </div>`;
+}
+
+function buildSubstepContent(grade, sub) {
+  const ss = GRADE_SUBSTEPS[sub];
+  if (ss.id==='la')   return buildLA(grade);
+  if (ss.id==='math') return buildMath(grade);
+  if (ss.id==='sci')  return buildSci(grade);
+  if (ss.id==='ss')   return buildSS(grade);
+  if (ss.id==='elec') return buildElec(grade);
+  return '';
+}
+
+// ── PATHWAY HELPER ────────────────────────
+function makePathway(title, icon, steps) {
+  const rows = steps.map(s => {
+    const allIds = s.ids || [];
+    const isDone = allIds.some(id => isChecked(id) || state.completedMath.concat(state.completedLA).concat(state.completedSci).includes(id));
+    const isCur  = !isDone && s.grade === state.startGrade;
+    const dc = isDone?'done':isCur?'cur':'fut';
+    const tc = isDone?'done-c':isCur?'cur-c':'fut-c';
+    return `<div class="pstep">
+      <div class="pdot ${dc}">${isDone?'✓':s.grade}</div>
+      <div class="ptext">
+        <div class="pgrade">Grade ${s.grade}</div>
+        <div class="pcourse ${tc}">${s.label}</div>
+        ${s.note?`<div class="pnote">${s.note}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="pathway"><div class="pathway-title">${icon} ${title} Pathway</div><div class="psteps">${rows}</div></div>`;
+}
+
+// ── COURSE OPTION HTML ────────────────────
+function courseOptHTML(course, grade) {
+  if (!course) return '';
+  const unlocked = canTake(course.id, grade);
+  const chosenCr = getChosenCredits(grade, course.id);
+  const sel = chosenCr > 0;
+  const isRec = isRecommended(course.id, grade);
+  const isVar = course.isVar;
+  const fixedCr = !isVar ? course.credits : course.credits[0];
+
+  let tags = '';
+  if (course.tags.includes('honors')) tags += `<span class="tag tag-h">Honors</span>`;
+  if (course.tags.includes('dc'))     tags += `<span class="tag tag-dc">DC</span>`;
+  if (course.tags.includes('ap'))     tags += `<span class="tag tag-ap">AP</span>`;
+  if (isRec && unlocked)              tags += `<span class="tag tag-rec">⭐ Rec</span>`;
+  if (!isVar && course.credits < 1)   tags += `<span class="tag tag-half">½ cr</span>`;
+
+  const lockReason = !unlocked ? getLockReason(course.id, grade) : '';
+  const lockLabel = !unlocked
+    ? `<div class="clock">🔒 ${lockReason}</div>`
+    : (course.prereqNote ? `<div class="csub">${course.prereqNote}</div>` : '');
+
+  // Variable credit chooser (shown only when selected)
+  let vchoose = '';
+  if (isVar && sel && unlocked) {
+    const [mn, mx] = course.credits;
+    const steps = [];
+    for (let v=mn; v<=mx; v+=mn) steps.push(Math.round(v*100)/100);
+    if (!steps.includes(mx)) steps.push(mx);
+    vchoose = `<div class="vchoose">${steps.map(v=>`<div class="vbtn ${chosenCr===v?'vsel':''}" onclick="event.stopPropagation();pickCredit(${grade},'${course.id}',${v})">${v} cr</div>`).join('')}</div>`;
+  }
+
+  const crLabel = isVar
+    ? (sel ? `${chosenCr} cr` : `${course.credits[0]}–${course.credits[1]} cr`)
+    : `${course.credits} cr`;
+
+  return `<div class="copt${sel?' sel':''}${!unlocked?' locked':''}${isRec&&unlocked?' rec':''}"
+    data-id="${course.id}" data-grade="${grade}"
+    title="${!unlocked ? lockReason : ''}"
+    onclick="toggleCourse('${course.id}',${grade},${fixedCr})">
+    <div class="cchk">${sel?'✓':''}</div>
+    <div class="cbody">
+      <div class="cname">${course.name} ${tags}</div>
+      ${lockLabel}
+      ${vchoose}
+    </div>
+    <div class="ccred">${crLabel}</div>
+  </div>`;
+}
+
+function toggleCourse(id, grade, defaultCr) {
+  const cur = getChosenCredits(grade, id);
+  const course = courseMap[id];
+  if (!course) return;
+  if (cur > 0) {
+    setChoice(grade, id, 0);
+  } else {
+    const cr = course.isVar ? course.credits[0] : course.credits;
+    setChoice(grade, id, cr);
+  }
+  // Remember which elective group is currently open (accordion - only one)
+  let openGroupIdx = -1;
+  document.querySelectorAll('.ehead').forEach((h,i) => { if (h.classList.contains('open')) openGroupIdx = i; });
+
+  const sub = state.subStep[grade] || 0;
+  const contentEl = document.getElementById('substep-content');
+  const barEl = document.getElementById('substep-bar');
+  const gaugeEl = document.querySelector('.gauge-slots');
+  const gaugeNum = document.querySelector('.gauge-num');
+  if (contentEl) {
+    contentEl.innerHTML = buildSubstepContent(grade, sub);
+    rebuildSubstepBar(grade, sub, barEl);
+    updateGauge(grade, gaugeEl, gaugeNum);
+    updateNavCred();
+    // Restore open group
+    if (openGroupIdx >= 0) {
+      const heads = document.querySelectorAll('.ehead');
+      if (heads[openGroupIdx]) {
+        heads[openGroupIdx].classList.add('open');
+        const body = heads[openGroupIdx].nextElementSibling;
+        if (body) body.classList.add('open');
+      }
+    }
+  } else {
+    renderStep();
+  }
+}
+
+function pickCredit(grade, id, cr) {
+  setChoice(grade, id, cr);
+  const sub = state.subStep[grade] || 0;
+  const contentEl = document.getElementById('substep-content');
+  const barEl = document.getElementById('substep-bar');
+  const gaugeEl = document.querySelector('.gauge-slots');
+  const gaugeNum = document.querySelector('.gauge-num');
+  if (contentEl) {
+    contentEl.innerHTML = buildSubstepContent(grade, sub);
+    rebuildSubstepBar(grade, sub, barEl);
+    updateGauge(grade, gaugeEl, gaugeNum);
+    updateNavCred();
+  }
+}
+
+function updateGauge(grade, slotsEl, numEl) {
+  if (!slotsEl) return;
+  const credits = getCredits(grade);
+  const isOver = credits > 7;
+  slotsEl.innerHTML = '';
+  for (let i=0;i<14;i++) {
+    const filled = (i/2) < credits;
+    const over = isOver && filled;
+    const d = document.createElement('div');
+    d.className = 'gslot '+(over?'over':filled?'filled':'');
+    slotsEl.appendChild(d);
+  }
+  if (numEl) {
+    numEl.className = 'gauge-num'+(isOver?' over':credits>=6?' full':'');
+    numEl.innerHTML = `<span class="gn">${credits}</span><span class="gm"> / 7 cr</span>`;
+  }
+}
+
+
+function getLockReason(courseId, forGrade) {
+  const c = courseMap[courseId];
+  if (!c) return 'Not available';
+  const priorChoices = {};
+  [9,10,11,12].filter(g => g < forGrade).forEach(g => {
+    Object.keys(state.choices[g]).forEach(id => { if (state.choices[g][id] > 0) priorChoices[id] = true; });
+  });
+  const completed = [...state.completedMath, ...state.completedSci, ...state.completedLA];
+  const m8 = state.prior8thMath;
+  function hasDone(id) {
+    if (priorChoices[id]) return true;
+    if (completed.includes(id)) return true;
+    if (id === 'alg1' && (m8==='alg1'||m8==='geo')) return true;
+    if (id === 'geo_m' && m8==='geo') return true;
+    return false;
+  }
+  const reasons = [];
+  if (c.id==='la1h') {
+    if (!state.mapProficient) reasons.push('Need MAP Proficient/Advanced in 8th ELA');
+    if (!state.got8thHonors) reasons.push('Need 90%+ in 8th grade LA');
+    if (!state.teacherRecLA) reasons.push('Need teacher recommendation');
+    return reasons.join(' · ') || 'Not eligible';
+  }
+  if (c.id==='la2h') {
+    if (!hasDone('la1h')) reasons.push('Need LA I Honors first');
+    if (!state.teacherRecLA) reasons.push('Need teacher recommendation');
+    return reasons.join(' · ') || 'Not eligible';
+  }
+  if (c.id==='la3h') {
+    if (!hasDone('la2h')) reasons.push('Need LA II Honors first');
+    if (!state.teacherRecLA) reasons.push('Need teacher recommendation');
+    return reasons.join(' · ') || 'Not eligible';
+  }
+  if (c.id==='geoh') {
+    if (!hasDone('alg1')) reasons.push('Need Algebra I first');
+    if (!state.teacherRecMath) reasons.push('Need math teacher recommendation');
+    return reasons.join(' · ') || 'Not eligible';
+  }
+  if (c.id==='alg2h') {
+    if (!hasDone('geo_m') && !hasDone('geoh')) reasons.push('Need Geometry first');
+    if (!state.teacherRecMath) reasons.push('Need math teacher recommendation');
+    return reasons.join(' · ') || 'Not eligible';
+  }
+  if (c.id==='physcih') return 'Need science teacher rec + MAP Proficient + top % on local science exam';
+  if (c.id==='apcalc') return 'Need College Algebra DC + Trig DC (or ACT Math 24+)';
+  if (c.prereqSoft && c.prereqSoft.includes('MACC') && !state.maccEligible) {
+    return 'Requires MACC Dual Credit eligibility (2.5+ GPA — update in Profile)';
+  }
+  if (c.prereqs.length > 0 && !c.prereqs.some(pid => hasDone(pid))) {
+    const prereqNames = c.prereqs.map(pid => courseMap[pid] ? courseMap[pid].name : pid);
+    return 'Need: ' + prereqNames.join(' or ');
+  }
+  return c.prereqNote || 'Prerequisites not met';
+}
+
+function updateNavCred() {
+  const el = document.getElementById('ncred');
+  if (el) el.innerHTML = `<span>${getTotalCredits()}</span> / 24 cr`;
+  const fill = document.getElementById('gfill');
+  if (fill) fill.style.width = Math.round(currentStep/(TOTAL_STEPS-1)*100)+'%';
+}
+
+function isRecommended(id, grade) {
+  const recs = {
+    9:  ['la1','la1h','wh','alg1','physci','physcih','pe','health'],
+    10: ['la2','la2h','ush','geo_m','geoh','bio1','span1','persfin'],
+    11: ['la3','la3h','gov','alg2h','alg2','chem','physics','persfin'],
+    12: ['engcomp','la4a','la4b','gov','apgov','apcalc'],
+  };
+  return (recs[grade]||[]).includes(id);
+}
+
+// ── LANGUAGE ARTS SUBSTEP ─────────────────
+function buildLA(grade) {
+  const pathway = makePathway('Language Arts','📘',[
+    {grade:9, ids:['la1','la1h'], label:(state.mapProficient&&state.got8thHonors&&state.teacherRecLA)?'LA I Honors (you qualify!)':'Language Arts I (standard)'},
+    {grade:10, ids:['la2','la2h'], label:'Language Arts II / II Honors'},
+    {grade:11, ids:['la3','la3h'], label:'Language Arts III / III Honors'},
+    {grade:12, ids:['la4a','la4b','engcomp','pubspk'], label:'LA IV-A/B or English Composition DC (+½-credit electives)'},
+  ]);
+  const completedIds = getCompletedForSubject(grade, 'LA');
+  const completedBadge = buildCompletedBadge(completedIds);
+  const courses = COURSES.filter(c => c.subject==='LA' && c.grade.includes(grade) && !completedIds.includes(c.id));
+  const earned = getReqCredits('la');
+  return pathway+completedBadge+`<div class="sh">📘 Language Arts — Grade ${grade} <span class="sh-req ${earned>=4?'met':''}">${earned}/4 cr total</span></div>
+    <div class="copts">${courses.map(c=>courseOptHTML(c,grade)).join('')}</div>`;
+}
+
+// ── MATH SUBSTEP ──────────────────────────
+function buildMath(grade) {
+  const m8 = state.prior8thMath;
+  let m8note = '';
+  if (m8==='alg1') m8note = '<div class="callout green" style="margin-bottom:12px"><span class="ci">📐</span><div>✓ Algebra I completed in 8th grade — Geometry (and Geometry Honors with teacher rec) unlocked for 9th!</div></div>';
+  if (m8==='geo')  m8note = '<div class="callout green" style="margin-bottom:12px"><span class="ci">📐</span><div>✓ Geometry completed in 8th grade — Algebra II (and Algebra II Honors with teacher rec) available this year!</div></div>';
+
+  const pathway = makePathway('Mathematics','📐',[
+    {grade:9,  ids:['prealg','alg1','geo_m','geoh'], label:m8==='geo'?'Algebra II / Honors (advanced!)':m8==='alg1'?'Geometry / Honors (unlocked!)':'Pre-Algebra or Algebra I', note:m8==='alg1'?'8th grade Alg I counted!':m8==='geo'?'8th grade Geo counted!':''},
+    {grade:10, ids:['geo_m','geoh','alg2','alg2h'], label:'Geometry → Algebra II / Honors'},
+    {grade:11, ids:['alg2','alg2h','intcalg','calcalg','trig','stats','mra'], label:'Algebra II → College Algebra DC + Trig DC, or Stats, or MR&A', note:'3 cr required; 4 recommended for college'},
+    {grade:12, ids:['apcalc','calcalg','trig','stats','mra'], label:'AP/DC Calculus or continue DC math sequence'},
+  ]);
+
+  // Completed in 8th grade or prior — hide from main list, show in "completed" badge
+  const completedIds = getCompletedForSubject(grade, 'Math');
+  const completedBadge = buildCompletedBadge(completedIds);
+  const courses = COURSES.filter(c => c.subject==='Math' && c.grade.includes(grade) && !completedIds.includes(c.id));
+  const earned = getReqCredits('math');
+  return pathway+m8note+completedBadge+`<div class="sh">📐 Mathematics — Grade ${grade} <span class="sh-req ${earned>=3?'met':''}">${earned}/3 cr total</span></div>
+    <div class="callout info" style="margin-bottom:12px"><span class="ci">ℹ️</span><div><b>Sequence:</b> Pre-Algebra → Algebra I → Geometry → Algebra II → (Intermediate Calc Algebra) → College Algebra DC + Trig DC (pair these!) → Calculus AB.<br>Note: Intermediate College Algebra is <b>0.5 cr, Fall only</b>; College Algebra and Trig are each <b>0.5 cr semester</b>.</div></div>
+    <div class="copts">${courses.map(c=>courseOptHTML(c,grade)).join('')}</div>`;
+}
+
+// ── SCIENCE SUBSTEP ───────────────────────
+function buildSci(grade) {
+  const pathway = makePathway('Science','🔬',[
+    {grade:9,  ids:['physci','physcih'], label:state.teacherRecSci?'Physical Science Honors (rec!)':'Physical Science', note:'80%+ (or 70%+ Honors) opens Biology I sophomore year'},
+    {grade:10, ids:['bio1','earth1','earth2','envchem','ecology'], label:'Biology I + Earth Science/Ecology/Env. Chem (semester electives)'},
+    {grade:11, ids:['chem','anatomy','bio2','physics'], label:'Chemistry DC, Physics, Human Anatomy DC, or Biology II DC'},
+    {grade:12, ids:['chem','anatomy','bio2','physics'], label:'Continue advanced sciences'},
+  ]);
+
+  const bio10note = grade===10 && !state.completedSci.includes('physci') && !state.completedSci.includes('physcih')
+    && !isChecked('physci') && !isChecked('physcih')
+    ? `<div class="callout amber"><span class="ci">⚠️</span><div>Biology I requires Physical Science from 9th grade. Go back to Grade 9 Science to add it first!</div></div>` : '';
+
+  const completedSciIds = getCompletedForSubject(grade, 'Sci');
+  const completedSciBadge = buildCompletedBadge(completedSciIds);
+  const courses = COURSES.filter(c => c.subject==='Sci' && c.grade.includes(grade) && !completedSciIds.includes(c.id));
+  const earned = getReqCredits('sci');
+  return pathway+bio10note+completedSciBadge+`<div class="sh">🔬 Science — Grade ${grade} <span class="sh-req ${earned>=3?'met':''}">${earned}/3 cr total</span></div>
+    <div class="copts">${courses.map(c=>courseOptHTML(c,grade)).join('')}</div>`;
+}
+
+// ── SS SUBSTEP ────────────────────────────
+function buildSS(grade) {
+  const pathway = makePathway('Social Studies','📗',[
+    {grade:9,  ids:['wh'],  label:'World History (required)'},
+    {grade:10, ids:['ush'], label:'U.S. History from 1865 (required)'},
+    {grade:11, ids:['gov','apgov'], label:'Government or AP Government (required)', note:'Must pass US & MO Constitution tests to graduate'},
+    {grade:12, ids:['gov','apgov','ushdc','wc1','wc2','psych','socio'], label:'Complete Gov if not done, then SS electives', note:'Most SS electives count as elective credit, NOT SS req'},
+  ]);
+
+  const notes = `<div class="callout info" style="margin-bottom:12px"><span class="ci">ℹ️</span><div>Geography, Cold War, Psychology, Sociology, Western Civ, US History DC = <b>elective credit only</b> (not SS requirement). Only World History, US History from 1865, Government, and AP Government count toward the 3-credit SS requirement.</div></div>`;
+
+  const courses = COURSES.filter(c => c.subject==='SS' && c.grade.includes(grade));
+  const earned = getReqCredits('ss');
+  return pathway+notes+`<div class="sh">📗 Social Studies — Grade ${grade} <span class="sh-req ${earned>=3?'met':''}">${earned}/3 cr total</span></div>
+    <div class="copts">${courses.map(c=>courseOptHTML(c,grade)).join('')}</div>`;
+}
+
+// ── ELECTIVES SUBSTEP ─────────────────────
+function buildElec(grade) {
+  const credits = getCredits(grade);
+  const remaining = Math.max(0, 7 - credits);
+  const reminders = [];
+  if (getReqCredits('arts') < 1) reminders.push('🎨 Fine Arts (1 cr)');
+  if (getEffectivePECredits() < 1) reminders.push('🏃 PE (1 cr)');
+  if (getEffectiveHealthCredits() < 0.5) reminders.push('💊 Health (½ cr)');
+  if (getReqCredits('practical') < 1) reminders.push('🏭 Practical Arts (1 cr)');
+  if (getReqCredits('finance') < 0.5) reminders.push('💼 Personal Finance (½ cr)');
+
+  const remBox = reminders.length
+    ? `<div class="callout amber"><span class="ci">📋</span><div><b>Still needed (all years):</b> ${reminders.join(' · ')}</div></div>`
+    : `<div class="callout green"><span class="ci">✅</span><div>All required elective categories covered!</div></div>`;
+  const spaceBox = `<div class="callout info" style="margin-bottom:10px"><span class="ci">📅</span><div>Grade ${grade} has <b>${remaining.toFixed(1)} credit slot(s)</b> remaining. Use them for electives!</div></div>`;
+
+  const groups = [
+    {icon:'🎨', label:'Fine Arts', note:'1 cr required for grad; Drill earns ½ FA credit', subj:['Arts'], extraIds:['drill']},
+    {icon:'🏃', label:'PE & Health', note:'½ cr PE + ½ cr Health required; Physical Conditioning = ½ or 1 cr', subj:['PE']},
+    {icon:'🌍', label:'Foreign Language', note:'Recommended for college-bound (2 yrs same language)', subj:['FL']},
+    {icon:'🏡', label:'Family & Consumer Science', note:'Counts as Practical Arts (1 cr req)', subj:['FCS']},
+    {icon:'🎖️', label:'JROTC', note:'LET2 earns ½ Health cr; 2.5 yrs earns PE cr; Drill = ½ Fine Arts', subj:['JROTC']},
+    {icon:'🏭', label:'MATC / Business / Career-Technical', note:'Many count as Practical Arts; some are 2-3 credit programs', subj:['MATC']},
+    {icon:'💼', label:'Personal Finance (Required)', note:'½ credit required to graduate', subj:[], ids:['persfin']},
+    {icon:'🧩', label:'Other Electives', note:'Yearbook, Cadet Teaching, MACC Online, Credit Recovery, etc.', subj:['Alt']},
+  ];
+
+  const groupsHtml = groups.map(g => {
+    let ids = g.ids ? [...g.ids] : [];
+    (g.subj||[]).forEach(s => {
+      COURSES.filter(c => c.subject===s && c.grade.includes(grade)).forEach(c => { if (!ids.includes(c.id)) ids.push(c.id); });
+    });
+    (g.extraIds||[]).forEach(eid => {
+      if (!ids.includes(eid) && courseMap[eid] && courseMap[eid].grade.includes(grade)) ids.push(eid);
+    });
+    if (!ids.length) return '';
+    const chosen = ids.filter(id => getChosenCredits(grade,id) > 0);
+    const countBadge = chosen.length
+      ? `<span class="ecnt has">${chosen.length} selected</span>`
+      : `<span class="ecnt">none</span>`;
+    const coursesHtml = ids.map(id => courseOptHTML(courseMap[id], grade)).filter(Boolean).join('');
+    return `<div class="egroup">
+      <div class="ehead" onclick="toggleElecGroup(this, event)">
+        <span class="eicon">${g.icon}</span>
+        <span class="elabel">${g.label} <span style="font-size:.7rem;color:var(--text3);font-weight:400">— ${g.note}</span></span>
+        ${countBadge}
+        <span class="earr">▾</span>
+      </div>
+      <div class="ebody"><div class="copts" style="padding:4px 0" onclick="event.stopPropagation()">${coursesHtml}</div></div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  const _sid = 'elec-s-'+grade;
+  const _sb = `<input class="elec-search" id="${_sid}" placeholder="🔍 Search all electives…" oninput="filterElecs('${_sid}',${grade})" /><div id="elec-sr-${grade}" style="margin-bottom:8px"></div>`;
+  return remBox+spaceBox+_sb+groupsHtml;
+}
+
+function toggleElecGroup(header, event) {
+  if (event) event.stopPropagation();
+  const wasOpen = header.classList.contains('open');
+  // Close all groups first
+  document.querySelectorAll('.ehead.open').forEach(h => {
+    h.classList.remove('open');
+    const b = h.nextElementSibling;
+    if (b) b.classList.remove('open');
+  });
+  // If it wasn't open, open it now
+  if (!wasOpen) {
+    header.classList.add('open');
+    const body = header.nextElementSibling;
+    if (body) body.classList.add('open');
+  }
+}
+
+// ── SUMMARY ──────────────────────────────
+function renderSummary() {
+  const name = state.name || 'Student';
+  const total = getTotalCredits();
+  const missing = getMissingReqs();
+  const good = missing.length === 0;
+
+  const REQS = [
+    {key:'la',   label:'Language Arts',   needed:4,   get:()=>getReqCredits('la')},
+    {key:'ss',   label:'Social Studies',  needed:3,   get:()=>getReqCredits('ss')},
+    {key:'math', label:'Mathematics',     needed:3,   get:()=>getReqCredits('math')},
+    {key:'sci',  label:'Science',         needed:3,   get:()=>getReqCredits('sci')},
+    {key:'arts', label:'Fine Arts',       needed:1,   get:()=>getReqCredits('arts')},
+    {key:'pe',   label:'PE',              needed:1,   get:()=>getEffectivePECredits()},
+    {key:'health',label:'Health',         needed:0.5, get:()=>getEffectiveHealthCredits()},
+    {key:'prac', label:'Practical Arts',  needed:1,   get:()=>getReqCredits('practical')},
+    {key:'fin',  label:'Personal Finance',needed:0.5, get:()=>getReqCredits('finance')},
+    {key:'total',label:'Total Credits',   needed:24,  get:()=>total},
+  ];
+
+  const reqGrid = REQS.map(r => {
+    const have = r.get();
+    const met = have >= r.needed;
+    const part = have > 0 && !met;
+    return `<div class="req-item">
+      <div class="rdot ${met?'met':part?'part':'unmet'}"></div>
+      <div class="rbody">
+        <span class="rlabel">${r.label}</span>
+        <span class="rprog ${met?'mc':part?'pc':'uc'}">${have} / ${r.needed}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 4-year visual grid
+  const yearGrid = [9,10,11,12].map(grade => {
+    const cr = getCredits(grade);
+    const glabel = {9:'Freshman',10:'Sophomore',11:'Junior',12:'Senior'}[grade];
+    const gcls = {9:'g9',10:'g10',11:'g11',12:'g12'}[grade];
+    const selectedCourses = COURSES.filter(c => c.grade.includes(grade) && getChosenCredits(grade,c.id)>0);
+    const rows = selectedCourses.length
+      ? selectedCourses.map(c => {
+          const chosenCr = getChosenCredits(grade, c.id);
+          let tags = '';
+          if (c.tags.includes('honors')) tags += `<span class="tag tag-h" style="font-size:.55rem;padding:1px 5px">H</span>`;
+          if (c.tags.includes('dc'))     tags += `<span class="tag tag-dc" style="font-size:.55rem;padding:1px 5px">DC</span>`;
+          if (c.tags.includes('ap'))     tags += `<span class="tag tag-ap" style="font-size:.55rem;padding:1px 5px">AP</span>`;
+          return `<div class="yr-row"><span class="yr-rname">${c.name}</span><div class="yr-rtags">${tags}</div><span class="yr-rcr">${chosenCr}cr</span></div>`;
+        }).join('')
+      : '';
+    const credCls = cr>7?'over':cr>0?'ok':'empty';
+    return `<div class="yr-card">
+      <div class="yr-head ${gcls}">
+        <span class="yr-label">Grade ${grade} — ${glabel}</span>
+        <span class="yr-cred ${credCls}">${cr} / 7 cr</span>
+      </div>
+      ${rows?`<div class="yr-courses">${rows}</div>`:'<div class="yr-empty">No courses selected</div>'}
+    </div>`;
+  }).join('');
+
+  // Detailed year-by-year list
+  const yearList = [9,10,11,12].map(grade => {
+    const cr = getCredits(grade);
+    const glabel = {9:'Freshman',10:'Sophomore',11:'Junior',12:'Senior'}[grade];
+    const selectedCourses = COURSES.filter(c => c.grade.includes(grade) && getChosenCredits(grade,c.id)>0);
+    const rows = selectedCourses.length
+      ? selectedCourses.map(c => {
+          const chosenCr = getChosenCredits(grade, c.id);
+          let tags = '';
+          if (c.tags.includes('honors')) tags += `<span class="tag tag-h" style="font-size:.55rem;padding:1px 5px">H</span>`;
+          if (c.tags.includes('dc'))     tags += `<span class="tag tag-dc" style="font-size:.55rem;padding:1px 5px">DC</span>`;
+          if (c.tags.includes('ap'))     tags += `<span class="tag tag-ap" style="font-size:.55rem;padding:1px 5px">AP</span>`;
+          return `<div class="ysb-row"><span>${c.name} ${tags}</span><span style="color:var(--text3);font-size:.7rem;font-weight:700">${chosenCr} cr</span></div>`;
+        }).join('')
+      : '<div class="ysb-empty">No courses selected</div>';
+    return `<div class="ysb">
+      <div class="ysb-h"><span class="ysb-t">Grade ${grade} — ${glabel}</span><span class="ysb-c ${cr>7?'over':cr>0?'ok':''}">${cr} / 7 cr</span></div>
+      <div class="ysb-courses">${rows}</div>
+    </div>`;
+  }).join('');
+
+  const verdictMsg = good
+    ? `All requirements met! ${name} is on track to graduate from Moberly High School.`
+    : `${missing.length} area(s) still need attention: ${missing.map(m=>m.label).join(', ')}.`;
+
+  return `
+    <div class="callout info" style="margin-bottom:14px">
+      <span class="ci">📋</span>
+      <div>This is your <b>Graduation Summary</b>. Navigate to any grade to edit your plan, or use <b>⊞ Plan</b> in the top nav for the full planning grid.</div>
+    </div>
+    <div class="sum-hero">
+      <div class="sum-badge">🎓</div>
+      <div class="sum-name">${name}'s Graduation Plan</div>
+      <div class="sum-sub">${total} total credits planned · Moberly High School</div>
+      <div class="verdict ${good?'good':missing.length<=2?'warn':'bad'}">${good?'✓ On Track to Graduate':missing.length<=2?'Almost There — A Few More Needed':'Needs More Courses'}</div>
+    </div>
+
+    ${good
+      ? `<div class="callout green"><span class="ci">🎉</span><div>${verdictMsg}</div></div>`
+      : `<div class="callout ${missing.length<=2?'amber':'red'}"><span class="ci">⚠️</span><div>${verdictMsg}</div></div>`}
+
+    <div class="sh">📊 4-Year Overview</div>
+    <div class="year-grid">${yearGrid}</div>
+
+    <div class="sh">📋 Graduation Requirements</div>
+    <div class="req-grid">${reqGrid}</div>
+
+    <div class="sh">📅 Detailed Course List</div>
+    ${yearList}
+
+    <div class="sh">📄 Export</div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="cbtn" onclick="toggleExport()">Show Text Version</button>
+      <button class="cbtn" id="copybtn" onclick="copyPlan()">📋 Copy to Clipboard</button>
+    </div>
+    <textarea class="ebox" id="ebox" readonly>${buildExportText()}</textarea>
+
+    <div class="btn-row" style="margin-top:22px">
+      <button class="btn btn-ghost" onclick="back()">← Edit Grade 12</button>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        ${[9,10,11,12].map(g=>`<button class="btn btn-ghost" style="padding:9px 14px;font-size:.78rem" onclick="goTo(${g-8+1})">Grade ${g}</button>`).join('')}
+        <button class="btn btn-primary" onclick="goTo(2)">🔄 Start Over</button>
+      </div>
+    </div>`;
+}
+
+function buildExportText() {
+  const name = state.name || 'Student';
+  const total = getTotalCredits();
+  const missing = getMissingReqs();
+  let t = `=====================================\n${name.toUpperCase()}'S MHS GRADUATION PLAN\n=====================================\nTotal Credits: ${total} / 24\nStatus: ${missing.length===0?'ON TRACK TO GRADUATE ✓':'INCOMPLETE'}\n`;
+  if (missing.length) t += `Needs: ${missing.map(m=>m.label).join(', ')}\n`;
+  const REQS = [
+    {label:'Language Arts (4 cr)',   get:()=>getReqCredits('la')},
+    {label:'Social Studies (3 cr)',  get:()=>getReqCredits('ss')},
+    {label:'Mathematics (3 cr)',     get:()=>getReqCredits('math')},
+    {label:'Science (3 cr)',         get:()=>getReqCredits('sci')},
+    {label:'Fine Arts (1 cr)',       get:()=>getReqCredits('arts')},
+    {label:'PE (1 cr)',              get:()=>getEffectivePECredits()},
+    {label:'Health (0.5 cr)',        get:()=>getEffectiveHealthCredits()},
+    {label:'Practical Arts (1 cr)',  get:()=>getReqCredits('practical')},
+    {label:'Personal Finance (0.5)', get:()=>getReqCredits('finance')},
+  ];
+  t += `\n--- REQUIREMENTS ---\n`;
+  REQS.forEach(r => { const h=r.get(); t += `${h>=parseFloat(r.label.match(/[\d.]+(?= cr)/)?.[0]||0)?'✓':'✗'} ${r.label}: ${h} cr\n`; });
+  [9,10,11,12].forEach(grade => {
+    const label={9:'FRESHMAN',10:'SOPHOMORE',11:'JUNIOR',12:'SENIOR'}[grade];
+    const cr = getCredits(grade);
+    t += `\n--- GRADE ${grade} — ${label} (${cr} credits) ---\n`;
+    const courses = COURSES.filter(c=>c.grade.includes(grade)&&getChosenCredits(grade,c.id)>0);
+    if (!courses.length) t += '  (none)\n';
+    else courses.forEach(c => {
+      const chosenCr = getChosenCredits(grade,c.id);
+      const tag = c.tags.includes('honors')?' [Honors]':c.tags.includes('dc')?' [DC]':c.tags.includes('ap')?' [AP]':'';
+      t += `  • ${c.name}${tag} — ${chosenCr} cr\n`;
+    });
+  });
+  t += `\n=====================================\nMoberly High School — Go Spartans!\n=====================================\n`;
+  return t;
+}
+
+function toggleExport() {
+  const box = document.getElementById('ebox');
+  if (box) box.style.display = box.style.display==='block'?'none':'block';
+}
+function copyPlan() {
+  const text = buildExportText();
+  const btn = document.getElementById('copybtn');
+  function onSuccess() {
+    if (btn) { btn.textContent='✓ Copied!'; btn.style.background='var(--green)'; btn.style.color='#000'; setTimeout(()=>{btn.textContent='📋 Copy to Clipboard';btn.style.background='';btn.style.color='';},2000); }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(()=>fallbackCopy(text,onSuccess));
+  } else { fallbackCopy(text,onSuccess); }
+}
+function fallbackCopy(text, onSuccess) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); onSuccess(); } catch(e) { alert('Copy failed — use Ctrl+A then Ctrl+C in the text box.'); }
+  document.body.removeChild(ta);
+}
+
+function toggleWizDrop(event) {
+  if (event) event.stopPropagation();
+  const drop = document.getElementById('nav-wiz-drop');
+  if (!drop) return;
+  drop.classList.toggle('open');
+  if (drop.classList.contains('open')) {
+    setTimeout(() => document.addEventListener('click', closeWizDrop, {once:true}), 10);
+  }
+}
+function closeWizDrop() {
+  const drop = document.getElementById('nav-wiz-drop');
+  if (drop) drop.classList.remove('open');
+}
+
+// ── "PREVIOUSLY COMPLETED" COURSE LOGIC ──
+// For a given grade+subject, courses already completed via 8th grade or prior choices
+// should be shown in a "completed" section rather than as selectable options
+function getCompletedForSubject(grade, subject) {
+  // Returns list of course ids that are "done before this grade" for this subject
+  const m8 = state.prior8thMath;
+  const done = [];
+  if (subject === 'Math') {
+    if (m8 === 'alg1' || m8 === 'geo') done.push('alg1');
+    if (m8 === 'geo')  done.push('geo_m');
+    // also prior HS completed
+    state.completedMath.forEach(id => { if (!done.includes(id)) done.push(id); });
+  }
+  if (subject === 'LA') state.completedLA.forEach(id => done.push(id));
+  if (subject === 'Sci') state.completedSci.forEach(id => done.push(id));
+  // only return courses relevant to this grade's normal range
+  return done.filter(id => {
+    const c = courseMap[id];
+    return c && c.subject === subject;
+  });
+}
+
+function buildCompletedBadge(ids) {
+  if (!ids.length) return '';
+  const names = ids.map(id => courseMap[id]?.name || id).join(', ');
+  return `<div style="background:var(--green-dim);border:1px solid rgba(61,184,112,.2);border-radius:9px;padding:9px 13px;margin-bottom:12px;font-size:.78rem;">
+    <div style="font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:4px;">✓ Completed Before This Grade</div>
+    <div style="color:var(--text2);">${names}</div>
+  </div>`;
+}
+
+// ── PLANNING GRID ──────────────────────────
+let planOpen = false;
+let activeDrop = null;
+
+function togglePlanView() {
+  planOpen = !planOpen;
+  const overlay = document.getElementById('plan-overlay');
+  const btn = document.getElementById('nav-plan-btn');
+  if (planOpen) {
+    overlay.classList.add('open');
+    btn.classList.add('active');
+    renderPlanGrid();
+  } else {
+    overlay.classList.remove('open');
+    btn.classList.remove('active');
+  }
+  // close any open dropdown
+  closeDropdown();
+}
+
+function closeDropdown() {
+  if (activeDrop) { activeDrop.remove(); activeDrop = null; }
+}
+
+function renderPlanGrid() {
+  const overlay = document.getElementById('plan-overlay');
+
+  const PLAN_ROWS = [
+    {id:'la',   label:'Language Arts', icon:'📘', subjects:['LA'],  req:'la',  needed:4},
+    {id:'ss',   label:'Social Studies',icon:'📗', subjects:['SS'],  req:'ss',  needed:3},
+    {id:'math', label:'Mathematics',   icon:'📐', subjects:['Math'],req:'math',needed:3},
+    {id:'sci',  label:'Science',       icon:'🔬', subjects:['Sci'], req:'sci', needed:3},
+    {id:'elec', label:'Electives',     icon:'🎨', subjects:['Arts','PE','FL','FCS','JROTC','MATC','Alt'],req:null,needed:0},
+  ];
+
+  const grades = [9,10,11,12];
+  const glabels = {9:'9th',10:'10th',11:'11th',12:'12th'};
+  const gcls = {9:'g9',10:'g10',11:'g11',12:'g12'};
+
+  // Header row
+  let gridHTML = `
+    <div class="pgcol-head subj">Subject</div>
+    ${grades.map(g=>`<div class="pgcol-head ${gcls[g]}">${glabels[g]} Grade<br><span style="font-weight:400;font-size:.62rem;color:var(--text3)">${getCredits(g)} cr</span></div>`).join('')}
+  `;
+
+  PLAN_ROWS.forEach((row, ri) => {
+    const isLast = ri === PLAN_ROWS.length - 1;
+    gridHTML += `<div class="pgrow-label ${isLast?'pgrow-last':''}">${row.icon} ${row.label}</div>`;
+    grades.forEach(g => {
+      const cellCourses = COURSES.filter(c =>
+        row.subjects.includes(c.subject) &&
+        c.grade.includes(g) &&
+        getChosenCredits(g, c.id) > 0
+      );
+      // Available to add (not already picked, can take)
+      const available = COURSES.filter(c =>
+        row.subjects.includes(c.subject) &&
+        c.grade.includes(g) &&
+        getChosenCredits(g, c.id) === 0 &&
+        canTake(c.id, g)
+      );
+
+      const chips = cellCourses.map(c => {
+        // credit editor for variable-credit courses handled below
+        const cr = getChosenCredits(g, c.id);
+        const chipCls = c.tags.includes('ap')?'ap':c.tags.includes('honors')?'h':c.tags.includes('dc')?'dc':'';
+        const crEdit = c.isVar
+          ? `<span class="pgcr-edit" onclick="event.stopPropagation();pgCycleCredit('${c.id}',${g})" title="Change credits">${cr}cr✎</span>`
+          : `<span class="pgcr-disp">${cr}cr</span>`;
+        return `<span class="pgchip ${chipCls}" title="${c.name} · click × to remove">
+          ${c.name.length>22?c.name.slice(0,20)+'…':c.name}
+          ${crEdit}
+          <span class="pgrm" onclick="event.stopPropagation();pgRemove('${c.id}',${g})">×</span>
+        </span>`;
+      }).join('');
+
+      const addBtn = available.length > 0
+        ? `<span class="pgadd" onclick="event.stopPropagation();pgShowDrop(this,${g},'${row.id}')">+ Add</span>`
+        : '';
+
+      gridHTML += `<div class="pgcell ${isLast?'pgrow-last':''}" onclick="closeDropdown()">${chips}${addBtn}</div>`;
+    });
+  });
+
+  // Requirements section
+  const REQS = [
+    {label:'Language Arts (4 cr)',   needed:4,   get:()=>getReqCredits('la')},
+    {label:'Social Studies (3 cr)',  needed:3,   get:()=>getReqCredits('ss')},
+    {label:'Mathematics (3 cr)',     needed:3,   get:()=>getReqCredits('math')},
+    {label:'Science (3 cr)',         needed:3,   get:()=>getReqCredits('sci')},
+    {label:'Fine Arts (1 cr)',       needed:1,   get:()=>getReqCredits('arts')},
+    {label:'PE (1 cr)',              needed:1,   get:()=>getEffectivePECredits()},
+    {label:'Health (0.5 cr)',        needed:0.5, get:()=>getEffectiveHealthCredits()},
+    {label:'Practical Arts (1 cr)',  needed:1,   get:()=>getReqCredits('practical')},
+    {label:'Personal Finance (0.5 cr)',needed:0.5,get:()=>getReqCredits('finance')},
+    {label:'Total Credits (24)',     needed:24,  get:()=>getTotalCredits()},
+  ];
+
+  const reqRows = REQS.map(r => {
+    const have = r.get();
+    const pct = Math.min(100, Math.round(have/r.needed*100));
+    const color = have>=r.needed?'var(--green)':have>0?'var(--amber)':'var(--red2)';
+    const icon = have>=r.needed?'✅':'❌';
+    return `<div class="pbreq-row">
+      <span style="font-size:.8rem">${icon}</span>
+      <span class="pbreq-label">${r.label}</span>
+      <div class="pbreq-bar"><div class="pbreq-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="pbreq-prog" style="color:${color}">${have} / ${r.needed}</span>
+    </div>`;
+  }).join('');
+
+  const missing = getMissingReqs();
+  const recItems = missing.length
+    ? missing.map(m=>`<div class="pbrec-item">📋 Still needed: ${m.label}</div>`).join('')
+    : `<div class="pbrec-item met">✅ All graduation requirements met!</div>`;
+
+  overlay.innerHTML = `<div class="plan-wrap" onclick="closeDropdown()">
+    <div class="plan-title">📋 Planning Grid — ${state.name||'Your'} 4-Year Plan</div>
+    <div class="plan-sub">Click <b>+ Add</b> to add courses · Click a course chip to remove it · Changes sync with the wizard</div>
+    <div class="plan-scroll"><div class="plan-grid">${gridHTML}</div></div>
+    <div class="plan-bottom">
+      <div class="pbreq">
+        <div class="pbreq-title">Graduation Requirements</div>
+        ${reqRows}
+      </div>
+      <div class="pbrec">
+        <div class="pbrec-title">Recommendations</div>
+        ${recItems}
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="btn btn-ghost" onclick="togglePlanView()">← Back to Wizard</button>
+      <button class="btn btn-primary" style="margin-left:10px" onclick="togglePlanView();goTo(6)">📋 Full Summary →</button>
+    </div>
+  </div>`;
+}
+
+function pgRemove(id, grade) {
+  setChoice(grade, id, 0);
+  renderPlanGrid();
+  updateNavCred();
+}
+
+function pgShowDrop(btn, grade, rowId) {
+  closeDropdown();
+  const ROW_SUBJS = {
+    la:['LA'], ss:['SS'], math:['Math'], sci:['Sci'],
+    elec:['Arts','PE','FL','FCS','JROTC','MATC','Alt']
+  };
+  const subjects = ROW_SUBJS[rowId] || [];
+
+  const rect = btn.getBoundingClientRect();
+  const drop = document.createElement('div');
+  drop.className = 'pgdrop';
+  drop.style.top = (rect.bottom + 4) + 'px';
+  drop.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
+
+  function buildDropItems(q) {
+    const pool = COURSES.filter(c =>
+      subjects.includes(c.subject) &&
+      c.grade.includes(grade) &&
+      getChosenCredits(grade, c.id) === 0 &&
+      (q ? c.name.toLowerCase().includes(q.toLowerCase()) : true)
+    );
+    return pool.slice(0, 20).map(c => {
+      const unlocked = canTake(c.id, grade);
+      const cr = c.isVar ? `${c.credits[0]}-${c.credits[1]} cr` : `${c.credits} cr`;
+      const lock = unlocked ? '' : ` title="${getLockReason(c.id, grade)}"`;
+      return `<div class="pgdi ${unlocked?'':'lk'}"${lock}${unlocked?` onclick="event.stopPropagation();pgAdd('${c.id}',${grade})"`:''}>
+        <span>${c.name}</span>
+        <span class="pgdi-cr">${cr}${unlocked?'':' 🔒'}</span>
+      </div>`;
+    }).join('') || '<div style="padding:8px 10px;font-size:.76rem;color:var(--text3)">No matches</div>';
+  }
+
+  drop.innerHTML = `<div style="padding:4px 4px 2px"><input class="pgdrop-search" placeholder="🔍 Search courses…" id="pgdrop-input" autocomplete="off" /></div><div id="pgdrop-list">${buildDropItems('')}</div>`;
+
+  document.body.appendChild(drop);
+  activeDrop = drop;
+
+  setTimeout(() => {
+    const si = document.getElementById('pgdrop-input');
+    if (si) {
+      si.focus();
+      si.addEventListener('input', () => {
+        const list = document.getElementById('pgdrop-list');
+        if (list) list.innerHTML = buildDropItems(si.value);
+      });
+    }
+    document.addEventListener('click', closeDropdown, {once:true});
+  }, 20);
+}
+
+function pgAdd(id, grade) {
+  const c = courseMap[id];
+  if (!c) return;
+  const cr = c.isVar ? c.credits[0] : c.credits;
+  setChoice(grade, id, cr);
+  closeDropdown();
+  renderPlanGrid();
+  updateNavCred();
+}
+
+
+// ── PATHS VIEW ──────────────────────────────────────────
+let pathsOpen = false;
+let activePathTab = 'math';
+
+function togglePathsView() {
+  pathsOpen = !pathsOpen;
+  if (pathsOpen && planOpen) {
+    planOpen = false;
+    document.getElementById('plan-overlay').classList.remove('open');
+    document.getElementById('nav-plan-btn').classList.remove('active');
+  }
+  const overlay = document.getElementById('paths-overlay');
+  const btn = document.getElementById('nav-paths-btn');
+  if (pathsOpen) { overlay.classList.add('open'); btn.classList.add('active'); renderPaths(); }
+  else { overlay.classList.remove('open'); btn.classList.remove('active'); }
+}
+
+function renderPaths() {
+  const overlay = document.getElementById('paths-overlay');
+  const tabs = [{id:'math',icon:'📐',label:'Math'},{id:'la',icon:'📘',label:'Language Arts'},{id:'sci',icon:'🔬',label:'Science'},{id:'ss',icon:'📗',label:'Social Studies'}];
+  const tabHtml = tabs.map(t => `<div class="ptab ${activePathTab===t.id?'active':''}" onclick="switchPathTab('${t.id}')">${t.icon} ${t.label}</div>`).join('');
+  overlay.innerHTML = `<div class="paths-wrap">
+    <div class="paths-title">🗺️ Course Paths</div>
+    <div class="paths-sub"><b>Green</b> = completed/selected · <b>Blue</b> = in your plan · Click any node to add/remove from plan</div>
+    <div class="path-tabs">${tabHtml}</div>
+    <div id="path-diagram-area" style="overflow-x:auto;padding-bottom:16px">${buildPathDiagram(activePathTab)}</div>
+    <div class="path-legend">
+      <div class="pleg-item"><div class="pleg-dot" style="background:var(--green)"></div>Completed</div>
+      <div class="pleg-item"><div class="pleg-dot" style="background:var(--blue2)"></div>In Plan</div>
+      <div class="pleg-item"><div class="pleg-dot" style="background:var(--border2)"></div>Available</div>
+      <div class="pleg-item"><div class="pleg-dot" style="border:2px dashed var(--border2);background:transparent"></div>Honors</div>
+      <div class="pleg-item"><div class="pleg-dot" style="background:var(--amber)"></div>AP/DC</div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-ghost" onclick="togglePathsView()">← Back to Wizard</button>
+    </div>
+  </div>`;
+}
+
+function switchPathTab(tab) {
+  activePathTab = tab;
+  renderPaths();
+}
+
+function pathNodeCls(id, grade) {
+  const completed = [...state.completedMath,...state.completedSci,...state.completedLA];
+  const c = courseMap[id];
+  if (!c) return 'flow-node locked';
+  const done = completed.includes(id) || isChecked(id);
+  const avail = canTake(id, grade);
+  return ['flow-node',
+    done ? (isChecked(id) ? 'selected' : 'done') : '',
+    !done && !avail ? 'locked' : '',
+    c.tags.includes('honors') ? 'honors' : '',
+    c.tags.includes('ap') ? 'ap' : ''
+  ].filter(Boolean).join(' ');
+}
+
+function fn(id, grade, sub) {
+  const c = courseMap[id];
+  if (!c) return '';
+  const cls = pathNodeCls(id, grade);
+  const avail = canTake(id, grade);
+  const ttip = !avail ? ` title="${getLockReason(id,grade).replace(/"/g,"'")}"` : '';
+  const clk = avail ? ` onclick="pathClick('${id}',${grade})"` : '';
+  const subHtml = sub ? `<div class="fn-sub">${sub}</div>` : '';
+  return `<div class="${cls}"${ttip}${clk}><div class="fn-dot"></div><div><div class="fn-name">${c.name}</div>${subHtml}</div></div>`;
+}
+
+function pathClick(id, grade) {
+  const c = courseMap[id];
+  if (!c) return;
+  const cr = c.isVar ? c.credits[0] : c.credits;
+  setChoice(grade, id, getChosenCredits(grade,id) > 0 ? 0 : cr);
+  renderPaths(); updateNavCred();
+}
+
+function buildPathDiagram(subject) {
+  if (subject === 'math') return buildMathPath();
+  if (subject === 'la')   return buildLAPath();
+  if (subject === 'sci')  return buildSciPath();
+  if (subject === 'ss')   return buildSSPath();
+  return '';
+}
+
+// Helper: vertical connector line, color based on whether the "from" node is done
+function pline(fromId) {
+  const done = isChecked(fromId) || [...state.completedMath,...state.completedSci,...state.completedLA].includes(fromId);
+  return `<div class="path-connector-v" style="${done?'background:var(--green)':''}"></div>`;
+}
+// Helper: fork — show two nodes side by side with shared connector
+function pfork(items) {
+  return `<div style="display:flex;gap:8px;justify-content:center">${items}</div>`;
+}
+// Helper: grade label
+function pgl(label) {
+  return `<div class="path-col-label">${label}</div>`;
+}
+// Helper: horizontal "or" spacer
+function por() { return `<div style="font-size:.7rem;color:var(--text3);align-self:center;padding:0 2px;margin-top:4px">or</div>`; }
+
+function fn(id, grade, sub) {
+  const c = courseMap[id];
+  if (!c) return '';
+  const completed = [...state.completedMath,...state.completedSci,...state.completedLA];
+  const done = completed.includes(id);
+  const sel = isChecked(id);
+  const avail = canTake(id, grade);
+  const cls = ['flow-node',
+    done ? 'done' : sel ? 'selected' : '',
+    !done && !sel && avail ? 'available-next' : '',
+    !done && !sel && !avail ? 'locked' : '',
+    c.tags.includes('honors') ? 'honors' : '',
+    c.tags.includes('ap') ? 'ap' : ''
+  ].filter(Boolean).join(' ');
+  const tip = !avail && !done && !sel ? ` title="${getLockReason(id, grade)}"` : '';
+  const click = (avail || sel) ? ` onclick="pathClick('${id}',${grade})"` : '';
+  const subHtml = sub ? `<div class="fn-sub">${sub}</div>` : '';
+  return `<div class="${cls}"${tip}${click}><div class="fn-dot"></div><div><div class="fn-name">${c.name}</div>${subHtml}</div></div>`;
+}
+
+function buildMathPath() {
+  const m8 = state.prior8thMath;
+  const has8Alg = m8==='alg1'||m8==='geo', has8Geo = m8==='geo';
+  const badge = (name) => `<div class="flow-node done" style="min-width:140px"><div class="fn-dot"></div><div><div class="fn-name">${name} ✓</div><div class="fn-sub">Completed</div></div></div>`;
+
+  const w = 'min-width:700px';
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;${w};padding:10px 0">
+    ${pgl('BEFORE HIGH SCHOOL')}
+    ${pfork(has8Geo ? badge('Algebra I') + por() + badge('Geometry') : has8Alg ? badge('Algebra I') : fn('prealg',9,'Optional'))}
+    ${has8Alg||has8Geo ? '' : pline('prealg') + pfork(fn('alg1',9))}
+    ${pline('alg1')}
+    ${pgl('GEOMETRY (Choose)')}
+    ${has8Geo ? '' : pfork(fn('geo_m', has8Alg?9:10) + por() + fn('geoh', has8Alg?9:10))}
+    ${pline('geo_m')}
+    ${pgl('ALGEBRA II (Choose)')}
+    ${pfork(fn('alg2', has8Geo?9:10) + por() + fn('alg2h', has8Geo?9:10))}
+    ${pline('alg2')}
+    ${pgl('UPPER MATH — Pick a track')}
+    <div style="display:flex;gap:20px;align-items:flex-start;justify-content:center">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="path-col-label" style="color:var(--blue2)">📈 CALC TRACK</div>
+        ${fn('calcalg',11,'Gr 11 · DC')}
+        ${pline('calcalg')}
+        ${fn('trig',11,'Gr 11 · DC')}
+        ${pline('trig')}
+        ${fn('apcalc',12,'Gr 12 · AP')}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="path-col-label">OTHER OPTIONS</div>
+        ${fn('stats',11,'Gr 11 · DC')}
+        ${pline('stats')}
+        ${fn('mra',11,'Gr 11')}
+        ${pline('mra')}
+        ${fn('intcalg',11,'Gr 11 · Fall')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildLAPath() {
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:360px;padding:10px 0">
+    ${pgl('GRADE 9')}
+    ${pfork(fn('la1',9) + por() + fn('la1h',9,'★ Honors'))}
+    ${pline('la1')}
+    ${pgl('GRADE 10')}
+    ${pfork(fn('la2',10) + por() + fn('la2h',10,'★ Honors'))}
+    ${pline('la2')}
+    ${pgl('GRADE 11')}
+    ${pfork(fn('la3',11) + por() + fn('la3h',11,'★ Honors'))}
+    ${pline('la3')}
+    ${pgl('GRADE 12 — Choose one main + electives')}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      ${fn('la4a',12,'Fall')}
+      ${fn('la4b',12,'Spring')}
+      ${fn('engcomp',12,'DC')}
+    </div>
+    <div style="font-size:.65rem;color:var(--text3);margin-top:8px;text-align:center">
+      + Electives: Public Speaking · Creative Writing · Mythology · Journalism · Multicultural Lit
+    </div>
+  </div>`;
+}
+
+function buildSciPath() {
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:400px;padding:10px 0">
+    ${pgl('GRADE 9 — Physical Science (Required)')}
+    ${pfork(fn('physci',9) + por() + fn('physcih',9,'★ Honors'))}
+    ${pline('physci')}
+    ${pgl('GRADE 10 — Biology Required + Electives')}
+    <div style="display:flex;gap:16px;align-items:flex-start;justify-content:center">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="path-col-label" style="color:var(--blue2)">REQUIRED</div>
+        ${fn('bio1',10)}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="path-col-label">ELECTIVES</div>
+        ${fn('earth1',10,'Fall')} ${fn('earth2',10,'Spr')}
+        ${fn('envchem',10)} ${fn('ecology',10)}
+      </div>
+    </div>
+    ${pline('bio1')}
+    ${pgl('GRADE 11–12 — Advanced Sciences')}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      ${fn('chem',11,'Gr 11 · DC')}
+      ${fn('anatomy',11,'Gr 11 · DC')}
+      ${fn('bio2',11,'Gr 11 · DC')}
+      ${fn('physics',12,'Gr 12')}
+    </div>
+  </div>`;
+}
+
+function buildSSPath() {
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:320px;padding:10px 0">
+    ${pgl('GRADE 9 — Required')}
+    ${fn('wh',9)}
+    ${pline('wh')}
+    ${pgl('GRADE 10 — Required')}
+    ${pfork(fn('ush',10) + por() + fn('apush',11,'AP · Rigorous'))}
+    ${pline('ush')}
+    ${pgl('GRADE 11–12 — Government (Required)')}
+    ${pfork(fn('gov',11) + por() + fn('apgov',11,'AP · Rigorous'))}
+    <div style="margin-top:14px;width:100%">
+      <div class="path-col-label">SS ELECTIVES (not required credit)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+        ${fn('psych',11)} ${fn('socio',11)} ${fn('wc1',11)} ${fn('coldwar',11)} ${fn('ci',11)}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── EVENTS ────────────────────────────────
+function attachEvents(step) {
+  if (step===1) {
+    document.querySelectorAll('input[name="sg"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const sec = document.getElementById('prior-section');
+        if (sec) sec.style.display = parseInt(r.value)>9?'':'none';
+      });
+    });
+    document.querySelectorAll('input[name="m8"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const note = document.getElementById('m8note');
+        if (!note) return;
+        const v = r.value;
+        note.style.display = (v==='alg1'||v==='geo') ? 'block' : 'none';
+        note.textContent = v==='geo'
+          ? '🎉🎉 Geometry in 8th grade unlocks Algebra II (and Algebra II Honors with teacher rec) for 9th grade!'
+          : '🎉 Algebra I in 8th grade unlocks Geometry (and Geometry Honors with teacher rec) for 9th grade!';
+      });
+    });
+  }
+}
+
+// ── INIT ──────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('loading');
+    loader.style.opacity = '0';
+    setTimeout(()=>loader.style.display='none', 500);
+    renderStep();
+  }, 900);
+});
+
+// ── ELECTIVE SEARCH ───────────────────────────────────────────
+function filterElecs(inputId, grade) {
+  const q = (document.getElementById(inputId)?.value || '').toLowerCase().trim();
+  const resultsEl = document.getElementById('elec-sr-' + grade);
+  if (!resultsEl) return;
+  if (!q) { resultsEl.innerHTML = ''; return; }
+  const elecSubjects = ['Arts','PE','FL','FCS','JROTC','MATC','Alt'];
+  const matches = COURSES.filter(c =>
+    elecSubjects.includes(c.subject) &&
+    c.grade.includes(grade) &&
+    c.name.toLowerCase().includes(q)
+  ).slice(0, 15);
+  if (!matches.length) {
+    resultsEl.innerHTML = '<div style="padding:8px 4px;font-size:.8rem;color:var(--text3)">No matches</div>';
+    return;
+  }
+  resultsEl.innerHTML = '<div style="font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Search results</div>' +
+    '<div class="copts">' + matches.map(c => courseOptHTML(c, grade)).join('') + '</div>';
+}
+
+// ── PLAN GRID: CREDIT CYCLER ──────────────────────────────────
+function pgCycleCredit(id, grade) {
+  const c = courseMap[id];
+  if (!c || !c.isVar) return;
+  const [mn, mx] = c.credits;
+  const cur = getChosenCredits(grade, id);
+  const vals = [];
+  for (let v = mn; v <= mx; v = Math.round((v + mn) * 10) / 10) vals.push(v);
+  if (!vals.includes(mx)) vals.push(mx);
+  const idx = vals.indexOf(cur);
+  const next = vals[(idx + 1) % vals.length];
+  setChoice(grade, id, next);
+  updateNavCred();
+  renderPlanGrid();
+}
+
+// ── PLAN GRID: DROPDOWN SEARCH ────────────────────────────────
+function pgFilterDrop(grade, rowId, query) {
+  const q = query.toLowerCase().trim();
+  const listEl = document.getElementById('pgdrop-list');
+  if (!listEl) return;
+  const subjectMap = {
+    la:['LA'], ss:['SS'], math:['Math'], sci:['Sci'],
+    elec:['Arts','PE','FL','FCS','JROTC','MATC','Alt']
+  };
+  const subjects = subjectMap[rowId] || [];
+  const pool = COURSES.filter(c =>
+    subjects.includes(c.subject) &&
+    c.grade.includes(grade) &&
+    getChosenCredits(grade, c.id) === 0 &&
+    (q ? c.name.toLowerCase().includes(q) : true)
+  );
+  listEl.innerHTML = pool.slice(0, 20).map(c => {
+    const cr = c.isVar ? c.credits[0] + '-' + c.credits[1] : c.credits;
+    const avail = canTake(c.id, grade);
+    const lock = avail ? '' : ` title="${getLockReason(c.id, grade)}"`;
+    return `<div class="pgdi${avail ? '' : ' pglocked'}"${lock}${avail ? ` onclick="pgAdd('${c.id}',${grade})"` : ''}>
+      ${c.name} <span style="opacity:.5;font-size:.7rem">${cr}cr${avail ? '' : ' 🔒'}</span>
+    </div>`;
+  }).join('') || '<div class="pgdi" style="color:var(--text3);cursor:default">No matches</div>';
+}
+
+// ── REQUIREMENTS OVERLAY ──────────────────────────────────────
+let reqsOpen = false;
+
+function toggleReqsView() {
+  reqsOpen = !reqsOpen;
+  if (reqsOpen) {
+    if (planOpen) { planOpen = false; document.getElementById('plan-overlay').classList.remove('open'); document.getElementById('nav-plan-btn').classList.remove('active'); }
+    if (pathsOpen) { pathsOpen = false; document.getElementById('paths-overlay').classList.remove('open'); document.getElementById('nav-paths-btn').classList.remove('active'); }
+  }
+  const overlay = document.getElementById('reqs-overlay');
+  const btn = document.getElementById('nav-reqs-btn');
+  if (!overlay || !btn) return;
+  if (reqsOpen) { overlay.classList.add('open'); btn.classList.add('active'); renderReqsPage(); }
+  else { overlay.classList.remove('open'); btn.classList.remove('active'); }
+}
+
+function renderReqsPage(searchQuery) {
+  const overlay = document.getElementById('reqs-overlay');
+  if (!overlay) return;
+  const q = (searchQuery || '').toLowerCase().trim();
+
+  const REQS = [
+    {key:'la',       label:'Language Arts',    icon:'📘', needed:4,   get:()=>getReqCredits('la'),          note:'4 credits required — LA I through senior year'},
+    {key:'ss',       label:'Social Studies',   icon:'📗', needed:3,   get:()=>getReqCredits('ss'),          note:'World History (9), US History (10), Government (11/12)'},
+    {key:'math',     label:'Mathematics',      icon:'📐', needed:3,   get:()=>getReqCredits('math'),        note:'At least Algebra I, Geometry, Algebra II sequence'},
+    {key:'sci',      label:'Science',          icon:'🔬', needed:3,   get:()=>getReqCredits('sci'),         note:'Physical Science + Biology I + one more science'},
+    {key:'arts',     label:'Fine Arts',        icon:'🎨', needed:1,   get:()=>getReqCredits('arts'),        note:'Art, Music, Theatre — JROTC Drill counts as ½ Fine Arts'},
+    {key:'pe',       label:'Physical Ed',      icon:'🏃', needed:1,   get:()=>getEffectivePECredits(),      note:'PE, Conditioning, Aerobics, Lifetime Sport or Team Sports'},
+    {key:'health',   label:'Health',           icon:'💊', needed:0.5, get:()=>getEffectiveHealthCredits(),  note:'Health & Family Ed (½ cr) — LET 2 earns ½ Health credit'},
+    {key:'practical',label:'Practical Arts',   icon:'🏭', needed:1,   get:()=>getReqCredits('practical'),   note:'CTE, Business, FCS, many MATC programs count'},
+    {key:'finance',  label:'Personal Finance', icon:'💼', needed:0.5, get:()=>getReqCredits('finance'),     note:'Personal Finance is ½ credit required for graduation'},
+  ];
+
+  const total = getTotalCredits();
+  const totalMet = total >= 24;
+  const pct = Math.min(100, Math.round(total / 24 * 100));
+
+  const catsHtml = REQS.map(r => {
+    const have = r.get();
+    const met = have >= r.needed;
+    const part = have > 0 && !met;
+    const dotCls = met ? 'met' : part ? 'part' : 'unmet';
+    const progCls = met ? 'met' : part ? 'part' : 'unmet';
+    const still = Math.max(0, r.needed - have).toFixed(1).replace('.0','');
+
+    // Courses already selected for this req
+    const selected = COURSES.filter(c => c.req === r.key && isChecked(c.id));
+    // Courses available to add
+    const available = COURSES.filter(c =>
+      c.req === r.key &&
+      !isChecked(c.id) &&
+      (q ? c.name.toLowerCase().includes(q) : true) &&
+      c.grade.some(g => canTake(c.id, g))
+    );
+    // Locked courses for this req
+    const locked = COURSES.filter(c =>
+      c.req === r.key &&
+      !isChecked(c.id) &&
+      !c.grade.some(g => canTake(c.id, g)) &&
+      (q ? c.name.toLowerCase().includes(q) : true)
+    );
+
+    const selHtml = selected.map(c => {
+      const g = [9,10,11,12].find(g => getChosenCredits(g,c.id)>0) || c.grade[0];
+      const cr = getChosenCredits(g,c.id);
+      return `<div class="req-course-row selected">
+        <div class="rcr-name">✓ ${c.name}</div>
+        <div class="rcr-grade">Grade ${g}</div>
+        <div class="rcr-done">+${cr} cr</div>
+      </div>`;
+    }).join('');
+
+    const avHtml = available.slice(0,8).map(c => {
+      const g = c.grade.find(g => canTake(c.id,g)) || c.grade[0];
+      const cr = c.isVar ? `${c.credits[0]}–${c.credits[1]}` : c.credits;
+      const isRig = c.tags.includes('rigorous') ? ' <span style="font-size:.62rem;color:var(--amber)">★ Rigorous</span>' : '';
+      return `<div class="req-course-row" onclick="reqAdd('${c.id}',${g})">
+        <div class="rcr-name">${c.name}${isRig}</div>
+        <div class="rcr-grade">Grade ${g}</div>
+        <div class="rcr-cr">+ ${cr} cr</div>
+      </div>`;
+    }).join('');
+
+    const lockHtml = locked.slice(0,3).map(c => {
+      const reason = getLockReason(c.id, c.grade[0]);
+      return `<div class="req-course-row" style="opacity:.45;cursor:default">
+        <div class="rcr-name">🔒 ${c.name}</div>
+        <div class="rcr-lock" style="flex:1">${reason.slice(0,60)}${reason.length>60?'…':''}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="req-cat">
+      <div class="req-cat-head">
+        <div class="req-dot ${dotCls}"></div>
+        <div class="req-cat-label">${r.icon} ${r.label}</div>
+        <div class="req-cat-prog ${progCls}">${have}/${r.needed} cr${met?' ✓':` — need ${still} more`}</div>
+      </div>
+      <div class="req-body">
+        <div class="req-note">${r.note}</div>
+        ${selHtml}
+        ${!met && available.length ? `<div class="req-add-label">Click to add to your plan:</div>${avHtml}` : ''}
+        ${!met && available.length > 8 ? `<div class="req-note">+${available.length-8} more available courses</div>` : ''}
+        ${lockHtml}
+        ${met ? '<div style="font-size:.78rem;color:var(--green);padding:6px 8px">✅ Requirement fulfilled!</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  overlay.innerHTML = `<div class="reqs-wrap">
+    <div class="paths-title">✅ Graduation Requirements</div>
+    <div class="paths-sub">24 credits minimum · 28 maximum · Click any course to add it to your plan</div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="font-size:1.5rem;font-weight:900;color:${totalMet?'var(--green)':'var(--amber)'}">${total}<span style="font-size:.9rem;font-weight:400;color:var(--text3)">/24</span></div>
+        <div style="flex:1">
+          <div style="height:7px;background:var(--surface3);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${totalMet?'var(--green)':'var(--blue2)'};border-radius:4px;transition:width .5s"></div>
+          </div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:3px">credits planned · ${totalMet?'Meets graduation minimum ✅':'Need '+(24-total)+' more to graduate'}</div>
+        </div>
+      </div>
+    </div>
+
+    <input class="req-search" placeholder="🔍 Search courses to add…" oninput="renderReqsPage(this.value)" />
+
+    ${catsHtml}
+
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-ghost" onclick="toggleReqsView()">← Back</button>
+    </div>
+  </div>`;
+}
+
+function reqAdd(id, grade) {
+  const c = courseMap[id];
+  if (!c) return;
+  const cr = c.isVar ? c.credits[0] : c.credits;
+  setChoice(grade, id, cr);
+  updateNavCred();
+  renderReqsPage();
+}
+</script>
+</body>
+</html><!-- DQ Tools Floating Menu -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+  .fab-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; z-index: 999; }
+  .fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 8px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.28s ease, transform 0.28s ease; }
+  .fab-wrap:hover .fab-menu { opacity: 1; transform: translateY(0); pointer-events: all; }
+  .fab-wrap:hover .fab-btn { transform: scale(1.1); background: #2ea85a; }
+  .fab-link { display: block; padding: 6px 14px; background: #28a45a; color: #fff; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background 0.15s, transform 0.15s; font-family: 'Outfit', sans-serif; box-shadow: 0 2px 8px rgba(40,164,90,0.28); }
+  .fab-link:hover { background: #1f8a48; transform: translateX(-2px); }
+  .fab-btn { width: 42px; height: 42px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(40,164,90,0.45); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; }
+</style>
+
+<div class="fab-wrap">
+  <div class="fab-menu">
+    <a class="fab-link" href="mathcalc.html">MathCalc</a>
+    <a class="fab-link" href="gpareview.html">GPA Review</a>
+    <a class="fab-link" href="courseplanner.html">Course Planner</a>
+    <a class="fab-link" href="dqtable.html">DQtable</a>
+    <a class="fab-link" href="index.html">Home</a>
+    <a class="fab-link" href="termsandpolicies.html">Terms & Policies</a>
+  </div>
+  <button class="fab-btn">☰</button>
+</div>
