@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathCalc · by DQtools</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05080e;
+    --bg2: #080d16;
+    --bg3: #0c1220;
+    --green: #00e676;
+    --green-dim: rgba(0,230,118,0.12);
+    --green-glow: rgba(0,230,118,0.25);
+    --blue: #2979ff;
+    --blue-dim: rgba(41,121,255,0.12);
+    --blue-glow: rgba(41,121,255,0.3);
+    --text: #e8edf5;
+    --muted: #6b7a99;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(41,121,255,0.5);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── MATH GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,230,118,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,230,118,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── FLOATING MATH SYMBOLS ─── */
+  .math-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .math-bg span {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: rgba(0,230,118,0.04);
+    user-select: none;
+    animation: floatSym 20s linear infinite;
+  }
+  @keyframes floatSym {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,0.3);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-badge .pulse {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--green-glow); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+
+  .hero-wordmark {
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  .hero-wordmark .math { color: var(--green); }
+  .hero-wordmark .calc { color: var(--blue); }
+
+  .hero-formula {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+  .hero-formula .hl { color: var(--green); }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.6;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+  .chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.7s 0.5s ease both;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: #05080e;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.7rem 1.8rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--green-glow);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.7rem 1.8rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .scroll-caret {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    animation: fadeUp 0.7s 0.7s ease both;
+  }
+  .scroll-caret span {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .scroll-caret .arrow {
+    font-size: 1.2rem;
+    color: var(--green);
+    animation: bounce 1.8s ease infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  /* ─── CARDS GRID ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1.25rem;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover { border-color: var(--border-hover); box-shadow: 0 0 30px var(--blue-dim); transform: translateY(-3px); }
+  .card:hover::before { opacity: 1; }
+
+  /* Featured card spans 2 rows */
+  .card-featured {
+    grid-row: span 2;
+  }
+
+  /* Coming soon card styling */
+  .card-soon {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .card-soon:hover {
+    border-color: var(--border);
+    box-shadow: none;
+    transform: none;
+  }
+  .card-soon:hover::before { opacity: 0; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .card-icon {
+    width: 46px; height: 46px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .card-soon .card-icon {
+    background: var(--bg3);
+    border-color: var(--border);
+  }
+
+  .card-icon-blue {
+    background: var(--blue-dim);
+    border-color: rgba(41,121,255,0.2);
+  }
+
+  .card-meta { flex: 1; }
+
+  .card-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .card-byline {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 0.2rem;
+  }
+
+  .badge-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,0.3);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: glowPulse 3s ease infinite;
+    white-space: nowrap;
+  }
+  .badge-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 8px var(--green-glow); }
+  }
+
+  .badge-soon {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .card-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  /* ─── PREVIEW AREA ─── */
+  .card-preview {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    transition: filter 0.2s;
+  }
+  .card:hover .card-preview { filter: brightness(1.15); }
+
+  .preview-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .preview-item-icon { font-size: 0.9rem; }
+  .preview-item-text {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+  .preview-item-text strong { color: var(--text); display: block; font-size: 0.7rem; }
+
+  .preview-formula {
+    background: var(--bg2);
+    border: 1px solid rgba(0,230,118,0.15);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    grid-column: span 2;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── TAGS & FOOTER ─── */
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+  }
+
+  .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tag-green { background: var(--green-dim); border-color: rgba(0,230,118,0.2); color: var(--green); }
+  .tag-blue  { background: var(--blue-dim);  border-color: rgba(41,121,255,0.2);  color: var(--blue);  }
+
+  .card-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  .card-count {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .card-count strong { color: var(--green); }
+
+  .btn-launch {
+    background: var(--green);
+    color: #05080e;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .btn-launch:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--green-glow); }
+
+  .btn-launch-ghost {
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Card animation delays */
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+  .card:nth-child(4) { animation-delay: 0.4s; }
+
+  /* ─── WIDE CARD (full-width info row) ─── */
+  .card-wide {
+    grid-column: span 2;
+  }
+
+  /* ─── FEATURES LIST in featured card ─── */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    background: var(--bg3);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .feature-row-icon { font-size: 1rem; flex-shrink: 0; }
+  .feature-row-text { font-size: 0.82rem; color: var(--muted); line-height: 1.4; }
+  .feature-row-text strong { color: var(--text); font-weight: 600; }
+
+  /* ─── MODAL ─── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,8,14,0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-backdrop.active { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid rgba(0,230,118,0.25);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.25s;
+    box-shadow: 0 0 80px rgba(0,230,118,0.1);
+  }
+  .modal-backdrop.active .modal { transform: scale(1); }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem; right: 1.25rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-icon {
+    width: 56px; height: 56px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,0.3);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.3rem;
+  }
+
+  .modal-tagline {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .modal-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .modal-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding: 0.5rem 0.7rem;
+    background: var(--bg3);
+    border-radius: 8px;
+  }
+  .modal-feature span:first-child { font-size: 1rem; }
+  .modal-feature strong { color: var(--text); }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-wordmark {
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+  .footer-wordmark .green { color: var(--green); }
+  .footer-wordmark .blue  { color: var(--blue);  }
+
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-back {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.35rem 0.85rem;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-back:hover { color: var(--green); border-color: rgba(0,230,118,0.3); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin-bottom: 3rem;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 680px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .card-featured { grid-row: span 1; }
+    .card-wide { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- floating math symbols -->
+<div class="math-bg" id="mathBg"></div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="pulse"></span>
+    by DQtools · MathCalc Suite
+  </div>
+
+  <h1 class="hero-wordmark">
+    <span class="math">Math</span><span class="calc">Calc</span>
+  </h1>
+
+  <div class="hero-formula">
+    <span class="hl">∫</span> dx &nbsp;·&nbsp;
+    <span class="hl">a²+b²=c²</span> &nbsp;·&nbsp;
+    <span class="hl">sin/cos/tan</span> &nbsp;·&nbsp;
+    <span class="hl">f′(x)</span> &nbsp;·&nbsp;
+    <span class="hl">Σ</span>
+  </div>
+
+  <p class="hero-sub">
+    A full suite of math calculator tools — <strong>step-by-step solutions</strong>,
+    animated visuals, and every formula you need, all in one place.
+  </p>
+
+  <div class="hero-chips">
+    <span class="chip">📐 GeoCalc</span>
+    <span class="chip">🔢 AlgICalc</span>
+    <span class="chip">📊 AlgIICalc</span>
+    <span class="chip">📡 TrigCalc</span>
+    <span class="chip">📉 StatCalc</span>
+    <span class="chip">🧠 SmartCalc</span>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#tools" class="btn-primary">Explore Tools ↓</a>
+    <a href="index.html" class="btn-ghost">← DQtools Home</a>
+  </div>
+
+  <div class="scroll-caret">
+    <span>Scroll</span>
+    <span class="arrow">↓</span>
+  </div>
+</section>
+
+<!-- ═══════════════ TOOLS ═══════════════ -->
+<div class="section" id="tools">
+  <div class="divider"></div>
+
+  <p class="section-label">// Tools</p>
+  <h2 class="section-title">The MathCalc Suite</h2>
+  <p class="section-desc">Two tools are live now — more are on the way. Every calculator includes step-by-step solutions so you understand the math, not just the answer.</p>
+
+  <div class="cards-grid">
+
+    <!-- ─── GEOCALC (featured, 2 rows) ─── -->
+    <div class="card card-featured" onclick="openModal('geocalc')">
+      <div class="card-header">
+        <div class="card-icon">📐</div>
+        <div class="card-meta">
+          <div class="card-name">GeoCalc</div>
+          <div class="card-byline">MathCalc Suite · Geometry</div>
+        </div>
+        <span class="badge-new"><span class="badge-dot"></span>Live</span>
+      </div>
+
+      <p class="card-desc">Your complete geometry toolkit — triangles, circles, polygons, coordinate geometry, and transformations with animated visuals and step-by-step solutions.</p>
+
+      <div class="card-preview">
+        <div class="preview-item">
+          <span class="preview-item-icon">📐</span>
+          <div class="preview-item-text"><strong>Triangles</strong>7 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">🔵</span>
+          <div class="preview-item-text"><strong>Circles</strong>2 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">🔷</span>
+          <div class="preview-item-text"><strong>Polygons</strong>5 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">📍</span>
+          <div class="preview-item-text"><strong>Coord</strong>5 tools</div>
+        </div>
+        <div class="preview-formula">a² + b² = c² &nbsp;·&nbsp; sin/cos/tan &nbsp;·&nbsp; a/sinA = b/sinB</div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-row">
+          <span class="feature-row-icon">∠</span>
+          <div class="feature-row-text"><strong>Triangle Tools</strong> — Pythagorean theorem, SOHCAHTOA, Law of Sines & Cosines</div>
+        </div>
+        <div class="feature-row">
+          <span class="feature-row-icon">📍</span>
+          <div class="feature-row-text"><strong>Coordinate Geometry</strong> — Distance, midpoint, slope, line & circle equations</div>
+        </div>
+        <div class="feature-row">
+          <span class="feature-row-icon">🔄</span>
+          <div class="feature-row-text"><strong>Transformations</strong> — Reflection, rotation, translation, dilation in one tool</div>
+        </div>
+      </div>
+
+      <div class="card-tags">
+        <span class="tag tag-green">geometry</span>
+        <span class="tag tag-blue">triangles</span>
+        <span class="tag">circles</span>
+        <span class="tag">polygons</span>
+        <span class="tag">coord</span>
+        <span class="tag">step-by-step</span>
+      </div>
+
+      <div class="card-action">
+        <span class="card-count"><strong>23</strong> tools inside</span>
+        <a href="mathcalc.html/GeoCalc" class="btn-launch" onclick="event.stopPropagation()">Open GeoCalc →</a>
+      </div>
+    </div>
+
+    <!-- ─── ALGICALC (featured, 2 rows) ─── -->
+    <div class="card card-featured" onclick="openModal('algicalc')">
+      <div class="card-header">
+        <div class="card-icon card-icon-blue">🔢</div>
+        <div class="card-meta">
+          <div class="card-name">AlgICalc</div>
+          <div class="card-byline">MathCalc Suite · Algebra I</div>
+        </div>
+        <span class="badge-new"><span class="badge-dot"></span>Live</span>
+      </div>
+
+      <p class="card-desc">Your complete Algebra I toolkit — expressions, equations, inequalities, graphing, functions, exponents, and more with step-by-step solutions.</p>
+
+      <div class="card-preview">
+        <div class="preview-item">
+          <span class="preview-item-icon">✏️</span>
+          <div class="preview-item-text"><strong>Expressions</strong>3 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">➕</span>
+          <div class="preview-item-text"><strong>Equations</strong>5 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">📈</span>
+          <div class="preview-item-text"><strong>Lines</strong>4 tools</div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-item-icon">⚡</span>
+          <div class="preview-item-text"><strong>Exponents</strong>2 tools</div>
+        </div>
+        <div class="preview-formula">3x+5=20 &nbsp;·&nbsp; m=(y₂−y₁)/(x₂−x₁) &nbsp;·&nbsp; f(x)</div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-row">
+          <span class="feature-row-icon">🔀</span>
+          <div class="feature-row-text"><strong>Equations</strong> — One-step, multi-step, variables both sides, systems of equations</div>
+        </div>
+        <div class="feature-row">
+          <span class="feature-row-icon">📈</span>
+          <div class="feature-row-text"><strong>Lines & Graphs</strong> — Slope, line equation finder, form converter, plot points</div>
+        </div>
+        <div class="feature-row">
+          <span class="feature-row-icon">🧩</span>
+          <div class="feature-row-text"><strong>Extras</strong> — Equation checker, number line tool, integer operations, percent calc</div>
+        </div>
+      </div>
+
+      <div class="card-tags">
+        <span class="tag tag-blue">algebra I</span>
+        <span class="tag tag-green">equations</span>
+        <span class="tag">graphing</span>
+        <span class="tag">functions</span>
+        <span class="tag">exponents</span>
+        <span class="tag">step-by-step</span>
+      </div>
+
+      <div class="card-action">
+        <span class="card-count"><strong>24</strong> tools inside</span>
+        <a href="mathcalc.html/AlgICalc" class="btn-launch" onclick="event.stopPropagation()">Open AlgICalc →</a>
+      </div>
+    </div>
+
+    <!-- ─── ALGIICALC (coming soon) ─── -->
+    <div class="card card-soon">
+      <div class="card-header">
+        <div class="card-icon card-icon-blue">📊</div>
+        <div class="card-meta">
+          <div class="card-name">AlgIICalc</div>
+          <div class="card-byline">MathCalc Suite · Algebra II</div>
+        </div>
+        <span class="badge-soon">Soon</span>
+      </div>
+      <p class="card-desc">Algebra II tools — quadratics, polynomials, complex numbers, exponential & logarithmic functions, conic sections, and more.</p>
+      <div class="card-tags">
+        <span class="tag">quadratics</span>
+        <span class="tag">polynomials</span>
+        <span class="tag">logarithms</span>
+        <span class="tag">conics</span>
+      </div>
+      <div class="card-action">
+        <span class="card-count" style="color:var(--muted)">Coming soon</span>
+        <span class="btn-launch-ghost">📊 Alg II</span>
+      </div>
+    </div>
+
+    <!-- ─── TRIGCALC (coming soon) ─── -->
+    <div class="card card-soon">
+      <div class="card-header">
+        <div class="card-icon" style="font-size:1.2rem">📡</div>
+        <div class="card-meta">
+          <div class="card-name">TrigCalc</div>
+          <div class="card-byline">MathCalc Suite · Trigonometry</div>
+        </div>
+        <span class="badge-soon">Soon</span>
+      </div>
+      <p class="card-desc">Trigonometry calculator — unit circle, identities, inverse trig, graphing sine & cosine waves, and angle conversions.</p>
+      <div class="card-tags">
+        <span class="tag">unit circle</span>
+        <span class="tag">identities</span>
+        <span class="tag">sin/cos/tan</span>
+        <span class="tag">graphing</span>
+      </div>
+      <div class="card-action">
+        <span class="card-count" style="color:var(--muted)">Coming soon</span>
+        <span class="btn-launch-ghost">📡 Trig</span>
+      </div>
+    </div>
+
+    <!-- ─── STATCALC (coming soon) ─── -->
+    <div class="card card-soon">
+      <div class="card-header">
+        <div class="card-icon" style="font-size:1.2rem">📉</div>
+        <div class="card-meta">
+          <div class="card-name">StatCalc</div>
+          <div class="card-byline">MathCalc Suite · Statistics</div>
+        </div>
+        <span class="badge-soon">Soon</span>
+      </div>
+      <p class="card-desc">Statistics toolkit — mean, median, mode, standard deviation, probability, distributions, and data visualization.</p>
+      <div class="card-tags">
+        <span class="tag">mean/median</span>
+        <span class="tag">probability</span>
+        <span class="tag">distributions</span>
+        <span class="tag">data viz</span>
+      </div>
+      <div class="card-action">
+        <span class="card-count" style="color:var(--muted)">Coming soon</span>
+        <span class="btn-launch-ghost">📉 Stats</span>
+      </div>
+    </div>
+
+    <!-- ─── SMARTCALC (coming soon, wide) ─── -->
+    <div class="card card-wide card-soon">
+      <div class="card-header">
+        <div class="card-icon card-icon-blue">🧠</div>
+        <div class="card-meta">
+          <div class="card-name">SmartCalc</div>
+          <div class="card-byline">MathCalc Suite · General Calculator</div>
+        </div>
+        <span class="badge-soon">Soon</span>
+      </div>
+      <p class="card-desc">A general-purpose smart calculator — handles arithmetic, fractions, unit conversions, and everyday math with clean step-by-step breakdowns. The all-in-one tool for when you just need to calculate something.</p>
+      <div class="card-tags">
+        <span class="tag">arithmetic</span>
+        <span class="tag">fractions</span>
+        <span class="tag">unit convert</span>
+        <span class="tag">step-by-step</span>
+        <span class="tag">general use</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-wordmark"><span class="green">Math</span><span class="blue">Calc</span> by DQtools</div>
+  <a href="index.html" class="footer-back">← DQtools Home</a>
+  <span class="footer-copy">© 2026 DQtools by E S · All rights reserved</span>
+</footer>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-backdrop" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-icon" id="mIcon">📐</div>
+    <div class="modal-title" id="mTitle">GeoCalc</div>
+    <p class="modal-tagline" id="mTagline">Your complete geometry toolkit with animated visuals, step-by-step solutions, and every shape calculator you need.</p>
+    <div class="modal-features" id="mFeatures"></div>
+    <div class="modal-footer">
+      <a href="#" class="btn-ghost" onclick="closeModalDirect()">← Close</a>
+      <a href="mathcalc.html/GeoCalc" class="btn-primary" id="mLink">Open GeoCalc →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Math symbol rain ──
+const syms = ['∫','∑','∂','√','π','∞','≈','≠','±','×','÷','∠','△','⊕','α','β','γ','θ','λ','Δ','∇','∈','⊂','∩','∪','a²','sin','cos','tan','log','lim','f′'];
+const bg = document.getElementById('mathBg');
+function spawnSymbol() {
+  const s = document.createElement('span');
+  s.textContent = syms[Math.floor(Math.random() * syms.length)];
+  s.style.left = Math.random() * 100 + 'vw';
+  s.style.animationDuration = (15 + Math.random() * 20) + 's';
+  s.style.animationDelay = (Math.random() * 5) + 's';
+  s.style.fontSize = (0.7 + Math.random() * 1.2) + 'rem';
+  bg.appendChild(s);
+  setTimeout(() => s.remove(), 35000);
+}
+for (let i = 0; i < 25; i++) setTimeout(spawnSymbol, i * 400);
+setInterval(spawnSymbol, 1800);
+
+// ── Modal ──
+const modalData = {
+  geocalc: {
+    icon: '📐',
+    title: 'GeoCalc',
+    tagline: 'Your complete geometry toolkit — 23 tools with animated visuals, step-by-step solutions, and every shape calculator you need.',
+    features: [
+      ['📐','Triangle Tools','Pythagorean theorem, SOHCAHTOA, Law of Sines, Law of Cosines — 7 tools'],
+      ['🔵','Circle Tools','Area, circumference, arc length, sector area, chord — 2 tools'],
+      ['🔷','Polygons','Rectangle, square, parallelogram, trapezoid, regular polygon — 5 tools'],
+      ['📍','Coordinate Geometry','Distance, midpoint, slope, line equations, circle equation — 5 tools'],
+      ['🔄','Transformations','Reflection, rotation, translation, dilation — 4 in 1'],
+      ['🔢','Scientific Calculator','Always in the ribbon — trig, logs, memory functions'],
+    ],
+    link: 'mathcalc.html/GeoCalc',
+    linkLabel: 'Open GeoCalc →'
+  },
+  algicalc: {
+    icon: '🔢',
+    title: 'AlgICalc',
+    tagline: 'Your complete Algebra I toolkit — 24 tools covering expressions, equations, graphing, functions, exponents, and more with step-by-step solutions.',
+    features: [
+      ['✏️','Expressions','Simplify, expand, and factor expressions — combine like terms, distributive property, GCF'],
+      ['🔀','Equations','One-step, multi-step, variables both sides, literal equations, systems of equations'],
+      ['⚖️','Inequalities','Solve & graph inequalities — includes the flip rule and number line visualization'],
+      ['📈','Lines & Graphs','Slope calculator, line equation finder, form converter (slope-intercept ↔ standard), plot points'],
+      ['📊','Functions','Function evaluator f(x) and function tables — table of values'],
+      ['⚡','Exponents & More','Exponent rules, scientific notation, proportions, percent calculator, distance formula d=rt'],
+    ],
+    link: 'mathcalc.html/AlgICalc',
+    linkLabel: 'Open AlgICalc →'
+  }
+};
+
+function openModal(id) {
+  const d = modalData[id]; if (!d) return;
+  document.getElementById('mIcon').textContent = d.icon;
+  document.getElementById('mTitle').textContent = d.title;
+  document.getElementById('mTagline').textContent = d.tagline;
+  document.getElementById('mLink').href = d.link;
+  document.getElementById('mLink').textContent = d.linkLabel;
+  const fl = document.getElementById('mFeatures');
+  fl.innerHTML = d.features.map(([ic,name,desc]) =>
+    `<div class="modal-feature"><span>${ic}</span><span><strong>${name}</strong> — ${desc}</span></div>`
+  ).join('');
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal').classList.remove('active');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+</script>
+</body>
+</html>
+<!-- DQ Tools Floating Menu -->
+<style>
+  .fab2-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 999; }
+  .fab2-toggle { width: 34px; height: 34px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(40,164,90,0.4); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; flex-shrink: 0; }
+  .fab2-toggle:hover { background: #2ea85a; transform: scale(1.08); }
+  .fab2-toggle.open { transform: rotate(45deg) scale(1.08); background: #1f8a48; }
+  .fab2-items { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.32s ease, opacity 0.25s ease; }
+  .fab2-items.open { max-height: 300px; opacity: 1; }
+  .fab2-item { display: flex; align-items: center; position: relative; }
+  .fab2-label { background: #18181f; color: #c8f0d8; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 6px; white-space: nowrap; border: 1px solid #2e2e42; opacity: 0; transform: translateX(6px); transition: opacity 0.15s, transform 0.15s; pointer-events: none; margin-right: 7px; }
+  .fab2-item:hover .fab2-label { opacity: 1; transform: translateX(0); }
+  .fab2-icon { width: 30px; height: 30px; border-radius: 50%; background: #28a45a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; text-decoration: none; box-shadow: 0 2px 8px rgba(40,164,90,0.3); transition: background 0.15s, transform 0.15s; flex-shrink: 0; }
+  .fab2-icon:hover { background: #1f8a48; transform: scale(1.12); }
+</style>
+
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item">
+      <span class="fab2-label">Terms & Policies</span>
+      <a class="fab2-icon" href="termsandpolicies.html">📋</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">Home</span>
+      <a class="fab2-icon" href="index.html">🏠</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">DQtable</span>
+      <a class="fab2-icon" href="dqtable.html">⚗️</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">Course Planner</span>
+      <a class="fab2-icon" href="courseplanner.html">📅</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">GPA Review</span>
+      <a class="fab2-icon" href="gpareview.html">🎓</a>
+    </div>
+    <div class="fab2-item">
+      <span class="fab2-label">MathCalc</span>
+      <a class="fab2-icon" href="mathcalc.html">🧮</a>
+    </div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
