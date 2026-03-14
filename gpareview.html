@@ -1507,7 +1507,7 @@ function dqRestoreData(data){
 let _dqST;
 function dqAutoSave(){clearTimeout(_dqST);_dqST=setTimeout(()=>{if(typeof DQAuth!=='undefined')DQAuth.saveData('gpa',dqGetSaveData());},1500);}
 const _origTopGpa=topGpa;
-function topGpa(){_origTopGpa();dqAutoSave();}
+topGpa=function(){_origTopGpa();dqAutoSave();};
 window.addEventListener('dq:authready',async({detail:{user}})=>{
   if(!user)return;
   const saved=await DQAuth.loadData('gpa');
