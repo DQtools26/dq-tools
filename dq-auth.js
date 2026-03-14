@@ -14,7 +14,7 @@ const FIREBASE_CONFIG = {
 };
 
 const SUPABASE_URL = "https://awpxwnfvbxtitmcxreep.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ysmBc5BjOwM5RzpHi9lbeA_-a34TXvM";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4";
 
 // ─── PRESET AVATARS ──────────────────────────────────────────────────
 const PRESET_AVATARS = ['🧪','🎓','📐','🧮','⚗️','🔬','📊','🌟','🦊','🐺','🦁','🐉','🚀','⚡','🌙','🔥'];
@@ -137,13 +137,13 @@ const CSS = `
 
 // ─── SUPABASE HELPERS ────────────────────────────────────────────────
 async function sbSave(userId, key, payload) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?on_conflict=user_id,data_key`, {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
+      'Prefer': 'resolution=merge-duplicates,return=minimal'
     },
     body: JSON.stringify({
       user_id: userId,
