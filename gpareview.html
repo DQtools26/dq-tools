@@ -11,6 +11,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
+  <script src="dq-auth.js" defer></script>
   <title>MHS GPAreview</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -324,12 +325,43 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
 /* Pulse on new course added */
 @keyframes rowPop{0%{opacity:0;transform:scale(.96) translateX(-8px);}60%{transform:scale(1.01) translateX(2px);}100%{opacity:1;transform:scale(1) translateX(0);}}
 .row-new{animation:rowPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;}
+
+/* ── DQ Auth Button (in navbar) ── */
+#dq-auth-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(14,19,32,0.8); border: 1px solid #2a4468;
+  border-radius: 100px; padding: 4px 10px 4px 5px;
+  font-family: 'Outfit', sans-serif; font-size: .68rem; font-weight: 700;
+  color: #7a9abf; cursor: pointer; transition: all .18s;
+  white-space: nowrap; flex-shrink: 0; margin-left: auto;
+}
+#dq-auth-btn:hover { border-color: #3a7fff; color: #e8eef8; }
+#dq-auth-btn.logged-in { border-color: rgba(77,232,136,.35); color: #e8eef8; }
+#dq-auth-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg,#2dcc6f,#3a7fff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; overflow: hidden; flex-shrink: 0;
+}
+#dq-auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#dq-user-dropdown {
+  position: fixed; top: 58px; right: 16px; z-index: 9001;
+  background: #0e1320; border: 1px solid #2a4468; border-radius: 14px;
+  padding: 6px; width: 220px; font-family: 'Outfit', sans-serif;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+  display: none; flex-direction: column; gap: 2px;
+}
+#dq-user-dropdown.open { display: flex; }
+
 </style>
 </head>
 <body>
 <div id="gbar"><div id="gfill" style="width:20%"></div></div>
 <div id="navbar">
-  <div class="nav-logo"><span class="nl-mhs">MHS</span><span class="nl-gpa">GPA</span><span class="nl-rev">review</span></div>
+  <div class="nav-logo"><span class="nl-mhs">MHS</span><span class="nl-gpa">GPA</span><span class="nl-rev">review</span><button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+    <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+  </button>
+</div>
   <button class="gear-btn" onclick="openSettings()" title="Settings">⚙</button>
   <div class="nav-steps">
     <div class="nav-step active" id="ns0" onclick="navTo(0)">Welcome</div>
@@ -1460,6 +1492,27 @@ function loadSaveCode(){
   }
 }
 
+
+
+// ── DQ Account: auto-save & load ──
+function dqGetSaveData(){return{v:1,name:sName,yrs:activeYrs,curYr,includeIP,yd:yearData};}
+function dqRestoreData(data){
+  if(!data||!data.v||!data.yrs)return;
+  sName=data.name||'';activeYrs=data.yrs;curYr=data.curYr||activeYrs[0];yearData=data.yd||{};includeIP=data.includeIP||false;
+  const inp=document.getElementById('inp-name');if(inp)inp.value=sName;
+  [9,10,11,12].forEach(g=>{const b=document.getElementById('gb'+g);if(b)b.classList.toggle('sel',activeYrs.includes(g));});
+  buildTabs();renderYrCard(curYr);topGpa();visitedScreens=new Set([0,1]);goTo(1);
+  DQAuth.toast('✓ Your GPA data has been restored!');
+}
+let _dqST;
+function dqAutoSave(){clearTimeout(_dqST);_dqST=setTimeout(()=>{if(typeof DQAuth!=='undefined')DQAuth.saveData('gpa',dqGetSaveData());},1500);}
+const _origTopGpa=topGpa;
+function topGpa(){_origTopGpa();dqAutoSave();}
+window.addEventListener('dq:authready',async({detail:{user}})=>{
+  if(!user)return;
+  const saved=await DQAuth.loadData('gpa');
+  if(saved)dqRestoreData(saved);
+});
 
 </script>
 
