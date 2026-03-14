@@ -201,7 +201,7 @@ async function sbGetAllKeys(userId) {
 
 // Profile stored in Supabase for cross-device sync
 // Falls back to localStorage if Supabase fails
-async function saveProfile(uid, data) {
+async function dqSaveProfile(uid, data) {
   // Always save to localStorage as instant cache
   try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
   // Also save to Supabase for cross-device sync
@@ -209,7 +209,7 @@ async function saveProfile(uid, data) {
     await sbSave(uid, 'profile', data);
   } catch (_) {}
 }
-async function loadProfile(uid) {
+async async function dqLoadProfile(uid) {
   // Try Supabase first for freshest data
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${uid}&data_key=eq.profile&select=payload`, {
@@ -399,7 +399,7 @@ async function initFirebase() {
     onAuthStateChanged(_auth, async user => {
       _user = user;
       if (user) {
-        _profile = await loadProfile(user.uid);
+        _profile = await dqLoadProfile(user.uid);
         if (!_profile) {
           _profile = {
             displayName: user.displayName || user.email.split('@')[0],
@@ -408,7 +408,7 @@ async function initFirebase() {
             photoURL: '🎓',
             createdAt: Date.now()
           };
-          saveProfile(user.uid, _profile);
+          dqSaveProfile(user.uid, _profile);
         }
       } else {
         _profile = null;
@@ -481,7 +481,7 @@ window.DQAuth = {
         await updateProfile(cred.user, { displayName: name });
         await sendEmailVerification(cred.user);
         const profile = { displayName: name, email, photoType: 'emoji', photoURL: '🎓', createdAt: Date.now() };
-        saveProfile(cred.user.uid, profile);
+        dqSaveProfile(cred.user.uid, profile);
         DQAuth.closeModal();
         DQAuth.toast('✓ Account created! Check your email to verify.');
       } else {
@@ -603,7 +603,7 @@ window.DQAuth = {
   updateProfile(updates) {
     if (!_user) return;
     _profile = { ..._profile, ...updates };
-    saveProfile(_user.uid, _profile); // async, fire and forget
+    dqSaveProfile(_user.uid, _profile); // async, fire and forget
     updateNavBtn(_user);
   },
 
