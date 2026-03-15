@@ -200,7 +200,6 @@ h1.hero-title{
 .mc-cat-name{font-size:.44rem;font-weight:700;color:#c8ddf5;display:block;}
 .mc-cat-sub{font-size:.38rem;color:#5a7a99;}
 
-
 .launch-btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:700;
@@ -508,7 +507,6 @@ h1.hero-title{
       </div>
     </div>
 
-
     <!-- MathCalc — full width with mockup preview -->
     <div class="tool-card wide" onclick="openLaunch('mathcalc')" style="flex-direction:column;align-items:stretch;gap:0;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
@@ -569,6 +567,36 @@ h1.hero-title{
       <div class="tool-card-footer" style="margin-top:14px;">
         <div style="font-size:.72rem;color:var(--text3);">GeoCalc · AlgCalc · Calc · and growing</div>
         <button class="launch-btn" onclick="event.stopPropagation();openLaunch('mathcalc')">Launch <i class="arrow-icon">→</i></button>
+      </div>
+    </div>
+
+
+    <!-- DQTasks -->
+    <div class="tool-card wide" onclick="openLaunch('dqtasks')" style="flex-direction:column;align-items:stretch;gap:0;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="tool-card-icon" style="background:var(--green-dim);border-color:rgba(77,232,136,.2);">✅</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="tool-card-name" style="margin-bottom:0;">DQTasks</div>
+              <span class="tool-tag-new">✦ NEW</span>
+            </div>
+            <div style="font-size:.7rem;color:var(--text3);font-weight:600;margin-top:2px;">Student Productivity Hub</div>
+          </div>
+        </div>
+        <span class="tool-tag">Productivity</span>
+      </div>
+      <div class="tool-card-desc">The ultimate productivity hub for students. Smart assignment tracking, an interactive notebook, and a dynamic calendar — all in one place. Color-coded labels, priority tracking, auto-suggestions, and optional cloud sync keep everything organized and actionable.</div>
+      <div class="tool-chips" style="margin-top:10px;">
+        <span class="chip">📋 Assignments</span>
+        <span class="chip">📓 Notebook</span>
+        <span class="chip">📅 Calendar</span>
+        <span class="chip">🏷️ Labels</span>
+        <span class="chip">☁️ Cloud Sync</span>
+      </div>
+      <div class="tool-card-footer" style="margin-top:14px;">
+        <div style="font-size:.72rem;color:var(--text3);">Tasks · Notes · Events · Classes · Jobs</div>
+        <button class="launch-btn" onclick="event.stopPropagation();openLaunch('dqtasks')">Launch <i class="arrow-icon">→</i></button>
       </div>
     </div>
 
@@ -662,6 +690,18 @@ const TOOLS = {
       {icon:'✨', text:'Step-by-step solutions with formula breakdowns so you understand the math, not just the answer.'},
     ]
   },
+  dqtasks: {
+    icon:'✅', name:'DQTasks',
+    tagline:'The ultimate productivity hub for students. Smart assignment tracking, interactive notebook, and dynamic calendar — all in one place with optional cloud sync.',
+    url:'dqtasks.html',
+    features:[
+      {icon:'📋', text:'Smart assignment tracker — add tasks, set due dates, priorities, and link to classes with color-coded labels.'},
+      {icon:'📓', text:'Interactive notebook with Smart Chips — link notes to assignments, classes, and events automatically.'},
+      {icon:'📅', text:'Dynamic calendar — see all your due dates, events, and tasks in one visual view.'},
+      {icon:'🏷️', text:'Color-coded labels and categories — organize by class, priority, or custom tags at a glance.'},
+      {icon:'☁️', text:'Optional cloud sync — sign in to save everything to your DQ Account and access from any device.'},
+    ]
+  },
   ai: {
     icon:'🤖', name:'AI Disclaimer',
     tagline:"Full transparency about how and where AI is used across DQ Tools — what's AI-assisted, how it works, and what to keep in mind.",
@@ -700,7 +740,35 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLaunch(
 <style>
   .dq-watermark { position: fixed; bottom: 8px; left: 12px; font-family: 'Outfit', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; color: #1a5c36; text-transform: uppercase; pointer-events: none; z-index: 998; white-space: nowrap; }
 </style>
+
+<style>
+  .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;white-space:nowrap;}
+  .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+  .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;font-family:'Outfit',sans-serif;flex-shrink:0;}
+  .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+  .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+  .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease,opacity .25s ease;}
+  .fab2-items.open{max-height:500px;opacity:1;}
+  .fab2-item{display:flex;align-items:center;position:relative;}
+  .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+  .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+  .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+  .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+</style>
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">My Account</span><a class="fab2-icon" href="account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">Terms & Policies</span><a class="fab2-icon" href="termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Home</span><a class="fab2-icon" href="index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQTasks</span><a class="fab2-icon" href="dqtasks.html">✅</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
 </body>
 </html>
 <!-- DQ Tools Floating Menu -->
@@ -716,46 +784,3 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLaunch(
 </style>
 
 <!-- DQ Tools Floating Menu -->
-<style>
-  .fab2-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 999; }
-  .fab2-toggle { width: 34px; height: 34px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(40,164,90,0.4); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; flex-shrink: 0; }
-  .fab2-toggle:hover { background: #2ea85a; transform: scale(1.08); }
-  .fab2-toggle.open { transform: rotate(45deg) scale(1.08); background: #1f8a48; }
-  .fab2-items { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.32s ease, opacity 0.25s ease; }
-  .fab2-items.open { max-height: 300px; opacity: 1; }
-  .fab2-item { display: flex; align-items: center; position: relative; }
-  .fab2-label { background: #18181f; color: #c8f0d8; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 6px; white-space: nowrap; border: 1px solid #2e2e42; opacity: 0; transform: translateX(6px); transition: opacity 0.15s, transform 0.15s; pointer-events: none; margin-right: 7px; }
-  .fab2-item:hover .fab2-label { opacity: 1; transform: translateX(0); }
-  .fab2-icon { width: 30px; height: 30px; border-radius: 50%; background: #28a45a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; text-decoration: none; box-shadow: 0 2px 8px rgba(40,164,90,0.3); transition: background 0.15s, transform 0.15s; flex-shrink: 0; }
-  .fab2-icon:hover { background: #1f8a48; transform: scale(1.12); }
-</style>
-
-<div class="fab2-wrap">
-  <div class="fab2-items" id="fab2menu">
-    <div class="fab2-item">
-      <span class="fab2-label">Terms & Policies</span>
-      <a class="fab2-icon" href="termsandpolicies.html">📋</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">Home</span>
-      <a class="fab2-icon" href="index.html">🏠</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">DQtable</span>
-      <a class="fab2-icon" href="dqtable.html">⚗️</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">Course Planner</span>
-      <a class="fab2-icon" href="courseplanner.html">📅</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">GPA Review</span>
-      <a class="fab2-icon" href="gpareview.html">🎓</a>
-    </div>
-    <div class="fab2-item">
-      <span class="fab2-label">MathCalc</span>
-      <a class="fab2-icon" href="mathcalc.html">🧮</a>
-    </div>
-  </div>
-  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
-</div>
