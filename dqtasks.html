@@ -1770,6 +1770,44 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   </div>
 </div>
 
+
+<!-- Edit Class Modal -->
+<div class="modal-overlay" id="edit-class-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-class-modal')">✕</button>
+    <div class="modal-title">✏️ Edit Class</div>
+    <div class="form-group">
+      <label class="form-label">Course Name</label>
+      <input type="text" class="form-input" id="edit-class-name" placeholder="Class name">
+    </div>
+    <div class="form-group" id="edit-class-icon-row">
+      <label class="form-label">Icon</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${['📚','🔬','🧮','🎨','🏃','🎵','💻','🌍','✍️','🧪','📐','🗺️','⚗️','📖','🎭','💡'].map(e =>
+          `<div onclick="setEditClassIcon('${e}',this)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all 0.12s;">${e}</div>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color</label>
+      <div class="color-options" id="edit-class-color-opts">
+        <div class="color-opt active" data-color="#4488ff" style="background:#4488ff;" onclick="setEditClassColor('#4488ff',this)"></div>
+        <div class="color-opt" data-color="#3db870" style="background:#3db870;" onclick="setEditClassColor('#3db870',this)"></div>
+        <div class="color-opt" data-color="#e89020" style="background:#e89020;" onclick="setEditClassColor('#e89020',this)"></div>
+        <div class="color-opt" data-color="#e03030" style="background:#e03030;" onclick="setEditClassColor('#e03030',this)"></div>
+        <div class="color-opt" data-color="#9966ff" style="background:#9966ff;" onclick="setEditClassColor('#9966ff',this)"></div>
+        <div class="color-opt" data-color="#22c5b0" style="background:#22c5b0;" onclick="setEditClassColor('#22c5b0',this)"></div>
+        <div class="color-opt" data-color="#ff77aa" style="background:#ff77aa;" onclick="setEditClassColor('#ff77aa',this)"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="saveEditClass()">Save</button>
+      <button class="btn btn-red btn-sm" onclick="deleteClass()">Delete Class</button>
+      <button class="btn btn-ghost" onclick="closeModal('edit-class-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Job Modal -->
 <div class="modal-overlay" id="add-job-modal">
   <div class="modal">
@@ -2353,14 +2391,7 @@ function renderTasks(){
   const el = document.getElementById('tasks-list');
   el.innerHTML = tasks.map(t=>renderItemHTML({...t,_type:'task'})).join('');
   document.getElementById('tasks-empty').style.display = tasks.length?'none':'';
-  document.getElementById('recurring-list').innerHTML = recurring.map(t=>`
-    <div class="task-item">
-      <div class="assign-check ${t.completed?'checked':''}" onclick="toggleComplete('task','${t.id}')"></div>
-      <div class="task-title">${t.title}</div>
-      <span class="task-badge" style="background:var(--blue-dim);color:var(--blue2);">🔁 ${t.recurType||'daily'}</span>
-      <button class="btn btn-red btn-sm" onclick="deleteItem('task','${t.id}')">✕</button>
-    </div>
-  `).join('') || '<div style="color:var(--text3);font-size:0.78rem;padding:8px;">No recurring tasks.</div>';
+  document.getElementById('tasks-empty').style.display = tasks.length?'none':'';
 }
 
 // ── COMPLETED ──
@@ -5265,15 +5296,21 @@ renderClassList = function() {
     const assigns = state.assignments.filter(a => a.classId === cls.id && !a.completed);
     const missing = assigns.filter(a => a.due && isOverdue(a.due));
     const week = assigns.filter(a => a.due && isDueThisWeek(a.due));
-    return `<div class="class-card ${state.activeClass === cls.id ? 'active' : ''}" onclick="selectClass('${cls.id}')">
+    return `<div class="class-card ${state.activeClass === cls.id ? 'active' : ''}" onclick="selectClass('${cls.id}')" style="position:relative;">
       <div class="class-color-bar" style="background:${cls.color};"></div>
       <div style="font-size:1.1rem;flex-shrink:0;">${cls.icon || '📚'}</div>
       <div class="class-info">
         <div class="class-name">${cls.name}</div>
         <div class="class-stats">${assigns.length} active${missing.length ? ` · <span style="color:var(--red2)">${missing.length} missing</span>` : ''}${week.length ? ` · ${week.length} this week` : ''}</div>
       </div>
+      <button onclick="event.stopPropagation();openEditClassModal('${cls.id}')" style="margin-left:auto;background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:0.65rem;color:var(--text2);cursor:pointer;opacity:0;transition:opacity 0.15s;flex-shrink:0;" class="edit-class-btn">✏️</button>
     </div>`;
   }).join('');
+  // Show edit buttons on hover
+  el.querySelectorAll('.class-card').forEach(card => {
+    card.addEventListener('mouseenter', () => { const b = card.querySelector('.edit-class-btn'); if(b) b.style.opacity='1'; });
+    card.addEventListener('mouseleave', () => { const b = card.querySelector('.edit-class-btn'); if(b) b.style.opacity='0'; });
+  });
 };
 
 // Update updateClassSelect to show icons
@@ -6025,16 +6062,36 @@ function dqAddUpdateType(newType) {
 }
 
 function dqAddSave() {
-  if (!_dqParsed) return;
-  // Pull latest values from adjustment fields
-  const type = document.getElementById('qa-type')?.value || _dqParsed.type;
-  const date = document.getElementById('qa-date')?.value || _dqParsed.date || '';
-  const time = document.getElementById('qa-time')?.value || _dqParsed.time || '';
-  const importance = parseInt(document.getElementById('qa-importance')?.value || _dqParsed.importance || 1);
-  const classId = document.getElementById('qa-class')?.value || _dqParsed.classId || '';
-  const remindDate = document.getElementById('qa-remind-date')?.value || '';
-  const remindTime = document.getElementById('qa-remind-time')?.value || '';
-  const title = _dqParsed.title;
+  // If parse hasn't run yet, run it now from current input
+  const rawInput = document.getElementById('dqadd-input')?.value?.trim() || '';
+  if (!_dqParsed && rawInput.length >= 2) {
+    _dqParsed = _nlParse(rawInput);
+  }
+  if (!_dqParsed || !_dqParsed.title) {
+    if (typeof DQAuth !== 'undefined') DQAuth.toast('⚠️ Please type something first!');
+    return;
+  }
+
+  // Always re-parse title from input in case user edited it after parse
+  const freshParsed = rawInput.length >= 2 ? _nlParse(rawInput) : _dqParsed;
+
+  // Pull from adjustment fields if rendered, else fall back to parsed values
+  const qaType = document.getElementById('qa-type');
+  const qaDate = document.getElementById('qa-date');
+  const qaTime = document.getElementById('qa-time');
+  const qaImportance = document.getElementById('qa-importance');
+  const qaClass = document.getElementById('qa-class');
+  const qaRemindDate = document.getElementById('qa-remind-date');
+  const qaRemindTime = document.getElementById('qa-remind-time');
+
+  const type = qaType?.value || _dqParsed.type || freshParsed.type || 'task';
+  const date = qaDate?.value || _dqParsed.date || freshParsed.date || '';
+  const time = qaTime?.value || _dqParsed.time || freshParsed.time || '';
+  const importance = parseInt(qaImportance?.value || _dqParsed.importance || freshParsed.importance || 1);
+  const classId = qaClass?.value || _dqParsed.classId || freshParsed.classId || '';
+  const remindDate = qaRemindDate?.value || '';
+  const remindTime = qaRemindTime?.value || '';
+  const title = _dqParsed.title || freshParsed.title || rawInput;
 
   const id = uid();
   let item;
@@ -6206,6 +6263,77 @@ function _nlParse(raw) {
   if (title.length) title = title[0].toUpperCase() + title.slice(1);
 
   return { type, title, date, time, importance, classId, emoji, remindDate:'', remindTime:'' };
+}
+
+
+// ── Edit Class ──
+let _editingClassId = null;
+let _editClassColor = '#4488ff';
+let _editClassIcon = '📚';
+
+function openEditClassModal(id) {
+  const cls = state.classes.find(c => c.id === id);
+  if (!cls) return;
+  _editingClassId = id;
+  _editClassColor = cls.color || '#4488ff';
+  _editClassIcon = cls.icon || '📚';
+
+  document.getElementById('edit-class-name').value = cls.name;
+
+  // Set color
+  document.querySelectorAll('#edit-class-color-opts .color-opt').forEach(o => {
+    o.classList.toggle('active', o.dataset.color === _editClassColor);
+  });
+
+  // Build icon row
+  const iconRow = document.getElementById('edit-class-icon-row');
+  const icons = ['📚','🔬','🧮','🎨','🏃','🎵','💻','🌍','✍️','🧪','📐','🗺️','⚗️','📖','🎭','💡'];
+  iconRow.innerHTML = `<label class="form-label">Icon</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${icons.map(e => `<div onclick="setEditClassIcon('${e}',this)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border-radius:6px;cursor:pointer;border:2px solid ${e===_editClassIcon?'var(--blue2)':'transparent'};transition:all 0.12s;">${e}</div>`).join('')}
+    </div>`;
+
+  openModal('edit-class-modal');
+  playSound('open');
+}
+
+function setEditClassIcon(icon, el) {
+  _editClassIcon = icon;
+  document.querySelectorAll('#edit-class-icon-row div[onclick]').forEach(d => d.style.borderColor = 'transparent');
+  if (el) el.style.borderColor = 'var(--blue2)';
+}
+
+function setEditClassColor(color, el) {
+  _editClassColor = color;
+  document.querySelectorAll('#edit-class-color-opts .color-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+function saveEditClass() {
+  const cls = state.classes.find(c => c.id === _editingClassId);
+  if (!cls) return;
+  const name = document.getElementById('edit-class-name').value.trim();
+  if (!name) { alert('Enter a class name.'); return; }
+  cls.name = name;
+  cls.color = _editClassColor;
+  cls.icon = _editClassIcon;
+  save();
+  closeModal('edit-class-modal');
+  renderSchool();
+  updateClassSelect();
+  playSound('save');
+}
+
+function deleteClass() {
+  if (!confirm('Delete this class? Assignments will remain but lose their class.')) return;
+  state.classes = state.classes.filter(c => c.id !== _editingClassId);
+  // Unlink assignments from deleted class
+  state.assignments.forEach(a => { if (a.classId === _editingClassId) a.classId = null; });
+  save();
+  closeModal('edit-class-modal');
+  renderSchool();
+  updateClassSelect();
+  playSound('delete');
 }
 
 </script>
