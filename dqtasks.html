@@ -883,6 +883,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   </div>
   <div id="global-save-indicator" style="font-size:0.6rem;font-weight:700;padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;opacity:0;transition:opacity 0.3s;">✓ Saved</div>
   <button id="nav-create" onclick="openCreateModal()">+ Create</button>
+  <button id="nav-quickadd" onclick="openDQAdd()" title="Quick Add (Q)" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;border:none;border-radius:8px;padding:6px 12px;font-family:var(--app-font);font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;">⚡ Quick Add</button>
   <button class="nav-icon-btn" onclick="showPage('notebook')" title="Smart Notebook">📓</button>
   <div class="nav-icon-btn notif-badge" id="notif-btn" data-count="0" onclick="toggleNotifPanel()" title="Notifications">🔔</div>
   <button class="nav-icon-btn" onclick="showPage('settings')" title="Settings">⚙️</button>
@@ -1918,9 +1919,15 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
 <!-- Chip Suggestion Bubble -->
 <div id="chip-suggestion">
   <div class="chip-sug-title" id="chip-sug-title">Add Smart Chip?</div>
-  <div id="chip-sug-text" style="font-size:0.78rem;color:var(--text2);"></div>
-  <div class="chip-sug-actions">
-    <button class="btn btn-primary btn-sm" onclick="acceptChipSuggestion()">✓ Add Chip</button>
+  <div id="chip-sug-text" style="font-size:0.78rem;color:var(--text2);margin-bottom:6px;"></div>
+  <!-- chip actions (shown for chip suggestions) -->
+  <div class="chip-sug-actions" id="chip-sug-chip-actions">
+    <button class="btn btn-primary btn-sm" onclick="acceptChipSuggestion()">🧠 Add Chip</button>
+    <button class="btn btn-ghost btn-sm" onclick="dismissChipSuggestion()">Dismiss</button>
+  </div>
+  <!-- tool actions (shown for tool suggestions) -->
+  <div class="chip-sug-actions" id="chip-sug-tool-actions" style="display:none;">
+    <button class="btn btn-primary btn-sm" id="chip-sug-tool-btn">Open Tool →</button>
     <button class="btn btn-ghost btn-sm" onclick="dismissChipSuggestion()">Dismiss</button>
   </div>
 </div>
@@ -2342,7 +2349,6 @@ function renderPersonal(){
 // ── TASKS ──
 function renderTasks(){
   const tasks = state.tasks.filter(t=>!t.recurring&&!t.completed&&t.workspace!=='personal'&&t.workspace!=='work'&&t.workspace!=='personal-goal');
-  const recurring = state.tasks.filter(t=>t.recurring&&!t.completed);
   document.getElementById('tasks-count').textContent = tasks.length;
   const el = document.getElementById('tasks-list');
   el.innerHTML = tasks.map(t=>renderItemHTML({...t,_type:'task'})).join('');
@@ -2818,6 +2824,24 @@ function loadNote(id){
   renderNoteColorPicker();
   renderNoteTagBar();
   editor.setAttribute('data-placeholder','Start writing…');
+  // Re-attach chip onclick handlers lost during innerHTML restore
+  _reattachChipHandlers(editor);
+}
+
+function _reattachChipHandlers(editor) {
+  editor.querySelectorAll('.smart-chip[data-id]').forEach(chip => {
+    const id = chip.getAttribute('data-id');
+    const type = chip.getAttribute('data-type') || 'assignment';
+    chip.setAttribute('contenteditable','false');
+    chip.onclick = (e) => { e.stopPropagation(); openChipPopup(id, type, chip); };
+    // Re-set tooltip
+    let item;
+    if (type==='assignment') item=state.assignments.find(a=>a.id===id);
+    else if (type==='event') item=state.events.find(e=>e.id===id);
+    else if (type==='task') item=state.tasks.find(t=>t.id===id);
+    else if (type==='countdown') item=(state.countdowns||[]).find(c=>c.id===id);
+    if (item) _setChipTooltip(chip, item, type);
+  });
 }
 
 function deleteNote(id){
@@ -3006,6 +3030,11 @@ function acceptChipSuggestion(){
 function dismissChipSuggestion(){
   document.getElementById('chip-suggestion').classList.remove('visible');
   chipSuggestionData=null;
+  // Always reset to chip actions so next suggestion works correctly
+  const ca = document.getElementById('chip-sug-chip-actions');
+  const ta = document.getElementById('chip-sug-tool-actions');
+  if (ca) ca.style.display = '';
+  if (ta) ta.style.display = 'none';
 }
 
 function openChipPicker(prefill){
@@ -3048,7 +3077,7 @@ function insertChip(id,type){
   chip.setAttribute('data-type',type);
   chip.setAttribute('contenteditable','false');
   chip.textContent=`${type==='assignment'?'📚':'📅'} ${item.title}`;
-  chip.onclick=(e)=>{e.stopPropagation();showDetail(type,id);};
+  chip.onclick=(e)=>{e.stopPropagation();openChipPopup(id,type,chip);};
   const editor=document.getElementById('editor-content');
   editor.focus();
   // Restore saved selection or append
@@ -3121,7 +3150,7 @@ function setCreateType(type,el){
   document.getElementById('event-fields').style.display=(type==='event')?'':'none';
   document.getElementById('due-fields').style.display=(type!=='event')?'':'none';
   document.getElementById('importance-group').style.display=(type!=='event')?'':'none';
-  document.getElementById('recurring-fields').style.display=(type==='recurring')?'':'none';
+  const rf=document.getElementById('recurring-fields'); if(rf) rf.style.display=(type==='recurring')?'':'none';
 
   const labels={'assignment':'📚 Assignment Title','event':'📅 Event Name','task':'✅ Task','goal':'⭐ Goal','work-task':'💼 Task Title','personal-task':'⭐ Task Title'};
   document.getElementById('create-title-label').textContent=labels[type]||'Title';
@@ -4892,14 +4921,13 @@ detectChipPatterns = function() {
     const rect = document.getElementById('editor-area').getBoundingClientRect();
     sug.style.top = (rect.top + 60) + 'px';
     sug.style.left = (rect.left + 48) + 'px';
-    // Override accept to go to tool instead of chip
-    sug._toolUrl = ts.url;
+    // Show TOOL actions, hide chip actions — keeps chip button untouched
+    document.getElementById('chip-sug-chip-actions').style.display = 'none';
+    document.getElementById('chip-sug-tool-actions').style.display = 'flex';
+    const toolBtn = document.getElementById('chip-sug-tool-btn');
+    toolBtn.textContent = `Open ${ts.tool} →`;
+    toolBtn.onclick = function() { window.open(ts.url, '_blank'); dismissChipSuggestion(); };
     sug.classList.add('visible');
-    const btn = sug.querySelector('button');
-    if (btn) btn.onclick = function() {
-      window.open(ts.url, '_blank');
-      dismissChipSuggestion();
-    };
   }
 };
 
@@ -5863,6 +5891,323 @@ function _playPhoneSound(type) {
   } catch(e) {}
 }
 
+
+// ═══════════════════════════════════════════════════
+//  DQAdd — Quick Add with Natural Language Parsing
+// ═══════════════════════════════════════════════════
+
+let _dqParsed = null; // holds the current parsed result
+
+function openDQAdd() {
+  const input = document.getElementById('dqadd-input');
+  input.value = '';
+  _dqParsed = null;
+  document.getElementById('dqadd-preview').style.display = 'none';
+  document.getElementById('dqadd-adjust').style.display = 'none';
+  document.getElementById('dqadd-save-btn').disabled = true;
+  openModal('dqadd-modal');
+  setTimeout(() => input.focus(), 80);
+  playSound('open');
+}
+
+// Q shortcut removed — use Quick Add button
+
+function dqAddExample(el) {
+  const input = document.getElementById('dqadd-input');
+  input.value = el.textContent.replace(/^[📚📅✅⏳]\s*/u, '');
+  dqAddParse(input.value);
+  input.focus();
+}
+
+function dqAddKeydown(e) {
+  if (e.key === 'Enter' && !document.getElementById('dqadd-save-btn').disabled) dqAddSave();
+  if (e.key === 'Escape') closeModal('dqadd-modal');
+}
+
+// ── Natural Language Parser ──
+function dqAddParse(raw) {
+  const text = raw.trim();
+  if (text.length < 2) {
+    document.getElementById('dqadd-preview').style.display = 'none';
+    document.getElementById('dqadd-adjust').style.display = 'none';
+    document.getElementById('dqadd-save-btn').disabled = true;
+    _dqParsed = null;
+    return;
+  }
+
+  const parsed = _nlParse(text);
+  _dqParsed = parsed;
+
+  // Show preview
+  document.getElementById('dqadd-preview').style.display = 'block';
+  document.getElementById('dqadd-adjust').style.display = 'block';
+  document.getElementById('dqadd-save-btn').disabled = false;
+
+  const icons = { assignment:'📚', event:'📅', task:'✅', goal:'⭐', countdown:'⏳', 'work-task':'💼', 'personal-task':'⭐' };
+  const typeLabels = { assignment:'Assignment', event:'Event', task:'Task', goal:'Goal', countdown:'Countdown', 'work-task':'Work Task', 'personal-task':'Personal Task' };
+
+  document.getElementById('dqadd-preview-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <div style="font-size:1rem;font-weight:800;">${icons[parsed.type]||'📌'} ${parsed.title}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="tag tag-blue" style="font-size:0.65rem;">${typeLabels[parsed.type]||parsed.type}</span>
+          ${parsed.date ? `<span class="tag tag-amber" style="font-size:0.65rem;">📅 ${fmtDate(parsed.date)}</span>` : ''}
+          ${parsed.time ? `<span class="tag tag-teal" style="font-size:0.65rem;">🕐 ${fmt12(parsed.time)}</span>` : ''}
+          ${parsed.importance > 1 ? `<span class="tag tag-red" style="font-size:0.65rem;">${'⭐'.repeat(parsed.importance)} Priority</span>` : ''}
+          ${parsed.classId ? `<span class="tag tag-green" style="font-size:0.65rem;">📚 ${state.classes.find(c=>c.id===parsed.classId)?.name||''}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Build adjustment fields
+  _renderDQAddFields(parsed);
+}
+
+function _renderDQAddFields(parsed) {
+  const el = document.getElementById('dqadd-fields');
+  const typeLabels = { assignment:'Assignment', event:'Event', task:'Task', goal:'Goal', countdown:'Countdown', 'work-task':'Work Task', 'personal-task':'Personal Task' };
+
+  el.innerHTML = `
+    <!-- Type -->
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="qa-type" onchange="dqAddUpdateType(this.value)" style="font-size:0.8rem;padding:6px 8px;">
+        ${['assignment','event','task','goal','work-task','personal-task','countdown'].map(t =>
+          `<option value="${t}" ${parsed.type===t?'selected':''}>${typeLabels[t]}</option>`
+        ).join('')}
+      </select>
+    </div>
+    <!-- Date -->
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Date</label>
+      <input type="date" class="form-input" id="qa-date" value="${parsed.date||''}" style="font-size:0.8rem;padding:6px 8px;" oninput="_dqParsed.date=this.value;dqAddParse(document.getElementById('dqadd-input').value)">
+    </div>
+    <!-- Time -->
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Time</label>
+      <input type="time" class="form-input" id="qa-time" value="${parsed.time||''}" style="font-size:0.8rem;padding:6px 8px;" oninput="_dqParsed.time=this.value">
+    </div>
+    <!-- Priority -->
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Priority</label>
+      <select class="form-select" id="qa-importance" style="font-size:0.8rem;padding:6px 8px;" onchange="_dqParsed.importance=parseInt(this.value)">
+        <option value="1" ${(parsed.importance||1)===1?'selected':''}>⭐ Low</option>
+        <option value="2" ${parsed.importance===2?'selected':''}>⭐⭐ Medium</option>
+        <option value="3" ${parsed.importance===3?'selected':''}>⭐⭐⭐ High</option>
+      </select>
+    </div>
+    <!-- Class (if assignment) -->
+    ${parsed.type==='assignment' ? `
+    <div class="form-group" style="margin:0;grid-column:1/-1;">
+      <label class="form-label">Class</label>
+      <select class="form-select" id="qa-class" style="font-size:0.8rem;padding:6px 8px;" onchange="_dqParsed.classId=this.value">
+        <option value="">No class</option>
+        ${state.classes.filter(c=>c.workspace==='school'||!c.workspace).map(c=>`<option value="${c.id}" ${parsed.classId===c.id?'selected':''}>${c.icon||'📚'} ${c.name}</option>`).join('')}
+      </select>
+    </div>` : ''}
+    <!-- Reminder -->
+    <div class="form-group" style="margin:0;grid-column:1/-1;">
+      <label class="form-label">🔔 Remind me (optional)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="date" class="form-input" id="qa-remind-date" style="flex:1;font-size:0.8rem;padding:6px 8px;" oninput="_dqParsed.remindDate=this.value">
+        <input type="time" class="form-input" id="qa-remind-time" style="width:110px;font-size:0.8rem;padding:6px 8px;" oninput="_dqParsed.remindTime=this.value">
+      </div>
+    </div>
+  `;
+}
+
+function dqAddUpdateType(newType) {
+  if (!_dqParsed) return;
+  _dqParsed.type = newType;
+  dqAddParse(document.getElementById('dqadd-input').value);
+}
+
+function dqAddSave() {
+  if (!_dqParsed) return;
+  // Pull latest values from adjustment fields
+  const type = document.getElementById('qa-type')?.value || _dqParsed.type;
+  const date = document.getElementById('qa-date')?.value || _dqParsed.date || '';
+  const time = document.getElementById('qa-time')?.value || _dqParsed.time || '';
+  const importance = parseInt(document.getElementById('qa-importance')?.value || _dqParsed.importance || 1);
+  const classId = document.getElementById('qa-class')?.value || _dqParsed.classId || '';
+  const remindDate = document.getElementById('qa-remind-date')?.value || '';
+  const remindTime = document.getElementById('qa-remind-time')?.value || '';
+  const title = _dqParsed.title;
+
+  const id = uid();
+  let item;
+
+  if (type === 'assignment') {
+    item = { id, title, classId: classId||null, due: date, time, importance, notes:'', tags:[], color:'#4488ff', completed:false, missing:false, workspace:'school' };
+    if (remindDate && remindTime) { item.remindDate=remindDate; item.remindTime=remindTime; item.reminderFired=false; }
+    state.assignments.push(item);
+  } else if (type === 'event') {
+    item = { id, title, category:'school', startDate:date, endDate:'', startTime:time, endTime:'', notes:'', tags:[], color:'#9966ff' };
+    state.events.push(item);
+  } else if (type === 'countdown') {
+    item = { id, text:title, date, emoji: _dqParsed.emoji||'⏳' };
+    if (!state.countdowns) state.countdowns = [];
+    state.countdowns.push(item);
+  } else {
+    const wsMap = { task:'general', 'work-task':'work', 'personal-task':'personal', goal:'personal-goal' };
+    item = { id, title, importance, due:date, time, notes:'', tags:[], color:'#4488ff', completed:false, workspace: wsMap[type]||'general', recurring:false, recurType:'' };
+    if (remindDate && remindTime) { item.remindDate=remindDate; item.remindTime=remindTime; item.reminderFired=false; }
+    state.tasks.push(item);
+  }
+
+  save();
+  closeModal('dqadd-modal');
+  playSound('add');
+
+  // Toast with context
+  const dateStr = date ? ` for ${fmtDate(date)}` : '';
+  const timeStr = time ? ` at ${fmt12(time)}` : '';
+  if (typeof DQAuth !== 'undefined') DQAuth.toast(`✅ "${title}" added${dateStr}${timeStr}`);
+
+  // Re-render current page
+  const cur = state.currentPage;
+  if (cur==='home') renderHome();
+  else if (cur==='school') renderSchool();
+  else if (cur==='work') renderWork();
+  else if (cur==='tasks') renderTasks();
+  else if (cur==='calendar') renderCalendar();
+  else if (cur==='upcoming') renderUpcomingPage();
+  else if (cur==='reminders') renderRemindersPage();
+  renderUpcoming(); renderMiniCal(); updateBadges(); updateProgressBar();
+}
+
+// ── Natural Language Parser ──
+function _nlParse(raw) {
+  let text = raw;
+  let type = 'task';
+  let title = text;
+  let date = '';
+  let time = '';
+  let importance = 1;
+  let classId = null;
+  let emoji = '⏳';
+
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  // ── Detect type from keywords ──
+  if (/\b(hw|homework|assignment|essay|quiz|test|exam|project|lab|worksheet|reading|chapter|problem set|due)\b/i.test(text)) type = 'assignment';
+  else if (/\b(meeting|session|event|practice|game|appointment|trip|party|concert|call|class)\b/i.test(text)) type = 'event';
+  else if (/\b(countdown|count down|days until|days till|until|till)\b/i.test(text)) type = 'countdown';
+  else if (/\b(work|shift|boss|job|task for work)\b/i.test(text)) type = 'work-task';
+  else if (/\b(personal|goal|habit|self|health|gym|workout)\b/i.test(text)) type = 'personal-task';
+  else if (/📚|🎒|school/i.test(text)) type = 'assignment';
+  else if (/📅|🗓️/i.test(text)) type = 'event';
+  else if (/⏳|countdown/i.test(text)) type = 'countdown';
+  else if (/💼|work/i.test(text)) type = 'work-task';
+
+  // ── Detect priority ──
+  if (/\b(urgent|asap|high priority|important|!)\b/i.test(text) || text.includes('!!!')) importance = 3;
+  else if (/\b(medium|moderate|normal|!!)\b/i.test(text)) importance = 2;
+
+  // ── Strip priority words ──
+  text = text.replace(/\b(urgent|asap|high priority|important)\b/ig, '').replace(/!+$/, '').trim();
+
+  // ── Parse time ──
+  const timeMatch = text.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i);
+  if (timeMatch) {
+    let h = parseInt(timeMatch[1]);
+    const m = parseInt(timeMatch[2]||'0');
+    const ampm = timeMatch[3].toLowerCase();
+    if (ampm === 'pm' && h < 12) h += 12;
+    if (ampm === 'am' && h === 12) h = 0;
+    time = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    text = text.replace(timeMatch[0], '').trim();
+  } else {
+    // 24h format
+    const t24 = text.match(/\b(\d{1,2}):(\d{2})\b/);
+    if (t24) {
+      time = `${String(t24[1]).padStart(2,'0')}:${t24[2]}`;
+      text = text.replace(t24[0], '').trim();
+    }
+  }
+
+  // ── Parse relative dates ──
+  const dow = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+  if (/\btoday\b/i.test(text)) {
+    date = todayStr;
+    text = text.replace(/\btoday\b/i,'').trim();
+  } else if (/\btomorrow\b/i.test(text)) {
+    const d = new Date(today); d.setDate(d.getDate()+1);
+    date = d.toISOString().split('T')[0];
+    text = text.replace(/\btomorrow\b/i,'').trim();
+  } else if (/\bnext week\b/i.test(text)) {
+    const d = new Date(today); d.setDate(d.getDate()+7);
+    date = d.toISOString().split('T')[0];
+    text = text.replace(/\bnext week\b/i,'').trim();
+  } else {
+    // Day of week
+    const dowMatch = text.match(new RegExp(`\\b(next\\s+)?(${dow.join('|')})\\b`,'i'));
+    if (dowMatch) {
+      const target = dow.indexOf(dowMatch[2].toLowerCase());
+      const cur = today.getDay();
+      let diff = target - cur;
+      if (diff <= 0 || dowMatch[1]) diff += 7;
+      const d = new Date(today); d.setDate(d.getDate()+diff);
+      date = d.toISOString().split('T')[0];
+      text = text.replace(dowMatch[0],'').trim();
+    } else {
+      // Month day  e.g. "Jan 15" or "December 3"
+      const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+      const mReg = new RegExp(`\\b(${[...months,...monthNames].join('|')})\\s+(\\d{1,2})\\b`,'i');
+      const mMatch = text.match(mReg);
+      if (mMatch) {
+        const mIdx = months.findIndex(m => mMatch[1].toLowerCase().startsWith(m));
+        const d = new Date(today.getFullYear(), mIdx, parseInt(mMatch[2]));
+        if (d < today) d.setFullYear(d.getFullYear()+1);
+        date = d.toISOString().split('T')[0];
+        text = text.replace(mMatch[0],'').trim();
+      }
+    }
+  }
+
+  // ── Detect class name ──
+  for (const cls of (state.classes||[])) {
+    if (text.toLowerCase().includes(cls.name.toLowerCase())) {
+      classId = cls.id;
+      break;
+    }
+  }
+  // Also match partial course names
+  if (!classId && type === 'assignment') {
+    const courseKeywords = [
+      ['geometry','geo'],['algebra','alg'],['biology','bio'],
+      ['chemistry','chem'],['physics','phys'],['history','hist'],
+      ['english','lang arts'],['spanish','french'],['calculus','calc'],
+    ];
+    for (const [full, short] of courseKeywords) {
+      if (text.toLowerCase().includes(full) || text.toLowerCase().includes(short)) {
+        const match = state.classes.find(c => c.name.toLowerCase().includes(full));
+        if (match) { classId = match.id; break; }
+      }
+    }
+  }
+
+  // ── Extract emoji ──
+  const emojiMatch = raw.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+  if (emojiMatch) emoji = emojiMatch[0];
+
+  // ── Clean title ──
+  // Remove leftover date/time words
+  title = text
+    .replace(/\b(next|this|coming|the)\b/gi,'')
+    .replace(/\s{2,}/g,' ')
+    .trim();
+  // Capitalize first letter
+  if (title.length) title = title[0].toUpperCase() + title.slice(1);
+
+  return { type, title, date, time, importance, classId, emoji, remindDate:'', remindTime:'' };
+}
+
 </script>
 
 <style>
@@ -5892,5 +6237,55 @@ function _playPhoneSound(type) {
   </div>
   <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
 </div>
+
+<!-- ═══════════════ DQAdd Modal ═══════════════ -->
+<div class="modal-overlay" id="dqadd-modal" style="align-items:flex-start;padding-top:60px;overflow-y:auto;">
+  <div class="modal" style="max-width:560px;padding:0;overflow:visible;border-radius:18px;margin-bottom:40px;">
+    <!-- Header -->
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--surface);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="font-size:1.1rem;font-weight:900;">⚡ Quick Add</div>
+        <button onclick="closeModal('dqadd-modal')" style="margin-left:auto;background:transparent;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;line-height:1;padding:4px;">✕</button>
+      </div>
+      <div style="position:relative;">
+        <input type="text" id="dqadd-input"
+          placeholder="e.g. Finish Geometry HW tomorrow 10am  or  Study session Tuesday 4pm"
+          style="width:100%;background:var(--surface2);border:2px solid var(--border2);border-radius:10px;
+                 padding:12px 14px;color:var(--text);font-family:var(--app-font);font-size:0.92rem;
+                 outline:none;transition:border-color 0.15s;"
+          oninput="dqAddParse(this.value)"
+          onkeydown="dqAddKeydown(event)"
+          onfocus="this.style.borderColor='var(--blue2)'"
+          onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <!-- Example hints -->
+      <div id="dqadd-hints" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+        <span class="tag tag-blue" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">📚 Finish HW tomorrow</span>
+        <span class="tag tag-purple" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">📅 Study session Tuesday 3pm</span>
+        <span class="tag tag-green" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">✅ Clean desk</span>
+        <span class="tag tag-amber" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">⏳ Countdown graduation</span>
+      </div>
+    </div>
+
+    <!-- Parsed preview -->
+    <div id="dqadd-preview" style="padding:16px 20px;background:var(--bg2);display:none;">
+      <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Detected</div>
+      <div id="dqadd-preview-content"></div>
+    </div>
+
+    <!-- Adjustments -->
+    <div id="dqadd-adjust" style="padding:14px 20px;border-top:1px solid var(--border);display:none;">
+      <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Adjust</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="dqadd-fields"></div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--surface);">
+      <button class="btn btn-primary" style="flex:1;" id="dqadd-save-btn" onclick="dqAddSave()" disabled>✓ Add</button>
+      <button class="btn btn-ghost" onclick="closeModal('dqadd-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
