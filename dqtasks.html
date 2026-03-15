@@ -378,37 +378,81 @@ body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-heig
   font-family:inherit;font-size:0.72rem;cursor:pointer;outline:none;
 }
 #editor-area{
-  flex:1;overflow-y:auto;padding:32px 48px;
+  flex:1;overflow-y:auto;padding:14px 48px 200px;
   position:relative;
   background:var(--bg2);
 }
 #editor-content{
   min-height:100%;outline:none;
-  font-size:0.9rem;line-height:1.7;color:var(--text);
+  font-size:0.9rem;color:var(--text);
   max-width:680px;margin:0 auto;
-  background:repeating-linear-gradient(
+  /* Fixed 28px line height so gradient never drifts */
+  line-height:28px;
+  background-image:repeating-linear-gradient(
     to bottom,
-    transparent,
-    transparent calc(1.7em - 1px),
-    var(--border) calc(1.7em - 1px),
-    var(--border) 1.7em
+    transparent 0px,
+    transparent 27px,
+    var(--border) 27px,
+    var(--border) 28px
   );
   background-attachment:local;
+  background-position:0 0;
 }
 #editor-content:focus{outline:none;}
-#editor-content h1{font-size:1.2rem;font-weight:800;margin-bottom:4px;color:var(--text);line-height:1.3;}
-#editor-content h2{font-size:1.0rem;font-weight:700;margin-bottom:3px;color:var(--text);line-height:1.3;}
-#editor-content h3{font-size:0.88rem;font-weight:700;margin-bottom:2px;color:var(--text);line-height:1.3;}
-#editor-content ul,#editor-content ol{padding-left:20px;margin:4px 0;}
-#editor-content li{margin:2px 0;}
-#editor-content input[type=checkbox]{margin-right:6px;accent-color:var(--green);}
+
+/* Every element uses the same 28px line-height so lines stay locked */
+#editor-content h1,
+#editor-content h2,
+#editor-content h3,
+#editor-content p,
+#editor-content div,
+#editor-content li,
+#editor-content blockquote {
+  line-height:28px;
+  margin:0;
+  padding:0;
+}
+/* Headings are bold/bigger but still 28px tall so they sit on one line */
+#editor-content h1{font-size:1.15rem;font-weight:900;color:var(--text);}
+#editor-content h2{font-size:1.0rem; font-weight:800;color:var(--text);}
+#editor-content h3{font-size:0.9rem; font-weight:700;color:var(--text);}
+
+#editor-content ul,
+#editor-content ol{
+  padding-left:22px;
+  margin:0;
+}
+#editor-content li{line-height:28px;margin:0;padding:0;}
+
+/* Checkboxes: sit on the 28px baseline, never above or below */
+#editor-content input[type=checkbox]{
+  vertical-align:middle;
+  position:relative;
+  top:-1px;
+  margin-right:7px;
+  accent-color:var(--green);
+  width:13px;height:13px;
+}
+
+/* Note title bar at the top of editor */
+#editor-title-bar{
+  padding:14px 48px 10px;
+  border-bottom:2px solid var(--border2);
+  background:var(--bg2);
+}
+#editor-title-input{
+  width:100%;background:transparent;border:none;outline:none;
+  font-size:1.3rem;font-weight:900;color:var(--text);
+  font-family:var(--app-font);
+  line-height:1.4;
+}
+#editor-title-input::placeholder{color:var(--text3);}
 #save-indicator{
   font-size:0.62rem;color:var(--text3);
   padding:4px 8px;
 }
 #save-indicator.saving{color:var(--amber);}
 #save-indicator.saved{color:var(--green);}
-
 /* ── Smart Chip ── */
 .smart-chip{
   display:inline-flex;align-items:center;gap:4px;
@@ -1205,6 +1249,9 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
             <span style="font-size:0.6rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);flex-shrink:0;">Tags:</span>
             <div id="note-tag-bar" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex:1;"></div>
           </div>
+          <div id="editor-title-bar">
+            <input type="text" id="editor-title-input" placeholder="Untitled Note" oninput="onNoteTitleInput(this.value)" onfocus="ensureNoteExists()">
+          </div>
           <div id="editor-area">
             <div id="editor-content" contenteditable="true" spellcheck="true"
               onkeyup="onEditorKeyUp()" oninput="scheduleNoteSave()" onpaste="handlePaste(event)"
@@ -1408,10 +1455,34 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
         </div>
 
         <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Special</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          <button class="btn btn-ghost btn-sm theme-btn" data-theme="retro" onclick="setTheme('retro',this)">💻 Retro/Terminal</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="retro" onclick="setTheme('retro',this)">💻 Retro</button>
           <button class="btn btn-ghost btn-sm theme-btn" data-theme="midnight" onclick="setTheme('midnight',this)">🌌 Midnight</button>
           <button class="btn btn-ghost btn-sm theme-btn" data-theme="paper" onclick="setTheme('paper',this)">📄 Paper</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Dark</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="sunset" onclick="setTheme('sunset',this)">🌅 Sunset</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="ocean" onclick="setTheme('ocean',this)">🌊 Ocean</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="blood-moon" onclick="setTheme('blood-moon',this)">🩸 Blood Moon</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="deep-space" onclick="setTheme('deep-space',this)">🔭 Deep Space</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Light</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="candy" onclick="setTheme('candy',this)">🍬 Candy</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="slate" onclick="setTheme('slate',this)">🪨 Slate</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="sepia" onclick="setTheme('sepia',this)">📜 Sepia</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="arctic" onclick="setTheme('arctic',this)">🧊 Arctic</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="bubblegum" onclick="setTheme('bubblegum',this)">🫧 Bubblegum</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Weird &amp; Fun</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="neon" onclick="setTheme('neon',this)">⚡ Neon</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="vaporwave" onclick="setTheme('vaporwave',this)">🌸 Vaporwave</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="matrix" onclick="setTheme('matrix',this)">🟩 Matrix</button>
         </div>
       </div>
 
@@ -1423,9 +1494,19 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
         </label>
         <div style="margin-bottom:10px;">
           <div style="font-size:0.68rem;color:var(--text2);margin-bottom:6px;font-weight:700;">Sound Pack</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
             <button class="btn btn-ghost btn-sm sound-pack-btn active" data-pack="default" onclick="setSoundPack('default',this)">🎵 Default</button>
-            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="retro" onclick="setSoundPack('retro',this)">👾 Retro</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="soft" onclick="setSoundPack('soft',this)">🌬️ Soft</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="piano" onclick="setSoundPack('piano',this)">🎹 Piano</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="xylophone" onclick="setSoundPack('xylophone',this)">🎼 Xylophone</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="warm" onclick="setSoundPack('warm',this)">☀️ Warm</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="jazz" onclick="setSoundPack('jazz',this)">🎷 Jazz</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="wooden" onclick="setSoundPack('wooden',this)">🪵 Wooden</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="chiptune" onclick="setSoundPack('chiptune',this)">👾 Chiptune</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="scifi" onclick="setSoundPack('scifi',this)">🚀 Sci-Fi</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="clock" onclick="setSoundPack('clock',this)">🕐 Clock</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="phone" onclick="setSoundPack('phone',this)">📱 Phone</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="retro" onclick="setSoundPack('retro',this)">🕹️ Retro</button>
             <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="nature" onclick="setSoundPack('nature',this)">🌿 Nature</button>
           </div>
         </div>
@@ -2729,12 +2810,14 @@ function loadNote(id){
   const editor=document.getElementById('editor-content');
   editor.innerHTML=note.content||'';
   editor.style.fontFamily=note.font||'Outfit';
+  // Set title bar
+  const titleInput=document.getElementById('editor-title-input');
+  if(titleInput) titleInput.value=note.title||'';
   filterNotes(document.getElementById('notes-search')?.value||'');
   setSaveIndicator('saved');
   renderNoteColorPicker();
   renderNoteTagBar();
-  // Set placeholder text
-  editor.setAttribute('data-placeholder', note.title||'Start writing…');
+  editor.setAttribute('data-placeholder','Start writing…');
 }
 
 function deleteNote(id){
@@ -3596,53 +3679,51 @@ function playSound(type) {
   if (!state.soundEnabled) return;
   try {
     const ctx = _getAC(); if (!ctx) return;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
+    const vol = soundVolume || 0.6;
     const t = ctx.currentTime;
+
+    // Multi-oscillator note helper
+    const snd = (freq, dur, gainVol, wave='sine', freqEnd=null, delay=0) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = wave;
+      o.frequency.setValueAtTime(freq, t+delay);
+      if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t+delay+dur*0.8);
+      const v = gainVol * vol;
+      g.gain.setValueAtTime(v, t+delay);
+      g.gain.exponentialRampToValueAtTime(0.001, t+delay+dur);
+      o.start(t+delay); o.stop(t+delay+dur+0.01);
+    };
+
     if (type === 'complete') {
-      // Upward chime - C5 → E5 → G5
-      o.type = 'sine';
-      o.frequency.setValueAtTime(523.25, t);
-      o.frequency.setValueAtTime(659.25, t + 0.12);
-      o.frequency.setValueAtTime(783.99, t + 0.24);
-      g.gain.setValueAtTime(0.15, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-      o.start(t); o.stop(t + 0.55);
+      // Rich 3-note chime C5-E5-G5 with harmonic overtones
+      [[523.25,0],[659.25,0.12],[783.99,0.24]].forEach(([f,d]) => {
+        snd(f, 0.55, 0.12, 'sine', null, d);
+        snd(f*2, 0.28, 0.025, 'sine', null, d);
+      });
     } else if (type === 'click') {
-      o.type = 'sine'; o.frequency.setValueAtTime(900, t);
-      g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-      o.start(t); o.stop(t + 0.06);
+      snd(900, 0.06, 0.05, 'sine');
+      snd(1300, 0.03, 0.015, 'sine');
     } else if (type === 'add') {
-      o.type = 'sine';
-      o.frequency.setValueAtTime(440, t); o.frequency.setValueAtTime(550, t+0.08);
-      g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-      o.start(t); o.stop(t + 0.22);
+      snd(440, 0.22, 0.10, 'sine');
+      snd(550, 0.18, 0.07, 'sine', null, 0.08);
+      snd(660, 0.14, 0.04, 'sine', null, 0.16);
     } else if (type === 'delete') {
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(280, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.18);
-      g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-      o.start(t); o.stop(t + 0.18);
+      snd(280, 0.20, 0.09, 'sawtooth', 100);
+      snd(180, 0.15, 0.04, 'sine', 60, 0.06);
     } else if (type === 'open') {
-      o.type = 'sine'; o.frequency.setValueAtTime(660, t); o.frequency.setValueAtTime(880, t+0.06);
-      g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-      o.start(t); o.stop(t + 0.18);
+      snd(528, 0.20, 0.07, 'sine');
+      snd(660, 0.16, 0.05, 'sine', null, 0.07);
+      snd(792, 0.12, 0.03, 'sine', null, 0.14);
     } else if (type === 'save') {
-      // Soft double-tap
-      o.type = 'sine'; o.frequency.setValueAtTime(550, t); o.frequency.setValueAtTime(550, t+0.1);
-      g.gain.setValueAtTime(0.08, t); g.gain.setValueAtTime(0.0, t+0.06);
-      g.gain.setValueAtTime(0.08, t+0.1); g.gain.exponentialRampToValueAtTime(0.001, t+0.2);
-      o.start(t); o.stop(t + 0.2);
+      snd(550, 0.10, 0.055, 'sine');
+      snd(550, 0.09, 0.045, 'sine', null, 0.14);
     } else if (type === 'navigate') {
-      o.type = 'sine'; o.frequency.setValueAtTime(400, t);
-      g.gain.setValueAtTime(0.04, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      o.start(t); o.stop(t + 0.08);
+      snd(420, 0.09, 0.04, 'sine');
     } else if (type === 'reminder') {
-      // Three ascending notes
-      o.type = 'sine';
-      o.frequency.setValueAtTime(440, t); o.frequency.setValueAtTime(554, t+0.15); o.frequency.setValueAtTime(659, t+0.30);
-      g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.55);
-      o.start(t); o.stop(t+0.55);
+      [[440,0],[554,0.15],[659,0.30],[880,0.46]].forEach(([f,d]) => snd(f, 0.4, 0.12, 'sine', null, d));
+    } else if (type === 'typewriter') {
+      snd(180+Math.random()*60, 0.04, 0.025, 'square');
     }
   } catch(e) {}
 }
@@ -3666,15 +3747,33 @@ function loadSoundPref() {
 // ─────────────────────────────────────────────────
 // ─── All theme definitions ───
 const THEME_VARS = {
-  dark:          { '--bg':'#0a0a0e','--bg2':'#111118','--surface':'#18181f','--surface2':'#20202a','--surface3':'#28283a','--border':'#2e2e42','--border2':'#3e3e58','--text':'#f0f0f8','--text2':'#9090b8','--text3':'#555570','--card-radius':'18px','--card-shadow':'none' },
-  light:         { '--bg':'#f4f4fa','--bg2':'#eaeaf2','--surface':'#ffffff','--surface2':'#ededf5','--surface3':'#e0e0ee','--border':'#ccccde','--border2':'#b0b0cc','--text':'#18182a','--text2':'#555575','--text3':'#9090aa','--card-radius':'18px','--card-shadow':'none' },
+  // ── Simple ──
+  dark:             { '--bg':'#0a0a0e','--bg2':'#111118','--surface':'#18181f','--surface2':'#20202a','--surface3':'#28283a','--border':'#2e2e42','--border2':'#3e3e58','--text':'#f0f0f8','--text2':'#9090b8','--text3':'#555570','--card-radius':'18px','--card-shadow':'none' },
+  light:            { '--bg':'#f4f4fa','--bg2':'#eaeaf2','--surface':'#ffffff','--surface2':'#ededf5','--surface3':'#e0e0ee','--border':'#ccccde','--border2':'#b0b0cc','--text':'#18182a','--text2':'#555575','--text3':'#9090aa','--card-radius':'18px','--card-shadow':'none' },
+  // ── Polished ──
   'polished-dark':  { '--bg':'#0d0d14','--bg2':'#131320','--surface':'#1a1a2e','--surface2':'#20203a','--surface3':'#282850','--border':'#2a2a4a','--border2':'#3a3a6a','--text':'#f2f2ff','--text2':'#8888cc','--text3':'#4a4a80','--card-radius':'20px','--card-shadow':'0 4px 24px rgba(0,0,0,0.4)' },
   'polished-light': { '--bg':'#f0f0fa','--bg2':'#e8e8f8','--surface':'#ffffff','--surface2':'#f5f5ff','--surface3':'#eaeaf8','--border':'#d0d0ee','--border2':'#b0b0dd','--text':'#14142a','--text2':'#505080','--text3':'#9090c0','--card-radius':'20px','--card-shadow':'0 2px 16px rgba(80,80,180,0.08)' },
+  // ── Nature ──
   'nature-dark':    { '--bg':'#080e08','--bg2':'#0e160e','--surface':'#121c12','--surface2':'#182418','--surface3':'#1e2e1e','--border':'#2a3e2a','--border2':'#3a5a3a','--text':'#e8f4e8','--text2':'#7aaa7a','--text3':'#3a5a3a','--card-radius':'16px','--card-shadow':'none' },
   'nature-light':   { '--bg':'#faf6f0','--bg2':'#f4ede4','--surface':'#fffdf8','--surface2':'#f8f2e8','--surface3':'#f0e8d8','--border':'#d8c8b0','--border2':'#c0a880','--text':'#2a1e0e','--text2':'#6a5040','--text3':'#a08060','--card-radius':'16px','--card-shadow':'none' },
+  // ── Special (original) ──
   'retro':          { '--bg':'#000900','--bg2':'#001400','--surface':'#001a00','--surface2':'#002200','--surface3':'#002800','--border':'#004400','--border2':'#006600','--text':'#00ff41','--text2':'#00cc33','--text3':'#007722','--card-radius':'4px','--card-shadow':'0 0 8px rgba(0,255,65,0.15)' },
   'midnight':       { '--bg':'#020818','--bg2':'#040e24','--surface':'#060e2a','--surface2':'#0a1435','--surface3':'#0e1a40','--border':'#122060','--border2':'#1a2c80','--text':'#d0e8ff','--text2':'#6090d0','--text3':'#304870','--card-radius':'18px','--card-shadow':'0 0 20px rgba(20,60,180,0.15)' },
   'paper':          { '--bg':'#f5f0e8','--bg2':'#ede8de','--surface':'#fdfaf4','--surface2':'#f5f0e4','--surface3':'#ede8d8','--border':'#d8ccb0','--border2':'#c0a878','--text':'#2a2010','--text2':'#6a5830','--text3':'#a09060','--card-radius':'3px','--card-shadow':'2px 3px 8px rgba(0,0,0,0.12)' },
+  // ── Dark themes ──
+  'sunset':         { '--bg':'#0e0806','--bg2':'#1a0e08','--surface':'#221208','--surface2':'#2e1810','--surface3':'#3a2018','--border':'#5a2e18','--border2':'#8a3e22','--text':'#fde8d8','--text2':'#e09060','--text3':'#805030','--card-radius':'18px','--card-shadow':'0 2px 16px rgba(180,80,20,0.15)' },
+  'ocean':          { '--bg':'#020c14','--bg2':'#041422','--surface':'#061c30','--surface2':'#0a2440','--surface3':'#0e2e52','--border':'#103a60','--border2':'#1a5080','--text':'#c8f0ff','--text2':'#60b0e0','--text3':'#306880','--card-radius':'18px','--card-shadow':'0 2px 20px rgba(0,100,180,0.12)' },
+  'neon':           { '--bg':'#080008','--bg2':'#100010','--surface':'#140016','--surface2':'#1c001e','--surface3':'#240028','--border':'#440055','--border2':'#6600aa','--text':'#f0f0ff','--text2':'#cc44ff','--text3':'#660088','--card-radius':'8px','--card-shadow':'0 0 16px rgba(180,0,255,0.2)' },
+  'blood-moon':     { '--bg':'#0a0000','--bg2':'#140000','--surface':'#1c0000','--surface2':'#260000','--surface3':'#300000','--border':'#500000','--border2':'#800000','--text':'#ffe8e8','--text2':'#e06060','--text3':'#802020','--card-radius':'18px','--card-shadow':'0 0 12px rgba(180,0,0,0.18)' },
+  'deep-space':     { '--bg':'#04000e','--bg2':'#080018','--surface':'#0c0020','--surface2':'#10002e','--surface3':'#16003e','--border':'#280060','--border2':'#3c0090','--text':'#e8e0ff','--text2':'#9060e0','--text3':'#482080','--card-radius':'18px','--card-shadow':'0 0 24px rgba(100,0,200,0.15)' },
+  'vaporwave':      { '--bg':'#0d0018','--bg2':'#160024','--surface':'#1e0030','--surface2':'#28003e','--surface3':'#32004a','--border':'#6000a0','--border2':'#9000d0','--text':'#ffe8ff','--text2':'#e060e0','--text3':'#802880','--card-radius':'12px','--card-shadow':'0 0 20px rgba(200,0,200,0.18)' },
+  'matrix':         { '--bg':'#000200','--bg2':'#000600','--surface':'#000900','--surface2':'#000e00','--surface3':'#001400','--border':'#003300','--border2':'#005500','--text':'#00ff00','--text2':'#00bb00','--text3':'#006600','--card-radius':'2px','--card-shadow':'0 0 6px rgba(0,200,0,0.2)' },
+  // ── Light themes ──
+  'candy':          { '--bg':'#fff0f8','--bg2':'#ffe6f4','--surface':'#ffffff','--surface2':'#fff0fa','--surface3':'#fde4f6','--border':'#f0b0d8','--border2':'#e080c0','--text':'#2a0820','--text2':'#a03070','--text3':'#d070a8','--card-radius':'20px','--card-shadow':'0 2px 12px rgba(200,80,160,0.1)' },
+  'slate':          { '--bg':'#f0f2f6','--bg2':'#e8ecf2','--surface':'#ffffff','--surface2':'#f2f4f8','--surface3':'#e8ecf2','--border':'#c8d0de','--border2':'#a8b4c8','--text':'#1a2030','--text2':'#4a5878','--text3':'#8898b8','--card-radius':'12px','--card-shadow':'0 1px 8px rgba(60,80,120,0.08)' },
+  'sepia':          { '--bg':'#f8f0e0','--bg2':'#f0e6d0','--surface':'#fdf6e4','--surface2':'#f8f0d8','--surface3':'#f0e6c8','--border':'#d8c090','--border2':'#c0a060','--text':'#2c1e08','--text2':'#7a5a28','--text3':'#b08848','--card-radius':'8px','--card-shadow':'1px 2px 6px rgba(100,70,20,0.1)' },
+  'arctic':         { '--bg':'#f4f8ff','--bg2':'#eaf2ff','--surface':'#ffffff','--surface2':'#f0f6ff','--surface3':'#e4f0ff','--border':'#b8d4f0','--border2':'#88b8e8','--text':'#0a1828','--text2':'#3060a0','--text3':'#7098c8','--card-radius':'18px','--card-shadow':'0 2px 12px rgba(60,120,200,0.08)' },
+  'bubblegum':      { '--bg':'#fff0f0','--bg2':'#ffe4e4','--surface':'#ffffff','--surface2':'#fff4f4','--surface3':'#ffe8f0','--border':'#ffb0c8','--border2':'#ff80a8','--text':'#280010','--text2':'#c02060','--text3':'#e878a8','--card-radius':'24px','--card-shadow':'0 4px 16px rgba(255,80,140,0.12)' },
 };
 let colorfulStrength = 2; // 1=low, 2=medium, 3=high
 
@@ -3743,7 +3842,7 @@ function _applyTheme(theme) {
     Object.entries(vars).forEach(([k,v]) => root.style.setProperty(k,v));
     // Theme-specific navbar/body
     const nbMap = {
-      'dark':           ['rgba(10,10,14,0.94)',   'rgba(10,10,14,0.92)',    ''],
+      'dark':           ['rgba(10,10,14,0.94)',    'rgba(10,10,14,0.92)',    ''],
       'light':          ['rgba(244,244,250,0.97)', 'rgba(234,234,242,0.96)', '#f4f4fa'],
       'polished-dark':  ['rgba(13,13,20,0.96)',    'rgba(13,13,20,0.94)',    ''],
       'polished-light': ['rgba(240,240,250,0.97)', 'rgba(232,232,248,0.96)', '#f0f0fa'],
@@ -3752,16 +3851,43 @@ function _applyTheme(theme) {
       'retro':          ['rgba(0,9,0,0.98)',        'rgba(0,9,0,0.96)',       '#000900'],
       'midnight':       ['rgba(2,8,24,0.97)',       'rgba(2,8,24,0.95)',      '#020818'],
       'paper':          ['rgba(245,240,232,0.97)', 'rgba(237,232,222,0.96)', '#f5f0e8'],
+      'sunset':         ['rgba(14,8,6,0.96)',       'rgba(14,8,6,0.94)',      ''],
+      'ocean':          ['rgba(2,12,20,0.97)',      'rgba(2,12,20,0.95)',     ''],
+      'neon':           ['rgba(8,0,8,0.98)',         'rgba(8,0,8,0.96)',       '#080008'],
+      'blood-moon':     ['rgba(10,0,0,0.97)',       'rgba(10,0,0,0.95)',      ''],
+      'deep-space':     ['rgba(4,0,14,0.97)',       'rgba(4,0,14,0.95)',      ''],
+      'vaporwave':      ['rgba(13,0,24,0.97)',      'rgba(13,0,24,0.95)',     ''],
+      'matrix':         ['rgba(0,2,0,0.99)',         'rgba(0,2,0,0.97)',       '#000200'],
+      'candy':          ['rgba(255,240,248,0.97)', 'rgba(255,230,244,0.96)', '#fff0f8'],
+      'slate':          ['rgba(240,242,246,0.97)', 'rgba(232,236,242,0.96)', '#f0f2f6'],
+      'sepia':          ['rgba(248,240,224,0.97)', 'rgba(240,230,208,0.96)', '#f8f0e0'],
+      'arctic':         ['rgba(244,248,255,0.97)', 'rgba(234,242,255,0.96)', '#f4f8ff'],
+      'bubblegum':      ['rgba(255,240,240,0.97)', 'rgba(255,228,228,0.96)', '#fff0f0'],
     };
     const [nbb, rbb, bodyb] = nbMap[theme] || ['rgba(10,10,14,0.94)','rgba(10,10,14,0.92)',''];
     if (nb) nb.style.background = nbb;
     if (rb) rb.style.background = rbb;
     body.style.background = bodyb || '';
-    // Special: retro uses green text accent
-    if (theme === 'retro') {
-      root.style.setProperty('--blue', '#00aa22');
-      root.style.setProperty('--blue2', '#00ff41');
-      root.style.setProperty('--blue-dim', '#001400');
+    // Theme-specific accent overrides
+    const accentOverrides = {
+      'retro':       ['#00aa22','#00ff41','#001400'],
+      'matrix':      ['#007700','#00ee00','#001200'],
+      'neon':        ['#8800cc','#cc44ff','#1a0028'],
+      'sunset':      ['#c04010','#ff6030','#200800'],
+      'ocean':       ['#0066aa','#00aaee','#002040'],
+      'blood-moon':  ['#aa0000','#ee2222','#1a0000'],
+      'deep-space':  ['#5500bb','#9944ff','#0e0022'],
+      'vaporwave':   ['#aa00cc','#ff44ee','#1c0028'],
+      'candy':       ['#c02060','#ff50a0','#2a0018'],
+      'arctic':      ['#2060c0','#4090ff','#0a1c40'],
+      'bubblegum':   ['#cc0060','#ff3388','#280010'],
+      'sepia':       ['#806020','#c09040','#1a1000'],
+    };
+    if (accentOverrides[theme]) {
+      const [p,a,d] = accentOverrides[theme];
+      root.style.setProperty('--blue', p);
+      root.style.setProperty('--blue2', a);
+      root.style.setProperty('--blue-dim', d);
     }
     // Paper: add card texture
     if (theme === 'paper') {
@@ -3772,6 +3898,13 @@ function _applyTheme(theme) {
     if (theme.startsWith('polished')) {
       root.style.setProperty('--card-shadow', theme === 'polished-dark' ? '0 4px 24px rgba(0,0,0,0.4)' : '0 2px 16px rgba(80,80,180,0.08)');
     }
+    // Neon/vaporwave: glow effects
+    if (theme === 'neon') root.style.setProperty('--card-shadow','0 0 18px rgba(180,0,255,0.25)');
+    if (theme === 'vaporwave') root.style.setProperty('--card-shadow','0 0 20px rgba(200,0,200,0.2)');
+    if (theme === 'matrix') { root.style.setProperty('--card-radius','2px'); root.style.setProperty('--card-shadow','0 0 8px rgba(0,200,0,0.2)'); }
+    if (theme === 'bubblegum') root.style.setProperty('--card-radius','24px');
+    if (theme === 'ocean') root.style.setProperty('--card-shadow','0 2px 20px rgba(0,100,180,0.15)');
+    if (theme === 'blood-moon') root.style.setProperty('--card-shadow','0 0 14px rgba(180,0,0,0.2)');
 
     // ── Per-theme fonts — set via CSS variable so ALL elements inherit ──
     const fontMap = {
@@ -3786,6 +3919,18 @@ function _applyTheme(theme) {
       'retro':          "'Courier New','Lucida Console',monospace",
       'midnight':       "'DM Sans','Outfit',sans-serif",
       'paper':          "Georgia,'Times New Roman','Book Antiqua',serif",
+      'sunset':         "'Outfit','DM Sans',sans-serif",
+      'ocean':          "'DM Sans',system-ui,sans-serif",
+      'neon':           "'Courier New',monospace",
+      'blood-moon':     "'Outfit','DM Sans',sans-serif",
+      'deep-space':     "'DM Sans',system-ui,sans-serif",
+      'vaporwave':      "'Courier New','DM Sans',sans-serif",
+      'matrix':         "'Courier New',monospace",
+      'candy':          "'Outfit','DM Sans',sans-serif",
+      'slate':          "'DM Sans',system-ui,sans-serif",
+      'sepia':          "Georgia,Palatino,serif",
+      'arctic':         "'DM Sans',system-ui,sans-serif",
+      'bubblegum':      "'Outfit','DM Sans',sans-serif",
     };
     const font = fontMap[theme] || fontMap['dark'];
     // Set the CSS variable — everything that uses font-family:inherit or var(--app-font) picks this up
@@ -5001,14 +5146,8 @@ function previewAllSounds() {
 }
 
 // Patch playSound to use pack + volume + toggles
-const _origPlaySound = playSound;
-playSound = function(type) {
-  if (!state.soundEnabled) return;
-  if (SOUND_TOGGLES[type] === false) return;
-  if (soundPack === 'retro') { _playRetroSound(type); return; }
-  if (soundPack === 'nature') { _playNatureSound(type); return; }
-  _origPlaySound(type);
-};
+// Store the raw base playSound as _baseSoundFn
+const _baseSoundFn = playSound;
 
 function _scaleGain(g, ctx, vol) {
   const master = (soundVolume !== undefined ? soundVolume : 0.6);
@@ -5103,6 +5242,436 @@ function initExtras() {
   renderSoundToggles();
 }
 setTimeout(initExtras, 200);
+
+
+// ── Note title bar ──
+function onNoteTitleInput(val) {
+  if (!state.activeNote) return;
+  const note = state.notes.find(n => n.id === state.activeNote);
+  if (!note) return;
+  note.title = val.substring(0, 60);
+  note.updated = Date.now();
+  scheduleNoteSave();
+  filterNotes(document.getElementById('notes-search')?.value || '');
+}
+
+function ensureNoteExists() {
+  // If no note is active when user clicks title bar, create one
+  if (!state.activeNote) {
+    newNote();
+  }
+}
+
+// Patch scheduleNoteSave so it does NOT overwrite title from first line anymore
+const _origScheduleNoteSave2 = scheduleNoteSave;
+scheduleNoteSave = function() {
+  setSaveIndicator('saving');
+  showSaveIndicator('saving');
+  clearTimeout(noteSaveTimer);
+  noteSaveTimer = setTimeout(() => {
+    const note = state.notes.find(n => n.id === state.activeNote);
+    if (!note) return;
+    const editor = document.getElementById('editor-content');
+    note.content = editor.innerHTML;
+    note.updated = Date.now();
+    // Title now comes from title bar only, not first line
+    const titleInput = document.getElementById('editor-title-input');
+    if (titleInput && titleInput.value.trim()) {
+      note.title = titleInput.value.trim().substring(0, 60);
+    }
+    save();
+    filterNotes('');
+    setSaveIndicator('saved');
+    showSaveIndicator('saved');
+  }, 800);
+};
+
+// Patch newNote to focus title bar instead of editor
+const _origNewNote = newNote;
+newNote = function() {
+  const note = {
+    id: uid(), title: '', content: '',
+    tags: [], color: '#4488ff',
+    created: Date.now(), updated: Date.now()
+  };
+  state.notes.push(note);
+  save();
+  loadNote(note.id);
+  // Focus title input first
+  setTimeout(() => {
+    const ti = document.getElementById('editor-title-input');
+    if (ti) ti.focus();
+  }, 50);
+};
+
+
+// ═══════════════════════════════════════════
+//  NEW SOUND PACKS
+// ═══════════════════════════════════════════
+
+// Patch playSound router to include all new packs
+// Master sound router — single source of truth
+playSound = function(type) {
+  if (!state.soundEnabled) return;
+  if (SOUND_TOGGLES[type] === false) return;
+  const pack = soundPack || 'default';
+  const packFns = {
+    soft:      _playSoftSound,
+    piano:     _playPianoSound,
+    xylophone: _playXyloSound,
+    warm:      _playWarmSound,
+    jazz:      _playJazzSound,
+    wooden:    _playWoodenSound,
+    chiptune:  _playChiptuneSound,
+    scifi:     _playScifiSound,
+    clock:     _playClockSound,
+    phone:     _playPhoneSound,
+    retro:     _playRetroSound,
+    nature:    _playNatureSound,
+    default:   _baseSoundFn,
+  };
+  const fn = packFns[pack] || _baseSoundFn;
+  fn(type);
+};
+
+function _note(ctx, freq, dur, vol, type='sine', t=null) {
+  t = t || ctx.currentTime;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t);
+  const v = (vol||0.1) * (soundVolume||0.6);
+  g.gain.setValueAtTime(v, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.start(t); o.stop(t + dur);
+  return { o, g, t, dur };
+}
+
+function _softNote(ctx, freq, dur, vol) {
+  const t = ctx.currentTime;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = 'sine';
+  o.frequency.setValueAtTime(freq, t);
+  const v = (vol||0.04) * (soundVolume||0.6);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(v, t + dur*0.3);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.start(t); o.stop(t + dur);
+}
+
+function _playSoftSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    if (type === 'complete') { _softNote(ctx, 528, 0.6, 0.06); setTimeout(()=>_softNote(ctx, 660, 0.5, 0.05), 150); }
+    else if (type === 'click') _softNote(ctx, 880, 0.08, 0.03);
+    else if (type === 'add') { _softNote(ctx, 440, 0.3, 0.05); setTimeout(()=>_softNote(ctx, 550, 0.3, 0.04), 120); }
+    else if (type === 'delete') _softNote(ctx, 330, 0.2, 0.04);
+    else if (type === 'reminder') { [440,550,660].forEach((f,i)=>setTimeout(()=>_softNote(ctx,f,0.35,0.06),i*160)); }
+    else _softNote(ctx, 660, 0.1, 0.03);
+  } catch(e) {}
+}
+
+function _playPianoSound(type) {
+  // Piano uses harmonic overtones for realistic tone
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const pianoNote = (freq, t, dur) => {
+      const vol = (soundVolume||0.6) * 0.12;
+      [1, 2, 3, 4].forEach((harmonic, i) => {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq * harmonic, t);
+        const hVol = vol / (harmonic * 1.5);
+        g.gain.setValueAtTime(hVol, t);
+        g.gain.exponentialRampToValueAtTime(hVol * 0.3, t + dur * 0.2);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.start(t); o.stop(t + dur);
+      });
+    };
+    const t = ctx.currentTime;
+    const notes = { complete:[523,659,784], add:[440,550], click:[880], delete:[330], navigate:[440], reminder:[523,659,784,1047], save:[440,523], open:[523,659] };
+    const seq = notes[type] || [523];
+    seq.forEach((f, i) => pianoNote(f, t + i * 0.12, 0.5));
+  } catch(e) {}
+}
+
+function _playXyloSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const xNote = (freq, t, dur) => {
+      const vol = (soundVolume||0.6) * 0.15;
+      // Xylophone: sharp attack, quick decay, slight metallic overtone
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur);
+      // Overtone
+      const o2 = ctx.createOscillator(); const g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.type = 'sine'; o2.frequency.setValueAtTime(freq * 3, t);
+      g2.gain.setValueAtTime(vol * 0.2, t); g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.4);
+      o2.start(t); o2.stop(t + dur * 0.4);
+    };
+    const t = ctx.currentTime;
+    const scales = { complete:[784,1047,1319], add:[523,659], click:[1047], delete:[330,262], navigate:[523], reminder:[523,659,784,1047,1319], save:[659,784], open:[659,784] };
+    const seq = scales[type] || [784];
+    seq.forEach((f,i) => xNote(f, t + i*0.1, 0.25));
+  } catch(e) {}
+}
+
+function _playWarmSound(type) {
+  // Warm, encouraging — bell-like with soft attack
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const warmBell = (freq, t, dur) => {
+      const vol = (soundVolume||0.6) * 0.1;
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur);
+    };
+    const t = ctx.currentTime;
+    if (type === 'complete') { warmBell(528, t, 0.7); warmBell(660, t+0.15, 0.6); warmBell(792, t+0.30, 0.55); }
+    else if (type === 'add') { warmBell(440, t, 0.4); warmBell(528, t+0.12, 0.35); }
+    else if (type === 'click') warmBell(880, t, 0.12);
+    else if (type === 'delete') warmBell(330, t, 0.3);
+    else if (type === 'reminder') { [440,528,660,792].forEach((f,i)=>warmBell(f, t+i*0.18, 0.5)); }
+    else warmBell(660, t, 0.15);
+  } catch(e) {}
+}
+
+function _playJazzSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const jNote = (freq, t, dur, vol=0.1) => {
+      const v = vol * (soundVolume||0.6);
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq * 0.99, t);
+      o.frequency.linearRampToValueAtTime(freq, t + 0.03); // slight pitch slide
+      g.gain.setValueAtTime(v, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur);
+    };
+    const t = ctx.currentTime;
+    // Jazz chords (minor 7ths, major 6ths)
+    if (type === 'complete') { [392,494,587,698].forEach((f,i)=>jNote(f,t+i*0.06,0.4,0.08)); }
+    else if (type === 'add') { [330,415,494].forEach((f,i)=>jNote(f,t+i*0.07,0.3,0.07)); }
+    else if (type === 'click') jNote(740, t, 0.08, 0.05);
+    else if (type === 'delete') { jNote(294,t,0.2,0.08); jNote(247,t+0.1,0.2,0.06); }
+    else if (type === 'reminder') { [370,466,554,698].forEach((f,i)=>jNote(f,t+i*0.1,0.4,0.09)); }
+    else jNote(494, t, 0.1, 0.05);
+  } catch(e) {}
+}
+
+function _playWoodenSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const woodKnock = (freq, t, decay, vol=0.12) => {
+      const v = vol * (soundVolume||0.6);
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'triangle';
+      // Wooden: pitch drops quickly (like a wood block)
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.5, t + decay * 0.3);
+      g.gain.setValueAtTime(v, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + decay);
+      o.start(t); o.stop(t + decay);
+    };
+    const t = ctx.currentTime;
+    if (type === 'complete') { woodKnock(800,t,0.15); woodKnock(1000,t+0.1,0.12); woodKnock(1200,t+0.22,0.12); }
+    else if (type === 'add') { woodKnock(600,t,0.12); woodKnock(800,t+0.1,0.1); }
+    else if (type === 'click') woodKnock(900, t, 0.06, 0.08);
+    else if (type === 'delete') { woodKnock(400,t,0.18); woodKnock(300,t+0.1,0.15); }
+    else if (type === 'reminder') { [600,700,800,900,1000].forEach((f,i)=>woodKnock(f,t+i*0.12,0.1)); }
+    else woodKnock(700, t, 0.08, 0.07);
+  } catch(e) {}
+}
+
+function _playChiptuneSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const chip = (freq, t, dur, vol=0.08) => {
+      const v = vol * (soundVolume||0.6);
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'square';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(v, t);
+      g.gain.setValueAtTime(v, t + dur * 0.8);
+      g.gain.setValueAtTime(0, t + dur); // square cutoff
+      o.start(t); o.stop(t + dur + 0.01);
+    };
+    const t = ctx.currentTime;
+    if (type === 'complete') { [330,440,330,440,880].forEach((f,i)=>chip(f,t+i*0.06,0.05)); }
+    else if (type === 'add') { chip(440,t,0.06); chip(550,t+0.07,0.06); }
+    else if (type === 'click') chip(800, t, 0.03, 0.05);
+    else if (type === 'delete') { chip(300,t,0.08); chip(220,t+0.09,0.08); }
+    else if (type === 'navigate') chip(550, t, 0.04, 0.04);
+    else if (type === 'reminder') { [440,550,440,550,440,550,880].forEach((f,i)=>chip(f,t+i*0.08,0.06)); }
+    else chip(660, t, 0.04, 0.04);
+  } catch(e) {}
+}
+
+function _playScifiSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const vol = (soundVolume||0.6);
+    const t = ctx.currentTime;
+
+    // Helper: layered sweep with optional vibrato
+    const scifiSweep = (f1, f2, start, dur, gainVol, wave='sine', vibrato=0) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = wave;
+      o.frequency.setValueAtTime(f1, start);
+      o.frequency.exponentialRampToValueAtTime(f2, start + dur);
+      if (vibrato) {
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.connect(lfoGain); lfoGain.connect(o.frequency);
+        lfo.frequency.value = vibrato;
+        lfoGain.gain.value = f1 * 0.02;
+        lfo.start(start); lfo.stop(start + dur);
+      }
+      g.gain.setValueAtTime(gainVol * vol, start);
+      g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      o.start(start); o.stop(start + dur);
+    };
+
+    // Helper: noise burst (white noise from buffer)
+    const noiseBurst = (start, dur, gainVol) => {
+      try {
+        const bufSize = Math.floor(ctx.sampleRate * dur);
+        const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const g = ctx.createGain();
+        const filt = ctx.createBiquadFilter();
+        filt.type = 'bandpass';
+        filt.frequency.value = 2000;
+        filt.Q.value = 0.5;
+        src.connect(filt); filt.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(gainVol * vol, start);
+        g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+        src.start(start); src.stop(start + dur);
+      } catch(e) {}
+    };
+
+    if (type === 'complete') {
+      // Power-up sequence: rising tone + harmonics + noise burst
+      scifiSweep(200, 1200, t,       0.35, 0.10, 'sine');
+      scifiSweep(400, 2400, t,       0.35, 0.05, 'sine');
+      scifiSweep(1200, 2400, t+0.30, 0.25, 0.08, 'sine', 8);
+      noiseBurst(t+0.25, 0.12, 0.04);
+    } else if (type === 'click') {
+      // Laser blip
+      scifiSweep(1800, 900, t, 0.07, 0.08, 'square');
+      noiseBurst(t, 0.03, 0.03);
+    } else if (type === 'add') {
+      // Transporter shimmer
+      scifiSweep(300, 800,  t,      0.18, 0.08, 'sine');
+      scifiSweep(600, 1200, t+0.05, 0.18, 0.05, 'sine', 12);
+      noiseBurst(t+0.10, 0.10, 0.03);
+    } else if (type === 'delete') {
+      // Disintegration: descending + noise
+      scifiSweep(800, 100, t,      0.25, 0.09, 'sawtooth');
+      scifiSweep(400, 50,  t+0.05, 0.22, 0.05, 'sawtooth');
+      noiseBurst(t, 0.20, 0.05);
+    } else if (type === 'open') {
+      // Portal opening: rising hum
+      scifiSweep(150, 500, t,      0.22, 0.07, 'sine', 6);
+      scifiSweep(300, 700, t+0.08, 0.18, 0.04, 'sine');
+    } else if (type === 'save') {
+      // Scan sound: quick up-down
+      scifiSweep(400, 900, t,      0.12, 0.06, 'sine');
+      scifiSweep(900, 400, t+0.12, 0.10, 0.04, 'sine');
+    } else if (type === 'navigate') {
+      // Quick warp blip
+      scifiSweep(600, 1000, t, 0.08, 0.06, 'sine');
+    } else if (type === 'reminder') {
+      // Alarm: pulsing sweeps
+      [0, 0.18, 0.36, 0.54, 0.72].forEach(d => {
+        scifiSweep(500, 1200, t+d, 0.12, 0.09, 'sine');
+      });
+      noiseBurst(t+0.72, 0.15, 0.04);
+    } else if (type === 'typewriter') {
+      scifiSweep(1400, 1000, t, 0.04, 0.04, 'square');
+    } else {
+      scifiSweep(500, 800, t, 0.08, 0.06, 'sine');
+    }
+  } catch(e) { console.warn('scifi sound error', e); }
+}
+
+function _playClockSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const tick = (t, vol=0.08, high=false) => {
+      const v = vol * (soundVolume||0.6);
+      const freq = high ? 2000 : 1400;
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'square';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(v, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+      o.start(t); o.stop(t + 0.04);
+    };
+    const tock = (t, vol=0.06) => tick(t, vol, false);
+    const ct = ctx.currentTime;
+    if (type === 'complete') { [0,0.25,0.5,0.75].forEach((d,i)=>i%2===0?tick(ct+d):tock(ct+d)); }
+    else if (type === 'click') tick(ct, 0.06);
+    else if (type === 'add') { tick(ct,0.08,true); tock(ct+0.15,0.06); }
+    else if (type === 'delete') { tock(ct,0.08); tock(ct+0.12,0.06); }
+    else if (type === 'reminder') { [0,0.2,0.4,0.6,0.8,1.0,1.2].forEach((d,i)=>i%2===0?tick(ct+d,0.1):tock(ct+d,0.08)); }
+    else if (type === 'navigate') tock(ct, 0.05);
+    else tick(ct, 0.05);
+  } catch(e) {}
+}
+
+function _playPhoneSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const beep = (freq, t, dur, vol=0.08) => {
+      const v = vol * (soundVolume||0.6);
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(v, t);
+      g.gain.setValueAtTime(v, t + dur * 0.85);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur);
+    };
+    const ct = ctx.currentTime;
+    if (type === 'complete') { beep(1000,ct,0.1); beep(1200,ct+0.15,0.1); beep(1400,ct+0.3,0.12); }
+    else if (type === 'click') beep(1200, ct, 0.05, 0.05);
+    else if (type === 'add') { beep(900,ct,0.08); beep(1100,ct+0.1,0.08); }
+    else if (type === 'delete') beep(700, ct, 0.12, 0.07);
+    else if (type === 'navigate') beep(1000, ct, 0.04, 0.04);
+    else if (type === 'reminder') {
+      // Ringtone pattern
+      [[1000,0],[1200,0.1],[1000,0.2],[1200,0.3],[0,0.5],[1000,0.7],[1200,0.8]].forEach(([f,d])=>{ if(f) beep(f,ct+d,0.08,0.09); });
+    }
+    else beep(1100, ct, 0.05, 0.05);
+  } catch(e) {}
+}
 
 </script>
 
