@@ -317,10 +317,13 @@ body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-heig
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
   background:var(--surface);
+  color:var(--text);
 }
 #notes-pane-header{
   padding:10px 12px;border-bottom:1px solid var(--border);
   display:flex;align-items:center;gap:8px;
+  background:var(--surface);
+  color:var(--text);
 }
 .note-item{
   padding:9px 10px;border-radius:8px;
@@ -378,14 +381,16 @@ body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-heig
   font-family:inherit;font-size:0.72rem;cursor:pointer;outline:none;
 }
 #editor-area{
-  flex:1;overflow-y:auto;padding:14px 48px 200px;
+  flex:1;overflow-y:auto;padding:0 48px 200px;
   position:relative;
   background:var(--bg2);
+  color:var(--text);
 }
 #editor-content{
   min-height:100%;outline:none;
   font-size:0.9rem;color:var(--text);
   max-width:680px;margin:0 auto;
+  padding-top:28px;
   /* Fixed 28px line height so gradient never drifts */
   line-height:28px;
   background-image:repeating-linear-gradient(
@@ -455,16 +460,23 @@ body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-heig
 #save-indicator.saved{color:var(--green);}
 /* ── Smart Chip ── */
 .smart-chip{
-  display:inline-flex;align-items:center;gap:4px;
-  background:var(--blue-dim);border:1px solid rgba(68,136,255,0.3);
-  border-radius:6px;padding:1px 7px;
-  font-size:0.78rem;font-weight:700;color:var(--blue2);
+  display:inline-block;
+  background:var(--blue-dim);border:1px solid var(--border2);
+  border-radius:5px;padding:0 6px;
+  font-size:0.75rem;font-weight:700;color:var(--blue2);
   cursor:pointer;transition:all 0.15s;
-  vertical-align:middle;
+  vertical-align:baseline;
+  line-height:1.6;
+  white-space:nowrap;
+  /* Critical: don't disrupt line height of surrounding text */
+  position:relative;
+  top:0;
 }
-.smart-chip:hover{background:rgba(68,136,255,0.15);border-color:var(--blue2);}
-.smart-chip.chip-event{background:var(--purple-dim);border-color:rgba(153,102,255,0.3);color:var(--purple);}
-.smart-chip.chip-assignment{background:var(--green-dim);border-color:rgba(61,184,112,0.3);color:var(--green);}
+.smart-chip:hover{opacity:0.85;}
+.smart-chip.chip-event{background:var(--purple-dim);border-color:var(--border2);color:var(--purple);}
+.smart-chip.chip-assignment{background:var(--green-dim);border-color:var(--border2);color:var(--green);}
+.smart-chip.chip-task{background:var(--surface2);border-color:var(--border2);color:var(--text2);}
+.smart-chip.chip-countdown{background:var(--amber-dim);border-color:var(--border2);color:var(--amber);}
 
 /* Chip suggestion bubble */
 #chip-suggestion{
@@ -472,11 +484,13 @@ body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-heig
   background:var(--surface);border:1px solid var(--border2);
   border-radius:10px;padding:10px 14px;
   box-shadow:0 8px 32px rgba(0,0,0,0.5);
-  z-index:300;font-size:0.82rem;
+  z-index:9999;font-size:0.82rem;
   min-width:240px;
+  color:var(--text);
+  font-family:var(--app-font);
 }
-#chip-suggestion.visible{display:block;}
-#chip-suggestion .chip-sug-title{font-weight:700;margin-bottom:6px;font-size:0.78rem;}
+#chip-suggestion.visible{display:block;animation:screenIn 0.15s ease;}
+#chip-suggestion .chip-sug-title{font-weight:700;margin-bottom:6px;font-size:0.78rem;color:var(--text);}
 #chip-suggestion .chip-sug-actions{display:flex;gap:6px;margin-top:8px;}
 
 /* ── Calendar ── */
@@ -1121,11 +1135,6 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <button class="btn btn-primary btn-sm" onclick="openCreateModal('task')">+ Add Task</button>
         </div>
       </div>
-      <div class="card">
-        <div class="section-header"><div class="section-title">🔁 Recurring</div></div>
-        <div id="recurring-list"></div>
-        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px;" onclick="openCreateModal('recurring')">+ Add Recurring Task</button>
-      </div>
     </div>
 
 
@@ -1714,16 +1723,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
       </div>
     </div>
 
-    <!-- Recurring -->
-    <div class="form-group" id="recurring-fields" style="display:none;">
-      <label class="form-label">Recurrence</label>
-      <select class="form-select" id="create-recur">
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-        <option value="weekdays">Weekdays</option>
-        <option value="monthly">Monthly</option>
-      </select>
-    </div>
+
 
     <div class="form-group" id="reminder-group">
       <label class="form-label">🔔 Remind Me</label>
@@ -1889,7 +1889,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
 </div>
 
 <!-- Smart Chip Picker Modal -->
-<div class="modal-overlay" id="chip-modal">
+<div class="modal-overlay" id="chip-modal" style="color:var(--text);">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('chip-modal')">✕</button>
     <div class="modal-title">🧠 Insert Smart Chip</div>
@@ -2821,13 +2821,24 @@ function loadNote(id){
 }
 
 function deleteNote(id){
+  // id may be undefined if called from toolbar — fall back to activeNote
+  const noteId = id || state.activeNote;
+  if(!noteId) return;
   if(!confirm('Delete this note?')) return;
-  state.notes=state.notes.filter(n=>n.id!==id);
-  if(state.activeNote===id){
-    state.activeNote=null;
-    document.getElementById('editor-content').innerHTML='';
+  state.notes = state.notes.filter(n => n.id !== noteId);
+  if(state.activeNote === noteId){
+    state.activeNote = null;
+    document.getElementById('editor-content').innerHTML = '';
+    const ti = document.getElementById('editor-title-input');
+    if(ti) ti.value = '';
   }
-  save();filterNotes(document.getElementById('notes-search')?.value||'');
+  save();
+  filterNotes(document.getElementById('notes-search')?.value || '');
+  // Auto-load next note if any remain
+  if(state.notes.length){
+    const sorted = [...state.notes].sort((a,b) => b.updated - a.updated);
+    loadNote(sorted[0].id);
+  }
 }
 
 function setNoteColor(color){
@@ -2948,14 +2959,21 @@ let chipSugTimeout=null;
 function onEditorKeyUp(){
   scheduleNoteSave();
   clearTimeout(chipSugTimeout);
-  chipSugTimeout=setTimeout(detectChipPatterns,800);
+  chipSugTimeout=setTimeout(detectChipPatterns,1200);
 }
 
 function detectChipPatterns(){
   const editor=document.getElementById('editor-content');
   const text=editor.innerText;
-  const lines=text.split('\n');
-  const lastLine=lines[lines.length-1]||lines[lines.length-2]||'';
+  const lines=text.split('\n').filter(l=>l.trim());
+  const lastLine=(lines[lines.length-1]||'').trim();
+
+  // Only suggest if line has some real content (at least 3 chars)
+  // and doesn't already have a chip on it
+  if(lastLine.length < 3){ dismissChipSuggestion(); return; }
+
+  // Don't re-suggest if we already suggested for this line
+  if(chipSuggestionData && chipSuggestionData.line.trim()===lastLine){ return; }
 
   for(const pat of CHIP_PATTERNS){
     if(pat.regex.test(lastLine)){
@@ -3105,7 +3123,7 @@ function setCreateType(type,el){
   document.getElementById('importance-group').style.display=(type!=='event')?'':'none';
   document.getElementById('recurring-fields').style.display=(type==='recurring')?'':'none';
 
-  const labels={'assignment':'📚 Assignment Title','event':'📅 Event Name','task':'✅ Task','goal':'⭐ Goal','work-task':'💼 Task Title','personal-task':'⭐ Task Title','recurring':'🔁 Task Name'};
+  const labels={'assignment':'📚 Assignment Title','event':'📅 Event Name','task':'✅ Task','goal':'⭐ Goal','work-task':'💼 Task Title','personal-task':'⭐ Task Title'};
   document.getElementById('create-title-label').textContent=labels[type]||'Title';
 }
 
@@ -3197,8 +3215,8 @@ function saveCreateItem(){
       tags:[...createTags],color:createColor,
       completed:false,
       workspace,
-      recurring:createType==='recurring',
-      recurType:createType==='recurring'?document.getElementById('create-recur').value:'',
+      recurring:false,
+      recurType:'',
     };
     if(editingId){const idx=state.tasks.findIndex(t=>t.id===editingId);state.tasks[idx]=item;}
     else state.tasks.push(item);
@@ -4886,13 +4904,15 @@ detectChipPatterns = function() {
 };
 
 // ── SMART CHIP: auto-fill date/time ──
-const _prevInsertChip = insertChip;
+// ── Full-featured insertChip ──
 insertChip = function(id, type) {
   closeModal('chip-modal');
+
+  // Find item
   let item;
   if (type === 'assignment') item = state.assignments.find(a => a.id === id);
-  else if (type === 'event') item = state.events.find(e => e.id === id);
-  else if (type === 'task') item = state.tasks.find(t => t.id === id);
+  else if (type === 'event')  item = state.events.find(e => e.id === id);
+  else if (type === 'task')   item = state.tasks.find(t => t.id === id);
   else if (type === 'countdown') item = (state.countdowns||[]).find(c => c.id === id);
   if (!item) return;
 
@@ -4902,20 +4922,16 @@ insertChip = function(id, type) {
   chip.setAttribute('data-type', type);
   chip.setAttribute('contenteditable', 'false');
 
-  // Build chip label with date auto-fill
-  let label = item.title || item.text || 'Item';
-  let dateInfo = '';
-  if (item.due) dateInfo = ' · ' + fmtDate(item.due) + (item.time ? ' ' + fmt12(item.time) : '');
-  else if (item.startDate) dateInfo = ' · ' + fmtDate(item.startDate) + (item.startTime ? ' ' + fmt12(item.startTime) : '');
-  else if (item.date) {
-    const diff = Math.ceil((new Date(item.date+'T12:00') - new Date()) / 86400000);
-    dateInfo = ' · ' + fmtDate(item.date) + (diff >= 0 ? ` (${diff}d)` : ' (past)');
-  }
+  // Build display text
+  _refreshChipDisplay(chip, item, type);
 
-  const icons = { assignment:'📚', event:'📅', task:'✅', countdown:'⏳' };
-  chip.textContent = `${icons[type]||'🔗'} ${label}${dateInfo}`;
-  chip.onclick = (e) => { e.stopPropagation(); if (type !== 'countdown') showDetail(type, id); };
+  // Tooltip — days remaining on hover
+  _setChipTooltip(chip, item, type);
 
+  // Click → open chip popup
+  chip.onclick = (e) => { e.stopPropagation(); openChipPopup(id, type, chip); };
+
+  // Insert into editor
   const editor = document.getElementById('editor-content');
   editor.focus();
   if (lastSelection) {
@@ -4925,20 +4941,194 @@ insertChip = function(id, type) {
     const range = sel.getRangeAt(0);
     range.deleteContents();
     range.insertNode(chip);
-    const afterRange = document.createRange();
-    afterRange.setStartAfter(chip);
-    afterRange.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(afterRange);
+    const after = document.createRange();
+    after.setStartAfter(chip); after.collapse(true);
+    sel.removeAllRanges(); sel.addRange(after);
     lastSelection = null;
   } else {
     editor.appendChild(chip);
   }
-  const space = document.createTextNode('\u00A0');
-  chip.after(space);
+  chip.after(document.createTextNode('\u00A0'));
   scheduleNoteSave();
   playSound('add');
 };
+
+function _getItemDiff(item, type) {
+  let targetDate = item.due || item.startDate || item.date || null;
+  if (!targetDate) return null;
+  const diff = Math.ceil((new Date(targetDate+'T12:00') - new Date()) / 86400000);
+  return diff;
+}
+
+function _refreshChipDisplay(chip, item, type) {
+  const icons = { assignment:'📚', event:'📅', task:'✅', countdown:'⏳' };
+  const label = item.title || item.text || 'Item';
+  const done = item.completed || false;
+  const checkmark = done ? ' ✓' : '';
+  let extra = '';
+  const diff = _getItemDiff(item, type);
+  if (type === 'countdown' && diff !== null) {
+    extra = diff === 0 ? ' · Today!' : diff > 0 ? ` · ${diff}d` : ` · ${Math.abs(diff)}d ago`;
+  } else if (item.due) {
+    extra = ' · ' + fmtDate(item.due) + (item.time ? ' '+fmt12(item.time) : '');
+  } else if (item.startDate) {
+    extra = ' · ' + fmtDate(item.startDate);
+  } else if (item.date) {
+    extra = diff !== null ? (diff >= 0 ? ` · ${diff}d` : ` · past`) : '';
+  }
+  chip.textContent = `${icons[type]||'🔗'} ${label}${extra}${checkmark}`;
+  if (done) chip.style.opacity = '0.55';
+  else chip.style.opacity = '';
+}
+
+function _setChipTooltip(chip, item, type) {
+  const label = item.title || item.text || 'Item';
+  const diff = _getItemDiff(item, type);
+  let tip = label;
+  if (diff !== null) {
+    if (diff === 0) tip += ' · Today';
+    else if (diff === 1) tip += ' · Tomorrow';
+    else if (diff > 0) tip += ` · ${diff} days away`;
+    else tip += ` · ${Math.abs(diff)} days ago`;
+  }
+  if (item.completed) tip += ' · ✓ Done';
+  chip.title = tip;
+}
+
+// Chip popup — edit display, mark done, delete→text
+function openChipPopup(id, type, chipEl) {
+  // Remove any existing popup
+  document.getElementById('chip-inline-popup')?.remove();
+
+  let item;
+  if (type === 'assignment') item = state.assignments.find(a => a.id === id);
+  else if (type === 'event') item = state.events.find(e => e.id === id);
+  else if (type === 'task') item = state.tasks.find(t => t.id === id);
+  else if (type === 'countdown') item = (state.countdowns||[]).find(c => c.id === id);
+  if (!item) return;
+
+  const label = item.title || item.text || 'Item';
+  const diff = _getItemDiff(item, type);
+  const done = item.completed || false;
+  const rect = chipEl.getBoundingClientRect();
+
+  const popup = document.createElement('div');
+  popup.id = 'chip-inline-popup';
+  popup.style.cssText = `
+    position:fixed;z-index:10000;
+    background:var(--surface);border:1px solid var(--border2);
+    border-radius:12px;padding:14px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.35);
+    min-width:220px;max-width:280px;
+    font-family:var(--app-font);color:var(--text);
+    top:${Math.min(rect.bottom+6, window.innerHeight-200)}px;
+    left:${Math.min(rect.left, window.innerWidth-290)}px;
+  `;
+
+  // Display mode options
+  const modes = [
+    { val:'name', label:'Name only' },
+    { val:'date', label:'Name + Date' },
+    { val:'days', label:'Name + Days' },
+    { val:'both', label:'Name + Date + Days' },
+  ];
+  const curMode = chipEl.getAttribute('data-display') || 'date';
+
+  popup.innerHTML = `
+    <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Smart Chip</div>
+    <div style="font-size:0.9rem;font-weight:800;margin-bottom:10px;">${label}</div>
+    ${diff !== null ? `<div style="font-size:0.72rem;color:var(--text2);margin-bottom:10px;">${diff===0?'Today':diff>0?diff+' days away':Math.abs(diff)+' days ago'}</div>` : ''}
+    <div style="font-size:0.68rem;font-weight:700;color:var(--text3);margin-bottom:4px;">Display</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+      ${modes.map(m => `<button onclick="setChipDisplay('${id}','${type}','${m.val}')" style="
+        padding:3px 8px;border-radius:5px;font-size:0.65rem;font-weight:700;cursor:pointer;border:1px solid var(--border2);
+        background:${curMode===m.val?'var(--blue-dim)':'var(--surface2)'};
+        color:${curMode===m.val?'var(--blue2)':'var(--text2)'};
+        font-family:var(--app-font);
+      ">${m.label}</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${type!=='event'&&type!=='countdown'?`<button onclick="toggleChipDone('${id}','${type}')" style="flex:1;padding:5px 8px;border-radius:6px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--${done?'surface3':'green-dim'});color:var(--${done?'text2':'green'});font-family:var(--app-font);">${done?'↩ Undo':'✓ Mark Done'}</button>`:''}
+      ${type!=='countdown'?`<button onclick="viewChipItem('${id}','${type}')" style="padding:5px 8px;border-radius:6px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:var(--app-font);">View</button>`:''}
+      <button onclick="convertChipToText('${id}')" style="padding:5px 8px;border-radius:6px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1px solid var(--red-dim);background:var(--red-dim);color:var(--red2);font-family:var(--app-font);">→ Text</button>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function _closePopup(e) {
+      if (!popup.contains(e.target) && e.target !== chipEl) {
+        popup.remove();
+        document.removeEventListener('click', _closePopup);
+      }
+    });
+  }, 50);
+}
+
+function setChipDisplay(id, type, mode) {
+  document.getElementById('chip-inline-popup')?.remove();
+  // Find chip element(s) in editor
+  const chips = document.querySelectorAll(`#editor-content .smart-chip[data-id="${id}"]`);
+  chips.forEach(chip => {
+    chip.setAttribute('data-display', mode);
+    let item;
+    if (type === 'assignment') item = state.assignments.find(a => a.id === id);
+    else if (type === 'event') item = state.events.find(e => e.id === id);
+    else if (type === 'task') item = state.tasks.find(t => t.id === id);
+    else if (type === 'countdown') item = (state.countdowns||[]).find(c => c.id === id);
+    if (!item) return;
+    const label = item.title || item.text || '';
+    const diff = _getItemDiff(item, type);
+    const done = item.completed || false;
+    const icons = { assignment:'📚', event:'📅', task:'✅', countdown:'⏳' };
+    const icon = icons[type] || '🔗';
+    const dateStr = item.due ? fmtDate(item.due) : item.startDate ? fmtDate(item.startDate) : item.date ? fmtDate(item.date) : '';
+    const dayStr = diff !== null ? (diff===0?'Today':diff>0?diff+'d':Math.abs(diff)+'d ago') : '';
+    const check = done ? ' ✓' : '';
+    if (mode === 'name')  chip.textContent = `${icon} ${label}${check}`;
+    if (mode === 'date')  chip.textContent = `${icon} ${label}${dateStr?' · '+dateStr:''}${check}`;
+    if (mode === 'days')  chip.textContent = `${icon} ${label}${dayStr?' · '+dayStr:''}${check}`;
+    if (mode === 'both')  chip.textContent = `${icon} ${label}${dateStr?' · '+dateStr:''}${dayStr?' ('+dayStr+')':''}${check}`;
+    _setChipTooltip(chip, item, type);
+  });
+  scheduleNoteSave();
+}
+
+function toggleChipDone(id, type) {
+  document.getElementById('chip-inline-popup')?.remove();
+  let item;
+  if (type === 'assignment') item = state.assignments.find(a => a.id === id);
+  else if (type === 'task') item = state.tasks.find(t => t.id === id);
+  if (!item) return;
+  item.completed = !item.completed;
+  save();
+  // Refresh all chips for this id
+  document.querySelectorAll(`#editor-content .smart-chip[data-id="${id}"]`).forEach(chip => {
+    _refreshChipDisplay(chip, item, type);
+    _setChipTooltip(chip, item, type);
+  });
+  playSound(item.completed ? 'complete' : 'click');
+  updateBadges(); updateProgressBar();
+}
+
+function viewChipItem(id, type) {
+  document.getElementById('chip-inline-popup')?.remove();
+  showDetail(type, id);
+}
+
+function convertChipToText(id) {
+  document.getElementById('chip-inline-popup')?.remove();
+  // Replace chip span with plain text
+  const chips = document.querySelectorAll(`#editor-content .smart-chip[data-id="${id}"]`);
+  chips.forEach(chip => {
+    const text = document.createTextNode(chip.textContent);
+    chip.replaceWith(text);
+  });
+  scheduleNoteSave();
+  playSound('delete');
+}
 
 // ── COUNTDOWN as smart chip ──
 // Patch filterChipSearch to include countdowns
