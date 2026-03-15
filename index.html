@@ -600,15 +600,15 @@ h1.hero-title{
       </div>
     </div>
 
-    <!-- AI Disclaimer — wide -->
-    <div class="tool-card wide" onclick="openLaunch('ai')">
-      <div class="tool-card-icon">🤖</div>
+    <!-- Terms & Policies — wide -->
+    <div class="tool-card wide" onclick="openLaunch('terms')">
+      <div class="tool-card-icon">📋</div>
       <div style="flex:1;">
-        <div class="tool-card-name">AI Disclaimer</div>
-        <div class="tool-card-desc">Transparency about how and where AI is used across these tools — what's AI-assisted and what to keep in mind.</div>
+        <div class="tool-card-name">Terms & Policies</div>
+        <div class="tool-card-desc">Privacy Policy, Terms of Service, and AI Disclosure — how DQ Tools handles your data, what AI was used for, and the rules of the site.</div>
       </div>
       <div class="tool-card-footer">
-        <button class="launch-btn" onclick="event.stopPropagation();openLaunch('ai')">Read <i class="arrow-icon">→</i></button>
+        <button class="launch-btn" onclick="event.stopPropagation();openLaunch('terms')">Read <i class="arrow-icon">→</i></button>
       </div>
     </div>
 
@@ -702,14 +702,14 @@ const TOOLS = {
       {icon:'☁️', text:'Optional cloud sync — sign in to save everything to your DQ Account and access from any device.'},
     ]
   },
-  ai: {
-    icon:'🤖', name:'AI Disclaimer',
-    tagline:"Full transparency about how and where AI is used across DQ Tools — what's AI-assisted, how it works, and what to keep in mind.",
+  terms: {
+    icon:'📋', name:'Terms & Policies',
+    tagline:'Privacy Policy, Terms of Service, and AI Disclosure — how DQ Tools handles your data, what AI was used for during development, and the rules of the site.',
     url:'termsandpolicies.html',
     features:[
-      {icon:'🔍', text:'Clear breakdown of which features use AI and how those systems work under the hood.'},
-      {icon:'📋', text:'What AI-generated content means for accuracy and how to interpret results responsibly.'},
-      {icon:'🛡️', text:'Information on responsible use, data handling, and the limits of AI-assisted tools.'},
+      {icon:'🔒', text:'Privacy Policy — how your data is collected, stored, and used. Optional accounts, local storage, and third-party services explained.'},
+      {icon:'📄', text:'Terms of Service — acceptable use, intellectual property, tool accuracy disclaimers, and limitation of liability.'},
+      {icon:'🤖', text:'AI Disclosure — exactly how Claude AI and ChatGPT were used to build the site, and what AI is NOT used for during operation.'},
     ]
   }
 };
