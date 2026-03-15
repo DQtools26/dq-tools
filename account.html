@@ -521,19 +521,47 @@ async function exportData() {
   a.download = 'dqtools-data.json'; a.click();
 }
 async function deleteAccount() {
-  if (!confirm('DELETE YOUR ACCOUNT? This removes everything permanently.')) return;
-  if (!confirm('Last chance — cannot be undone. Delete account?')) return;
+  if (!confirm('DELETE YOUR ACCOUNT? This removes your profile, all saved data, and login permanently.')) return;
+  if (!confirm('Last chance — this cannot be undone. Are you absolutely sure?')) return;
+
+  // Ask for password to re-authenticate (required by Firebase before deleting)
+  const password = prompt('Enter your password to confirm account deletion:');
+  if (!password) return;
+
   const user = DQAuth.getUser();
+  if (!user) { alert('Not signed in.'); return; }
+
   try {
+    // Re-authenticate first — Firebase requires this for account deletion
+    const { EmailAuthProvider, reauthenticateWithCredential, deleteUser } =
+      await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+
+    // Delete all Supabase data
     const keys = await DQAuth.getAllDataKeys();
     for (const { key } of keys) await DQAuth.deleteData(key);
+
+    // Delete profile from Supabase
+    await DQAuth.deleteData('profile');
+
+    // Clear local cache
     try { localStorage.removeItem(`dq_profile_${user.uid}`); } catch (_) {}
-    const { deleteUser } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+
+    // Delete Firebase account
     await deleteUser(user);
+
+    alert('Your account has been permanently deleted.');
     window.location.href = 'index.html';
   } catch (e) {
-    alert(e.code === 'auth/requires-recent-login'
-      ? 'Sign out and back in, then try again.' : 'Failed to delete account.');
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      alert('Wrong password. Account was not deleted.');
+    } else if (e.code === 'auth/requires-recent-login') {
+      alert('Please sign out and sign back in, then try again.');
+    } else {
+      alert('Failed to delete account. Please try again.');
+      console.error(e);
+    }
   }
 }
 </script>
