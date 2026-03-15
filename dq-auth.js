@@ -510,6 +510,20 @@ window.DQAuth = {
     if (!_auth) return;
     await window._DQFire.signOut(_auth);
     document.getElementById('dq-user-dropdown').classList.remove('open');
+    // Clear local profile cache on sign out
+    try { if (_user) localStorage.removeItem(`dq_profile_${_user.uid}`); } catch (_) {}
+  },
+
+  async logoutAllDevices() {
+    // Firebase doesn't support true "logout all devices" on the free plan.
+    // Best we can do: sign out this device and show a message.
+    // If user is on another device, their session will expire naturally
+    // or they can sign out manually.
+    if (!_auth) return;
+    document.getElementById('dq-user-dropdown')?.classList.remove('open');
+    await window._DQFire.signOut(_auth);
+    DQAuth.toast('✓ Signed out. Other devices will sign out when their session expires.');
+    setTimeout(() => window.location.href = 'index.html', 1500);
   },
 
   async forgotPassword() {
