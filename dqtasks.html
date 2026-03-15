@@ -2864,7 +2864,7 @@ function _reattachChipHandlers(editor) {
     const id = chip.getAttribute('data-id');
     const type = chip.getAttribute('data-type') || 'assignment';
     chip.setAttribute('contenteditable','false');
-    chip.onclick = (e) => { e.stopPropagation(); openChipPopup(id, type, chip); };
+    _attachChipClick(chip, id, type);
     // Re-set tooltip
     let item;
     if (type==='assignment') item=state.assignments.find(a=>a.id===id);
@@ -3108,7 +3108,7 @@ function insertChip(id,type){
   chip.setAttribute('data-type',type);
   chip.setAttribute('contenteditable','false');
   chip.textContent=`${type==='assignment'?'📚':'📅'} ${item.title}`;
-  chip.onclick=(e)=>{e.stopPropagation();openChipPopup(id,type,chip);};
+  _attachChipClick(chip, id, type);
   const editor=document.getElementById('editor-content');
   editor.focus();
   // Restore saved selection or append
@@ -4968,7 +4968,8 @@ filterChipSearch = function(q) {
   }
 };
 
-// Also detect tool suggestions in notebook as you type
+// Tool suggestions in notebook — show once per session per tool, don't re-show after dismiss
+const _dismissedToolSuggestions = new Set();
 const _prevDetectChipPatterns = detectChipPatterns;
 detectChipPatterns = function() {
   _prevDetectChipPatterns();
@@ -4976,21 +4977,33 @@ detectChipPatterns = function() {
   if (!editor) return;
   const lastLine = (editor.innerText.split('\n').filter(l => l.trim()).pop() || '').toLowerCase();
   const ts = getToolSuggestion(lastLine);
-  if (ts && !document.getElementById('chip-suggestion').classList.contains('visible')) {
-    const sug = document.getElementById('chip-suggestion');
-    document.getElementById('chip-sug-title').textContent = `${ts.icon} Try ${ts.tool}?`;
-    document.getElementById('chip-sug-text').textContent = ts.desc + ' — might help!';
-    const rect = document.getElementById('editor-area').getBoundingClientRect();
-    sug.style.top = (rect.top + 60) + 'px';
-    sug.style.left = (rect.left + 48) + 'px';
-    // Show TOOL actions, hide chip actions — keeps chip button untouched
-    document.getElementById('chip-sug-chip-actions').style.display = 'none';
-    document.getElementById('chip-sug-tool-actions').style.display = 'flex';
-    const toolBtn = document.getElementById('chip-sug-tool-btn');
-    toolBtn.textContent = `Open ${ts.tool} →`;
-    toolBtn.onclick = function() { window.open(ts.url, '_blank'); dismissChipSuggestion(); };
-    sug.classList.add('visible');
+  const sug = document.getElementById('chip-suggestion');
+  // Don't show if already visible, already dismissed this tool, or chip suggestion showing
+  if (!ts) return;
+  if (sug.classList.contains('visible')) return;
+  if (_dismissedToolSuggestions.has(ts.tool)) return;
+  document.getElementById('chip-sug-title').textContent = `${ts.icon} Try ${ts.tool}?`;
+  document.getElementById('chip-sug-text').textContent = ts.desc + ' — might help!';
+  const rect = document.getElementById('editor-area').getBoundingClientRect();
+  sug.style.top = (rect.top + 60) + 'px';
+  sug.style.left = (rect.left + 48) + 'px';
+  document.getElementById('chip-sug-chip-actions').style.display = 'none';
+  document.getElementById('chip-sug-tool-actions').style.display = 'flex';
+  const toolBtn = document.getElementById('chip-sug-tool-btn');
+  toolBtn.textContent = `Open ${ts.tool} →`;
+  toolBtn.onclick = function() { window.open(ts.url, '_blank'); dismissChipSuggestion(); };
+  sug.classList.add('visible');
+};
+
+// When dismissed, remember this tool so it never shows again this session
+const _origDismissChip = dismissChipSuggestion;
+dismissChipSuggestion = function() {
+  // If it was a tool suggestion, mark it as dismissed permanently for this session
+  const title = document.getElementById('chip-sug-title')?.textContent || '';
+  for (const ts of (typeof TOOL_SUGGESTIONS !== 'undefined' ? TOOL_SUGGESTIONS : [])) {
+    if (title.includes(ts.tool)) { _dismissedToolSuggestions.add(ts.tool); break; }
   }
+  _origDismissChip();
 };
 
 // ── SMART CHIP: auto-fill date/time ──
@@ -5019,7 +5032,7 @@ insertChip = function(id, type) {
   _setChipTooltip(chip, item, type);
 
   // Click → open chip popup
-  chip.onclick = (e) => { e.stopPropagation(); openChipPopup(id, type, chip); };
+  _attachChipClick(chip, id, type);
 
   // Insert into editor
   const editor = document.getElementById('editor-content');
@@ -5083,6 +5096,24 @@ function _setChipTooltip(chip, item, type) {
   }
   if (item.completed) tip += ' · ✓ Done';
   chip.title = tip;
+}
+
+// Only open popup on deliberate click — not drag/selection
+function _attachChipClick(chip, id, type) {
+  let _mouseDownX = 0, _mouseDownY = 0;
+  chip.addEventListener('mousedown', (e) => {
+    _mouseDownX = e.clientX;
+    _mouseDownY = e.clientY;
+  });
+  chip.addEventListener('mouseup', (e) => {
+    e.stopPropagation();
+    const dx = Math.abs(e.clientX - _mouseDownX);
+    const dy = Math.abs(e.clientY - _mouseDownY);
+    // Only open if mouse barely moved (not a drag or text selection)
+    if (dx < 5 && dy < 5) {
+      openChipPopup(id, type, chip);
+    }
+  });
 }
 
 // Chip popup — edit display, mark done, delete→text
