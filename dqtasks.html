@@ -42,7 +42,8 @@
   --teal-dim: #0a1e1c;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+:root{--app-font:'Outfit','DM Sans',sans-serif;}
+body{font-family:var(--app-font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar{width:6px;height:6px;}
@@ -353,6 +354,7 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
 #editor-pane{
   flex:1;display:flex;flex-direction:column;
   background:var(--bg2);
+  color:var(--text);
   overflow:hidden;
 }
 #editor-toolbar{
@@ -378,25 +380,25 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
 #editor-area{
   flex:1;overflow-y:auto;padding:32px 48px;
   position:relative;
+  background:var(--bg2);
 }
 #editor-content{
   min-height:100%;outline:none;
   font-size:0.9rem;line-height:1.7;color:var(--text);
   max-width:680px;margin:0 auto;
-  /* Subtle lined paper look */
   background:repeating-linear-gradient(
     to bottom,
     transparent,
     transparent calc(1.7em - 1px),
-    rgba(46,46,66,0.3) calc(1.7em - 1px),
-    rgba(46,46,66,0.3) 1.7em
+    var(--border) calc(1.7em - 1px),
+    var(--border) 1.7em
   );
   background-attachment:local;
 }
 #editor-content:focus{outline:none;}
-#editor-content h1{font-size:1.5rem;font-weight:800;margin-bottom:8px;color:var(--text);}
-#editor-content h2{font-size:1.15rem;font-weight:700;margin-bottom:6px;color:var(--text);}
-#editor-content h3{font-size:0.95rem;font-weight:700;margin-bottom:4px;color:var(--text);}
+#editor-content h1{font-size:1.2rem;font-weight:800;margin-bottom:4px;color:var(--text);line-height:1.3;}
+#editor-content h2{font-size:1.0rem;font-weight:700;margin-bottom:3px;color:var(--text);line-height:1.3;}
+#editor-content h3{font-size:0.88rem;font-weight:700;margin-bottom:2px;color:var(--text);line-height:1.3;}
 #editor-content ul,#editor-content ol{padding-left:20px;margin:4px 0;}
 #editor-content li{margin:2px 0;}
 #editor-content input[type=checkbox]{margin-right:6px;accent-color:var(--green);}
@@ -854,10 +856,26 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
 <!-- Notification Panel -->
 <div id="notif-panel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-    <div style="font-size:0.82rem;font-weight:800;">Notifications</div>
-    <button class="btn btn-sm btn-ghost" onclick="clearNotifs()">Clear All</button>
+    <div style="font-size:0.82rem;font-weight:800;">🔔 Notifications</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="btn btn-sm btn-ghost" id="notif-expand-btn" onclick="toggleNotifExpand()" title="Expand">⤢</button>
+      <button class="btn btn-sm btn-ghost" onclick="clearNotifs()">Clear</button>
+    </div>
   </div>
   <div id="notif-list"></div>
+</div>
+
+<!-- Expanded Notification Modal -->
+<div class="modal-overlay" id="notif-modal">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('notif-modal')">✕</button>
+    <div class="modal-title">🔔 All Notifications</div>
+    <div id="notif-modal-list" style="max-height:60vh;overflow-y:auto;"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn btn-red btn-sm" onclick="clearNotifs();closeModal('notif-modal')">🗑️ Clear All</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('notif-modal')">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- Main App Layout -->
@@ -1137,9 +1155,9 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <div id="editor-toolbar">
             <select class="heading-select" onchange="applyHeading(this.value)" id="heading-sel">
               <option value="p">Normal</option>
-              <option value="h1">H1</option>
-              <option value="h2">H2</option>
-              <option value="h3">H3</option>
+              <option value="h1">Title</option>
+              <option value="h2">Heading</option>
+              <option value="h3">Subheading</option>
             </select>
             <select class="font-select" onchange="applyFont(this.value)" id="font-sel">
               <option value="Outfit">Sans</option>
@@ -1154,12 +1172,29 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
             <div class="toolbar-sep"></div>
             <button class="toolbar-btn" onclick="insertList()" title="Bullet List">• List</button>
             <button class="toolbar-btn" onclick="insertChecklist()" title="Checklist">☑</button>
-            <button class="toolbar-btn" onclick="fmt('hiliteColor','#3a2a6a')" title="Highlight">🖊</button>
+            <div class="toolbar-sep"></div>
+            <div style="position:relative;display:inline-flex;align-items:center;">
+              <button class="toolbar-btn" id="highlight-btn" onclick="applyHighlight()" title="Highlight" style="padding-right:4px;">🖊</button>
+              <button class="toolbar-btn" onclick="toggleHighlightPicker(event)" style="padding:4px 3px;font-size:0.55rem;" title="Pick highlight color">▼</button>
+              <div id="highlight-picker" style="display:none;position:absolute;top:32px;left:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px;z-index:500;display:none;gap:5px;flex-wrap:wrap;width:130px;">
+                <div onclick="setHighlightColor('#ffe066','#1a1500')" style="width:20px;height:20px;background:#ffe066;border-radius:4px;cursor:pointer;border:2px solid transparent;" title="Yellow"></div>
+                <div onclick="setHighlightColor('#b3f0a0','#0a1a06')" style="width:20px;height:20px;background:#b3f0a0;border-radius:4px;cursor:pointer;" title="Green"></div>
+                <div onclick="setHighlightColor('#a0d4ff','#061220')" style="width:20px;height:20px;background:#a0d4ff;border-radius:4px;cursor:pointer;" title="Blue"></div>
+                <div onclick="setHighlightColor('#ffb3d9','#1a0610')" style="width:20px;height:20px;background:#ffb3d9;border-radius:4px;cursor:pointer;" title="Pink"></div>
+                <div onclick="setHighlightColor('#e0b3ff','#100618')" style="width:20px;height:20px;background:#e0b3ff;border-radius:4px;cursor:pointer;" title="Purple"></div>
+                <div onclick="setHighlightColor('#ffc89a','#1a0c00')" style="width:20px;height:20px;background:#ffc89a;border-radius:4px;cursor:pointer;" title="Orange"></div>
+                <button onclick="removeHighlight();toggleHighlightPicker()" style="font-size:0.62rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text2);cursor:pointer;width:100%;margin-top:2px;">✕ Remove</button>
+              </div>
+            </div>
+            <button class="toolbar-btn" onclick="removeHighlight()" title="Remove highlight" style="font-size:0.7rem;">✕🖊</button>
             <div class="toolbar-sep"></div>
             <button class="toolbar-btn" onclick="openChipPicker()" title="Smart Chip" style="background:var(--blue-dim);color:var(--blue2);border:1px solid rgba(68,136,255,0.3);">🧠 Chip</button>
             <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onclick="zoomEditor(-1)" title="Zoom out" style="font-size:0.8rem;">A-</button>
+            <button class="toolbar-btn" onclick="zoomEditor(1)" title="Zoom in" style="font-size:0.8rem;">A+</button>
+            <div class="toolbar-sep"></div>
             <button class="toolbar-btn" onclick="togglePaperTheme()" id="paper-theme-btn">🌙</button>
-            <button class="toolbar-btn btn-red" onclick="deleteNote(state.activeNote)" title="Delete Note" style="margin-left:2px;">🗑️</button>
+            <button class="toolbar-btn" onclick="deleteNote(state.activeNote)" title="Delete Note" style="margin-left:2px;color:var(--red2);">🗑️</button>
             <div id="save-indicator" style="margin-left:auto;font-size:0.62rem;color:var(--text3);padding:4px 8px;">● Saved</div>
           </div>
           <!-- Note meta bar: color + tags -->
@@ -1335,21 +1370,78 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
         <div class="page-title">⚙️ Settings</div>
       </div>
       <div class="card">
-        <div class="section-title" style="margin-bottom:10px;">🌓 Theme</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="theme-picker">
+        <div class="section-title" style="margin-bottom:14px;">🌓 Theme</div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Simple</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
           <button class="btn btn-ghost btn-sm theme-btn active" data-theme="dark" onclick="setTheme('dark',this)">🌙 Dark</button>
           <button class="btn btn-ghost btn-sm theme-btn" data-theme="light" onclick="setTheme('light',this)">☀️ Light</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Colorful</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           <button class="btn btn-ghost btn-sm theme-btn" data-theme="colorful-dark" onclick="setTheme('colorful-dark',this)">🎨 Colorful Dark</button>
           <button class="btn btn-ghost btn-sm theme-btn" data-theme="colorful-light" onclick="setTheme('colorful-light',this)">🌈 Colorful Light</button>
         </div>
+        <div id="colorful-strength-section" style="margin-bottom:12px;display:none;">
+          <div style="font-size:0.68rem;color:var(--text2);margin-bottom:4px;">Colorful Strength</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:0.62rem;color:var(--text3);">Low</span>
+            <input type="range" id="colorful-strength" min="1" max="3" value="2" step="1" style="flex:1;accent-color:var(--blue);" oninput="setColorfulStrength(parseInt(this.value))">
+            <span style="font-size:0.62rem;color:var(--text3);">High</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.58rem;color:var(--text3);padding:0 2px;margin-top:2px;">
+            <span>Slight tint</span><span>Colored navbar</span><span>Full saturation</span>
+          </div>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Polished</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="polished-dark" onclick="setTheme('polished-dark',this)">✨ Polished Dark</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="polished-light" onclick="setTheme('polished-light',this)">💎 Polished Light</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nature</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="nature-dark" onclick="setTheme('nature-dark',this)">🌲 Forest Dark</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="nature-light" onclick="setTheme('nature-light',this)">🌸 Meadow Light</button>
+        </div>
+
+        <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Special</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="retro" onclick="setTheme('retro',this)">💻 Retro/Terminal</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="midnight" onclick="setTheme('midnight',this)">🌌 Midnight</button>
+          <button class="btn btn-ghost btn-sm theme-btn" data-theme="paper" onclick="setTheme('paper',this)">📄 Paper</button>
+        </div>
       </div>
+
       <div class="card">
-        <div class="section-title" style="margin-bottom:10px;">🔊 Sound Effects</div>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.85rem;margin-bottom:8px;">
+        <div class="section-title" style="margin-bottom:12px;">🔊 Sound Effects</div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.85rem;margin-bottom:10px;">
           <input type="checkbox" id="sound-toggle" onchange="setSoundEnabled(this.checked)" style="accent-color:var(--blue);width:16px;height:16px;">
           Enable sound effects
         </label>
-        <div style="font-size:0.68rem;color:var(--text3);">Chimes on completion, clicks on interactions, swoosh on delete.</div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.68rem;color:var(--text2);margin-bottom:6px;font-weight:700;">Sound Pack</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm sound-pack-btn active" data-pack="default" onclick="setSoundPack('default',this)">🎵 Default</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="retro" onclick="setSoundPack('retro',this)">👾 Retro</button>
+            <button class="btn btn-ghost btn-sm sound-pack-btn" data-pack="nature" onclick="setSoundPack('nature',this)">🌿 Nature</button>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.68rem;color:var(--text2);margin-bottom:4px;font-weight:700;">Volume</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:0.7rem;">🔈</span>
+            <input type="range" id="sound-volume" min="0" max="100" value="60" style="flex:1;accent-color:var(--blue);" oninput="setSoundVolume(parseInt(this.value))">
+            <span style="font-size:0.7rem;">🔊</span>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="font-size:0.68rem;color:var(--text2);margin-bottom:6px;font-weight:700;">Per-Sound Toggles</div>
+          <div id="sound-toggles" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="previewAllSounds()" style="width:100%;">▶ Preview Sounds</button>
       </div>
       <div class="card">
         <div class="section-title" style="margin-bottom:12px;">🎨 Accent Color</div>
@@ -3572,10 +3664,19 @@ function loadSoundPref() {
 // ─────────────────────────────────────────────────
 //  THEMES
 // ─────────────────────────────────────────────────
+// ─── All theme definitions ───
 const THEME_VARS = {
-  dark:  { '--bg':'#0a0a0e','--bg2':'#111118','--surface':'#18181f','--surface2':'#20202a','--surface3':'#28283a','--border':'#2e2e42','--border2':'#3e3e58','--text':'#f0f0f8','--text2':'#9090b8','--text3':'#555570' },
-  light: { '--bg':'#f4f4fa','--bg2':'#eaeaf2','--surface':'#ffffff','--surface2':'#ededf5','--surface3':'#e0e0ee','--border':'#ccccde','--border2':'#b0b0cc','--text':'#18182a','--text2':'#555575','--text3':'#9090aa' }
+  dark:          { '--bg':'#0a0a0e','--bg2':'#111118','--surface':'#18181f','--surface2':'#20202a','--surface3':'#28283a','--border':'#2e2e42','--border2':'#3e3e58','--text':'#f0f0f8','--text2':'#9090b8','--text3':'#555570','--card-radius':'18px','--card-shadow':'none' },
+  light:         { '--bg':'#f4f4fa','--bg2':'#eaeaf2','--surface':'#ffffff','--surface2':'#ededf5','--surface3':'#e0e0ee','--border':'#ccccde','--border2':'#b0b0cc','--text':'#18182a','--text2':'#555575','--text3':'#9090aa','--card-radius':'18px','--card-shadow':'none' },
+  'polished-dark':  { '--bg':'#0d0d14','--bg2':'#131320','--surface':'#1a1a2e','--surface2':'#20203a','--surface3':'#282850','--border':'#2a2a4a','--border2':'#3a3a6a','--text':'#f2f2ff','--text2':'#8888cc','--text3':'#4a4a80','--card-radius':'20px','--card-shadow':'0 4px 24px rgba(0,0,0,0.4)' },
+  'polished-light': { '--bg':'#f0f0fa','--bg2':'#e8e8f8','--surface':'#ffffff','--surface2':'#f5f5ff','--surface3':'#eaeaf8','--border':'#d0d0ee','--border2':'#b0b0dd','--text':'#14142a','--text2':'#505080','--text3':'#9090c0','--card-radius':'20px','--card-shadow':'0 2px 16px rgba(80,80,180,0.08)' },
+  'nature-dark':    { '--bg':'#080e08','--bg2':'#0e160e','--surface':'#121c12','--surface2':'#182418','--surface3':'#1e2e1e','--border':'#2a3e2a','--border2':'#3a5a3a','--text':'#e8f4e8','--text2':'#7aaa7a','--text3':'#3a5a3a','--card-radius':'16px','--card-shadow':'none' },
+  'nature-light':   { '--bg':'#faf6f0','--bg2':'#f4ede4','--surface':'#fffdf8','--surface2':'#f8f2e8','--surface3':'#f0e8d8','--border':'#d8c8b0','--border2':'#c0a880','--text':'#2a1e0e','--text2':'#6a5040','--text3':'#a08060','--card-radius':'16px','--card-shadow':'none' },
+  'retro':          { '--bg':'#000900','--bg2':'#001400','--surface':'#001a00','--surface2':'#002200','--surface3':'#002800','--border':'#004400','--border2':'#006600','--text':'#00ff41','--text2':'#00cc33','--text3':'#007722','--card-radius':'4px','--card-shadow':'0 0 8px rgba(0,255,65,0.15)' },
+  'midnight':       { '--bg':'#020818','--bg2':'#040e24','--surface':'#060e2a','--surface2':'#0a1435','--surface3':'#0e1a40','--border':'#122060','--border2':'#1a2c80','--text':'#d0e8ff','--text2':'#6090d0','--text3':'#304870','--card-radius':'18px','--card-shadow':'0 0 20px rgba(20,60,180,0.15)' },
+  'paper':          { '--bg':'#f5f0e8','--bg2':'#ede8de','--surface':'#fdfaf4','--surface2':'#f5f0e4','--surface3':'#ede8d8','--border':'#d8ccb0','--border2':'#c0a878','--text':'#2a2010','--text2':'#6a5830','--text3':'#a09060','--card-radius':'3px','--card-shadow':'2px 3px 8px rgba(0,0,0,0.12)' },
 };
+let colorfulStrength = 2; // 1=low, 2=medium, 3=high
 
 function setTheme(theme, el) {
   state.theme = theme;
@@ -3583,64 +3684,142 @@ function setTheme(theme, el) {
   _applyTheme(theme);
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
+  // Show colorful strength only for colorful themes
+  const ss = document.getElementById('colorful-strength-section');
+  if (ss) ss.style.display = theme.startsWith('colorful') ? '' : 'none';
   savePersist();
   playSound('click');
 }
 
 function _applyTheme(theme) {
   const root = document.documentElement;
-  // Get current accent color
   const accentStr = getComputedStyle(root).getPropertyValue('--blue2').trim() || '#4488ff';
-  const hex = accentStr.replace('#','');
+  const hex = (accentStr.replace('#','')).padEnd(6,'0');
   const r = parseInt(hex.slice(0,2),16)||68;
   const g = parseInt(hex.slice(2,4),16)||136;
   const b = parseInt(hex.slice(4,6),16)||255;
-
-  const base = theme.includes('light') ? THEME_VARS.light : THEME_VARS.dark;
-  Object.entries(base).forEach(([k,v]) => root.style.setProperty(k,v));
-
   const nb = document.getElementById('navbar');
   const rb = document.getElementById('ribbon');
   const body = document.body;
+  const s = colorfulStrength || 2; // 1=low,2=med,3=high
 
-  if (theme === 'dark') {
-    if (nb) nb.style.cssText = nb.style.cssText.replace(/background:[^;]+;?/,'') || '';
-    if (rb) rb.style.cssText = rb.style.cssText.replace(/background:[^;]+;?/,'') || '';
-    body.style.background = '';
-    nb && (nb.style.background = 'rgba(10,10,14,0.94)');
-    rb && (rb.style.background = 'rgba(10,10,14,0.92)');
-  } else if (theme === 'light') {
-    if (nb) nb.style.background = 'rgba(244,244,250,0.97)';
-    if (rb) rb.style.background = 'rgba(234,234,242,0.96)';
-    body.style.background = '#f4f4fa';
-  } else if (theme === 'colorful-dark') {
-    // Strong accent tint everywhere
-    root.style.setProperty('--bg', `rgb(${Math.max(0,Math.round(r*0.05))},${Math.max(0,Math.round(g*0.04))},${Math.max(0,Math.round(b*0.10))})`);
-    root.style.setProperty('--bg2', `rgb(${Math.max(0,Math.round(r*0.08))},${Math.max(0,Math.round(g*0.07))},${Math.max(0,Math.round(b*0.15))})`);
-    root.style.setProperty('--surface', `rgb(${Math.max(0,Math.round(r*0.12))},${Math.max(0,Math.round(g*0.10))},${Math.max(0,Math.round(b*0.22))})`);
-    root.style.setProperty('--surface2', `rgb(${Math.max(0,Math.round(r*0.16))},${Math.max(0,Math.round(g*0.14))},${Math.max(0,Math.round(b*0.28))})`);
-    root.style.setProperty('--surface3', `rgb(${Math.max(0,Math.round(r*0.20))},${Math.max(0,Math.round(g*0.18))},${Math.max(0,Math.round(b*0.34))})`);
-    root.style.setProperty('--border', `rgba(${r},${g},${b},0.30)`);
-    root.style.setProperty('--border2', `rgba(${r},${g},${b},0.55)`);
-    // STRONG colored navbar
-    if (nb) nb.style.background = `rgba(${Math.max(0,Math.round(r*0.12))},${Math.max(0,Math.round(g*0.10))},${Math.max(0,Math.round(b*0.30))},0.97)`;
-    if (rb) rb.style.background = `rgba(${Math.max(0,Math.round(r*0.10))},${Math.max(0,Math.round(g*0.08))},${Math.max(0,Math.round(b*0.26))},0.95)`;
-    body.style.background = `rgb(${Math.max(0,Math.round(r*0.05))},${Math.max(0,Math.round(g*0.04))},${Math.max(0,Math.round(b*0.10))})`;
-  } else if (theme === 'colorful-light') {
-    root.style.setProperty('--bg', `rgb(${Math.min(255,240+Math.round(r*0.06))},${Math.min(255,238+Math.round(g*0.04))},${Math.min(255,252+Math.round(b*0.01))})`);
-    root.style.setProperty('--surface', '#ffffff');
-    root.style.setProperty('--surface2', `rgba(${r},${g},${b},0.07)`);
-    root.style.setProperty('--surface3', `rgba(${r},${g},${b},0.13)`);
-    root.style.setProperty('--border', `rgba(${r},${g},${b},0.22)`);
-    root.style.setProperty('--border2', `rgba(${r},${g},${b},0.40)`);
-    root.style.setProperty('--text', '#16162a');
-    root.style.setProperty('--text2', '#505068');
-    root.style.setProperty('--text3', '#9090aa');
-    // STRONG colored navbar in light colorful
-    if (nb) nb.style.background = `rgba(${r},${g},${b},0.18)`;
-    if (rb) rb.style.background = `rgba(${r},${g},${b},0.12)`;
-    body.style.background = `rgb(${Math.min(255,240+Math.round(r*0.06))},${Math.min(255,238+Math.round(g*0.04))},${Math.min(255,252)})`;
+  // Apply CSS card vars
+  root.style.setProperty('--card-radius', '18px');
+  root.style.setProperty('--card-shadow', 'none');
+
+  if (theme === 'colorful-dark' || theme === 'colorful-light') {
+    const isLight = theme === 'colorful-light';
+    const base = THEME_VARS[isLight ? 'light' : 'dark'];
+    Object.entries(base).forEach(([k,v]) => root.style.setProperty(k,v));
+
+    // Strength multipliers
+    const bgMult   = [0.02, 0.05, 0.10][s-1];
+    const surfMult = [0.04, 0.12, 0.22][s-1];
+    const navAlpha = [0.06, 0.18, 0.35][s-1];
+    const ribAlpha = [0.04, 0.12, 0.28][s-1];
+    const brdAlpha = [0.12, 0.30, 0.55][s-1];
+
+    if (!isLight) {
+      root.style.setProperty('--bg', `rgb(${Math.max(0,Math.round(r*bgMult))},${Math.max(0,Math.round(g*bgMult*0.8))},${Math.max(0,Math.round(b*bgMult*2))})`);
+      root.style.setProperty('--bg2', `rgb(${Math.max(0,Math.round(r*bgMult*1.5))},${Math.max(0,Math.round(g*bgMult*1.2))},${Math.max(0,Math.round(b*bgMult*2.8))})`);
+      root.style.setProperty('--surface', `rgb(${Math.max(0,Math.round(r*surfMult))},${Math.max(0,Math.round(g*surfMult*0.9))},${Math.max(0,Math.round(b*surfMult*1.8))})`);
+      root.style.setProperty('--surface2', `rgb(${Math.max(0,Math.round(r*surfMult*1.3))},${Math.max(0,Math.round(g*surfMult*1.1))},${Math.max(0,Math.round(b*surfMult*2.2))})`);
+      root.style.setProperty('--border', `rgba(${r},${g},${b},${brdAlpha})`);
+      root.style.setProperty('--border2', `rgba(${r},${g},${b},${Math.min(0.8,brdAlpha*1.8)})`);
+      body.style.background = `rgb(${Math.max(0,Math.round(r*bgMult))},${Math.max(0,Math.round(g*bgMult*0.8))},${Math.max(0,Math.round(b*bgMult*2))})`;
+    } else {
+      root.style.setProperty('--bg', `rgb(${Math.min(255,245+Math.round(r*0.04))},${Math.min(255,242+Math.round(g*0.03))},${Math.min(255,255)})`);
+      root.style.setProperty('--surface', '#ffffff');
+      root.style.setProperty('--surface2', `rgba(${r},${g},${b},${[0.04,0.07,0.14][s-1]})`);
+      root.style.setProperty('--surface3', `rgba(${r},${g},${b},${[0.07,0.13,0.24][s-1]})`);
+      root.style.setProperty('--border', `rgba(${r},${g},${b},${[0.10,0.22,0.40][s-1]})`);
+      root.style.setProperty('--text', '#16162a'); root.style.setProperty('--text2','#505068'); root.style.setProperty('--text3','#9090aa');
+      body.style.background = `rgb(${Math.min(255,245+Math.round(r*0.04))},${Math.min(255,242)},255)`;
+    }
+    if (nb) nb.style.background = `rgba(${r},${g},${b},${navAlpha})`;
+    if (rb) rb.style.background = `rgba(${r},${g},${b},${ribAlpha})`;
+  } else if (THEME_VARS[theme]) {
+    const vars = THEME_VARS[theme];
+    Object.entries(vars).forEach(([k,v]) => root.style.setProperty(k,v));
+    // Theme-specific navbar/body
+    const nbMap = {
+      'dark':           ['rgba(10,10,14,0.94)',   'rgba(10,10,14,0.92)',    ''],
+      'light':          ['rgba(244,244,250,0.97)', 'rgba(234,234,242,0.96)', '#f4f4fa'],
+      'polished-dark':  ['rgba(13,13,20,0.96)',    'rgba(13,13,20,0.94)',    ''],
+      'polished-light': ['rgba(240,240,250,0.97)', 'rgba(232,232,248,0.96)', '#f0f0fa'],
+      'nature-dark':    ['rgba(8,14,8,0.96)',      'rgba(8,14,8,0.94)',      ''],
+      'nature-light':   ['rgba(250,246,240,0.97)', 'rgba(244,237,228,0.96)', '#faf6f0'],
+      'retro':          ['rgba(0,9,0,0.98)',        'rgba(0,9,0,0.96)',       '#000900'],
+      'midnight':       ['rgba(2,8,24,0.97)',       'rgba(2,8,24,0.95)',      '#020818'],
+      'paper':          ['rgba(245,240,232,0.97)', 'rgba(237,232,222,0.96)', '#f5f0e8'],
+    };
+    const [nbb, rbb, bodyb] = nbMap[theme] || ['rgba(10,10,14,0.94)','rgba(10,10,14,0.92)',''];
+    if (nb) nb.style.background = nbb;
+    if (rb) rb.style.background = rbb;
+    body.style.background = bodyb || '';
+    // Special: retro uses green text accent
+    if (theme === 'retro') {
+      root.style.setProperty('--blue', '#00aa22');
+      root.style.setProperty('--blue2', '#00ff41');
+      root.style.setProperty('--blue-dim', '#001400');
+    }
+    // Paper: add card texture
+    if (theme === 'paper') {
+      root.style.setProperty('--card-radius', '3px');
+      root.style.setProperty('--card-shadow', '2px 3px 8px rgba(0,0,0,0.12)');
+    }
+    // Polished: enhanced shadows
+    if (theme.startsWith('polished')) {
+      root.style.setProperty('--card-shadow', theme === 'polished-dark' ? '0 4px 24px rgba(0,0,0,0.4)' : '0 2px 16px rgba(80,80,180,0.08)');
+    }
+
+    // ── Per-theme fonts — set via CSS variable so ALL elements inherit ──
+    const fontMap = {
+      'dark':           "'Outfit','DM Sans',sans-serif",
+      'light':          "'Outfit','DM Sans',sans-serif",
+      'colorful-dark':  "'Outfit','DM Sans',sans-serif",
+      'colorful-light': "'Outfit','DM Sans',sans-serif",
+      'polished-dark':  "'DM Sans',system-ui,sans-serif",
+      'polished-light': "'DM Sans',system-ui,sans-serif",
+      'nature-dark':    "Palatino,'Palatino Linotype',Georgia,serif",
+      'nature-light':   "Palatino,'Palatino Linotype',Georgia,serif",
+      'retro':          "'Courier New','Lucida Console',monospace",
+      'midnight':       "'DM Sans','Outfit',sans-serif",
+      'paper':          "Georgia,'Times New Roman','Book Antiqua',serif",
+    };
+    const font = fontMap[theme] || fontMap['dark'];
+    // Set the CSS variable — everything that uses font-family:inherit or var(--app-font) picks this up
+    root.style.setProperty('--app-font', font);
+    body.style.fontFamily = 'var(--app-font)';
+
+    // Retro special: square corners everywhere
+    if (theme === 'retro') {
+      root.style.setProperty('--card-radius', '2px');
+      document.querySelectorAll('.btn,.tag,.form-input,.form-select,.form-textarea,.card,.modal').forEach(el => {
+        el.style.borderRadius = '2px';
+        el.style.fontFamily = 'var(--app-font)';
+      });
+    } else {
+      document.querySelectorAll('.btn').forEach(el => el.style.borderRadius = '');
+    }
+    // Paper: no border radius
+    if (theme === 'paper') {
+      document.querySelectorAll('.card').forEach(el => el.style.fontFamily = 'var(--app-font)');
+    }
   }
+  // Apply card radius/shadow to .card elements
+  document.querySelectorAll('.card,.modal').forEach(el => {
+    el.style.borderRadius = getComputedStyle(root).getPropertyValue('--card-radius').trim() || '18px';
+    const sh = getComputedStyle(root).getPropertyValue('--card-shadow').trim();
+    if (sh && sh !== 'none') el.style.boxShadow = sh;
+  });
+}
+
+function setColorfulStrength(v) {
+  colorfulStrength = v;
+  localStorage.setItem('dqtasks_colorful_strength', v);
+  if (state.theme.startsWith('colorful')) _applyTheme(state.theme);
+  savePersist();
 }
 
 function loadTheme() {
@@ -3651,6 +3830,8 @@ function loadTheme() {
     document.querySelectorAll('.theme-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === saved);
     });
+    const ss = document.getElementById('colorful-strength-section');
+    if (ss) ss.style.display = saved.startsWith('colorful') ? '' : 'none';
   }, 50);
 }
 
@@ -4405,6 +4586,523 @@ showPage = function(page) {
 setInterval(() => {
   if (state.currentPage === 'reminders') renderRemindersPage();
 }, 60000);
+
+
+// ═══════════════════════════════════════════════
+//  ADDITIONAL FEATURES — Batch 3
+// ═══════════════════════════════════════════════
+
+// ── Load colorful strength ──
+function _loadColorfulStrength() {
+  const s = localStorage.getItem('dqtasks_colorful_strength');
+  if (s) colorfulStrength = parseInt(s) || 2;
+  const sl = document.getElementById('colorful-strength');
+  if (sl) sl.value = colorfulStrength;
+}
+
+// ── HIGHLIGHT SYSTEM ──
+let _hlColor = '#ffe066';
+let _hlTextColor = '#1a1500';
+
+function setHighlightColor(bg, fg) {
+  _hlColor = bg;
+  _hlTextColor = fg;
+  document.getElementById('highlight-btn').style.color = bg;
+  document.getElementById('highlight-btn').style.textShadow = `0 0 4px ${bg}`;
+  toggleHighlightPicker();
+  applyHighlight();
+}
+
+function applyHighlight() {
+  const editor = document.getElementById('editor-content');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('hiliteColor', false, _hlColor);
+  document.execCommand('foreColor', false, _hlTextColor);
+  scheduleNoteSave();
+}
+
+function removeHighlight() {
+  const editor = document.getElementById('editor-content');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('hiliteColor', false, 'transparent');
+  document.execCommand('removeFormat', false, null);
+  scheduleNoteSave();
+}
+
+function toggleHighlightPicker(e) {
+  if (e) e.stopPropagation();
+  const p = document.getElementById('highlight-picker');
+  if (!p) return;
+  const shown = p.style.display === 'flex';
+  p.style.display = shown ? 'none' : 'flex';
+  if (!shown) {
+    setTimeout(() => {
+      document.addEventListener('click', function _close() {
+        p.style.display = 'none';
+        document.removeEventListener('click', _close);
+      });
+    }, 50);
+  }
+}
+
+// ── ZOOM in notebook ──
+let _editorFontSize = 0.9;
+function zoomEditor(dir) {
+  _editorFontSize = Math.min(1.6, Math.max(0.6, _editorFontSize + dir * 0.1));
+  const ed = document.getElementById('editor-content');
+  if (ed) ed.style.fontSize = _editorFontSize + 'rem';
+  playSound('click');
+}
+
+// ── PREVENT typing before note exists ──
+const _origOnEditorKeyUp = onEditorKeyUp;
+onEditorKeyUp = function() {
+  const editor = document.getElementById('editor-content');
+  if (!state.activeNote) {
+    // No note selected — clear any typed content and block
+    if (editor && editor.textContent.trim()) {
+      editor.innerHTML = '';
+      editor.blur();
+      if (typeof DQAuth !== 'undefined') DQAuth.toast('Create or select a note first!');
+    }
+    return;
+  }
+  _origOnEditorKeyUp();
+};
+
+// ── TOOL SUGGESTIONS in chip search ──
+const TOOL_SUGGESTIONS = [
+  { keywords: ['geometry','geo','triangle','circle','polygon','area','perimeter','pythagorean'], tool: 'GeoCalc', url: 'geocalc.html', icon: '📐', desc: 'Geometry calculator' },
+  { keywords: ['algebra','equation','factor','quadratic','linear','variable','solve'], tool: 'AlgCalc', url: 'algicalc.html', icon: '🔢', desc: 'Algebra calculator' },
+  { keywords: ['math','calculus','trig','statistics','calc'], tool: 'MathCalc', url: 'mathcalc.html', icon: '🧮', desc: 'Math calculator hub' },
+  { keywords: ['element','periodic','atom','compound','molecule','chemistry','bohr'], tool: 'DQtable', url: 'dqtable.html', icon: '⚗️', desc: 'Interactive periodic table' },
+  { keywords: ['gpa','grade','credit','honor','cumulative','weighted'], tool: 'GPA Review', url: 'gpareview.html', icon: '🎓', desc: 'GPA calculator' },
+  { keywords: ['course','schedule','plan','credit','graduation','prerequisite'], tool: 'Course Planner', url: 'courseplanner.html', icon: '📅', desc: '4-year course planner' },
+];
+
+function getToolSuggestion(q) {
+  if (!q || q.length < 3) return null;
+  const lower = q.toLowerCase();
+  for (const ts of TOOL_SUGGESTIONS) {
+    if (ts.keywords.some(kw => lower.includes(kw))) return ts;
+  }
+  return null;
+}
+
+// Patch filterChipSearch to add tool suggestion
+const _prevFilterChipSearch = filterChipSearch;
+filterChipSearch = function(q) {
+  _prevFilterChipSearch(q);
+  // Append tool suggestion if relevant
+  const el = document.getElementById('chip-search-results');
+  if (!el || !q) return;
+  const suggestion = getToolSuggestion(q);
+  if (suggestion) {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-top:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;gap:10px;';
+    div.innerHTML = `
+      <div style="font-size:1.2rem;">${suggestion.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:0.78rem;font-weight:700;">Try ${suggestion.tool}?</div>
+        <div style="font-size:0.65rem;color:var(--text2);">${suggestion.desc} — might help with this!</div>
+      </div>
+      <a href="${suggestion.url}" style="font-size:0.68rem;color:var(--blue2);font-weight:700;text-decoration:none;padding:4px 8px;border:1px solid var(--blue2);border-radius:6px;">Open →</a>
+    `;
+    el.appendChild(div);
+  }
+};
+
+// Also detect tool suggestions in notebook as you type
+const _prevDetectChipPatterns = detectChipPatterns;
+detectChipPatterns = function() {
+  _prevDetectChipPatterns();
+  const editor = document.getElementById('editor-content');
+  if (!editor) return;
+  const lastLine = (editor.innerText.split('\n').filter(l => l.trim()).pop() || '').toLowerCase();
+  const ts = getToolSuggestion(lastLine);
+  if (ts && !document.getElementById('chip-suggestion').classList.contains('visible')) {
+    const sug = document.getElementById('chip-suggestion');
+    document.getElementById('chip-sug-title').textContent = `${ts.icon} Try ${ts.tool}?`;
+    document.getElementById('chip-sug-text').textContent = ts.desc + ' — might help!';
+    const rect = document.getElementById('editor-area').getBoundingClientRect();
+    sug.style.top = (rect.top + 60) + 'px';
+    sug.style.left = (rect.left + 48) + 'px';
+    // Override accept to go to tool instead of chip
+    sug._toolUrl = ts.url;
+    sug.classList.add('visible');
+    const btn = sug.querySelector('button');
+    if (btn) btn.onclick = function() {
+      window.open(ts.url, '_blank');
+      dismissChipSuggestion();
+    };
+  }
+};
+
+// ── SMART CHIP: auto-fill date/time ──
+const _prevInsertChip = insertChip;
+insertChip = function(id, type) {
+  closeModal('chip-modal');
+  let item;
+  if (type === 'assignment') item = state.assignments.find(a => a.id === id);
+  else if (type === 'event') item = state.events.find(e => e.id === id);
+  else if (type === 'task') item = state.tasks.find(t => t.id === id);
+  else if (type === 'countdown') item = (state.countdowns||[]).find(c => c.id === id);
+  if (!item) return;
+
+  const chip = document.createElement('span');
+  chip.className = `smart-chip chip-${type}`;
+  chip.setAttribute('data-id', id);
+  chip.setAttribute('data-type', type);
+  chip.setAttribute('contenteditable', 'false');
+
+  // Build chip label with date auto-fill
+  let label = item.title || item.text || 'Item';
+  let dateInfo = '';
+  if (item.due) dateInfo = ' · ' + fmtDate(item.due) + (item.time ? ' ' + fmt12(item.time) : '');
+  else if (item.startDate) dateInfo = ' · ' + fmtDate(item.startDate) + (item.startTime ? ' ' + fmt12(item.startTime) : '');
+  else if (item.date) {
+    const diff = Math.ceil((new Date(item.date+'T12:00') - new Date()) / 86400000);
+    dateInfo = ' · ' + fmtDate(item.date) + (diff >= 0 ? ` (${diff}d)` : ' (past)');
+  }
+
+  const icons = { assignment:'📚', event:'📅', task:'✅', countdown:'⏳' };
+  chip.textContent = `${icons[type]||'🔗'} ${label}${dateInfo}`;
+  chip.onclick = (e) => { e.stopPropagation(); if (type !== 'countdown') showDetail(type, id); };
+
+  const editor = document.getElementById('editor-content');
+  editor.focus();
+  if (lastSelection) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(lastSelection);
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(chip);
+    const afterRange = document.createRange();
+    afterRange.setStartAfter(chip);
+    afterRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(afterRange);
+    lastSelection = null;
+  } else {
+    editor.appendChild(chip);
+  }
+  const space = document.createTextNode('\u00A0');
+  chip.after(space);
+  scheduleNoteSave();
+  playSound('add');
+};
+
+// ── COUNTDOWN as smart chip ──
+// Patch filterChipSearch to include countdowns
+const _prevFCS2 = filterChipSearch;
+filterChipSearch = function(q) {
+  const el = document.getElementById('chip-search-results');
+  if (!el) return;
+  const items = [
+    ...state.assignments.map(a => ({...a,_t:'assignment',_i:'📚'})),
+    ...state.events.map(e => ({...e,_t:'event',_i:'📅'})),
+    ...state.tasks.map(t => ({...t,_t:'task',_i:'✅'})),
+    ...(state.countdowns||[]).map(c => ({...c, title: c.text, _t:'countdown', _i: c.emoji||'⏳'})),
+  ].filter(i => !q || (i.title||'').toLowerCase().includes(q.toLowerCase()));
+
+  let html = items.length
+    ? items.slice(0,8).map(i => `
+        <div class="search-result-item" onclick="insertChip('${i.id}','${i._t}');playSound('click')">
+          <div class="search-result-icon">${i._i}</div>
+          <div class="search-result-text">
+            <div class="search-result-title">${i.title||i.text}</div>
+            <div class="search-result-sub">${i._t}${i.due?' · Due '+fmtDate(i.due):i.startDate?' · '+fmtDate(i.startDate):i.date?' · '+fmtDate(i.date):''}</div>
+          </div>
+          <span style="font-size:0.65rem;color:var(--blue2);font-weight:700;flex-shrink:0;">Insert →</span>
+        </div>`).join('')
+    : `<div style="color:var(--text3);font-size:0.78rem;padding:8px 10px;">${q?`No matches for "${q}"` : 'Start typing to search…'}</div>`;
+
+  html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+    <div class="eyebrow" style="margin-bottom:6px;">Create & Insert New</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm" onclick="chipCreateNew('assignment')">📚 Assignment</button>
+      <button class="btn btn-ghost btn-sm" onclick="chipCreateNew('event')">📅 Event</button>
+      <button class="btn btn-ghost btn-sm" onclick="chipCreateNew('task')">✅ Task</button>
+      <button class="btn btn-ghost btn-sm" onclick="openAddCountdownModal();closeModal('chip-modal')">⏳ Countdown</button>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+
+  // Add tool suggestion
+  const ts = getToolSuggestion(q || '');
+  if (ts) {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-top:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;gap:10px;';
+    div.innerHTML = `<div style="font-size:1.1rem;">${ts.icon}</div><div style="flex:1;"><div style="font-size:0.75rem;font-weight:700;">Try ${ts.tool}?</div><div style="font-size:0.62rem;color:var(--text2);">${ts.desc}</div></div><a href="${ts.url}" style="font-size:0.65rem;color:var(--blue2);font-weight:700;text-decoration:none;padding:3px 7px;border:1px solid var(--blue2);border-radius:5px;">Open →</a>`;
+    el.appendChild(div);
+  }
+};
+
+// ── CLASS ICONS (emoji picker) ──
+let _classIconForNew = '📚';
+
+function openAddClassModal() {
+  document.getElementById('add-class-search').value = '';
+  document.getElementById('course-suggestions').innerHTML = '';
+  classColor = '#4488ff';
+  _classIconForNew = '📚';
+  document.querySelectorAll('#class-color-opts .color-opt').forEach(o => o.classList.remove('active'));
+  document.querySelector('#class-color-opts .color-opt[data-color="#4488ff"]')?.classList.add('active');
+  // Add icon row if not present
+  let iconRow = document.getElementById('class-icon-row');
+  if (!iconRow) {
+    const modal = document.getElementById('add-class-modal').querySelector('.modal');
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'form-group';
+    iconDiv.id = 'class-icon-row';
+    iconDiv.innerHTML = `<label class="form-label">Class Icon</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${['📚','🔬','🧮','🎨','🏃','🎵','💻','🌍','✍️','🧪','📐','🗺️','⚗️','📖','🎭','💡'].map(e =>
+          `<div onclick="setClassIcon('${e}',this)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all 0.12s;" title="${e}">${e}</div>`
+        ).join('')}
+      </div>`;
+    const colorGroup = modal.querySelector('#class-color-opts').closest('.form-group');
+    modal.insertBefore(iconDiv, colorGroup);
+  }
+  // Reset icon selection
+  document.querySelectorAll('#class-icon-row div[onclick]').forEach(d => d.style.borderColor = 'transparent');
+  const first = document.querySelector('#class-icon-row div[onclick]');
+  if (first) first.style.borderColor = 'var(--blue2)';
+  openModal('add-class-modal');
+}
+
+function setClassIcon(icon, el) {
+  _classIconForNew = icon;
+  document.querySelectorAll('#class-icon-row div[onclick]').forEach(d => d.style.borderColor = 'transparent');
+  if (el) el.style.borderColor = 'var(--blue2)';
+}
+
+// Patch addClassConfirm to save icon
+const _origAddClassConfirm = addClassConfirm;
+addClassConfirm = function() {
+  // We'll intercept by patching after
+  const name = document.getElementById('add-class-search').value.trim();
+  if (!name) { alert('Enter a class name.'); return; }
+  if (state.classes.find(c => c.name === name)) { alert('Class already added!'); return; }
+  state.classes.push({ id: uid(), name, color: classColor, icon: _classIconForNew, workspace: 'school' });
+  save(); closeModal('add-class-modal');
+  renderSchool(); updateClassSelect();
+};
+
+// Update renderClassList to show icons
+const _origRenderClassList = renderClassList;
+renderClassList = function() {
+  const el = document.getElementById('school-class-list');
+  const classes = state.classes.filter(c => c.workspace === 'school' || !c.workspace);
+  el.innerHTML = classes.map(cls => {
+    const assigns = state.assignments.filter(a => a.classId === cls.id && !a.completed);
+    const missing = assigns.filter(a => a.due && isOverdue(a.due));
+    const week = assigns.filter(a => a.due && isDueThisWeek(a.due));
+    return `<div class="class-card ${state.activeClass === cls.id ? 'active' : ''}" onclick="selectClass('${cls.id}')">
+      <div class="class-color-bar" style="background:${cls.color};"></div>
+      <div style="font-size:1.1rem;flex-shrink:0;">${cls.icon || '📚'}</div>
+      <div class="class-info">
+        <div class="class-name">${cls.name}</div>
+        <div class="class-stats">${assigns.length} active${missing.length ? ` · <span style="color:var(--red2)">${missing.length} missing</span>` : ''}${week.length ? ` · ${week.length} this week` : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// Update updateClassSelect to show icons
+const _origUpdateClassSelect = updateClassSelect;
+updateClassSelect = function() {
+  const sel = document.getElementById('create-class');
+  const classes = state.classes.filter(c => c.workspace === 'school' || !c.workspace);
+  sel.innerHTML = '<option value="">Select a class…</option>' + classes.map(c => `<option value="${c.id}">${c.icon||'📚'} ${c.name}</option>`).join('');
+  if (state.activeClass) sel.value = state.activeClass;
+};
+
+// ── EXPANDED NOTIFICATION MODAL ──
+function toggleNotifExpand() {
+  const el = document.getElementById('notif-modal-list');
+  if (!el) return;
+  el.innerHTML = state.notifications.map(n => `
+    <div style="padding:10px 12px;border-radius:8px;margin-bottom:6px;background:var(--surface2);border:1px solid var(--border);">
+      <div style="font-size:0.82rem;">${n.text}</div>
+      <div style="font-size:0.62rem;color:var(--text3);margin-top:4px;">${timeAgo(n.time)}</div>
+    </div>
+  `).join('') || '<div style="color:var(--text3);font-size:0.78rem;padding:12px;">No notifications.</div>';
+  openModal('notif-modal');
+  document.getElementById('notif-panel').classList.remove('open');
+}
+
+// ── EXPANDED NOTIFICATION renderNotifList patch ──
+const _origRenderNotifList = renderNotifList;
+renderNotifList = function() {
+  const el = document.getElementById('notif-list');
+  el.innerHTML = state.notifications.slice(0,5).map(n => `
+    <div class="notif-item">
+      ${n.text}
+      <div class="notif-time">${timeAgo(n.time)}</div>
+    </div>
+  `).join('') || '<div style="color:var(--text3);font-size:0.78rem;padding:8px;">No notifications.</div>';
+  if (state.notifications.length > 5) {
+    el.innerHTML += `<div style="text-align:center;padding:6px 0;"><button class="btn btn-ghost btn-sm" onclick="toggleNotifExpand()">See all ${state.notifications.length} →</button></div>`;
+  }
+};
+
+// ── SOUND PACK SYSTEM ──
+let soundPack = 'default';
+let soundVolume = 0.6;
+const SOUND_TOGGLES = { complete:true, click:true, add:true, delete:true, open:true, save:false, navigate:false, reminder:true, typewriter:true };
+
+function setSoundPack(pack, el) {
+  soundPack = pack;
+  localStorage.setItem('dqtasks_sound_pack', pack);
+  document.querySelectorAll('.sound-pack-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  playSound('click');
+  savePersist();
+}
+
+function setSoundVolume(v) {
+  soundVolume = v / 100;
+  localStorage.setItem('dqtasks_sound_vol', v);
+}
+
+function loadSoundSettings() {
+  const pack = localStorage.getItem('dqtasks_sound_pack');
+  if (pack) { soundPack = pack; const btn = document.querySelector(`.sound-pack-btn[data-pack="${pack}"]`); if (btn) { document.querySelectorAll('.sound-pack-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); } }
+  const vol = localStorage.getItem('dqtasks_sound_vol');
+  if (vol) { soundVolume = parseInt(vol)/100; const sl = document.getElementById('sound-volume'); if(sl) sl.value = vol; }
+  renderSoundToggles();
+}
+
+function renderSoundToggles() {
+  const el = document.getElementById('sound-toggles');
+  if (!el) return;
+  const labels = { complete:'Complete ✓', click:'Click', add:'Add item', delete:'Delete', open:'Open modal', save:'Save', navigate:'Navigate', reminder:'Reminder', typewriter:'Typewriter' };
+  el.innerHTML = Object.entries(SOUND_TOGGLES).map(([k,v]) => `
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.68rem;">
+      <input type="checkbox" ${v?'checked':''} onchange="toggleSoundEffect('${k}',this.checked)" style="accent-color:var(--blue);">
+      ${labels[k]||k}
+    </label>
+  `).join('');
+}
+
+function toggleSoundEffect(key, val) {
+  SOUND_TOGGLES[key] = val;
+  localStorage.setItem('dqtasks_sound_toggles', JSON.stringify(SOUND_TOGGLES));
+}
+
+function previewAllSounds() {
+  const sounds = Object.keys(SOUND_TOGGLES).filter(k => SOUND_TOGGLES[k]);
+  sounds.forEach((s, i) => setTimeout(() => playSound(s), i * 600));
+}
+
+// Patch playSound to use pack + volume + toggles
+const _origPlaySound = playSound;
+playSound = function(type) {
+  if (!state.soundEnabled) return;
+  if (SOUND_TOGGLES[type] === false) return;
+  if (soundPack === 'retro') { _playRetroSound(type); return; }
+  if (soundPack === 'nature') { _playNatureSound(type); return; }
+  _origPlaySound(type);
+};
+
+function _scaleGain(g, ctx, vol) {
+  const master = (soundVolume !== undefined ? soundVolume : 0.6);
+  const scaled = (vol||0.1) * master;
+  g.gain.setValueAtTime(scaled, ctx.currentTime);
+  return scaled;
+}
+
+function _playRetroSound(type) {
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    const vol = soundVolume * 0.12;
+    o.type = 'square';
+    if (type === 'complete') {
+      o.frequency.setValueAtTime(220, t); o.frequency.setValueAtTime(440, t+0.1); o.frequency.setValueAtTime(880, t+0.2);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.35);
+      o.start(t); o.stop(t+0.35);
+    } else if (type === 'click') {
+      o.frequency.setValueAtTime(600, t);
+      g.gain.setValueAtTime(vol*0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.04);
+      o.start(t); o.stop(t+0.04);
+    } else if (type === 'add') {
+      o.frequency.setValueAtTime(400, t); o.frequency.setValueAtTime(500, t+0.06);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.15);
+      o.start(t); o.stop(t+0.15);
+    } else if (type === 'delete') {
+      o.frequency.setValueAtTime(400, t); o.frequency.setValueAtTime(200, t+0.1);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.15);
+      o.start(t); o.stop(t+0.15);
+    } else {
+      o.frequency.setValueAtTime(440, t);
+      g.gain.setValueAtTime(vol*0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.06);
+      o.start(t); o.stop(t+0.06);
+    }
+  } catch(e) {}
+}
+
+function _playNatureSound(type) {
+  // Soft nature-inspired tones
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    const vol = soundVolume * 0.12;
+    o.type = 'sine';
+    if (type === 'complete') {
+      // Bird-like ascending
+      o.frequency.setValueAtTime(600, t); o.frequency.setValueAtTime(900, t+0.15); o.frequency.setValueAtTime(1200, t+0.3);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.5);
+      o.start(t); o.stop(t+0.5);
+    } else if (type === 'click') {
+      o.frequency.setValueAtTime(1000, t); o.frequency.exponentialRampToValueAtTime(700, t+0.08);
+      g.gain.setValueAtTime(vol*0.6, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.1);
+      o.start(t); o.stop(t+0.1);
+    } else if (type === 'delete') {
+      o.frequency.setValueAtTime(400, t); o.frequency.exponentialRampToValueAtTime(200, t+0.2);
+      g.gain.setValueAtTime(vol*0.8, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.25);
+      o.start(t); o.stop(t+0.25);
+    } else {
+      o.frequency.setValueAtTime(800, t);
+      g.gain.setValueAtTime(vol*0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.12);
+      o.start(t); o.stop(t+0.12);
+    }
+  } catch(e) {}
+}
+
+// ── SAVE: don't play save sound every auto-save ──
+// Only play on explicit user actions, not background auto-saves
+const _origSaveOld = save;
+let _saveCount = 0;
+save = function() {
+  showSaveIndicator('saving');
+  _origSaveOld();
+  setTimeout(() => {
+    showSaveIndicator('saved');
+    _saveCount++;
+    // Only play sound every 5th save or on first save
+    if (_saveCount === 1 || _saveCount % 5 === 0) {
+      // Don't play — too noisy. Let explicit actions trigger sounds.
+    }
+  }, 300);
+};
+
+// ── INIT EXTRAS ──
+function initExtras() {
+  _loadColorfulStrength();
+  loadSoundSettings();
+  renderSoundToggles();
+}
+setTimeout(initExtras, 200);
 
 </script>
 
