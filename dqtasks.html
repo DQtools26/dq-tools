@@ -4111,8 +4111,15 @@ save = function() {
 //  PERSIST: save theme/sound/accent to DQ Account
 // ─────────────────────────────────────────────────
 function savePersist() {
-  // These are preferences — save separately so they don't bloat tool data
-  const prefs = { theme: state.theme, soundEnabled: state.soundEnabled, accentHue: state.accentHue };
+  const prefs = {
+    theme:            state.theme,
+    soundEnabled:     state.soundEnabled,
+    accentHue:        state.accentHue,
+    soundPack:        soundPack,
+    soundVolume:      Math.round((soundVolume||0.6)*100),
+    soundToggles:     {...SOUND_TOGGLES},
+    colorfulStrength: colorfulStrength||2,
+  };
   localStorage.setItem('dqtasks_prefs', JSON.stringify(prefs));
   if (typeof DQAuth !== 'undefined' && DQAuth.getUser()) {
     DQAuth.saveData('dqtasks_prefs', prefs);
@@ -4130,10 +4137,34 @@ async function loadPersist() {
   }
   if (prefs) {
     if (prefs.theme) { state.theme = prefs.theme; loadTheme(); }
-    if (prefs.soundEnabled !== undefined) { state.soundEnabled = prefs.soundEnabled; const cb = document.getElementById('sound-toggle'); if(cb) cb.checked = prefs.soundEnabled; }
+    if (prefs.soundEnabled !== undefined) {
+      state.soundEnabled = prefs.soundEnabled;
+      const cb = document.getElementById('sound-toggle');
+      if (cb) cb.checked = prefs.soundEnabled;
+    }
     if (prefs.accentHue) {
       const swatch = document.querySelector(`.accent-swatch[data-hue="${prefs.accentHue}"]`);
       if (swatch) swatch.click();
+    }
+    if (prefs.soundPack) {
+      soundPack = prefs.soundPack;
+      const btn = document.querySelector(`.sound-pack-btn[data-pack="${prefs.soundPack}"]`);
+      if (btn) { document.querySelectorAll('.sound-pack-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+    }
+    if (prefs.soundVolume !== undefined) {
+      soundVolume = prefs.soundVolume / 100;
+      const sl = document.getElementById('sound-volume');
+      if (sl) sl.value = prefs.soundVolume;
+    }
+    if (prefs.soundToggles) {
+      Object.assign(SOUND_TOGGLES, prefs.soundToggles);
+      renderSoundToggles();
+    }
+    if (prefs.colorfulStrength) {
+      colorfulStrength = prefs.colorfulStrength;
+      const sl = document.getElementById('colorful-strength');
+      if (sl) sl.value = colorfulStrength;
+      if (state.theme && state.theme.startsWith('colorful')) _applyTheme(state.theme);
     }
   }
 }
@@ -5368,6 +5399,7 @@ function setSoundPack(pack, el) {
 function setSoundVolume(v) {
   soundVolume = v / 100;
   localStorage.setItem('dqtasks_sound_vol', v);
+  savePersist();
 }
 
 function loadSoundSettings() {
@@ -5393,6 +5425,7 @@ function renderSoundToggles() {
 function toggleSoundEffect(key, val) {
   SOUND_TOGGLES[key] = val;
   localStorage.setItem('dqtasks_sound_toggles', JSON.stringify(SOUND_TOGGLES));
+  savePersist();
 }
 
 function previewAllSounds() {
