@@ -212,6 +212,7 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
   position:sticky;top:97px;
   height:calc(100vh - 97px);
   overflow-y:auto;
+  z-index:1;
 }
 
 /* ── Cards ── */
@@ -436,12 +437,13 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
 #cal-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 #cal-grid{
   display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+  grid-auto-rows:90px;
 }
 .cal-day-name{font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);text-align:center;padding:4px;}
 .cal-day{
-  min-height:80px;background:var(--surface2);border:1px solid var(--border);
+  height:90px;background:var(--surface2);border:1px solid var(--border);
   border-radius:8px;padding:6px;cursor:pointer;transition:all 0.12s;
-  position:relative;
+  position:relative;overflow:hidden;
 }
 .cal-day:hover{border-color:var(--border2);background:var(--surface3);}
 .cal-day.today{border-color:var(--blue2);background:var(--blue-dim);}
@@ -449,8 +451,9 @@ body{font-family:'Outfit','DM Sans',sans-serif;background:var(--bg);color:var(--
 .cal-day-num{font-size:0.72rem;font-weight:700;margin-bottom:4px;}
 .cal-today .cal-day-num{color:var(--blue2);}
 .cal-event{
-  font-size:0.6rem;font-weight:700;padding:2px 5px;border-radius:4px;
-  margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:0.58rem;font-weight:700;padding:1px 4px;border-radius:3px;
+  margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.3;
 }
 
 /* ── Mini Calendar ── */
@@ -842,6 +845,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   <div class="ribbon-tab" data-page="calendar" onclick="showPage('calendar')">📅 Calendar</div>
   <div class="ribbon-tab" data-page="completed" onclick="showPage('completed')">✔️ Completed</div>
   <div class="ribbon-tab" data-page="missing" onclick="showPage('missing')">⚠️ Missing</div>
+  <div class="ribbon-tab" data-page="reminders" onclick="showPage('reminders')">🔔 Reminders</div>
 </div>
 
 <!-- Search Results Dropdown -->
@@ -874,6 +878,10 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
       <div class="sidebar-label">Tools</div>
       <div class="sidebar-item" onclick="showPage('notebook')"><span class="item-icon">📓</span> Smart Notebook</div>
       <div class="sidebar-item" onclick="showPage('calendar')"><span class="item-icon">📅</span> Calendar</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">More</div>
+      <div class="sidebar-item" onclick="showPage('reminders')"><span class="item-icon">🔔</span> Reminders</div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
@@ -1210,6 +1218,49 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
         </div>
       </div>
       <div id="cal-grid"></div>
+    </div>
+
+
+    <!-- REMINDERS & COUNTDOWNS PAGE -->
+    <div id="page-reminders" class="page-content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Reminders & Countdowns</div>
+          <div class="page-title">🔔 Reminders</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openAddReminderModal()">+ Reminder</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddCountdownModal()">+ Countdown</button>
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">🔔 Reminders</div>
+          <span class="section-count" id="reminders-count">0</span>
+        </div>
+        <div id="reminders-list"></div>
+        <div class="empty-state" id="reminders-empty">
+          <div class="empty-icon">🔔</div>
+          <p>No reminders yet. Add one to get notified at a specific time.</p>
+          <button class="btn btn-ghost btn-sm" onclick="openAddReminderModal()">+ Add Reminder</button>
+        </div>
+      </div>
+
+      <!-- Countdowns -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">⏳ Countdowns</div>
+          <span class="section-count" id="countdowns-count">0</span>
+        </div>
+        <div id="countdowns-list"></div>
+        <div class="empty-state" id="countdowns-empty">
+          <div class="empty-icon">⏳</div>
+          <p>No countdowns yet. Add a date to count down to!</p>
+          <button class="btn btn-ghost btn-sm" onclick="openAddCountdownModal()">+ Add Countdown</button>
+        </div>
+      </div>
     </div>
 
     <!-- COMPLETED PAGE -->
@@ -1592,6 +1643,57 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   </div>
 </div>
 
+
+
+<!-- Add Reminder Modal -->
+<div class="modal-overlay" id="add-reminder-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-reminder-modal')">✕</button>
+    <div class="modal-title">🔔 Add Reminder</div>
+    <div class="form-group">
+      <label class="form-label">Reminder Text</label>
+      <input type="text" class="form-input" id="rem-text" placeholder="e.g. Call dentist" onkeydown="if(event.key==='Enter')saveReminder()">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="rem-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <input type="time" class="form-input" id="rem-time">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="saveReminder()">Add</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-reminder-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Countdown Modal -->
+<div class="modal-overlay" id="add-countdown-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-countdown-modal')">✕</button>
+    <div class="modal-title">⏳ Add Countdown</div>
+    <div class="form-group">
+      <label class="form-label">What are you counting down to?</label>
+      <input type="text" class="form-input" id="cd-text" placeholder="e.g. Christmas, Summer Break…" onkeydown="if(event.key==='Enter')saveCountdown()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Date</label>
+      <input type="date" class="form-input" id="cd-date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji (optional)</label>
+      <input type="text" class="form-input" id="cd-emoji" placeholder="🎄" maxlength="2" style="width:70px;">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="saveCountdown()">Add</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-countdown-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- Add Habit Modal -->
 <div class="modal-overlay" id="add-habit-modal">
@@ -2150,13 +2252,22 @@ function renderCalendar(){
       const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const isToday=dateStr===todayStr;
       const eventsOnDay=getEventsOnDay(dateStr);
-      const assignsOnDay=state.assignments.filter(a=>a.due===dateStr&&!a.completed);
-      const overCount=Math.max(0,(assignsOnDay.length+eventsOnDay.length)-3);
+      const assignsOnDay=(state.calFilter==='all'||state.calFilter==='school')?state.assignments.filter(a=>a.due===dateStr&&!a.completed):[];
+      const tasksOnDay=getTasksOnDay(dateStr);
+      const allOnDay=[...assignsOnDay,...eventsOnDay,...tasksOnDay];
+      const shown=allOnDay.slice(0,3);
+      const overCount=Math.max(0,allOnDay.length-3);
       html+=`<div class="cal-day ${isToday?'today':''}" onclick="openDayDetail('${dateStr}')">
         <div class="cal-day-num" style="${isToday?'color:var(--blue2);font-weight:900;':''}">${day}</div>
-        ${assignsOnDay.slice(0,2).map(a=>`<div class="cal-event" style="background:${a.color||'#4488ff'}22;color:${a.color||'#4488ff'};" onclick="event.stopPropagation();showDetail('assignment','${a.id}')">${a.title}${a.time?' '+fmt12(a.time):''}</div>`).join('')}
-        ${eventsOnDay.slice(0,1).map(e=>`<div class="cal-event" style="background:${e.color||'#9966ff'}22;color:${e.color||'#9966ff'};" onclick="event.stopPropagation();showDetail('event','${e.id}')">${e.title}${e.startTime?' '+fmt12(e.startTime):''}</div>`).join('')}
-        ${overCount>0?`<div style="font-size:0.55rem;color:var(--text3);">+${overCount} more</div>`:''}
+        ${shown.map(item=>{
+          const isAss=item.hasOwnProperty('classId');
+          const isTask=item.hasOwnProperty('completed')&&!item.hasOwnProperty('classId')&&!item.hasOwnProperty('startDate');
+          const color=item.color||(isAss?'#4488ff':isTask?'#3db870':'#9966ff');
+          const lbl=item.title+(item.time?' '+fmt12(item.time):item.startTime?' '+fmt12(item.startTime):'');
+          const type=isAss?'assignment':isTask?'task':'event';
+          return `<div class="cal-event" style="background:${color}22;color:${color};" onclick="event.stopPropagation();showDetail('${type}','${item.id}')">${lbl}</div>`;
+        }).join('')}
+        ${overCount>0?`<div style="font-size:0.52rem;color:var(--text3);font-weight:700;">+${overCount} more</div>`:''}
       </div>`;
     }
     const remaining=(7-(firstDay+daysInMonth)%7)%7;
@@ -2206,10 +2317,17 @@ function renderCalendar(){
 function getEventsOnDay(dateStr){
   return state.events.filter(e=>{
     if(!e.startDate) return false;
-    if(state.calFilter!=='all'&&e.category!==state.calFilter) return false;
+    // Only filter by category when a specific category filter is active
+    if(state.calFilter!=='all'&&state.calFilter!=='tasks'&&e.category!==state.calFilter) return false;
+    if(state.calFilter==='tasks') return false; // tasks filter hides events
     if(!e.endDate) return e.startDate===dateStr;
     return dateStr>=e.startDate&&dateStr<=e.endDate;
   });
+}
+
+function getTasksOnDay(dateStr){
+  if(state.calFilter!=='all'&&state.calFilter!=='tasks') return [];
+  return state.tasks.filter(t=>t.due===dateStr&&!t.completed);
 }
 
 function calNav(dir){
@@ -4058,6 +4176,235 @@ function initEnhancements() {
   window.addEventListener('resize', initMobileMenu);
 }
 setTimeout(initEnhancements, 120);
+
+
+// ═══════════════════════════════════════════════════
+//  EXTRA FIXES & FEATURES
+// ═══════════════════════════════════════════════════
+
+// ── State for new features ──
+if (!state.reminders)   state.reminders  = [];  // {id,text,date,time,fired}
+if (!state.countdowns)  state.countdowns = [];  // {id,text,date,emoji}
+
+// ── TYPEWRITER SOUND for notebook ──
+let _typeTimer;
+document.addEventListener('keydown', function(e) {
+  const editor = document.getElementById('editor-content');
+  if (!editor || !document.activeElement || document.activeElement !== editor) return;
+  if (!state.soundEnabled) return;
+  // Only for printable keys, not navigation
+  if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+    clearTimeout(_typeTimer);
+    _typeTimer = setTimeout(() => {
+      try {
+        const ctx = _getAC(); if (!ctx) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        const t = ctx.currentTime;
+        // Soft mechanical click - slightly randomized pitch
+        o.type = 'square';
+        const pitch = 180 + Math.random() * 60;
+        o.frequency.setValueAtTime(pitch, t);
+        o.frequency.exponentialRampToValueAtTime(pitch * 0.5, t + 0.03);
+        g.gain.setValueAtTime(0.025, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        o.start(t); o.stop(t + 0.04);
+      } catch(e) {}
+    }, 0);
+  }
+});
+
+// ── TICK sound for UI clicks without existing sounds ──
+document.addEventListener('click', function(e) {
+  if (!state.soundEnabled) return;
+  const target = e.target;
+  // Only tick on interactive elements that don't already play sounds
+  const isBtn = target.matches('.ribbon-tab, .sidebar-item, .qd-btn, .filter-pill, .view-btn, .mini-cal-d, .form-chip, .tag');
+  if (!isBtn) return;
+  try {
+    const ctx = _getAC(); if (!ctx) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    o.type = 'sine';
+    o.frequency.setValueAtTime(700, t);
+    g.gain.setValueAtTime(0.03, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    o.start(t); o.stop(t + 0.05);
+  } catch(e) {}
+});
+
+// ── MISSING: auto-bump priority ──
+// When renderMissing is called, increase importance of missing items by 1 (max 3)
+const _origRenderMissing = renderMissing;
+renderMissing = function() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  state.assignments.forEach(a => {
+    if (a.due && a.due < todayStr && !a.completed) {
+      a.missing = true;
+      // Bump importance toward max (3), but only once per item
+      if (!a._priorityBumped && (a.importance||1) < 3) {
+        a.importance = Math.min(3, (a.importance||1) + 1);
+        a._priorityBumped = true;
+      }
+    } else if (a.due && a.due >= todayStr) {
+      a.missing = false;
+    }
+  });
+  _origRenderMissing();
+};
+
+// ── REMINDERS & COUNTDOWNS ──
+function renderRemindersPage() {
+  const rems = state.reminders || [];
+  const cds  = state.countdowns || [];
+  const now  = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+
+  document.getElementById('reminders-count').textContent = rems.length;
+  document.getElementById('countdowns-count').textContent = cds.length;
+  document.getElementById('reminders-empty').style.display = rems.length ? 'none' : '';
+  document.getElementById('countdowns-empty').style.display = cds.length ? 'none' : '';
+
+  // Reminders
+  const remEl = document.getElementById('reminders-list');
+  remEl.innerHTML = rems.map(r => {
+    const isPast = r.date < todayStr || (r.date === todayStr && r.time < now.toTimeString().slice(0,5));
+    return `<div class="task-item" style="${r.fired||isPast?'opacity:0.55;':''}">
+      <div style="font-size:1.1rem;flex-shrink:0;">🔔</div>
+      <div style="flex:1;">
+        <div class="task-title" style="${r.fired?'text-decoration:line-through;':''}">${r.text}</div>
+        <div style="font-size:0.68rem;color:${isPast&&!r.fired?'var(--red2)':'var(--text2)'};">
+          ${fmtDate(r.date)}${r.time?' at '+fmt12(r.time):''}${isPast&&!r.fired?' · overdue':''}${r.fired?' · ✓ fired':''}
+        </div>
+      </div>
+      <button class="btn btn-red btn-sm" onclick="deleteReminder('${r.id}')">✕</button>
+    </div>`;
+  }).join('') || '';
+
+  // Countdowns
+  const cdEl = document.getElementById('countdowns-list');
+  cdEl.innerHTML = cds.map(cd => {
+    const target = new Date(cd.date + 'T12:00');
+    const diff = Math.ceil((target - now) / 86400000);
+    const isPast = diff < 0;
+    const isToday = diff === 0;
+    const color = isPast ? 'var(--red2)' : isToday ? 'var(--amber)' : 'var(--blue2)';
+    const label = isPast ? `${Math.abs(diff)} day${Math.abs(diff)!==1?'s':''} ago` :
+                  isToday ? 'TODAY! 🎉' :
+                  diff === 1 ? 'Tomorrow!' :
+                  `${diff} days`;
+    return `<div class="card" style="margin-bottom:8px;padding:16px;border-color:${color}33;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="font-size:2rem;flex-shrink:0;">${cd.emoji||'⏳'}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.88rem;font-weight:800;">${cd.text}</div>
+          <div style="font-size:0.72rem;color:var(--text2);margin-top:2px;">${fmtDate(cd.date)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:1.8rem;font-weight:900;color:${color};line-height:1;">${isPast?'—':diff}</div>
+          <div style="font-size:0.62rem;color:${color};font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">${isPast?'past':isToday?'today':'days'}</div>
+        </div>
+        <button class="btn btn-red btn-sm" onclick="deleteCountdown('${cd.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('') || '';
+}
+
+function openAddReminderModal() {
+  document.getElementById('rem-text').value = '';
+  document.getElementById('rem-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('rem-time').value = '';
+  openModal('add-reminder-modal');
+  setTimeout(() => document.getElementById('rem-text').focus(), 60);
+}
+
+function saveReminder() {
+  const text = document.getElementById('rem-text').value.trim();
+  const date = document.getElementById('rem-date').value;
+  const time = document.getElementById('rem-time').value;
+  if (!text || !date) { alert('Enter reminder text and date.'); return; }
+  if (!state.reminders) state.reminders = [];
+  state.reminders.push({ id: uid(), text, date, time, fired: false });
+  playSound('add'); save(); closeModal('add-reminder-modal');
+  if (state.currentPage === 'reminders') renderRemindersPage();
+}
+
+function deleteReminder(id) {
+  state.reminders = (state.reminders||[]).filter(r => r.id !== id);
+  playSound('delete'); save(); renderRemindersPage();
+}
+
+function openAddCountdownModal() {
+  document.getElementById('cd-text').value = '';
+  document.getElementById('cd-date').value = '';
+  document.getElementById('cd-emoji').value = '';
+  openModal('add-countdown-modal');
+  setTimeout(() => document.getElementById('cd-text').focus(), 60);
+}
+
+function saveCountdown() {
+  const text = document.getElementById('cd-text').value.trim();
+  const date = document.getElementById('cd-date').value;
+  const emoji = document.getElementById('cd-emoji').value.trim() || '⏳';
+  if (!text || !date) { alert('Enter a name and target date.'); return; }
+  if (!state.countdowns) state.countdowns = [];
+  state.countdowns.push({ id: uid(), text, date, emoji });
+  playSound('add'); save(); closeModal('add-countdown-modal');
+  if (state.currentPage === 'reminders') renderRemindersPage();
+}
+
+function deleteCountdown(id) {
+  state.countdowns = (state.countdowns||[]).filter(c => c.id !== id);
+  playSound('delete'); save(); renderRemindersPage();
+}
+
+// Patch checkReminders to also check state.reminders
+const _origCheckReminders = checkReminders;
+checkReminders = function() {
+  _origCheckReminders();
+  const now = new Date();
+  const d = now.toISOString().split('T')[0];
+  const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  (state.reminders||[]).forEach(r => {
+    if (r.date === d && r.time === t && !r.fired) {
+      r.fired = true;
+      addNotif('🔔 ' + r.text);
+      playSound('reminder');
+      if (typeof DQAuth !== 'undefined') DQAuth.toast('🔔 ' + r.text);
+      if (state.currentPage === 'reminders') renderRemindersPage();
+      try { localStorage.setItem('dqtasks_v1', JSON.stringify(state)); } catch(e){}
+    }
+  });
+  // Refresh countdowns display if on that page
+  if (state.currentPage === 'reminders') renderRemindersPage();
+};
+
+// Patch showPage for reminders
+const _origShowPageV2 = showPage;
+showPage = function(page) {
+  if (page === 'reminders') {
+    document.querySelectorAll('.page-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.ribbon-tab,.sidebar-item').forEach(el => el.classList.remove('active'));
+    const pg = document.getElementById('page-reminders');
+    if (pg) pg.style.display = 'block';
+    const tab = document.querySelector('.ribbon-tab[data-page="reminders"]');
+    if (tab) tab.classList.add('active');
+    state.currentPage = 'reminders';
+    renderRemindersPage();
+    updateProgressBar();
+    playSound('navigate');
+    return;
+  }
+  _origShowPageV2(page);
+};
+
+// Refresh countdowns every minute (so day counts update live)
+setInterval(() => {
+  if (state.currentPage === 'reminders') renderRemindersPage();
+}, 60000);
 
 </script>
 
