@@ -910,6 +910,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   <div class="ribbon-tab" data-page="reminders" onclick="showPage('reminders')">🔔 Reminders</div>
   <div class="ribbon-tab" data-page="countdowns" onclick="showPage('countdowns')">⏳ Countdowns</div>
   <div class="ribbon-tab" data-page="timer" onclick="showPage('timer')">⏱ Timer</div>
+  <div class="ribbon-tab" data-page="stats" onclick="showPage('stats')">📊 Stats</div>
 </div>
 
 <!-- Search Results Dropdown -->
@@ -964,6 +965,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
       <div class="sidebar-item" onclick="showPage('calendar')"><span class="item-icon">📅</span> Calendar</div>
       <div class="sidebar-item" onclick="showPage('countdowns')"><span class="item-icon">⏳</span> Countdowns</div>
       <div class="sidebar-item" onclick="showPage('timer')"><span class="item-icon">⏱</span> Study Timer</div>
+      <div class="sidebar-item" onclick="showPage('stats')"><span class="item-icon">📊</span> Stats</div>
       <div class="sidebar-item" onclick="showPage('reminders')"><span class="item-icon">🔔</span> Reminders</div>
     </div>
     <div class="sidebar-section">
@@ -971,10 +973,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
       <div class="sidebar-item" onclick="showPage('missing')"><span class="item-icon">⚠️</span> Missing <span class="item-badge" id="missing-badge">0</span></div>
       <div class="sidebar-item" onclick="showPage('completed')"><span class="item-icon">✔️</span> Completed</div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Labels</div>
-      <div id="label-sidebar-list"></div>
-    </div>
+
   </div>
 
   <!-- Main Content -->
@@ -1327,8 +1326,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <div class="page-title">🔔 Reminders</div>
         </div>
         <div class="page-actions">
-          <button class="btn btn-ghost btn-sm" onclick="openAddReminderModal()">+ Reminder</button>
-          <button class="btn btn-primary btn-sm" onclick="openAddCountdownModal()">+ Countdown</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddReminderModal()">+ Reminder</button>
         </div>
       </div>
 
@@ -1385,6 +1383,12 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <div class="page-title">⏳ Countdowns</div>
         </div>
         <div class="page-actions">
+          <div style="display:flex;gap:4px;background:var(--surface2);border-radius:8px;padding:3px;">
+            <button class="btn btn-ghost btn-sm cd-mode-btn active" data-mode="auto" onclick="setCountdownDisplayMode('auto',this)" style="font-size:0.65rem;padding:3px 8px;">Auto</button>
+            <button class="btn btn-ghost btn-sm cd-mode-btn" data-mode="days" onclick="setCountdownDisplayMode('days',this)" style="font-size:0.65rem;padding:3px 8px;">Days</button>
+            <button class="btn btn-ghost btn-sm cd-mode-btn" data-mode="hours" onclick="setCountdownDisplayMode('hours',this)" style="font-size:0.65rem;padding:3px 8px;">Hours</button>
+            <button class="btn btn-ghost btn-sm cd-mode-btn" data-mode="minutes" onclick="setCountdownDisplayMode('minutes',this)" style="font-size:0.65rem;padding:3px 8px;">Minutes</button>
+          </div>
           <button class="btn btn-primary btn-sm" onclick="openAddCountdownModal()">+ Countdown</button>
         </div>
       </div>
@@ -1489,6 +1493,47 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <div class="empty-icon">⏱</div>
           <p>No sessions yet. Start a timer!</p>
         </div>
+      </div>
+    </div>
+
+
+    <!-- STATS PAGE -->
+    <div id="page-stats" class="page-content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Your Progress</div>
+          <div class="page-title">📊 Stats</div>
+        </div>
+        <div class="page-actions">
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;cursor:pointer;">
+            <input type="checkbox" id="stats-fun-mode" onchange="savePersist()" style="accent-color:var(--blue);">
+            🎮 Fun Mode
+          </label>
+        </div>
+      </div>
+      <!-- Key stats -->
+      <div class="stat-row" id="stats-top-row" style="flex-wrap:wrap;gap:10px;"></div>
+      <!-- Streaks -->
+      <div class="card" style="margin-top:0;">
+        <div class="section-header"><div class="section-title">🔥 Streaks</div></div>
+        <div id="stats-streaks"></div>
+      </div>
+      <!-- Progress bars -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">📈 Project Progress</div>
+          <button class="btn btn-ghost btn-sm" onclick="openAddProgressModal()">+ Add</button>
+        </div>
+        <div id="stats-progress-bars"></div>
+        <div class="empty-state" id="stats-progress-empty" style="display:none;">
+          <p>Track progress on projects, essays, or any ongoing work.</p>
+          <button class="btn btn-ghost btn-sm" onclick="openAddProgressModal()">+ Add Progress Item</button>
+        </div>
+      </div>
+      <!-- Study tips -->
+      <div class="card" id="stats-tips-card">
+        <div class="section-header"><div class="section-title">💡 Study Tips</div></div>
+        <div id="stats-tips"></div>
       </div>
     </div>
 
@@ -1684,11 +1729,7 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
           <div class="accent-swatch" data-hue="pink" data-primary="#aa3366" data-accent="#ff77aa" style="background:#ff77aa;" onclick="setAccentColor('pink','#aa3366','#ff77aa',this)" title="Pink"></div>
         </div>
       </div>
-      <div class="card">
-        <div class="section-title" style="margin-bottom:12px;">🏷️ Labels & Colors</div>
-        <div id="labels-settings-list"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="openAddLabelModal()">+ Add Label</button>
-      </div>
+
       <div class="card">
         <div class="section-title" style="margin-bottom:12px;">💾 Data</div>
         <button class="btn btn-ghost btn-sm" onclick="exportData()">📤 Export Data (JSON)</button>
@@ -1764,6 +1805,14 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
         <label class="form-label">Class</label>
         <select class="form-select" id="create-class">
           <option value="">Select a class…</option>
+        </select>
+      </div>
+      <div class="form-group" id="assign-recur-group" style="display:none;">
+        <label class="form-label">🔁 Repeat</label>
+        <select class="form-select" id="create-assign-recur">
+          <option value="">Does not repeat</option>
+          <option value="weekly">Weekly</option>
+          <option value="weekdays">Weekdays (Mon–Fri)</option>
         </select>
       </div>
     </div>
@@ -2048,6 +2097,55 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
   </div>
 </div>
 
+
+<!-- Add Progress Item Modal -->
+<div class="modal-overlay" id="add-progress-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-progress-modal')">✕</button>
+    <div class="modal-title">📈 Track Progress</div>
+    <div class="form-group">
+      <label class="form-label">Item Name</label>
+      <input type="text" class="form-input" id="prog-name" placeholder="e.g. Research Paper, Coding Project…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Progress (0–100%)</label>
+      <input type="range" id="prog-pct" min="0" max="100" value="0" style="width:100%;accent-color:var(--blue);" oninput="document.getElementById('prog-pct-label').textContent=this.value+'%'">
+      <div id="prog-pct-label" style="font-size:0.78rem;color:var(--text2);margin-top:4px;">0%</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="saveProgressItem()">Add</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-progress-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Reminder Modal -->
+<div class="modal-overlay" id="edit-reminder-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-reminder-modal')">✕</button>
+    <div class="modal-title">✏️ Edit Reminder</div>
+    <div class="form-group">
+      <label class="form-label">Reminder Text</label>
+      <input type="text" class="form-input" id="edit-rem-text" placeholder="Reminder text">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="edit-rem-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <input type="time" class="form-input" id="edit-rem-time">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="saveEditReminder()">Save</button>
+      <button class="btn btn-red btn-sm" onclick="deleteReminderFromEdit()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('edit-reminder-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Habit Modal -->
 <div class="modal-overlay" id="add-habit-modal">
   <div class="modal">
@@ -2114,6 +2212,50 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
 
 
 <script>
+
+// ── Early variable declarations (hoisted to prevent TDZ errors) ──
+// Sound
+let soundPack = 'default';
+let soundVolume = 0.6;
+const SOUND_TOGGLES = { complete:true, click:true, add:true, delete:true, open:true, save:false, navigate:false, reminder:true, typewriter:true };
+// Theme
+let colorfulStrength = 2;
+// Quick Add
+let _dqParsed = null;
+// Notebook chips
+let chipSuggestionData = null;
+let lastSelection = null;
+// Countdowns
+let _countdownDisplayMode = 'auto';
+// Timer
+let _timerMode = 'pomodoro';
+let _timerInterval = null;
+let _timerRunning = false;
+let _timerSeconds = 0;
+let _timerTotalSeconds = 0;
+let _timerPhase = 'work';
+let _timerSession = 0;
+let _timerMaxSessions = 4;
+let _timerHistory = [];
+let _timerStopwatchSeconds = 0;
+// Alarm
+let _alarmInterval = null;
+// Notifications
+let _lastNotifCheck = 0;
+let _dismissedToolSuggestions = new Set();
+// Edit modals
+let _editingClassId = null;
+let _editClassColor = '#4488ff';
+let _editClassIcon = '📚';
+let _editingCountdownId = null;
+let _editingReminderId = null;
+// Create modal
+let createTags = [];
+let createColor = '#4488ff';
+let createType = 'assignment';
+let editingId = null;
+let labelColor = '#4488ff';
+
 // ════════════════════════════════════════════════
 //  DQTasks — Main Application Script
 // ════════════════════════════════════════════════
@@ -2151,17 +2293,11 @@ let state = {
   soundEnabled: false,
 };
 
-let createType = 'assignment';
-let createTags = [];
-let createColor = '#4488ff';
+
 let createImportance = 1;
 let classColor = '#4488ff';
-let labelColor = '#4488ff';
-let editingId = null;
 let paperDark = false;
 let noteSaveTimer = null;
-let chipSuggestionData = null;
-let lastSelection = null;
 
 // ── MHS Course List ──
 const MHS_COURSES = [
@@ -2238,10 +2374,7 @@ const CHIP_PATTERNS = [
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
 // ── Welcome Screen ──
-function dismissWelcome(signIn){
-  document.getElementById('welcome-screen').style.display='none';
-  if(signIn && typeof DQAuth !== 'undefined') DQAuth.openModal();
-}
+
 
 // ── Page Navigation ──
 function showPage(page){
@@ -2379,11 +2512,11 @@ function renderHomeLabels(){
   const el = document.getElementById('home-labels');
   el.innerHTML = state.labels.map(l=>`
     <span class="tag" style="background:${l.color}22;color:${l.color};border-color:${l.color}44;cursor:pointer;"
-      onclick="filterByLabel('${l.name}')">${l.name}</span>
-  `).join('')+'<span class="tag tag-gray" onclick="filterByLabel(null)">Clear</span>';
+      onclick="filterByTag('${l.name}')">${l.name}</span>
+  `).join('')+'<span class="tag tag-gray" onclick="filterByTag(null)">Clear</span>';
 }
 
-function filterByLabel(label){
+function filterByTag(label){
   state.labelFilter = label;
   renderHome();
 }
@@ -2906,6 +3039,7 @@ function loadAccentColor(){
 // ── SETTINGS ──
 function renderSettings(){
   const el=document.getElementById('labels-settings-list');
+  if (!el) return;
   el.innerHTML=state.labels.map(l=>`
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
       <div style="width:12px;height:12px;border-radius:50%;background:${l.color};flex-shrink:0;"></div>
@@ -2918,8 +3052,12 @@ function renderSettings(){
 
 function renderLabelSidebar(){
   const el=document.getElementById('label-sidebar-list');
-  el.innerHTML=state.labels.map(l=>`
-    <div class="sidebar-item" onclick="filterByLabel('${l.name}');showPage('home');">
+  if (!el) return; // Labels merged into tags — sidebar element removed
+  // Show unique tags from all items
+  const allTags = new Set();
+  [...state.assignments,...state.tasks,...state.events,...state.notes].forEach(i=>(i.tags||[]).forEach(t=>allTags.add(t)));
+  el.innerHTML=[...allTags].map(t=>`
+    <div class="sidebar-item" onclick="filterByTag('${t}');showPage('home');">
       <span style="width:8px;height:8px;border-radius:50%;background:${l.color};flex-shrink:0;display:inline-block;"></span>
       <span>${l.name}</span>
     </div>
@@ -3334,6 +3472,7 @@ function setCreateType(type,el){
 
   document.getElementById('assignment-fields').style.display=(type==='assignment')?'':'none';
   document.getElementById('event-fields').style.display=(type==='event')?'':'none';
+  const arg=document.getElementById('assign-recur-group'); if(arg) arg.style.display=(type==='assignment')?'':'none';
   document.getElementById('due-fields').style.display=(type!=='event')?'':'none';
   document.getElementById('importance-group').style.display=(type!=='event')?'':'none';
   const rf=document.getElementById('recurring-fields'); if(rf) rf.style.display=(type==='recurring')?'':'none';
@@ -3391,10 +3530,12 @@ function saveCreateItem(){
   if(!title){alert('Please enter a title.');return;}
 
   if(createType==='assignment'){
+    const assignRecur = document.getElementById('create-assign-recur')?.value||'';
     const item={
       id:editingId||uid(),title,
       classId:document.getElementById('create-class').value||null,
       due:document.getElementById('create-due').value,
+      recur:assignRecur,
       time:document.getElementById('create-time').value,
       importance:createImportance,
       notes:document.getElementById('create-notes').value,
@@ -3407,7 +3548,8 @@ function saveCreateItem(){
     else state.assignments.push(item);
     addNotif(`📚 Assignment added: ${title}`);
   } else if(createType==='event'){
-    const item={
+    const recurVal = document.getElementById('create-event-recur')?.value || '';
+    const baseItem={
       id:editingId||uid(),title,
       category:document.getElementById('create-event-cat').value,
       startDate:document.getElementById('create-event-start').value,
@@ -3415,10 +3557,17 @@ function saveCreateItem(){
       startTime:document.getElementById('create-event-time').value,
       endTime:document.getElementById('create-event-time-end').value,
       notes:document.getElementById('create-notes').value,
-      tags:[...createTags],color:createColor
+      tags:[...createTags],color:createColor,
+      recur: recurVal
     };
-    if(editingId){const idx=state.events.findIndex(e=>e.id===editingId);state.events[idx]=item;}
-    else state.events.push(item);
+    if(editingId){const idx=state.events.findIndex(e=>e.id===editingId);state.events[idx]=baseItem;}
+    else {
+      state.events.push(baseItem);
+      // Generate recurring instances up to 1 year
+      if (recurVal && baseItem.startDate) {
+        _generateRecurringEvents(baseItem, recurVal);
+      }
+    }
     addNotif(`📅 Event added: ${title}`);
   } else {
     const workspace={task:'general','work-task':'work','personal-task':'personal',goal:'personal-goal',recurring:'general'}[createType]||'general';
@@ -3452,14 +3601,7 @@ function saveCreateItem(){
 }
 
 // ── Add Class ──
-function openAddClassModal(){
-  document.getElementById('add-class-search').value='';
-  document.getElementById('course-suggestions').innerHTML='';
-  classColor='#4488ff';
-  document.querySelectorAll('#class-color-opts .color-opt').forEach(o=>o.classList.remove('active'));
-  document.querySelector('#class-color-opts .color-opt[data-color="#4488ff"]')?.classList.add('active');
-  openModal('add-class-modal');
-}
+
 function filterCourses(q){
   const el=document.getElementById('course-suggestions');
   if(!q){el.innerHTML='';return;}
@@ -3799,6 +3941,9 @@ function loadLocal(){
         dailyResetDate:saved.dailyResetDate||'',
         reminders:saved.reminders||[],
         countdowns:saved.countdowns||[],
+        streaks:saved.streaks||{taskStreak:0,habitStreak:0,lastTaskDate:'',lastHabitDate:'',totalCompleted:0,totalHabits:0,dailyCompleted:{},funMode:false},
+        progressItems:saved.progressItems||[],
+        xp:saved.xp||0,
       });
     }
   }catch(e){}
@@ -3820,6 +3965,9 @@ function restoreState(data){
     dailyResetDate:data.dailyResetDate||state.dailyResetDate||'',
     reminders:data.reminders||state.reminders||[],
     countdowns:data.countdowns||state.countdowns||[],
+    streaks:data.streaks||state.streaks||{},
+    progressItems:data.progressItems||state.progressItems||[],
+    xp:data.xp||state.xp||0,
   });
   save();
   showPage(state.currentPage);
@@ -4022,7 +4170,6 @@ const THEME_VARS = {
   'arctic':         { '--bg':'#f4f8ff','--bg2':'#eaf2ff','--surface':'#ffffff','--surface2':'#f0f6ff','--surface3':'#e4f0ff','--border':'#b8d4f0','--border2':'#88b8e8','--text':'#0a1828','--text2':'#3060a0','--text3':'#7098c8','--card-radius':'18px','--card-shadow':'0 2px 12px rgba(60,120,200,0.08)' },
   'bubblegum':      { '--bg':'#fff0f0','--bg2':'#ffe4e4','--surface':'#ffffff','--surface2':'#fff4f4','--surface3':'#ffe8f0','--border':'#ffb0c8','--border2':'#ff80a8','--text':'#280010','--text2':'#c02060','--text3':'#e878a8','--card-radius':'24px','--card-shadow':'0 4px 16px rgba(255,80,140,0.12)' },
 };
-let colorfulStrength = 2; // 1=low, 2=medium, 3=high
 
 function setTheme(theme, el) {
   state.theme = theme;
@@ -4675,7 +4822,7 @@ renderLabelSidebar = function() {
   const all = [...state.assignments,...state.tasks,...state.notes];
   el.innerHTML = state.labels.map(l => {
     const n = all.filter(i => (i.tags||[]).includes(l.name)).length;
-    return `<div class="sidebar-item" onclick="filterByLabel('${l.name}');showPage('home');playSound('navigate')">
+    return `<div class="sidebar-item" onclick="filterByTag('${l.name}');showPage('home');playSound('navigate')">
       <span style="width:8px;height:8px;border-radius:50%;background:${l.color};flex-shrink:0;display:inline-block;margin-right:2px;"></span>
       <span style="flex:1;">${l.name}</span>
       ${n>0?`<span class="item-badge green">${n}</span>`:''}
@@ -4851,11 +4998,32 @@ renderMissing = function() {
 // ── REMINDERS & COUNTDOWNS ──
 function renderRemindersPage() {
   const rems = state.reminders || [];
-  const cds  = state.countdowns || [];
   const now  = new Date();
   const todayStr = now.toISOString().split('T')[0];
 
-  document.getElementById('reminders-count').textContent = rems.length;
+  const rcEl = document.getElementById('reminders-count');
+  if (rcEl) rcEl.textContent = rems.length;
+  const reEl = document.getElementById('reminders-empty');
+  if (reEl) reEl.style.display = rems.length ? 'none' : '';
+
+  const el = document.getElementById('reminders-list');
+  if (!el) return;
+
+  el.innerHTML = rems.map(r => {
+    const isPast = r.date < todayStr || (r.date === todayStr && r.time && r.time < now.toTimeString().slice(0,5));
+    const dateLabel = r.date === todayStr ? 'Today' : r.date === new Date(Date.now()+86400000).toISOString().split('T')[0] ? 'Tomorrow' : fmtDate(r.date);
+    return `<div class="task-item" style="${r.fired||isPast?'opacity:0.6;':''}">
+      <div style="font-size:1.1rem;flex-shrink:0;">🔔</div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-title" style="${r.fired?'text-decoration:line-through;':''}">${r.text}</div>
+        <div style="font-size:0.68rem;color:${isPast&&!r.fired?'var(--red2)':'var(--text2)'};">
+          ${dateLabel}${r.time?' at '+fmt12(r.time):''}${r.fired?' · ✓ fired':''}${isPast&&!r.fired?' · overdue':''}
+        </div>
+      </div>
+      <button onclick="openEditReminderModal('${r.id}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.65rem;color:var(--text2);cursor:pointer;flex-shrink:0;">✏️</button>
+      <button onclick="deleteReminder('${r.id}')" style="background:var(--red-dim);color:var(--red2);border:1px solid rgba(224,48,48,0.3);border-radius:6px;padding:3px 8px;font-size:0.65rem;cursor:pointer;flex-shrink:0;">✕</button>
+    </div>`;
+  }).join('') || '';
 }
 
 function openAddReminderModal() {
@@ -5064,7 +5232,6 @@ filterChipSearch = function(q) {
 };
 
 // Tool suggestions in notebook — show once per session per tool, don't re-show after dismiss
-const _dismissedToolSuggestions = new Set();
 const _prevDetectChipPatterns = detectChipPatterns;
 detectChipPatterns = function() {
   _prevDetectChipPatterns();
@@ -5509,9 +5676,6 @@ renderNotifList = function() {
 };
 
 // ── SOUND PACK SYSTEM ──
-let soundPack = 'default';
-let soundVolume = 0.6;
-const SOUND_TOGGLES = { complete:true, click:true, add:true, delete:true, open:true, save:false, navigate:false, reminder:true, typewriter:true };
 
 function setSoundPack(pack, el) {
   soundPack = pack;
@@ -6101,7 +6265,6 @@ function _playPhoneSound(type) {
 //  DQAdd — Quick Add with Natural Language Parsing
 // ═══════════════════════════════════════════════════
 
-let _dqParsed = null; // holds the current parsed result
 
 function openDQAdd() {
   const input = document.getElementById('dqadd-input');
@@ -6459,9 +6622,6 @@ function _nlParse(raw) {
 
 
 // ── Edit Class ──
-let _editingClassId = null;
-let _editClassColor = '#4488ff';
-let _editClassIcon = '📚';
 
 function openEditClassModal(id) {
   const cls = state.classes.find(c => c.id === id);
@@ -6693,16 +6853,6 @@ setInterval(() => {
 // ═══════════════════════════════════════════════════
 //  STUDY TIMER
 // ═══════════════════════════════════════════════════
-let _timerMode = 'pomodoro';
-let _timerInterval = null;
-let _timerRunning = false;
-let _timerSeconds = 0;
-let _timerTotalSeconds = 0;
-let _timerPhase = 'work'; // work | short-break | long-break
-let _timerSession = 0;
-let _timerMaxSessions = 4;
-let _timerHistory = [];
-let _timerStopwatchSeconds = 0;
 
 function setTimerMode(mode, el) {
   _timerMode = mode;
@@ -6955,31 +7105,41 @@ function addCountdownFromItem(id, type) {
 // ═══════════════════════════════════════════════════
 //  SMART NOTIFICATIONS — overdue + due soon alerts
 // ═══════════════════════════════════════════════════
-let _lastNotifCheck = 0;
 
 function checkSmartNotifications() {
   const now = Date.now();
-  if (now - _lastNotifCheck < 5 * 60 * 1000) return; // max every 5 min
+  if (now - _lastNotifCheck < 5 * 60 * 1000) return;
   _lastNotifCheck = now;
 
   const todayStr = new Date().toISOString().split('T')[0];
   const tomorrowStr = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const in3days = new Date(Date.now()+3*86400000).toISOString().split('T')[0];
 
-  // Overdue
+  // Overdue assignments
   const overdue = state.assignments.filter(a => !a.completed && a.due && a.due < todayStr);
-  if (overdue.length) {
-    addNotif(`⚠️ You have ${overdue.length} overdue assignment${overdue.length!==1?'s':''}! Check Missing tab.`);
-  }
+  if (overdue.length === 1) addNotif(`⚠️ "${overdue[0].title}" is overdue! Open Missing tab.`);
+  else if (overdue.length > 1) addNotif(`⚠️ ${overdue.length} overdue assignments! Check Missing tab.`);
 
   // Due today
-  const dueToday = state.assignments.filter(a => !a.completed && a.due === todayStr);
-  dueToday.forEach(a => addNotif(`📅 Due today: ${a.title}`));
+  const dueToday = [...state.assignments, ...state.tasks].filter(a => !a.completed && (a.due||'') === todayStr);
+  if (dueToday.length === 1) addNotif(`📅 Due today: "${dueToday[0].title}"`);
+  else if (dueToday.length > 1) addNotif(`📅 ${dueToday.length} things due today — check Focus tab!`);
 
   // Due tomorrow
   const dueTomorrow = state.assignments.filter(a => !a.completed && a.due === tomorrowStr);
-  if (dueTomorrow.length) {
-    addNotif(`⏰ ${dueTomorrow.length} assignment${dueTomorrow.length!==1?'s':''} due tomorrow.`);
-  }
+  if (dueTomorrow.length) addNotif(`⏰ Due tomorrow: ${dueTomorrow.map(a=>'"'+a.title+'"').slice(0,2).join(', ')}${dueTomorrow.length>2?' + more':''}`);
+
+  // High-importance items due in 3 days
+  const urgent = state.assignments.filter(a => !a.completed && a.importance===3 && a.due > tomorrowStr && a.due <= in3days);
+  urgent.forEach(a => addNotif(`⭐ High priority: "${a.title}" due ${_smartDateLabel(a.due,'')}`));
+
+  // Habit streak encouragement
+  const streak = state.streaks?.taskStreak || 0;
+  if (streak > 0 && streak % 7 === 0) addNotif(`🔥 ${streak}-day task streak! Keep it up!`);
+
+  // Upcoming events today
+  const eventsToday = state.events.filter(e => e.startDate === todayStr);
+  eventsToday.forEach(e => addNotif(`📅 Event today: "${e.title}"${e.startTime?' at '+fmt12(e.startTime):''}`));
 }
 
 // Run smart notifications on load and every 10 mins
@@ -7035,8 +7195,6 @@ showDetail = function(type, id) {
 // ═══════════════════════════════════════════════════
 //  PERSISTENT ALARM BANNER
 // ═══════════════════════════════════════════════════
-let _alarmInterval = null;
-let _alarmAudioCtx = null;
 
 function _showTimerAlarm(msg) {
   // Remove existing
@@ -7116,7 +7274,6 @@ checkReminders = function() {
 // ═══════════════════════════════════════════════════
 //  COUNTDOWN EDITING
 // ═══════════════════════════════════════════════════
-let _editingCountdownId = null;
 
 function openEditCountdownModal(id) {
   const cd = (state.countdowns||[]).find(c => c.id === id);
@@ -7242,9 +7399,17 @@ renderCountdownsPage = function() {
     const isToday = diff === 0;
     const isSoon = diff > 0 && diff <= 7;
     const color = isPast ? 'var(--red2)' : isToday ? 'var(--amber)' : isSoon ? 'var(--green)' : 'var(--blue2)';
-    const bigNum = isPast ? '–' : showMins ? (Math.abs(totalMins)+'m') : diff === 0 ? (totalHours+'h') : diff;
-    const bigLabel = isPast ? 'past' : showMins ? 'mins' : isToday ? 'hours' : diff===1?'day':'days';
-    const label = isPast ? `${Math.abs(diff)}d ago` : showMins ? `${Math.abs(totalMins)} minutes ${totalMins>=0?'until':'ago'}` : isToday ? `${totalHours}h remaining` : diff===1?'Tomorrow!':diff+' days away';
+    const mode = _countdownDisplayMode || 'auto';
+    let bigNum, bigLabel, label;
+    if (isPast) { bigNum='–'; bigLabel='past'; label=`${Math.abs(diff)}d ago`; }
+    else if (mode === 'minutes' || (mode === 'auto' && Math.abs(totalMins) < 120)) {
+      const m = Math.abs(totalMins);
+      bigNum = m+'m'; bigLabel='mins'; label=`${m} minute${m!==1?'s':''} away`;
+    } else if (mode === 'hours' || (mode === 'auto' && diff === 0)) {
+      bigNum = Math.abs(totalHours)+'h'; bigLabel='hours'; label=`${Math.abs(totalHours)}h remaining`;
+    } else {
+      bigNum = diff; bigLabel = diff===1?'day':'days'; label = diff===1?'Tomorrow!':diff+' days away';
+    }
     return `<div class="card" style="margin-bottom:10px;padding:16px 18px;border-color:${color}44;display:flex;align-items:center;gap:14px;">
       <div style="font-size:2rem;flex-shrink:0;">${cd.emoji||'⏳'}</div>
       <div style="flex:1;">
@@ -7293,6 +7458,393 @@ function _smartDateLabel(dateStr, timeStr) {
   const diff = Math.round((d - new Date()) / 86400000);
   if (diff >= 0 && diff <= 6) return dow[d.getDay()] + timeLabel;
   return fmtDate(dateStr) + timeLabel;
+}
+
+
+// ═══════════════════════════════════════════════════
+//  RECURRING EVENTS
+// ═══════════════════════════════════════════════════
+function _generateRecurringEvents(base, recurType) {
+  const start = new Date(base.startDate + 'T12:00');
+  const limit = new Date(start);
+  limit.setFullYear(limit.getFullYear() + 1); // max 1 year ahead
+  const generated = [];
+  let cur = new Date(start);
+
+  const advance = () => {
+    if (recurType === 'daily') cur.setDate(cur.getDate() + 1);
+    else if (recurType === 'weekly') cur.setDate(cur.getDate() + 7);
+    else if (recurType === 'weekdays') {
+      cur.setDate(cur.getDate() + 1);
+      while (cur.getDay() === 0 || cur.getDay() === 6) cur.setDate(cur.getDate() + 1);
+    } else if (recurType === 'monthly') cur.setMonth(cur.getMonth() + 1);
+  };
+
+  advance(); // start from next occurrence
+  let count = 0;
+  while (cur <= limit && count < 365) {
+    const dateStr = cur.toISOString().split('T')[0];
+    generated.push({
+      ...base,
+      id: uid(),
+      startDate: dateStr,
+      endDate: base.endDate ? dateStr : '',
+      _recurParent: base.id,
+    });
+    advance();
+    count++;
+  }
+  state.events.push(...generated);
+}
+
+// ═══════════════════════════════════════════════════
+//  EDIT REMINDER
+// ═══════════════════════════════════════════════════
+
+function openEditReminderModal(id) {
+  const r = (state.reminders||[]).find(x => x.id === id);
+  if (!r) return;
+  _editingReminderId = id;
+  document.getElementById('edit-rem-text').value = r.text || '';
+  document.getElementById('edit-rem-date').value = r.date || '';
+  document.getElementById('edit-rem-time').value = r.time || '';
+  openModal('edit-reminder-modal');
+  playSound('open');
+}
+
+function saveEditReminder() {
+  const r = (state.reminders||[]).find(x => x.id === _editingReminderId);
+  if (!r) return;
+  r.text = document.getElementById('edit-rem-text').value.trim();
+  r.date = document.getElementById('edit-rem-date').value;
+  r.time = document.getElementById('edit-rem-time').value;
+  r.fired = false; // reset so it can fire again
+  save(); closeModal('edit-reminder-modal');
+  renderRemindersPage(); playSound('save');
+}
+
+function deleteReminderFromEdit() {
+  state.reminders = (state.reminders||[]).filter(r => r.id !== _editingReminderId);
+  save(); closeModal('edit-reminder-modal');
+  renderRemindersPage(); playSound('delete');
+}
+
+// ═══════════════════════════════════════════════════
+//  STREAKS & GAMIFICATION
+// ═══════════════════════════════════════════════════
+if (!state.streaks) state.streaks = { taskStreak: 0, habitStreak: 0, lastTaskDate: '', lastHabitDate: '', totalCompleted: 0, totalHabits: 0, dailyCompleted: {}, funMode: false };
+if (!state.progressItems) state.progressItems = []; // {id, name, pct, color}
+if (!state.xp) state.xp = 0;
+
+function _updateStreaks(type) {
+  if (!state.streaks) state.streaks = { taskStreak:0, habitStreak:0, lastTaskDate:'', lastHabitDate:'', totalCompleted:0, totalHabits:0, dailyCompleted:{}, funMode:false };
+  const todayStr = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+
+  if (type === 'task') {
+    state.streaks.totalCompleted = (state.streaks.totalCompleted||0) + 1;
+    state.xp = (state.xp||0) + 10;
+    // Track daily
+    if (!state.streaks.dailyCompleted) state.streaks.dailyCompleted = {};
+    state.streaks.dailyCompleted[todayStr] = (state.streaks.dailyCompleted[todayStr]||0) + 1;
+    // Streak
+    if (state.streaks.lastTaskDate === yesterday) state.streaks.taskStreak = (state.streaks.taskStreak||0) + 1;
+    else if (state.streaks.lastTaskDate !== todayStr) state.streaks.taskStreak = 1;
+    state.streaks.lastTaskDate = todayStr;
+  } else if (type === 'habit') {
+    state.streaks.totalHabits = (state.streaks.totalHabits||0) + 1;
+    state.xp = (state.xp||0) + 5;
+    if (state.streaks.lastHabitDate === yesterday) state.streaks.habitStreak = (state.streaks.habitStreak||0) + 1;
+    else if (state.streaks.lastHabitDate !== todayStr) state.streaks.habitStreak = 1;
+    state.streaks.lastHabitDate = todayStr;
+  }
+}
+
+// Patch toggleComplete to update streaks + confetti
+const _origToggleCompleteStats = toggleComplete;
+toggleComplete = function(type, id) {
+  // Check if completing (not un-completing)
+  let wasCompleted = false;
+  if (type === 'assignment') { const a = state.assignments.find(x=>x.id===id); wasCompleted = a?.completed; }
+  else { const t = state.tasks.find(x=>x.id===id); wasCompleted = t?.completed; }
+
+  _origToggleCompleteStats(type, id);
+
+  // Only trigger on completion, not un-completion
+  let isNowCompleted = false;
+  if (type === 'assignment') { const a = state.assignments.find(x=>x.id===id); isNowCompleted = a?.completed; }
+  else { const t = state.tasks.find(x=>x.id===id); isNowCompleted = t?.completed; }
+
+  if (!wasCompleted && isNowCompleted) {
+    _updateStreaks('task');
+    if (state.streaks?.funMode || document.getElementById('stats-fun-mode')?.checked) {
+      _triggerConfetti();
+    }
+  }
+};
+
+// Patch toggleHabit for streaks
+const _origToggleHabitStats = toggleHabit;
+toggleHabit = function(id) {
+  const h = state.habits.find(x => x.id === id);
+  const wasComplete = h?.completedToday;
+  _origToggleHabitStats(id);
+  if (!wasComplete && state.habits.find(x=>x.id===id)?.completedToday) {
+    _updateStreaks('habit');
+    h.streak = (h.streak||0) + 1;
+    if (state.streaks?.funMode) _triggerConfetti();
+  } else if (wasComplete) {
+    // Un-completing — decrement streak
+    const hh = state.habits.find(x=>x.id===id);
+    if (hh) hh.streak = Math.max(0, (hh.streak||1) - 1);
+  }
+};
+
+// ── CONFETTI ──
+function _triggerConfetti() {
+  const colors = ['#4488ff','#3db870','#e89020','#9966ff','#ff77aa','#22c5b0'];
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:99998;overflow:hidden;';
+  document.body.appendChild(container);
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const x = Math.random() * 100;
+    const size = 6 + Math.random() * 8;
+    const delay = Math.random() * 0.5;
+    const duration = 1.5 + Math.random() * 1;
+    piece.style.cssText = `position:absolute;top:-20px;left:${x}%;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random()>0.5?'50%':'2px'};animation:confettiFall ${duration}s ${delay}s ease-in forwards;`;
+    container.appendChild(piece);
+  }
+  // Add keyframes if not there
+  if (!document.getElementById('confetti-style')) {
+    const st = document.createElement('style');
+    st.id = 'confetti-style';
+    st.textContent = `@keyframes confettiFall { 0%{transform:translateY(0) rotate(0);opacity:1;} 100%{transform:translateY(110vh) rotate(720deg);opacity:0;} }`;
+    document.head.appendChild(st);
+  }
+  setTimeout(() => container.remove(), 3000);
+}
+
+// ═══════════════════════════════════════════════════
+//  STATS PAGE
+// ═══════════════════════════════════════════════════
+function renderStats() {
+  if (!state.streaks) state.streaks = { taskStreak:0, habitStreak:0, lastTaskDate:'', lastHabitDate:'', totalCompleted:0, totalHabits:0, dailyCompleted:{}, funMode:false };
+  if (!state.progressItems) state.progressItems = [];
+  if (state.xp === undefined) state.xp = 0;
+  const s = state.streaks;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const funMode = document.getElementById('stats-fun-mode');
+  if (funMode) funMode.checked = s.funMode || false;
+
+  // Top stats row
+  const topEl = document.getElementById('stats-top-row');
+  if (topEl) {
+    const completedToday = (s.dailyCompleted||{})[todayStr] || 0;
+    const totalDays = Object.keys(s.dailyCompleted||{}).length || 1;
+    const avgPerDay = ((s.totalCompleted||0) / totalDays).toFixed(1);
+    const level = Math.floor((state.xp||0) / 100) + 1;
+    const xpInLevel = (state.xp||0) % 100;
+    topEl.innerHTML = `
+      <div class="stat-card"><div class="stat-num" style="color:var(--green);">${s.taskStreak||0}</div><div class="stat-lbl">Task Streak 🔥</div></div>
+      <div class="stat-card"><div class="stat-num">${s.totalCompleted||0}</div><div class="stat-lbl">Total Done</div></div>
+      <div class="stat-card"><div class="stat-num">${completedToday}</div><div class="stat-lbl">Done Today</div></div>
+      <div class="stat-card"><div class="stat-num">${avgPerDay}</div><div class="stat-lbl">Avg / Day</div></div>
+      <div class="stat-card" style="grid-column:span 2;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="stat-lbl">Level ${level}</div>
+          <div style="font-size:0.62rem;color:var(--text3);">${xpInLevel}/100 XP</div>
+        </div>
+        <div style="height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px;width:${xpInLevel}%;transition:width 0.5s;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Streaks
+  const streakEl = document.getElementById('stats-streaks');
+  if (streakEl) {
+    const habits = state.habits || [];
+    const habitRows = habits.map(h => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:1.1rem;">${h.icon||'🔁'}</div>
+        <div style="flex:1;font-size:0.85rem;font-weight:600;">${h.name}</div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="font-size:0.78rem;font-weight:900;color:${(h.streak||0)>=3?'var(--amber)':'var(--text2)'};">${h.streak||0}</span>
+          <span style="font-size:0.68rem;color:var(--text3);">day streak ${(h.streak||0)>=7?'🔥':''}</span>
+        </div>
+      </div>
+    `).join('');
+    streakEl.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:120px;background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--amber);">${s.taskStreak||0}</div>
+          <div style="font-size:0.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;">Task Streak</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--green);">${s.habitStreak||0}</div>
+          <div style="font-size:0.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;">Habit Streak</div>
+        </div>
+      </div>
+      ${habitRows || '<div style="color:var(--text3);font-size:0.78rem;padding:8px;">Add habits in the Daily tab to track streaks.</div>'}
+    `;
+  }
+
+  // Progress bars
+  renderProgressBars();
+
+  // Study tips
+  const tipsEl = document.getElementById('stats-tips');
+  const TIPS = [
+    { icon:'🍅', tip:'Use the Pomodoro Timer for focused 25-minute work sessions. Studies show it reduces mental fatigue.', tag:'Focus' },
+    { icon:'📋', tip:'Check Focus tab to see what to work on first. Tackle overdue items before anything else.', tag:'Priority' },
+    { icon:'🔁', tip:'Streaks build momentum. Even completing one small habit daily compounds over weeks.', tag:'Habits' },
+    { icon:'📓', tip:'Use Smart Chips in your notebook to link notes directly to assignments — review them together.', tag:'Notes' },
+    { icon:'⏳', tip:'Use countdowns for big deadlines. Seeing "14 days away" makes it feel real and urgent.', tag:'Planning' },
+    { icon:'🌙', tip:'Review your assignments each evening and add due dates — it takes 2 minutes and saves hours of stress.', tag:'Routine' },
+    { icon:'📅', tip:'Use the Calendar Week view Sunday night to see the full week ahead and plan your sessions.', tag:'Planning' },
+    { icon:'🎯', tip:'Focus mode shows your top priorities. Aim to knock off the #1 item before checking anything else.', tag:'Focus' },
+    { icon:'💤', tip:'Taking real breaks between study sessions (like Pomodoro short breaks) improves retention.', tag:'Wellbeing' },
+    { icon:'✅', tip:'Break large assignments into smaller tasks so you can check things off and build momentum.', tag:'Productivity' },
+  ];
+  // Show 3 random tips, refreshed on load
+  const tips = [...TIPS].sort(() => Math.random()-0.5).slice(0, 3);
+  if (tipsEl) tipsEl.innerHTML = tips.map(t => `
+    <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:1.4rem;flex-shrink:0;">${t.icon}</div>
+      <div>
+        <div style="font-size:0.62rem;font-weight:900;color:var(--blue2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">${t.tag}</div>
+        <div style="font-size:0.82rem;color:var(--text2);line-height:1.5;">${t.tip}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Progress Bars ──
+function renderProgressBars() {
+  const el = document.getElementById('stats-progress-bars');
+  const empty = document.getElementById('stats-progress-empty');
+  if (!el || !document.getElementById('page-stats')) return;
+  const items = state.progressItems || [];
+  if (empty) empty.style.display = items.length ? 'none' : '';
+  el.innerHTML = items.map(item => `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+        <div style="font-size:0.85rem;font-weight:700;">${item.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:0.78rem;color:var(--text2);">${item.pct}%</span>
+          <input type="range" min="0" max="100" value="${item.pct}" style="width:80px;accent-color:var(--blue);"
+            oninput="updateProgressItem('${item.id}',parseInt(this.value));this.previousElementSibling.textContent=this.value+'%'">
+          <button onclick="deleteProgressItem('${item.id}')" style="background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;">✕</button>
+        </div>
+      </div>
+      <div style="height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;background:${item.pct>=100?'var(--green)':item.pct>=60?'var(--blue)':'var(--amber)'};border-radius:4px;width:${item.pct}%;transition:width 0.4s ease;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddProgressModal() {
+  document.getElementById('prog-name').value = '';
+  document.getElementById('prog-pct').value = 0;
+  document.getElementById('prog-pct-label').textContent = '0%';
+  openModal('add-progress-modal');
+  setTimeout(() => document.getElementById('prog-name').focus(), 50);
+}
+
+function saveProgressItem() {
+  const name = document.getElementById('prog-name').value.trim();
+  const pct = parseInt(document.getElementById('prog-pct').value || 0);
+  if (!name) { alert('Enter a name.'); return; }
+  if (!state.progressItems) state.progressItems = [];
+  state.progressItems.push({ id: uid(), name, pct });
+  save(); closeModal('add-progress-modal');
+  playSound('add'); renderProgressBars();
+}
+
+function updateProgressItem(id, pct) {
+  const item = (state.progressItems||[]).find(x => x.id === id);
+  if (item) { item.pct = pct; save(); }
+}
+
+function deleteProgressItem(id) {
+  state.progressItems = (state.progressItems||[]).filter(x => x.id !== id);
+  save(); playSound('delete'); renderProgressBars();
+}
+
+// ── Daily habit streak display in Daily tab ──
+const _origRenderDaily = renderDaily;
+renderDaily = function() {
+  checkDailyReset();
+  const h = state.habits || [];
+  const done = h.filter(x => x.completedToday).length;
+  const total = h.length;
+  const pctEl = document.getElementById('daily-progress-text');
+  const barEl = document.getElementById('daily-progress-bar');
+  const emptyEl = document.getElementById('daily-empty');
+  const listEl = document.getElementById('daily-habits-list');
+  if (pctEl) pctEl.textContent = `${done} / ${total}`;
+  if (barEl) barEl.style.width = (total ? (done/total*100) : 0) + '%';
+  if (emptyEl) emptyEl.style.display = total ? 'none' : '';
+  if (!listEl) return;
+  listEl.innerHTML = h.map(habit => `
+    <div class="task-item" style="${habit.completedToday ? 'opacity:0.55;' : ''}">
+      <div class="assign-check ${habit.completedToday ? 'checked' : ''}" onclick="toggleHabit('${habit.id}')"></div>
+      <div class="task-title" style="flex:1;${habit.completedToday ? 'text-decoration:line-through;' : ''}">${habit.icon || '🔁'} ${habit.name}</div>
+      ${(habit.streak||0) > 0 ? `<span style="font-size:0.65rem;color:${habit.streak>=7?'var(--amber)':'var(--text3)'};font-weight:700;flex-shrink:0;">${habit.streak}d ${habit.streak>=7?'🔥':''}</span>` : ''}
+      <button class="btn btn-red btn-sm" onclick="deleteHabit('${habit.id}')">✕</button>
+    </div>
+  `).join('') || '';
+};
+
+// Fun mode toggle saves to prefs
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'stats-fun-mode') {
+    if (!state.streaks) state.streaks = {};
+    state.streaks.funMode = e.target.checked;
+    save(); savePersist();
+  }
+});
+
+// ── Patch showPage for stats ──
+const _origShowPageStats = showPage;
+showPage = function(page) {
+  if (page === 'stats') {
+    document.querySelectorAll('.page-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.ribbon-tab,.sidebar-item').forEach(el => el.classList.remove('active'));
+    const pg = document.getElementById('page-stats');
+    if (pg) pg.style.display = 'block';
+    const tab = document.querySelector('.ribbon-tab[data-page="stats"]');
+    if (tab) tab.classList.add('active');
+    state.currentPage = 'stats';
+    renderStats();
+    updateProgressBar();
+    playSound('navigate');
+    return;
+  }
+  _origShowPageStats(page);
+};
+
+// Add stats to _extraPages if master router exists
+if (typeof _extraPages !== 'undefined') _extraPages.stats = () => { if(document.getElementById('page-stats')) renderStats(); };
+
+// ── Countdown hours/minutes toggle ──
+
+function setCountdownDisplayMode(mode, el) {
+  _countdownDisplayMode = mode;
+  localStorage.setItem('dqtasks_cd_mode', mode);
+  document.querySelectorAll('.cd-mode-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderCountdownsPage();
+  playSound('click');
+}
+
+function loadCountdownDisplayMode() {
+  const saved = localStorage.getItem('dqtasks_cd_mode');
+  if (saved) _countdownDisplayMode = saved;
 }
 
 </script>
