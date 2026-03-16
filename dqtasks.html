@@ -2427,15 +2427,21 @@ function uncomplete(id){
 // ── MISSING ──
 function renderMissing(){
   const todayStr=new Date().toISOString().split('T')[0];
-  // Auto-mark overdue as missing — only BEFORE today, not today itself
+  // Auto-mark overdue assignments
   state.assignments.forEach(a=>{
     if(a.due&&a.due<todayStr&&!a.completed) a.missing=true;
-    else if(a.due&&a.due>=todayStr) a.missing=false; // reset if rescheduled
+    else if(a.due&&a.due>=todayStr) a.missing=false;
   });
-  const missing=state.assignments.filter(a=>a.missing&&!a.completed);
+  // Also include overdue tasks that have a due date
+  const missingAssignments = state.assignments.filter(a=>a.missing&&!a.completed);
+  const missingTasks = state.tasks.filter(t=>t.due&&t.due<todayStr&&!t.completed);
+  const missing = [
+    ...missingAssignments.map(a=>({...a,_type:'assignment'})),
+    ...missingTasks.map(t=>({...t,_type:'task'})),
+  ].sort((a,b)=>(a.due||'').localeCompare(b.due||''));
   document.getElementById('missing-empty').style.display=missing.length?'none':'';
   document.getElementById('missing-badge').textContent=missing.length;
-  document.getElementById('missing-list').innerHTML=missing.map(a=>renderItemHTML({...a,_type:'assignment'})).join('');
+  document.getElementById('missing-list').innerHTML=missing.map(item=>renderItemHTML(item)).join('');
 }
 
 // ── CALENDAR ──
