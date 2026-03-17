@@ -2260,12 +2260,22 @@ let createType = 'assignment';
 let editingId = null;
 let labelColor = '#4488ff';
 // ── Date helpers — always use LOCAL time, never UTC ──
+// ── Timezone-aware date helpers ──
+// These use _clockTZ so all date comparisons respect the user's timezone
 function localDateStr(date) {
+  try {
+    const d = date || new Date();
+    if (typeof _clockTZ !== 'undefined' && _clockTZ) {
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: _clockTZ,
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+      return fmt.format(d);
+    }
+  } catch(e) {}
+  // Fallback: local system time
   const d = date || new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function localDateOffset(days) {
   const d = new Date();
@@ -6298,14 +6308,17 @@ function _playPhoneSound(type) {
 
 
 function openDQAdd() {
-  const input = document.getElementById('dqadd-input');
-  input.value = '';
-  _dqParsed = null;
-  document.getElementById('dqadd-preview').style.display = 'none';
-  document.getElementById('dqadd-adjust').style.display = 'none';
-  document.getElementById('dqadd-save-btn').disabled = true;
   openModal('dqadd-modal');
-  setTimeout(() => input.focus(), 80);
+  _dqParsed = null;
+  const input = document.getElementById('dqadd-input');
+  const preview = document.getElementById('dqadd-preview');
+  const adjust = document.getElementById('dqadd-adjust');
+  const saveBtn = document.getElementById('dqadd-save-btn');
+  if (input) input.value = '';
+  if (preview) preview.style.display = 'none';
+  if (adjust) adjust.style.display = 'none';
+  if (saveBtn) saveBtn.disabled = true;
+  setTimeout(() => { if (input) input.focus(); }, 80);
   playSound('open');
 }
 
@@ -6327,9 +6340,9 @@ function dqAddKeydown(e) {
 function dqAddParse(raw) {
   const text = raw.trim();
   if (text.length < 2) {
-    document.getElementById('dqadd-preview').style.display = 'none';
-    document.getElementById('dqadd-adjust').style.display = 'none';
-    document.getElementById('dqadd-save-btn').disabled = true;
+    const p=document.getElementById('dqadd-preview'); if(p) p.style.display='none';
+    const a=document.getElementById('dqadd-adjust'); if(a) a.style.display='none';
+    const s=document.getElementById('dqadd-save-btn'); if(s) s.disabled=true;
     _dqParsed = null;
     return;
   }
@@ -6338,9 +6351,9 @@ function dqAddParse(raw) {
   _dqParsed = parsed;
 
   // Show preview
-  document.getElementById('dqadd-preview').style.display = 'block';
-  document.getElementById('dqadd-adjust').style.display = 'block';
-  document.getElementById('dqadd-save-btn').disabled = false;
+  const _p=document.getElementById('dqadd-preview'); if(_p) _p.style.display='block';
+  const _a=document.getElementById('dqadd-adjust'); if(_a) _a.style.display='block';
+  const _s=document.getElementById('dqadd-save-btn'); if(_s) _s.disabled=false;
 
   const icons = { assignment:'📚', event:'📅', task:'✅', goal:'⭐', countdown:'⏳', 'work-task':'💼', 'personal-task':'⭐' };
   const typeLabels = { assignment:'Assignment', event:'Event', task:'Task', goal:'Goal', countdown:'Countdown', 'work-task':'Work Task', 'personal-task':'Personal Task' };
@@ -6353,6 +6366,7 @@ function dqAddParse(raw) {
 
 function _renderDQAddFields(parsed) {
   const el = document.getElementById('dqadd-fields');
+  if (!el) return;
   const typeLabels = { assignment:'Assignment', event:'Event', task:'Task', goal:'Goal', countdown:'Countdown', 'work-task':'Work Task', 'personal-task':'Personal Task' };
 
   el.innerHTML = `
@@ -6523,7 +6537,7 @@ function _nlParse(raw) {
   let emoji = '⏳';
 
   const today = new Date();
-  const todayStr = tolocalDateStr(day);
+  const todayStr = localDateStr();
 
   // ── Strip filler phrases ──
   text = text.replace(/^(i have|i need to|i must|i should|remind me to|don't forget to|need to)\s+/i, '');
@@ -8164,28 +8178,7 @@ function _updateLocalDateFns() {
   };
 }
 
-// Patch localDateStr to use clock timezone
-const _origLocalDateStr = localDateStr;
-localDateStr = function(date) {
-  try {
-    const d = date || new Date();
-    const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: _clockTZ,
-      year: 'numeric', month: '2-digit', day: '2-digit'
-    });
-    return formatter.format(d);
-  } catch(e) {
-    return _origLocalDateStr(date);
-  }
-};
-
-// Patch localDateOffset too
-const _origLocalDateOffset = localDateOffset;
-localDateOffset = function(days) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return localDateStr(d);
-};
+// localDateStr and localDateOffset now timezone-aware at source — no patch needed
 
 // Countdown target: use local midnight of that date
 // new Date(cd.date + 'T12:00') is noon LOCAL — this is correct for day-level countdowns
