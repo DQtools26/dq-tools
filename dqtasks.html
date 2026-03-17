@@ -2255,6 +2255,21 @@ let createColor = '#4488ff';
 let createType = 'assignment';
 let editingId = null;
 let labelColor = '#4488ff';
+// ── Date helpers — always use LOCAL time, never UTC ──
+function localDateStr(date) {
+  const d = date || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function localDateOffset(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return localDateStr(d);
+}
+
+
 
 // ════════════════════════════════════════════════
 //  DQTasks — Main Application Script
@@ -2426,9 +2441,9 @@ function updateProgressBar(){
 // ── HOME ──
 function renderHome(){
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localDateStr(now);
   const weekEnd = new Date(now); weekEnd.setDate(now.getDate()+7);
-  const weekStr = weekEnd.toISOString().split('T')[0];
+  const weekStr = localDateStr(weekEnd);
 
   const allItems = [...state.assignments, ...state.tasks];
   const active = allItems.filter(x=>!x.completed);
@@ -2451,8 +2466,8 @@ function renderHome(){
 }
 
 function renderTodaySection(filter){
-  const todayStr = new Date().toISOString().split('T')[0];
-  const weekStr  = new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  const todayStr = localDateStr();
+  const weekStr  = localDateOffset(7);
   let items = [];
   const sectionLabels={
     'all':'Today\'s Items','week':'This Week\'s Items',
@@ -2530,7 +2545,7 @@ function renderItemHTML(item){
   const tags = (item.tags||[]).map(t=>`<span class="tag tag-blue" style="font-size:0.6rem;">${t}</span>`).join('');
   const classObj = item.classId ? state.classes.find(c=>c.id===item.classId) : null;
   const classBadge = classObj ? `<span class="tag" style="background:${classObj.color}22;color:${classObj.color};border-color:${classObj.color}44;font-size:0.6rem;">${classObj.name}</span>` : '';
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = localDateStr();
   const truly_overdue = item.due && item.due < todayStr && !item.completed;
   const timeStr = item.time ? ` at ${fmt12(item.time)}` : '';
   const dueBadge = item.due ? `<span style="font-size:0.65rem;color:${truly_overdue?'var(--red2)':item.due===todayStr?'var(--amber)':'var(--text2)'};">📅 ${item.due===todayStr?'Today'+timeStr:fmtDate(item.due)+timeStr}${truly_overdue?' ⚠️':''}</span>` : '';
@@ -2598,8 +2613,8 @@ function renderSchoolAssignments(){
   let items = state.assignments.filter(a=>a.workspace==='school'||!a.workspace);
   if(state.activeClass) items = items.filter(a=>a.classId===state.activeClass);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const soonStr  = new Date(Date.now()+3*86400000).toISOString().split('T')[0];
+  const todayStr = localDateStr();
+  const soonStr  = localDateOffset(3);
 
   if(state.schoolFilter==='due-soon') items=items.filter(a=>a.due&&a.due>=todayStr&&a.due<=soonStr&&!a.completed);
   if(state.schoolFilter==='missing') items=items.filter(a=>a.due&&a.due<todayStr&&!a.completed);
@@ -2708,7 +2723,7 @@ function uncomplete(id){
 
 // ── MISSING ──
 function renderMissing(){
-  const todayStr=new Date().toISOString().split('T')[0];
+  const todayStr=localDateStr();
   // Auto-mark overdue assignments
   state.assignments.forEach(a=>{
     if(a.due&&a.due<todayStr&&!a.completed) a.missing=true;
@@ -2741,7 +2756,7 @@ function renderCalendar(){
     const daysInMonth = new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
     const prevDays = new Date(d.getFullYear(),d.getMonth(),0).getDate();
     let html = days.map(dy=>`<div class="cal-day-name">${dy}</div>`).join('');
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = localDateStr();
     for(let i=0;i<firstDay;i++){
       const day = prevDays-(firstDay-1-i);
       html+=`<div class="cal-day other-month"><div class="cal-day-num">${day}</div></div>`;
@@ -2780,10 +2795,10 @@ function renderCalendar(){
     el.style.gridTemplateColumns='repeat(7,1fr)';
     const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let html = days.map(dy=>`<div class="cal-day-name">${dy}</div>`).join('');
-    const todayStr=new Date().toISOString().split('T')[0];
+    const todayStr=localDateStr();
     for(let i=0;i<7;i++){
       const day=new Date(startOfWeek);day.setDate(startOfWeek.getDate()+i);
-      const dateStr=day.toISOString().split('T')[0];
+      const dateStr=localDateStr(day);
       const isToday=dateStr===todayStr;
       const evOnDay=getEventsOnDay(dateStr);
       const assOnDay=state.assignments.filter(a=>a.due===dateStr&&!a.completed);
@@ -2796,7 +2811,7 @@ function renderCalendar(){
     el.innerHTML=html;
   } else {
     // Day view
-    const dateStr=d.toISOString().split('T')[0];
+    const dateStr=localDateStr(d);
     titleEl.textContent = d.toLocaleDateString('default',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
     el.style.gridTemplateColumns='1fr';
     const evOnDay=getEventsOnDay(dateStr);
@@ -2868,7 +2883,7 @@ function renderMiniCal(){
   document.getElementById('mini-cal-title').textContent=d.toLocaleString('default',{month:'long',year:'numeric'});
   const firstDay=new Date(d.getFullYear(),d.getMonth(),1).getDay();
   const daysInMonth=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
-  const todayStr=new Date().toISOString().split('T')[0];
+  const todayStr=localDateStr();
   const days=['S','M','T','W','T','F','S'];
   let html=days.map(dy=>`<div class="mini-cal-dn">${dy}</div>`).join('');
   for(let i=0;i<firstDay;i++) html+=`<div></div>`;
@@ -2893,9 +2908,9 @@ function jumpToCalDate(dateStr){
 
 // ── Upcoming ──
 function renderUpcoming(){
-  const todayStr=new Date().toISOString().split('T')[0];
-  const tomorrowStr=new Date(Date.now()+86400000).toISOString().split('T')[0];
-  const weekStr=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  const todayStr=localDateStr();
+  const tomorrowStr=localDateOffset(1);
+  const weekStr=localDateOffset(7);
   let items=[];
 
   const f=state.upcomingFilter;
@@ -2924,17 +2939,17 @@ function setUpcomingFilter(f,el){
 
 // ── UPCOMING PAGE ──
 function renderUpcomingPage(){
-  const todayStr=new Date().toISOString().split('T')[0];
-  const tomorrowStr=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const todayStr=localDateStr();
+  const tomorrowStr=localDateOffset(1);
   const range=state.upcomingPageRange||'today';
   const type=state.upcomingPageType||'all';
 
   let endStr;
   if(range==='today') endStr=todayStr;
   else if(range==='tomorrow') endStr=tomorrowStr;
-  else if(range==='3days') endStr=new Date(Date.now()+3*86400000).toISOString().split('T')[0];
-  else if(range==='week') endStr=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
-  else if(range==='month') endStr=new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+  else if(range==='3days') endStr=localDateOffset(3);
+  else if(range==='week') endStr=localDateOffset(7);
+  else if(range==='month') endStr=localDateOffset(30);
   else endStr='9999-12-31';
 
   let items=[];
@@ -3706,7 +3721,7 @@ function showDetail(type,id){
     const imp=item.importance||1;
     const impColor=imp===3?'var(--red2)':imp===2?'var(--amber)':'var(--green)';
     const impLabel=imp===3?'⭐⭐⭐ High Priority':imp===2?'⭐⭐ Medium Priority':'⭐ Low Priority';
-    const todayStr=new Date().toISOString().split('T')[0];
+    const todayStr=localDateStr();
     const truly_overdue=item.due&&item.due<todayStr&&!item.completed;
     const dueDisplay=item.due?(item.due===todayStr?'Today'+(item.time?' at '+fmt12(item.time):''):fmtDate(item.due)+(item.time?' at '+fmt12(item.time):'')):'No due date';
     html=`
@@ -3874,12 +3889,12 @@ function fmtDateTime(ts){
 }
 function isOverdue(due){
   if(!due) return false;
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateStr();
   return due<today; // strictly BEFORE today — today is NOT overdue
 }
 function isTodayOrOverdue(due){
   if(!due) return false;
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateStr();
   return due<=today;
 }
 function fmt12(t){
@@ -3891,8 +3906,8 @@ function fmt12(t){
 }
 function isDueThisWeek(due){
   if(!due) return false;
-  const today=new Date().toISOString().split('T')[0];
-  const weekEnd=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  const today=localDateStr();
+  const weekEnd=localDateOffset(7);
   return due>=today&&due<=weekEnd;
 }
 function stripHTML(html){return html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();}
@@ -3905,7 +3920,7 @@ function timeAgo(ts){
 }
 
 function updateBadges(){
-  const todayStr=new Date().toISOString().split('T')[0];
+  const todayStr=localDateStr();
   const missing=state.assignments.filter(a=>a.due&&a.due<todayStr&&!a.completed).length;
   document.getElementById('missing-badge').textContent=missing;
 }
@@ -4014,7 +4029,7 @@ function dismissWelcome(signIn){
 }
 
 // Set today's date as default for due dates
-const todayVal=new Date().toISOString().split('T')[0];
+const todayVal=localDateStr();
 document.getElementById('create-due').value=todayVal;
 document.getElementById('create-event-start').value=todayVal;
 
@@ -4435,6 +4450,8 @@ function savePersist() {
     soundVolume:      Math.round((soundVolume||0.6)*100),
     soundToggles:     {...SOUND_TOGGLES},
     colorfulStrength: colorfulStrength||2,
+    timezone:         Intl.DateTimeFormat().resolvedOptions().timeZone,
+    tzOffset:         new Date().getTimezoneOffset(),
   };
   localStorage.setItem('dqtasks_prefs', JSON.stringify(prefs));
   if (typeof DQAuth !== 'undefined' && DQAuth.getUser()) {
@@ -4498,7 +4515,7 @@ window.addEventListener('dq:authready', async ({ detail: { user } }) => {
 //  DAILY HABITS
 // ─────────────────────────────────────────────────
 function checkDailyReset() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   if (state.dailyResetDate !== today) {
     state.habits.forEach(h => { h.completedToday = false; });
     state.dailyResetDate = today;
@@ -4603,7 +4620,7 @@ function setDaySubView(view, el) {
 }
 
 function getCountdownText(dateStr) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   if (dateStr === today) return '📅 Today';
   const diff = Math.round((new Date(dateStr+'T12:00') - new Date(today+'T12:00')) / 86400000);
   if (diff < 0) return `⚠️ ${Math.abs(diff)}d ago`;
@@ -4622,7 +4639,7 @@ function renderHourView(dateStr) {
   });
   const tasksOnDay = state.tasks.filter(t => t.due === dateStr && !t.completed);
   const nowHour = new Date().getHours();
-  const isToday = dateStr === new Date().toISOString().split('T')[0];
+  const isToday = dateStr === localDateStr();
 
   // All-day / no-time items at top
   const noTimeItems = [
@@ -4666,7 +4683,7 @@ renderCalendar = function() {
   const toggle = document.getElementById('day-view-toggle');
   if (toggle) toggle.style.display = (state.calView === 'day') ? 'block' : 'none';
   if (state.calView === 'day' && daySubView === 'hour') {
-    const dateStr = state.calDate.toISOString().split('T')[0];
+    const dateStr = localDateStr(state.calDate);
     renderHourView(dateStr);
   }
 };
@@ -4726,7 +4743,7 @@ function startReminderCheck() {
 
 function checkReminders() {
   const now = new Date();
-  const d = now.toISOString().split('T')[0];
+  const d = localDateStr(now);
   const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   [...state.assignments, ...state.tasks, ...state.events].forEach(item => {
     if (item.remindDate === d && item.remindTime === t && !item.reminderFired) {
@@ -4979,7 +4996,7 @@ document.addEventListener('click', function(e) {
 // When renderMissing is called, increase importance of missing items by 1 (max 3)
 const _origRenderMissing = renderMissing;
 renderMissing = function() {
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = localDateStr();
   state.assignments.forEach(a => {
     if (a.due && a.due < todayStr && !a.completed) {
       a.missing = true;
@@ -4999,7 +5016,7 @@ renderMissing = function() {
 function renderRemindersPage() {
   const rems = state.reminders || [];
   const now  = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localDateStr(now);
 
   const rcEl = document.getElementById('reminders-count');
   if (rcEl) rcEl.textContent = rems.length;
@@ -5011,7 +5028,7 @@ function renderRemindersPage() {
 
   el.innerHTML = rems.map(r => {
     const isPast = r.date < todayStr || (r.date === todayStr && r.time && r.time < now.toTimeString().slice(0,5));
-    const dateLabel = r.date === todayStr ? 'Today' : r.date === new Date(Date.now()+86400000).toISOString().split('T')[0] ? 'Tomorrow' : fmtDate(r.date);
+    const dateLabel = r.date === todayStr ? 'Today' : r.date === localDateOffset(1) ? 'Tomorrow' : fmtDate(r.date);
     return `<div class="task-item" style="${r.fired||isPast?'opacity:0.6;':''}">
       <div style="font-size:1.1rem;flex-shrink:0;">🔔</div>
       <div style="flex:1;min-width:0;">
@@ -5028,7 +5045,7 @@ function renderRemindersPage() {
 
 function openAddReminderModal() {
   document.getElementById('rem-text').value = '';
-  document.getElementById('rem-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('rem-date').value = localDateStr();
   document.getElementById('rem-time').value = '';
   openModal('add-reminder-modal');
   setTimeout(() => document.getElementById('rem-text').focus(), 60);
@@ -5080,7 +5097,7 @@ const _origCheckReminders = checkReminders;
 checkReminders = function() {
   _origCheckReminders();
   const now = new Date();
-  const d = now.toISOString().split('T')[0];
+  const d = localDateStr(now);
   const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   (state.reminders||[]).forEach(r => {
     if (r.date === d && r.time === t && !r.fired) {
@@ -6492,7 +6509,7 @@ function _nlParse(raw) {
   let emoji = '⏳';
 
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = tolocalDateStr(day);
 
   // ── Strip filler phrases ──
   text = text.replace(/^(i have|i need to|i must|i should|remind me to|don't forget to|need to)\s+/i, '');
@@ -6546,11 +6563,11 @@ function _nlParse(raw) {
     text = text.replace(/\btoday\b/i,'').trim();
   } else if (/\btomorrow\b/i.test(text)) {
     const d = new Date(today); d.setDate(d.getDate()+1);
-    date = d.toISOString().split('T')[0];
+    date = localDateStr(d);
     text = text.replace(/\btomorrow\b/i,'').trim();
   } else if (/\bnext week\b/i.test(text)) {
     const d = new Date(today); d.setDate(d.getDate()+7);
-    date = d.toISOString().split('T')[0];
+    date = localDateStr(d);
     text = text.replace(/\bnext week\b/i,'').trim();
   } else {
     // Day of week — match full names AND abbreviations
@@ -6565,7 +6582,7 @@ function _nlParse(raw) {
       let diff = target - cur;
       if (diff <= 0 || dowMatch[1]) diff += 7;
       const d = new Date(today); d.setDate(d.getDate()+diff);
-      date = d.toISOString().split('T')[0];
+      date = localDateStr(d);
       text = text.replace(dowMatch[0],'').trim();
     } else {
       // Month day  e.g. "Jan 15" or "December 3"
@@ -6576,7 +6593,7 @@ function _nlParse(raw) {
         const mIdx = months.findIndex(m => mMatch[1].toLowerCase().startsWith(m));
         const d = new Date(today.getFullYear(), mIdx, parseInt(mMatch[2]));
         if (d < today) d.setFullYear(d.getFullYear()+1);
-        date = d.toISOString().split('T')[0];
+        date = localDateStr(d);
         text = text.replace(mMatch[0],'').trim();
       }
     }
@@ -6731,8 +6748,8 @@ function renderFocus() {
   if (!el) return;
 
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const tomorrowStr = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const todayStr = localDateStr(now);
+  const tomorrowStr = localDateOffset(1);
 
   const allItems = [
     ...state.assignments.filter(a => !a.completed).map(a => ({...a, _type:'assignment'})),
@@ -7111,9 +7128,9 @@ function checkSmartNotifications() {
   if (now - _lastNotifCheck < 5 * 60 * 1000) return;
   _lastNotifCheck = now;
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const tomorrowStr = new Date(Date.now()+86400000).toISOString().split('T')[0];
-  const in3days = new Date(Date.now()+3*86400000).toISOString().split('T')[0];
+  const todayStr = localDateStr();
+  const tomorrowStr = localDateOffset(1);
+  const in3days = localDateOffset(3);
 
   // Overdue assignments
   const overdue = state.assignments.filter(a => !a.completed && a.due && a.due < todayStr);
@@ -7246,7 +7263,7 @@ function dismissAlarm() {
 const _origCheckReminders2 = checkReminders;
 checkReminders = function() {
   const now = new Date();
-  const d = now.toISOString().split('T')[0];
+  const d = localDateStr(now);
   const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   const fired = [];
   [...(state.assignments||[]),...(state.tasks||[]),...(state.events||[])].forEach(item => {
@@ -7340,8 +7357,8 @@ function _injectEventPickerIntoCountdownModal() {
   if (document.getElementById('cd-event-picker')) return;
   const modal = document.querySelector('#add-countdown-modal .modal');
   if (!modal) return;
-  const events = state.events.filter(e => e.startDate >= new Date().toISOString().split('T')[0]);
-  const assignments = state.assignments.filter(a => !a.completed && a.due >= new Date().toISOString().split('T')[0]);
+  const events = state.events.filter(e => e.startDate >= localDateStr());
+  const assignments = state.assignments.filter(a => !a.completed && a.due >= localDateStr());
   const items = [...events, ...assignments].slice(0, 20);
   if (!items.length) return;
 
@@ -7447,8 +7464,8 @@ function openDQAddFromChip() {
 
 function _smartDateLabel(dateStr, timeStr) {
   if (!dateStr) return '';
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const today = localDateStr();
+  const tomorrow = localDateOffset(1);
   const dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const d = new Date(dateStr + 'T12:00');
   const timeLabel = timeStr ? ' at ' + fmt12(timeStr) : '';
@@ -7483,7 +7500,7 @@ function _generateRecurringEvents(base, recurType) {
   advance(); // start from next occurrence
   let count = 0;
   while (cur <= limit && count < 365) {
-    const dateStr = cur.toISOString().split('T')[0];
+    const dateStr = localDateStr(cur);
     generated.push({
       ...base,
       id: uid(),
@@ -7538,8 +7555,8 @@ if (!state.xp) state.xp = 0;
 
 function _updateStreaks(type) {
   if (!state.streaks) state.streaks = { taskStreak:0, habitStreak:0, lastTaskDate:'', lastHabitDate:'', totalCompleted:0, totalHabits:0, dailyCompleted:{}, funMode:false };
-  const todayStr = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+  const todayStr = localDateStr();
+  const yesterday = localDateOffset(-1);
 
   if (type === 'task') {
     state.streaks.totalCompleted = (state.streaks.totalCompleted||0) + 1;
@@ -7634,7 +7651,7 @@ function renderStats() {
   if (!state.progressItems) state.progressItems = [];
   if (state.xp === undefined) state.xp = 0;
   const s = state.streaks;
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = localDateStr();
   const funMode = document.getElementById('stats-fun-mode');
   if (funMode) funMode.checked = s.funMode || false;
 
