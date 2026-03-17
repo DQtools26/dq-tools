@@ -884,6 +884,10 @@ body, #navbar, #ribbon, .card, .sidebar-item, .assign-item, .task-item, .event-c
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" id="search-input" placeholder="Search tasks, notes, events…" oninput="handleSearch(this.value)" onfocus="openSearch()" onblur="setTimeout(closeSearch,200)">
   </div>
+  <button id="nav-clock" onclick="toggleClockPanel()" title="Clock & Timezone" style="display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:8px;padding:3px 10px;cursor:pointer;flex-shrink:0;min-width:72px;line-height:1.2;">
+    <span id="nav-clock-time" style="font-size:0.78rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">--:--</span>
+    <span id="nav-clock-date" style="font-size:0.55rem;color:var(--text3);font-weight:600;letter-spacing:0.03em;">---</span>
+  </button>
   <div id="global-save-indicator" style="font-size:0.6rem;font-weight:700;padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;opacity:0;transition:opacity 0.3s;">✓ Saved</div>
   <button id="nav-create" onclick="openCreateModal()">+ Create</button>
   <button id="nav-quickadd" onclick="openDQAdd()" title="Quick Add (Q)" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;border:none;border-radius:8px;padding:6px 12px;font-family:var(--app-font);font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;">⚡ Quick Add</button>
@@ -4493,6 +4497,16 @@ async function loadPersist() {
       Object.assign(SOUND_TOGGLES, prefs.soundToggles);
       renderSoundToggles();
     }
+    if (prefs.timezone) {
+      _clockTZ = prefs.timezone;
+      localStorage.setItem('dqtasks_tz', prefs.timezone);
+      const tzSel = document.getElementById('clock-tz-select');
+      if (tzSel) tzSel.value = prefs.timezone;
+    }
+    if (prefs.clockFormat) {
+      _clockFormat = prefs.clockFormat;
+      localStorage.setItem('dqtasks_clock_fmt', String(prefs.clockFormat));
+    }
     if (prefs.colorfulStrength) {
       colorfulStrength = prefs.colorfulStrength;
       const sl = document.getElementById('colorful-strength');
@@ -7406,7 +7420,7 @@ renderCountdownsPage = function() {
   emptyEl.style.display = cds.length ? 'none' : '';
   const sorted = [...cds].sort((a,b) => (a.date||'9999').localeCompare(b.date||'9999'));
   el.innerHTML = sorted.map(cd => {
-    const target = cd.time ? new Date(cd.date + 'T' + cd.time) : new Date(cd.date + 'T12:00');
+    const target = (typeof _countdownTarget === 'function') ? _countdownTarget(cd.date, cd.time) : (cd.time ? new Date(cd.date + 'T' + cd.time) : new Date(cd.date + 'T23:59:00'));
     const diff = Math.ceil((target - now) / 86400000);
     const totalMs = target - now;
     const totalHours = Math.ceil(totalMs / 3600000);
@@ -7864,6 +7878,333 @@ function loadCountdownDisplayMode() {
   if (saved) _countdownDisplayMode = saved;
 }
 
+
+// ════════════════════════════════════════════════
+//  CLOCK & TIMEZONE
+// ════════════════════════════════════════════════
+
+// List of common timezones
+const TZ_LIST = [
+  'America/New_York','America/Chicago','America/Denver','America/Los_Angeles',
+  'America/Anchorage','America/Honolulu','America/Phoenix',
+  'America/Toronto','America/Vancouver','America/Mexico_City',
+  'America/Sao_Paulo','America/Buenos_Aires','America/Lima',
+  'Europe/London','Europe/Paris','Europe/Berlin','Europe/Rome',
+  'Europe/Madrid','Europe/Amsterdam','Europe/Moscow','Europe/Istanbul',
+  'Asia/Dubai','Asia/Kolkata','Asia/Bangkok','Asia/Singapore',
+  'Asia/Tokyo','Asia/Shanghai','Asia/Seoul','Asia/Jakarta',
+  'Australia/Sydney','Australia/Melbourne','Australia/Perth',
+  'Pacific/Auckland','Pacific/Fiji',
+  'Africa/Cairo','Africa/Johannesburg','Africa/Lagos',
+  'Atlantic/Reykjavik','UTC',
+];
+
+let _clockTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+let _clockFormat = 12; // 12 or 24
+let _clockInterval = null;
+let _clockPanelOpen = false;
+let _clockTZOffset = ''; // cached, recomputed every minute not every second
+let _clockLastMinute = -1;
+
+function initClock() {
+  // Load saved TZ
+  const saved = localStorage.getItem('dqtasks_tz');
+  if (saved) _clockTZ = saved;
+  else _clockTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Populate timezone select
+  const sel = document.getElementById('clock-tz-select');
+  if (sel) {
+    sel.innerHTML = TZ_LIST.map(tz =>
+      `<option value="${tz}" ${tz === _clockTZ ? 'selected' : ''}>${tz.replace(/_/g,' ')}</option>`
+    ).join('');
+  }
+
+  // Load clock format pref
+  const savedFmt = localStorage.getItem('dqtasks_clock_fmt');
+  if (savedFmt) _clockFormat = parseInt(savedFmt);
+  // Update format buttons
+  const btn12 = document.getElementById('clock-fmt-12');
+  const btn24 = document.getElementById('clock-fmt-24');
+  if (btn12) { btn12.style.background = _clockFormat===12?'var(--blue-dim)':'var(--surface2)'; btn12.style.color = _clockFormat===12?'var(--blue2)':'var(--text2)'; }
+  if (btn24) { btn24.style.background = _clockFormat===24?'var(--blue-dim)':'var(--surface2)'; btn24.style.color = _clockFormat===24?'var(--blue2)':'var(--text2)'; }
+
+  _clockInterval = setInterval(_tickClock, 1000);
+  _tickClock();
+}
+
+// Cached formatter — recreated only when TZ changes
+let _clockFormatter = null;
+let _clockFormatterTZ = null;
+function _getClockFormatter() {
+  if (!_clockFormatter || _clockFormatterTZ !== _clockTZ) {
+    _clockFormatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: _clockTZ,
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit',
+      hour12: false
+    });
+    _clockFormatterTZ = _clockTZ;
+  }
+  return _clockFormatter;
+}
+
+function _getLocalNow() {
+  try {
+    const parts = Object.fromEntries(_getClockFormatter().formatToParts(new Date()).map(p => [p.type, p.value]));
+    const h24 = parseInt(parts.hour);
+    return {
+      h: h24,
+      h12: h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24,
+      ampm: h24 < 12 ? 'AM' : 'PM',
+      m: parseInt(parts.minute),
+      s: parseInt(parts.second),
+      dateStr: `${parts.year}-${parts.month}-${parts.day}`,
+      display: `${parts.month}/${parts.day}/${parts.year}`,
+    };
+  } catch(e) {
+    const now = new Date();
+    const h24 = now.getHours();
+    return {
+      h: h24,
+      h12: h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24,
+      ampm: h24 < 12 ? 'AM' : 'PM',
+      m: now.getMinutes(),
+      s: now.getSeconds(),
+      dateStr: localDateStr(now),
+      display: now.toLocaleDateString(),
+    };
+  }
+}
+
+function _tickClock() {
+  const t = _getLocalNow();
+  const mm = String(t.m).padStart(2,'0');
+  const ss = String(t.s).padStart(2,'0');
+  const use24 = _clockFormat === 24;
+
+  // Format hour for display
+  const dispH = use24 ? String(t.h).padStart(2,'0') : String(t.h12);
+  const dispHNav = use24 ? String(t.h).padStart(2,'0') : String(t.h12).padStart(2,'0');
+  const ampmStr = use24 ? '' : ` ${t.ampm}`;
+
+  // Navbar mini clock — only update when minute changes
+  if (t.m !== _clockLastMinute) {
+    _clockLastMinute = t.m;
+    const navTime = document.getElementById('nav-clock-time');
+    const navDate = document.getElementById('nav-clock-date');
+    if (navTime) navTime.textContent = `${dispHNav}:${mm}${ampmStr}`;
+    if (navDate) {
+      const d = new Date(t.dateStr + 'T12:00');
+      navDate.textContent = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    }
+    // Also recompute TZ offset once per minute (expensive operation)
+    _clockTZOffset = _getTZOffset();
+    const tzDisp = document.getElementById('clock-tz-display');
+    if (tzDisp) tzDisp.textContent = `${_clockTZ.replace(/_/g,' ')} (UTC${_clockTZOffset})`;
+  }
+
+  // Panel — only update when open
+  if (_clockPanelOpen) {
+    const dig = document.getElementById('clock-digital');
+    if (dig) dig.textContent = `${dispH}:${mm}:${ss}${ampmStr}`;
+    const dateFull = document.getElementById('clock-date-full');
+    if (dateFull && !dateFull._lastDate || dateFull._lastDate !== t.dateStr) {
+      if (dateFull) {
+        const dayName = new Intl.DateTimeFormat('en-US',{timeZone:_clockTZ,weekday:'long'}).format(new Date());
+        dateFull.textContent = `${dayName}, ${t.display}`;
+        dateFull._lastDate = t.dateStr;
+      }
+    }
+    _drawAnalogClock(t.h % 12, t.m, t.s);
+  }
+}
+
+function _getTZOffset() {
+  try {
+    const now = new Date();
+    const utc = new Date(now.toLocaleString('en-US', {timeZone:'UTC'}));
+    const local = new Date(now.toLocaleString('en-US', {timeZone: _clockTZ}));
+    const diff = (local - utc) / 60000;
+    const sign = diff >= 0 ? '+' : '-';
+    const h = Math.floor(Math.abs(diff) / 60);
+    const m = Math.abs(diff) % 60;
+    return `${sign}${h}${m ? ':'+String(m).padStart(2,'0') : ''}`;
+  } catch(e) { return ''; }
+}
+
+function _drawAnalogClock(h, m, s) {
+  const canvas = document.getElementById('analog-clock');
+  if (!canvas) return;
+  const ctx2 = canvas.getContext('2d');
+  const cx = 80, cy = 80, r = 74;
+
+  // Get theme colors from CSS vars
+  const style = getComputedStyle(document.documentElement);
+  const bg = style.getPropertyValue('--surface').trim() || '#18181f';
+  const surface2 = style.getPropertyValue('--surface2').trim() || '#20202a';
+  const border = style.getPropertyValue('--border2').trim() || '#3e3e58';
+  const textColor = style.getPropertyValue('--text').trim() || '#f0f0f8';
+  const blue = style.getPropertyValue('--blue2').trim() || '#4488ff';
+  const text3 = style.getPropertyValue('--text3').trim() || '#555570';
+
+  ctx2.clearRect(0, 0, 160, 160);
+
+  // Face
+  ctx2.beginPath(); ctx2.arc(cx, cy, r, 0, Math.PI*2);
+  ctx2.fillStyle = surface2; ctx2.fill();
+  ctx2.strokeStyle = border; ctx2.lineWidth = 2; ctx2.stroke();
+
+  // Hour markers
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * Math.PI * 2 - Math.PI/2;
+    const isMajor = i % 3 === 0;
+    const len = isMajor ? 10 : 5;
+    const x1 = cx + Math.cos(angle) * (r - 4);
+    const y1 = cy + Math.sin(angle) * (r - 4);
+    const x2 = cx + Math.cos(angle) * (r - 4 - len);
+    const y2 = cy + Math.sin(angle) * (r - 4 - len);
+    ctx2.beginPath(); ctx2.moveTo(x1, y1); ctx2.lineTo(x2, y2);
+    ctx2.strokeStyle = isMajor ? textColor : text3;
+    ctx2.lineWidth = isMajor ? 2 : 1;
+    ctx2.stroke();
+  }
+
+  // Hour hand
+  const hAngle = ((h + m/60) / 12) * Math.PI*2 - Math.PI/2;
+  ctx2.beginPath();
+  ctx2.moveTo(cx, cy);
+  ctx2.lineTo(cx + Math.cos(hAngle) * 45, cy + Math.sin(hAngle) * 45);
+  ctx2.strokeStyle = textColor; ctx2.lineWidth = 3.5; ctx2.lineCap = 'round'; ctx2.stroke();
+
+  // Minute hand
+  const mAngle = ((m + s/60) / 60) * Math.PI*2 - Math.PI/2;
+  ctx2.beginPath();
+  ctx2.moveTo(cx, cy);
+  ctx2.lineTo(cx + Math.cos(mAngle) * 62, cy + Math.sin(mAngle) * 62);
+  ctx2.strokeStyle = textColor; ctx2.lineWidth = 2.5; ctx2.lineCap = 'round'; ctx2.stroke();
+
+  // Second hand
+  const sAngle = (s / 60) * Math.PI*2 - Math.PI/2;
+  ctx2.beginPath();
+  ctx2.moveTo(cx, cy);
+  ctx2.lineTo(cx + Math.cos(sAngle) * 68, cy + Math.sin(sAngle) * 68);
+  ctx2.strokeStyle = blue; ctx2.lineWidth = 1.5; ctx2.lineCap = 'round'; ctx2.stroke();
+
+  // Center dot
+  ctx2.beginPath(); ctx2.arc(cx, cy, 4, 0, Math.PI*2);
+  ctx2.fillStyle = blue; ctx2.fill();
+}
+
+function toggleClockPanel() {
+  const panel = document.getElementById('clock-panel');
+  if (!panel) return;
+  _clockPanelOpen = !_clockPanelOpen;
+  if (_clockPanelOpen) {
+    // Position below the clock button
+    const btn = document.getElementById('nav-clock');
+    const rect = btn ? btn.getBoundingClientRect() : {left:0,bottom:60};
+    panel.style.display = 'block';
+    panel.style.top = (rect.bottom + 8) + 'px';
+    panel.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
+    _tickClock();
+    // Close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', function _closeC(e) {
+        if (!panel.contains(e.target) && e.target.id !== 'nav-clock' && !e.target.closest('#nav-clock')) {
+          panel.style.display = 'none';
+          _clockPanelOpen = false;
+          document.removeEventListener('click', _closeC);
+        }
+      });
+    }, 100);
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function setClockFormat(fmt) {
+  _clockFormat = fmt;
+  localStorage.setItem('dqtasks_clock_fmt', String(fmt));
+  // Update button styles
+  const btn12 = document.getElementById('clock-fmt-12');
+  const btn24 = document.getElementById('clock-fmt-24');
+  if (btn12) { btn12.style.background = fmt===12?'var(--blue-dim)':'var(--surface2)'; btn12.style.color = fmt===12?'var(--blue2)':'var(--text2)'; }
+  if (btn24) { btn24.style.background = fmt===24?'var(--blue-dim)':'var(--surface2)'; btn24.style.color = fmt===24?'var(--blue2)':'var(--text2)'; }
+  // Force navbar update
+  _clockLastMinute = -1;
+  _tickClock();
+  savePersist();
+}
+
+function setTimezone(tz) {
+  _clockTZ = tz;
+  localStorage.setItem('dqtasks_tz', tz);
+  _tickClock();
+  // Update localDateStr to use new TZ
+  _updateLocalDateFns();
+  savePersist();
+  if (typeof DQAuth !== 'undefined') DQAuth.toast(`🕐 Timezone set to ${tz.replace(/_/g,' ')}`);
+}
+
+function autoSyncTimezone() {
+  const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const sel = document.getElementById('clock-tz-select');
+  if (sel) sel.value = detected;
+  setTimezone(detected);
+  if (typeof DQAuth !== 'undefined') DQAuth.toast(`🔄 Synced to ${detected.replace(/_/g,' ')}`);
+}
+
+// Override localDateStr to use timezone-aware date
+function _updateLocalDateFns() {
+  // Patch localDateStr to always use _clockTZ
+  window._tzAwareDate = function() {
+    const t = _getLocalNow();
+    return t.dateStr;
+  };
+}
+
+// Patch localDateStr to use clock timezone
+const _origLocalDateStr = localDateStr;
+localDateStr = function(date) {
+  try {
+    const d = date || new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: _clockTZ,
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    return formatter.format(d);
+  } catch(e) {
+    return _origLocalDateStr(date);
+  }
+};
+
+// Patch localDateOffset too
+const _origLocalDateOffset = localDateOffset;
+localDateOffset = function(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return localDateStr(d);
+};
+
+// Countdown target: use local midnight of that date
+// new Date(cd.date + 'T12:00') is noon LOCAL — this is correct for day-level countdowns
+// but can still be off. Instead use start of day in local TZ.
+function _countdownTarget(dateStr, timeStr) {
+  if (timeStr) {
+    // Specific time — parse as local
+    return new Date(dateStr + 'T' + timeStr);
+  }
+  // No time — use end of day (23:59) in local timezone for fairness
+  // This means "due today" shows 0d until end of today, not noon
+  return new Date(dateStr + 'T23:59:00');
+}
+
+// Run initClock after DOM ready
+document.addEventListener('DOMContentLoaded', () => setTimeout(initClock, 100));
+// Fallback if DOMContentLoaded already fired
+if (document.readyState !== 'loading') setTimeout(initClock, 100);
+
 </script>
 
 <style>
@@ -7941,6 +8282,34 @@ function loadCountdownDisplayMode() {
       <button class="btn btn-ghost" onclick="closeModal('dqadd-modal')">Cancel</button>
     </div>
   </div>
+</div>
+
+
+<!-- Clock & Timezone Panel -->
+<div id="clock-panel" style="display:none;position:fixed;z-index:10000;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:20px;box-shadow:0 8px 40px rgba(0,0,0,0.35);min-width:280px;font-family:var(--app-font);color:var(--text);">
+  <!-- Analog clock -->
+  <div style="display:flex;justify-content:center;margin-bottom:14px;">
+    <canvas id="analog-clock" width="160" height="160" style="border-radius:50%;"></canvas>
+  </div>
+  <!-- Digital time + date -->
+  <div style="text-align:center;margin-bottom:14px;">
+    <div id="clock-digital" style="font-size:2rem;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;"></div>
+    <div id="clock-date-full" style="font-size:0.78rem;color:var(--text2);margin-top:2px;"></div>
+  </div>
+  <!-- Format toggle -->
+  <div style="display:flex;gap:6px;margin-bottom:12px;">
+    <button id="clock-fmt-12" onclick="setClockFormat(12)" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;background:var(--blue-dim);color:var(--blue2);">12h</button>
+    <button id="clock-fmt-24" onclick="setClockFormat(24)" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;background:var(--surface2);color:var(--text2);">24h</button>
+  </div>
+  <!-- Timezone -->
+  <div style="background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+    <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;">Timezone</div>
+    <div id="clock-tz-display" style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"></div>
+    <select id="clock-tz-select" class="form-select" style="font-size:0.75rem;padding:5px 8px;width:100%;margin-bottom:8px;" onchange="setTimezone(this.value)">
+    </select>
+    <button onclick="autoSyncTimezone()" style="width:100%;padding:6px;border-radius:7px;border:1px solid var(--border2);background:var(--surface3);color:var(--text2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;">🔄 Auto Sync from Device</button>
+  </div>
+  <button onclick="document.getElementById('clock-panel').style.display='none'" style="width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--app-font);font-size:0.75rem;font-weight:700;cursor:pointer;">Close</button>
 </div>
 
 </body>
