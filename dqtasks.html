@@ -2560,7 +2560,7 @@ function renderItemHTML(item){
   const classObj = item.classId ? state.classes.find(c=>c.id===item.classId) : null;
   const classBadge = classObj ? `<span class="tag" style="background:${classObj.color}22;color:${classObj.color};border-color:${classObj.color}44;font-size:0.6rem;">${classObj.name}</span>` : '';
   const todayStr = localDateStr();
-  const truly_overdue = item.due && item.due < todayStr && !item.completed;
+  const truly_overdue = item.due && isOverdue(item.due, item.time) && !item.completed;
   const timeStr = item.time ? ` at ${fmt12(item.time)}` : '';
   const dueBadge = item.due ? `<span style="font-size:0.65rem;color:${truly_overdue?'var(--red2)':item.due===todayStr?'var(--amber)':'var(--text2)'};">📅 ${item.due===todayStr?'Today'+timeStr:fmtDate(item.due)+timeStr}${truly_overdue?' ⚠️':''}</span>` : '';
 
@@ -2740,8 +2740,8 @@ function renderMissing(){
   const todayStr=localDateStr();
   // Auto-mark overdue assignments
   state.assignments.forEach(a=>{
-    if(a.due&&a.due<todayStr&&!a.completed) a.missing=true;
-    else if(a.due&&a.due>=todayStr) a.missing=false;
+    if(a.due && isOverdue(a.due, a.time) && !a.completed) a.missing=true;
+    else if(a.due && !isOverdue(a.due, a.time)) a.missing=false;
   });
   // Also include overdue tasks that have a due date
   const missingAssignments = state.assignments.filter(a=>a.missing&&!a.completed);
@@ -3736,7 +3736,7 @@ function showDetail(type,id){
     const impColor=imp===3?'var(--red2)':imp===2?'var(--amber)':'var(--green)';
     const impLabel=imp===3?'⭐⭐⭐ High Priority':imp===2?'⭐⭐ Medium Priority':'⭐ Low Priority';
     const todayStr=localDateStr();
-    const truly_overdue=item.due&&item.due<todayStr&&!item.completed;
+    const truly_overdue=item.due&&isOverdue(item.due,item.time)&&!item.completed;
     const dueDisplay=item.due?(item.due===todayStr?'Today'+(item.time?' at '+fmt12(item.time):''):fmtDate(item.due)+(item.time?' at '+fmt12(item.time):'')):'No due date';
     html=`
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -3901,15 +3901,22 @@ function fmtDateTime(ts){
   if(!ts) return '';
   return new Date(ts).toLocaleDateString('default',{month:'short',day:'numeric'});
 }
-function isOverdue(due){
+function isOverdue(due, time){
   if(!due) return false;
   const today=localDateStr();
-  return due<today; // strictly BEFORE today — today is NOT overdue
+  if(due < today) return true;
+  // If due today AND a time is set, check if that time has passed
+  if(due === today && time) {
+    const now = new Date();
+    const [h,m] = time.split(':').map(Number);
+    const dueDate = new Date(); dueDate.setHours(h,m,0,0);
+    return now > dueDate;
+  }
+  return false;
 }
-function isTodayOrOverdue(due){
+function isTodayOrOverdue(due, time){
   if(!due) return false;
-  const today=localDateStr();
-  return due<=today;
+  return due < localDateStr() || (due === localDateStr() && (!time || isOverdue(due, time)));
 }
 function fmt12(t){
   if(!t) return '';
@@ -3935,7 +3942,7 @@ function timeAgo(ts){
 
 function updateBadges(){
   const todayStr=localDateStr();
-  const missing=state.assignments.filter(a=>a.due&&a.due<todayStr&&!a.completed).length;
+  const missing=state.assignments.filter(a=>a.due&&isOverdue(a.due,a.time)&&!a.completed).length;
   document.getElementById('missing-badge').textContent=missing;
 }
 
@@ -5362,7 +5369,11 @@ insertChip = function(id, type) {
 function _getItemDiff(item, type) {
   let targetDate = item.due || item.startDate || item.date || null;
   if (!targetDate) return null;
-  const diff = Math.ceil((new Date(targetDate+'T12:00') - new Date()) / 86400000);
+  // Use calendar-day comparison to avoid time-of-day affecting day count
+  const todayStr2 = localDateStr();
+  const todayM = new Date(todayStr2 + 'T00:00:00');
+  const targetM = new Date(targetDate + 'T00:00:00');
+  const diff = Math.round((targetM - todayM) / 86400000);
   return diff;
 }
 
@@ -7435,7 +7446,14 @@ renderCountdownsPage = function() {
   const sorted = [...cds].sort((a,b) => (a.date||'9999').localeCompare(b.date||'9999'));
   el.innerHTML = sorted.map(cd => {
     const target = (typeof _countdownTarget === 'function') ? _countdownTarget(cd.date, cd.time) : (cd.time ? new Date(cd.date + 'T' + cd.time) : new Date(cd.date + 'T23:59:00'));
-    const diff = Math.ceil((target - now) / 86400000);
+    // Calendar-day diff: compare date strings so time-of-day never affects the day count
+    const todayForCd = localDateStr(now);
+    const targetDateStr = cd.date;
+    const todayParts = todayForCd.split('-').map(Number);
+    const targetParts = targetDateStr.split('-').map(Number);
+    const todayMidnight = new Date(todayParts[0], todayParts[1]-1, todayParts[2]);
+    const targetMidnight = new Date(targetParts[0], targetParts[1]-1, targetParts[2]);
+    const diff = Math.round((targetMidnight - todayMidnight) / 86400000);
     const totalMs = target - now;
     const totalHours = Math.ceil(totalMs / 3600000);
     const totalMins = Math.ceil(totalMs / 60000);
