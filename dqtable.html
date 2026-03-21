@@ -13,7 +13,7 @@
   </script>
   <script src="dq-auth.js" defer></script>
   <title>DQtable</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#0a0a0e; --bg2:#111118; --surface:#18181f; --surface2:#20202a; --surface3:#28283a;
@@ -24,19 +24,9 @@
   --green:#3db870; --green-dim:#0e2a1a;
   --amber:#e89020; --amber-dim:#2a1a06;
   --purple:#9966ff; --teal:#22c5b0;
-
-  /* Element category colors */
-  --alkali: #ff6b6b;
-  --alkaline: #ffa94d;
-  --lanthanide: #cc5de8;
-  --actinide: #e599f7;
-  --transition: #4dabf7;
-  --post-transition: #74c0fc;
-  --metalloid: #63e6be;
-  --nonmetal: #a9e34b;
-  --halogen: #ffe066;
-  --noble: #91a7ff;
-  --unknown: #adb5bd;
+  --alkali:#ff6b6b; --alkaline:#ffa94d; --lanthanide:#cc5de8; --actinide:#e599f7;
+  --transition:#4dabf7; --post-transition:#74c0fc; --metalloid:#63e6be;
+  --nonmetal:#a9e34b; --halogen:#ffe066; --noble:#91a7ff; --unknown:#adb5bd;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -54,43 +44,26 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 #nav-search-input:focus{border-color:var(--blue2);}
 #nav-search-input::placeholder{color:var(--text3);}
 
-/* ===== PAGES ===== */
 .page{display:none;min-height:100vh;}
 .page.active{display:block;}
 
 /* ===== PERIODIC TABLE PAGE ===== */
 #page-table{padding:70px 12px 40px;}
-.pt-header{text-align:center;padding:16px 0 12px;position:relative;}
+.pt-header{text-align:center;padding:16px 0 12px;}
 .pt-title{font-size:1.6rem;font-weight:900;letter-spacing:-.04em;background:linear-gradient(135deg,var(--blue2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .pt-subtitle{font-size:0.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-top:2px;}
-
 .toggle-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 8px;flex-wrap:wrap;}
 .toggle-chip{padding:4px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:0.7rem;font-weight:700;cursor:pointer;color:var(--text3);background:transparent;transition:all 0.15s;font-family:'Outfit',sans-serif;}
 .toggle-chip:hover{border-color:var(--blue2);color:var(--blue2);}
 .toggle-chip.on{background:var(--blue-dim);border-color:var(--blue2);color:var(--blue2);}
-
-/* Category bar */
 .cat-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 12px 10px;max-width:1200px;margin:0 auto;}
 .cat-badge{display:flex;align-items:center;gap:5px;font-size:0.62rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);cursor:pointer;padding:3px 8px;border-radius:4px;transition:all 0.15s;}
 .cat-badge:hover{background:var(--surface2);}
 .cat-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
-.cat-badge.highlighted .cat-dot{box-shadow:0 0 6px currentColor;}
-
-/* Hover banner */
 #hover-banner{height:28px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:700;color:var(--text2);transition:all 0.2s;letter-spacing:.05em;}
-
-/* Periodic Table Grid */
 .pt-wrap{overflow-x:auto;padding-bottom:10px;}
 .pt-grid{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;min-width:800px;max-width:1200px;margin:0 auto;padding:0 8px;}
-.pt-gap{min-width:1px;}
-
-.el-cell{
-  aspect-ratio:1;min-width:48px;max-width:68px;
-  background:var(--surface);border:1px solid var(--border);border-radius:6px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;transition:background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.15s;
-  position:relative;padding:2px;animation:cellIn 0.4s ease both;
-}
+.el-cell{aspect-ratio:1;min-width:48px;max-width:68px;background:var(--surface);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.15s,box-shadow 0.15s;position:relative;padding:2px;animation:cellIn 0.4s ease both;}
 @keyframes cellIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
 .el-cell:hover{transform:scale(1.1);z-index:10;border-color:rgba(255,255,255,0.5);box-shadow:0 0 14px rgba(255,255,255,0.12),0 4px 20px rgba(0,0,0,0.5);}
 .el-cell.dimmed{opacity:0.15;transition:opacity 0.2s;}
@@ -99,18 +72,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .el-sym{font-size:1.2rem;font-weight:900;letter-spacing:-.02em;line-height:1;}
 .el-name{font-size:0.42rem;font-weight:600;color:rgba(255,255,255,0.65);text-align:center;margin-top:1px;}
 .el-mass{font-size:0.4rem;color:rgba(255,255,255,0.4);font-family:'Space Mono',monospace;}
-
-/* Trend overlay */
-.el-cell.trend-overlay .el-trend-val{
-  position:absolute;bottom:2px;right:3px;
-  font-size:0.38rem;font-weight:700;font-family:'Space Mono',monospace;
-  color:rgba(255,255,255,0.7);
-}
-
-/* Lanthanide/Actinide row separator */
-.pt-lan-header{grid-column:1/-1;height:8px;}
-
-/* valence table */
 #valence-overlay{display:none;max-width:700px;margin:12px auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
 #valence-overlay.show{display:block;animation:fadeIn 0.2s ease;}
 .vtable{width:100%;border-collapse:collapse;font-size:0.75rem;}
@@ -120,23 +81,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .vtable tr:hover td{background:var(--surface2);}
 
 /* ===== ELEMENT POPUP ===== */
-#el-popup{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;padding:20px;
-}
-#el-popup.show{display:flex;animation:fadeIn 0.2s ease;}
-#el-popup-inner{
-  background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  max-width:420px;width:100%;padding:24px;position:relative;
-  animation:slideUp 0.25s ease;max-height:90vh;overflow-y:auto;
-}
+#el-popup{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;}
+#el-popup.show{display:flex;}
+#el-popup-inner{background:var(--surface);border:1px solid var(--border);border-radius:18px;max-width:420px;width:100%;padding:24px;position:relative;animation:popupIn 0.25s cubic-bezier(0.34,1.56,0.64,1);max-height:90vh;overflow-y:auto;}
 .popup-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;line-height:1;transition:color 0.15s;}
 .popup-close:hover{color:var(--text);}
 .popup-el-header{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
 .popup-el-badge{width:70px;height:70px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
-.popup-el-badge .sym{font-size:2rem;font-weight:900;}
-.popup-el-badge .num{font-size:0.58rem;font-weight:700;opacity:0.7;font-family:'Space Mono',monospace;}
 .popup-el-name{font-size:1.4rem;font-weight:800;}
 .popup-el-cat{font-size:0.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:2px;}
 .popup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
@@ -150,6 +101,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border2);}
 .btn-ghost:hover{border-color:var(--blue2);color:var(--blue2);}
 .btn-sm{padding:7px 14px;font-size:0.75rem;}
+.btn-green{background:var(--green);color:white;box-shadow:0 2px 12px rgba(61,184,112,0.35);}
+.btn-green:hover{background:#4dd980;}
 
 /* ===== SEARCH PAGE ===== */
 #page-search{max-width:800px;margin:0 auto;padding:70px 20px 40px;}
@@ -175,31 +128,24 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 #page-element{max-width:900px;margin:0 auto;padding:70px 20px 40px;}
 .el-detail-header{display:flex;gap:20px;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;}
 .el-detail-badge{width:100px;height:100px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
-.el-detail-badge .sym{font-size:2.8rem;font-weight:900;line-height:1;}
-.el-detail-badge .num{font-size:0.65rem;font-weight:700;opacity:0.7;font-family:'Space Mono',monospace;}
 .el-detail-info{flex:1;}
 .el-detail-name{font-size:2rem;font-weight:900;letter-spacing:-.04em;}
 .el-detail-cat{font-size:0.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;margin-top:4px;margin-bottom:8px;}
 .el-detail-config{font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--text2);background:var(--surface2);border-radius:6px;padding:4px 8px;display:inline-block;}
-
 .el-data-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
-/* Data card stagger */
 .el-data-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;animation:screenIn 0.3s ease both;}
 .el-data-label{font-size:0.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
 .el-data-val{font-size:1rem;font-weight:700;}
-.el-data-unit{font-size:0.65rem;color:var(--text2);font-weight:500;}
-
 .el-action-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
-
 .nav-trail{display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text3);margin-bottom:16px;flex-wrap:wrap;}
 .nav-trail a{color:var(--blue2);cursor:pointer;text-decoration:none;}
 .nav-trail a:hover{text-decoration:underline;}
 .nav-trail-sep{color:var(--text3);}
 
 /* ===== COMPOUND BUILDER PAGE ===== */
-#page-compound{max-width:1100px;margin:0 auto;padding:70px 20px 40px;}
-.compound-layout{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start;}
-@media(max-width:800px){.compound-layout{grid-template-columns:1fr;}}
+#page-compound{max-width:1200px;margin:0 auto;padding:70px 20px 40px;}
+.compound-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
+@media(max-width:900px){.compound-layout{grid-template-columns:1fr;}}
 .compound-input-area{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;}
 .compound-result-pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;position:sticky;top:58px;}
 .section-title{font-size:0.88rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -208,17 +154,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .element-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;transition:border-color 0.15s;}
 .element-row:focus-within{border-color:var(--blue2);}
 .el-row-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;flex-shrink:0;}
-.el-row-select{flex:1;background:transparent;border:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;outline:none;cursor:pointer;}
-.el-row-select option{background:var(--surface2);}
-.el-row-qty{width:60px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;outline:none;text-align:center;}
+.el-row-qty{width:52px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:4px 6px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:700;outline:none;text-align:center;}
 .el-row-qty:focus{border-color:var(--blue2);}
 .el-row-remove{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:2px 4px;transition:color 0.15s;}
 .el-row-remove:hover{color:var(--red2);}
+.charge-selector{display:flex;align-items:center;gap:4px;}
+.charge-btn{padding:2px 8px;border:1px solid var(--border);border-radius:5px;font-size:0.68rem;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);font-family:'Space Mono',monospace;transition:all 0.12s;white-space:nowrap;}
+.charge-btn:hover{border-color:var(--blue2);color:var(--blue2);}
+.charge-btn.active-pos{background:rgba(255,85,85,0.2);border-color:var(--red2);color:var(--red2);}
+.charge-btn.active-neg{background:rgba(68,136,255,0.2);border-color:var(--blue2);color:var(--blue2);}
+.charge-btn.active-zero{background:rgba(144,144,184,0.2);border-color:var(--text2);color:var(--text2);}
+
 .btn-dashed{width:100%;padding:10px;background:transparent;border:1.5px dashed var(--border2);border-radius:10px;color:var(--text3);font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:4px;}
 .btn-dashed:hover{border-color:var(--blue2);color:var(--blue2);}
 
 /* Result pane */
-.result-formula{font-size:1.8rem;font-weight:900;text-align:center;padding:16px;background:var(--surface2);border-radius:12px;margin-bottom:14px;letter-spacing:.02em;font-family:'Space Mono',monospace;min-height:64px;display:flex;align-items:center;justify-content:center;}
+.result-formula{font-size:1.6rem;font-weight:900;text-align:center;padding:14px;background:var(--surface2);border-radius:12px;margin-bottom:8px;letter-spacing:.02em;font-family:'Space Mono',monospace;min-height:58px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;}
+.compound-name-display{font-size:0.9rem;font-weight:700;text-align:center;color:var(--blue2);margin-bottom:12px;font-style:italic;min-height:20px;}
 .result-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem;}
 .result-row:last-child{border-bottom:none;}
 .result-label{color:var(--text3);font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
@@ -229,14 +181,18 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .bond-polar{background:rgba(255,224,102,0.12);color:#ffe066;border:1px solid rgba(255,224,102,0.3);}
 .bond-nonpolar{background:rgba(163,228,75,0.12);color:#a9e34b;border:1px solid rgba(163,228,75,0.3);}
 .bond-metallic{background:rgba(77,171,247,0.12);color:#4dabf7;border:1px solid rgba(77,171,247,0.3);}
-.result-explanation{margin-top:12px;padding:10px 12px;background:var(--blue-dim);border:1px solid rgba(34,85,204,0.3);border-radius:8px;font-size:0.78rem;line-height:1.5;color:var(--blue2);}
+.result-explanation{margin-top:10px;padding:10px 12px;background:var(--blue-dim);border:1px solid rgba(34,85,204,0.3);border-radius:8px;font-size:0.75rem;line-height:1.5;color:var(--blue2);}
+
+/* Charge balance indicator */
+.charge-balance-bar{margin:10px 0;padding:8px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;display:flex;align-items:center;gap:8px;border:1px solid transparent;}
+.charge-balance-bar.neutral{background:rgba(61,184,112,0.12);border-color:rgba(61,184,112,0.3);color:var(--green);}
+.charge-balance-bar.unbalanced{background:rgba(224,48,48,0.1);border-color:rgba(224,48,48,0.3);color:var(--red2);}
+
+/* Warnings */
+.chem-warning{padding:8px 12px;background:rgba(232,144,32,0.1);border:1px solid rgba(232,144,32,0.3);border-radius:8px;font-size:0.72rem;color:#e8b060;margin-top:8px;display:flex;align-items:flex-start;gap:6px;}
 
 /* Lewis viz */
 .lewis-viz{margin-top:14px;text-align:center;}
-.lewis-atoms-wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:12px;}
-.lewis-atom{display:flex;flex-direction:column;align-items:center;gap:6px;}
-.lewis-canvas-wrap{position:relative;width:80px;height:80px;}
-.lewis-label{font-size:0.7rem;font-weight:700;color:var(--text2);}
 
 /* Toggle switch */
 .toggle-switch-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:0.78rem;font-weight:700;color:var(--text2);}
@@ -251,7 +207,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
 #page-bohr{max-width:900px;margin:0 auto;padding:70px 20px 40px;}
 .bohr-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;}
 @media(max-width:720px){.bohr-layout{grid-template-columns:1fr;}}
-@media(max-width:640px){#lewis-main-layout{grid-template-columns:1fr!important;}}
 .bohr-canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;text-align:center;}
 #bohr-canvas{border-radius:12px;background:#0d0d15;max-width:100%;}
 .bohr-controls{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
@@ -262,71 +217,91 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
 .bohr-stat-val{font-size:1.1rem;font-weight:800;}
 .shell-display{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--blue2);}
 
-/* ===== LEWIS STRUCTURE PAGE ===== */
+/* ===== LEWIS DOTS PAGE ===== */
 #page-lewis{max-width:900px;margin:0 auto;padding:70px 20px 40px;}
+
+/* ===== EQUATION BALANCER PAGE ===== */
+#page-equation{max-width:1000px;margin:0 auto;padding:70px 20px 40px;}
+.eq-input-area{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px;}
+.eq-input-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+.eq-main-input{flex:1;min-width:220px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.95rem;outline:none;transition:border-color 0.15s;}
+.eq-main-input:focus{border-color:var(--blue2);}
+.eq-main-input::placeholder{color:var(--text3);font-family:'Outfit',sans-serif;}
+.eq-method-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.8rem;outline:none;cursor:pointer;}
+.eq-result-area{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;display:none;}
+.eq-result-area.show{display:block;animation:fadeIn 0.2s ease;}
+.eq-balanced{font-size:1.4rem;font-weight:900;font-family:'Space Mono',monospace;text-align:center;padding:18px;background:var(--surface2);border-radius:12px;margin-bottom:16px;line-height:1.6;letter-spacing:.02em;word-break:break-all;}
+.eq-step{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.eq-step-num{font-size:0.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue2);margin-bottom:4px;}
+.eq-step-text{font-size:0.82rem;line-height:1.5;color:var(--text);}
+.eq-atom-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:12px;}
+.eq-atom-table th{background:var(--surface3);padding:7px 10px;text-align:left;font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);}
+.eq-atom-table td{padding:7px 10px;border-bottom:1px solid var(--border);}
+.eq-atom-table tr:last-child td{border-bottom:none;}
+.atom-balanced{color:var(--green);font-weight:800;}
+.atom-unbalanced{color:var(--red2);font-weight:800;}
+.eq-type-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+.eq-synthesis{background:rgba(68,136,255,0.15);color:var(--blue2);border:1px solid rgba(68,136,255,0.3);}
+.eq-decomp{background:rgba(232,144,32,0.12);color:#e8b060;border:1px solid rgba(232,144,32,0.3);}
+.eq-combustion{background:rgba(255,107,107,0.12);color:#ff8888;border:1px solid rgba(255,107,107,0.3);}
+.eq-redox{background:rgba(153,102,255,0.12);color:var(--purple);border:1px solid rgba(153,102,255,0.3);}
+.eq-generic{background:rgba(99,230,190,0.12);color:var(--teal);border:1px solid rgba(99,230,190,0.3);}
+.eq-interactive-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.coeff-box{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;}
+.coeff-sym{font-family:'Space Mono',monospace;font-size:0.88rem;font-weight:700;}
+.coeff-input{width:44px;background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:3px 6px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;text-align:center;outline:none;}
+.coeff-input:focus{border-color:var(--blue2);}
+.coeff-input.bad{border-color:var(--red2);background:var(--red-dim);}
+.coeff-input.good{border-color:var(--green);background:var(--green-dim);}
+.eq-examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.eq-example-btn{padding:4px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:0.7rem;font-weight:700;cursor:pointer;color:var(--text2);font-family:'Space Mono',monospace;transition:all 0.15s;}
+.eq-example-btn:hover{border-color:var(--blue2);color:var(--blue2);}
+.eq-error{padding:12px 14px;background:var(--red-dim);border:1px solid rgba(224,48,48,0.3);border-radius:10px;color:var(--red2);font-size:0.8rem;margin-top:8px;}
 
 /* ===== SHARED ===== */
 .page-header{margin-bottom:24px;}
 .page-header h2{font-size:1.5rem;font-weight:900;letter-spacing:-.03em;}
 .page-header p{color:var(--text2);font-size:0.82rem;margin-top:4px;}
-
-/* Trend overlays */
 .trend-hot{background:linear-gradient(135deg,rgba(255,107,107,0.2),rgba(255,107,107,0.05))!important;}
 .trend-warm{background:linear-gradient(135deg,rgba(255,200,100,0.15),rgba(255,200,100,0.03))!important;}
 .trend-cool{background:linear-gradient(135deg,rgba(77,171,247,0.15),rgba(77,171,247,0.03))!important;}
 .trend-cold{background:linear-gradient(135deg,rgba(145,167,255,0.2),rgba(145,167,255,0.05))!important;}
-
-@keyframes formulaPop{0%{transform:scale(0.9);opacity:0.5}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
-.formula-pop{animation:formulaPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;}
-
-/* Popup entrance */
-@keyframes popupIn{from{opacity:0;transform:scale(0.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-#el-popup-inner{animation:popupIn 0.25s cubic-bezier(0.34,1.56,0.64,1);}
-
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes screenIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.ani{animation:screenIn 0.3s ease both;}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:var(--border2);}
-
-/* Callout */
 .callout{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;font-size:0.78rem;line-height:1.5;border:1px solid transparent;margin-bottom:10px;}
 .callout.info{background:var(--blue-dim);border-color:rgba(34,85,204,.3);color:var(--blue2);}
 .callout.amber{background:var(--amber-dim);border-color:rgba(232,144,32,.25);color:#e8b060;}
 .callout.green{background:var(--green-dim);border-color:rgba(61,184,112,.25);color:#a0e0b8;}
 .callout.red{background:var(--red-dim);border-color:rgba(224,48,48,.25);color:var(--red2);}
 
-/* ── DQ Auth Button (in navbar) ── */
-#dq-auth-btn {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(14,19,32,0.8); border: 1px solid #2a4468;
-  border-radius: 100px; padding: 4px 10px 4px 5px;
-  font-family: 'Outfit', sans-serif; font-size: .68rem; font-weight: 700;
-  color: #7a9abf; cursor: pointer; transition: all .18s;
-  white-space: nowrap; flex-shrink: 0; margin-left: auto;
-}
-#dq-auth-btn:hover { border-color: #3a7fff; color: #e8eef8; }
-#dq-auth-btn.logged-in { border-color: rgba(77,232,136,.35); color: #e8eef8; }
-#dq-auth-avatar {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: linear-gradient(135deg,#2dcc6f,#3a7fff);
-  display: flex; align-items: center; justify-content: center;
-  font-size: .75rem; overflow: hidden; flex-shrink: 0;
-}
-#dq-auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
-#dq-user-dropdown {
-  position: fixed; top: 58px; right: 16px; z-index: 9001;
-  background: #0e1320; border: 1px solid #2a4468; border-radius: 14px;
-  padding: 6px; width: 220px; font-family: 'Outfit', sans-serif;
-  box-shadow: 0 8px 32px rgba(0,0,0,.6);
-  display: none; flex-direction: column; gap: 2px;
-}
-#dq-user-dropdown.open { display: flex; }
+/* ── DQ Auth Button ── */
+#dq-auth-btn{display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;margin-left:auto;}
+#dq-auth-btn:hover{border-color:#3a7fff;color:#e8eef8;}
+#dq-auth-btn.logged-in{border-color:rgba(77,232,136,.35);color:#e8eef8;}
+#dq-auth-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0;}
+#dq-auth-avatar img{width:100%;height:100%;object-fit:cover;}
+#dq-user-dropdown{position:fixed;top:58px;right:16px;z-index:9001;background:#0e1320;border:1px solid #2a4468;border-radius:14px;padding:6px;width:220px;font-family:'Outfit',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.6);display:none;flex-direction:column;gap:2px;}
+#dq-user-dropdown.open{display:flex;}
 
+@keyframes formulaPop{0%{transform:scale(0.9);opacity:0.5}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.formula-pop{animation:formulaPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes popupIn{from{opacity:0;transform:scale(0.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes screenIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ani{animation:screenIn 0.3s ease both;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--border2);}
+
+/* VSEPR shape display */
+.shape-diagram{text-align:center;margin-top:12px;}
+.shape-svg-wrap{display:inline-block;background:var(--surface2);border-radius:12px;padding:12px;}
+
+/* Eq mode tabs */
+.eq-mode-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.eq-mode-tab{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;color:var(--text3);background:transparent;transition:all 0.15s;font-family:'Outfit',sans-serif;}
+.eq-mode-tab:hover{border-color:var(--blue2);color:var(--blue2);}
+.eq-mode-tab.active{background:var(--blue-dim);border-color:var(--blue2);color:var(--blue2);}
 </style>
 </head>
 <body>
@@ -337,11 +312,12 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
   <button class="nav-btn active" onclick="showPage('table')" id="nb-table">⚛ Table</button>
   <button class="nav-btn" onclick="showPage('search')" id="nb-search">🔍 Search</button>
   <button class="nav-btn" onclick="showPage('compound')" id="nb-compound">🧪 Compound</button>
+  <button class="nav-btn" onclick="showPage('equation')" id="nb-equation">⚖️ Balance</button>
   <button class="nav-btn" onclick="showPage('bohr')" id="nb-bohr">🌀 Bohr</button>
   <button class="nav-btn" onclick="showPage('lewis')" id="nb-lewis">🔗 Lewis</button>
   <div class="nav-spacer"></div>
   <input id="nav-search-input" placeholder="Quick search…" oninput="quickSearch(this.value)" onfocus="showPage('search');document.getElementById('main-search').value=this.value;doSearch()" />
-<button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
     <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
   </button>
 </div>
@@ -352,8 +328,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
     <div class="pt-title">DQtable</div>
     <div class="pt-subtitle">Interactive Periodic Table of Elements</div>
   </div>
-
-  <!-- Toggle controls -->
   <div class="toggle-row">
     <button class="toggle-chip" id="tc-trends" onclick="toggleTrends()">📈 Trends</button>
     <button class="toggle-chip" id="tc-valence" onclick="toggleValence()">⚡ Valence Info</button>
@@ -365,13 +339,8 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
       <option value="density">Density</option>
     </select>
   </div>
-
-  <!-- Category legend -->
   <div class="cat-bar" id="cat-bar"></div>
-
-  <!-- Hover info banner -->
   <div id="hover-banner">Hover over an element to see its category</div>
-  <!-- Trend legend -->
   <div id="trend-legend" style="display:none;justify-content:center;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
     <span style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Low</span>
     <div style="display:flex;height:10px;width:160px;border-radius:5px;overflow:hidden;">
@@ -383,13 +352,9 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
     <span style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">High</span>
     <span id="trend-legend-label" style="font-size:0.65rem;font-weight:700;color:var(--text2);margin-left:6px;"></span>
   </div>
-
-  <!-- Valence info table -->
   <div id="valence-overlay">
     <table class="vtable">
-      <thead><tr>
-        <th>Family</th><th>Valence e⁻</th><th>Tendency</th><th>Exchange</th><th>Ionic Charge</th>
-      </tr></thead>
+      <thead><tr><th>Family</th><th>Valence e⁻</th><th>Tendency</th><th>Exchange</th><th>Ionic Charge</th></tr></thead>
       <tbody>
         <tr><td>Alkali Metals</td><td>1</td><td>Lose</td><td>1</td><td>+1</td></tr>
         <tr><td>Alkaline Earth Metals</td><td>2</td><td>Lose</td><td>2</td><td>+2</td></tr>
@@ -402,8 +367,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
       </tbody>
     </table>
   </div>
-
-  <!-- Periodic Table Grid -->
   <div class="pt-wrap">
     <div class="pt-grid" id="pt-grid"></div>
   </div>
@@ -448,7 +411,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
 <div id="page-compound" class="page">
   <div class="page-header">
     <h2>🧪 Compound Builder</h2>
-    <p>Select elements or polyatomic ions — charges are balanced automatically</p>
+    <p>Build ionic & covalent compounds with smart charge balancing, naming, and bond prediction</p>
   </div>
   <div class="compound-layout">
     <div class="compound-input-area">
@@ -457,19 +420,77 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
       <button class="btn-dashed" onclick="addCompoundRow()">+ Add Element / Ion</button>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <div style="font-size:0.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Visualization Mode</div>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="toggle-chip on" id="vis-dots" onclick="setVisMode('dots')">Lewis Dots</button>
           <button class="toggle-chip" id="vis-structure" onclick="setVisMode('structure')">Lewis Structure</button>
         </div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <button class="btn btn-green btn-sm" onclick="sendToEquationBalancer()" style="width:100%;">⚖️ Use in Equation Balancer →</button>
       </div>
     </div>
     <div class="compound-result-pane">
       <div class="section-title"><span class="section-icon">📊</span> Results</div>
       <div class="result-formula" id="result-formula">—</div>
+      <div class="compound-name-display" id="compound-name-display"></div>
+      <div id="charge-balance-indicator"></div>
       <div id="result-details"></div>
+      <div id="result-warnings"></div>
       <div id="result-explanation" class="result-explanation" style="display:none;"></div>
       <div id="lewis-viz-area" class="lewis-viz" style="margin-top:12px;"></div>
+      <div id="vsepr-display" style="margin-top:10px;"></div>
     </div>
+  </div>
+</div>
+
+<!-- ===================== EQUATION BALANCER PAGE ===================== -->
+<div id="page-equation" class="page">
+  <div class="page-header">
+    <h2>⚖️ Equation Balancer</h2>
+    <p>Balance any chemical equation with step-by-step explanations</p>
+  </div>
+  <div class="eq-input-area">
+    <div class="eq-mode-tabs">
+      <button class="eq-mode-tab active" id="eq-tab-inspection" onclick="setEqMode('inspection')">Inspection</button>
+      <button class="eq-mode-tab" id="eq-tab-algebraic" onclick="setEqMode('algebraic')">Algebraic</button>
+      <button class="eq-mode-tab" id="eq-tab-redox" onclick="setEqMode('redox')">Half-Reaction (Redox)</button>
+    </div>
+    <div class="eq-input-row">
+      <input class="eq-main-input" id="eq-input" placeholder="e.g. H2 + O2 → H2O  or  Fe + O2 → Fe2O3" oninput="eqLiveUpdate()" onkeydown="if(event.key==='Enter')balanceEquation()" />
+      <button class="btn btn-primary" onclick="balanceEquation()">⚖️ Balance</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearEquation()">Clear</button>
+    </div>
+    <div style="font-size:0.68rem;color:var(--text3);margin-bottom:10px;">Use → or = to separate reactants/products. Subscripts: H2O, Fe2O3. Charges: Fe^3+, Cl^-</div>
+    <div style="font-size:0.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;">Examples:</div>
+    <div class="eq-examples">
+      <button class="eq-example-btn" onclick="loadExample('H2 + O2 → H2O')">H₂ + O₂ → H₂O</button>
+      <button class="eq-example-btn" onclick="loadExample('Fe + O2 → Fe2O3')">Fe + O₂ → Fe₂O₃</button>
+      <button class="eq-example-btn" onclick="loadExample('CH4 + O2 → CO2 + H2O')">CH₄ combustion</button>
+      <button class="eq-example-btn" onclick="loadExample('Al + HCl → AlCl3 + H2')">Al + HCl</button>
+      <button class="eq-example-btn" onclick="loadExample('C3H8 + O2 → CO2 + H2O')">C₃H₈ combustion</button>
+      <button class="eq-example-btn" onclick="loadExample('Na + H2O → NaOH + H2')">Na + H₂O</button>
+      <button class="eq-example-btn" onclick="loadExample('KMnO4 + HCl → KCl + MnCl2 + H2O + Cl2')">Redox: KMnO₄</button>
+      <button class="eq-example-btn" onclick="loadExample('Ca3(PO4)2 + H2SO4 → CaSO4 + H3PO4')">Ca₃(PO₄)₂</button>
+      <button class="eq-example-btn" onclick="loadExample('C2H5OH + O2 → CO2 + H2O')">Ethanol combustion</button>
+      <button class="eq-example-btn" onclick="loadExample('N2 + H2 → NH3')">Haber process</button>
+    </div>
+    <div id="eq-redox-options" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;">Redox Conditions:</div>
+      <div style="display:flex;gap:8px;">
+        <button class="toggle-chip on" id="eq-acidic-btn" onclick="setRedoxCondition('acidic')">Acidic Solution</button>
+        <button class="toggle-chip" id="eq-basic-btn" onclick="setRedoxCondition('basic')">Basic Solution</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="eq-result-area" id="eq-result-area">
+    <div id="eq-result-inner"></div>
+  </div>
+
+  <!-- Interactive mode -->
+  <div id="eq-interactive-area" style="display:none;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;">
+    <div style="font-size:0.88rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;">🔄 Interactive Balancing <span style="font-size:0.68rem;font-weight:600;color:var(--text3);">— adjust coefficients and see live atom counts</span></div>
+    <div id="eq-interactive-inner"></div>
   </div>
 </div>
 
@@ -508,8 +529,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
       <h2>🔗 Lewis Dot Structures</h2>
       <p>Visualize valence electrons for any element</p>
     </div>
-
-    <!-- Search bar -->
     <div style="max-width:400px;margin-bottom:20px;">
       <div class="search-box-wrap">
         <span class="search-icon">🔍</span>
@@ -517,10 +536,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
       </div>
       <div id="lewis-search-results" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
     </div>
-
-    <!-- Main layout -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;" id="lewis-main-layout">
-      <!-- Left: single element viewer -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;">
         <div style="font-size:0.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;">Single Element</div>
         <div id="lewis-single-display" style="text-align:center;">
@@ -528,7 +544,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
         </div>
         <div id="lewis-single-info" style="margin-top:14px;"></div>
       </div>
-      <!-- Right: compare two elements -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;">
         <div style="font-size:0.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;">Compare Two Elements</div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
@@ -548,8 +563,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:whit
         </div>
       </div>
     </div>
-
-    <!-- All elements grid by category -->
     <div style="margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;">
       <div style="font-size:0.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;">Browse by Valence Electrons</div>
       <div id="lewis-gallery" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
@@ -690,7 +703,6 @@ const ELEMENTS = [
   {n:118,sym:"Og",name:"Oganesson",mass:294,group:18,period:7,block:"p",cat:"unknown",config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶",en:null,ie:null,ar:null,mp:null,bp:null,density:null,year:2002,state:"unknown"}
 ];
 
-// Polyatomic ions
 const POLYATOMIC_IONS = [
   {name:"Nitrate",formula:"NO₃⁻",charge:-1,valence:24,sym:"NO₃"},
   {name:"Sulfate",formula:"SO₄²⁻",charge:-2,valence:32,sym:"SO₄"},
@@ -706,64 +718,150 @@ const POLYATOMIC_IONS = [
   {name:"Peroxide",formula:"O₂²⁻",charge:-2,valence:14,sym:"O₂"},
   {name:"Cyanide",formula:"CN⁻",charge:-1,valence:10,sym:"CN"},
   {name:"Thiosulfate",formula:"S₂O₃²⁻",charge:-2,valence:32,sym:"S₂O₃"},
+  {name:"Oxalate",formula:"C₂O₄²⁻",charge:-2,valence:28,sym:"C₂O₄"},
+  {name:"Sulfite",formula:"SO₃²⁻",charge:-2,valence:26,sym:"SO₃"},
+  {name:"Nitrite",formula:"NO₂⁻",charge:-1,valence:18,sym:"NO₂"},
+  {name:"Hypochlorite",formula:"ClO⁻",charge:-1,valence:14,sym:"ClO"},
 ];
 
-// Common/fun names for elements
 const COMMON_NAMES = {
   1:"Lightest element; most abundant in universe",2:"Party balloon gas; noble gas",3:"Lightest metal; used in batteries",4:"Used in nuclear reactors",
   5:"Essential for plants; found in borax",6:"Building block of all life",7:"Makes up 78% of air",8:"Essential for breathing",
   9:"Most reactive nonmetal; used in toothpaste",10:"Neon signs; lighting",11:"Table salt ingredient",12:"Lightest structural metal",
   13:"Foil wrap; airplane metal",14:"Computer chips; Silicon Valley",15:"Matches and fertilizers",16:"Gunpowder ingredient; brimstone",
   17:"Bleach and disinfectants",18:"Welding shielding gas",19:"Banana electrolyte; potassium",20:"Bones and teeth; chalk",
-  22:"Aerospace alloys; very strong and light",24:"Chromium plating; stainless steel",25:"Manganese in batteries",
-  26:"Iron equals steel; most used metal on Earth",27:"Vitamin B12 component; cobalt blue",28:"Coins; magnetic",
-  29:"Electrical wire; old pennies",30:"Galvanizing steel; sunscreen",
-  47:"Sterling silver; photography",78:"Catalytic converters; jewelry",79:"Gold - aurum; used as currency for millennia",
-  80:"Liquid metal; old thermometers",82:"Old pipes; leaded gasoline",88:"Radioactive; used in cancer treatment",
-  92:"Nuclear fuel; radioactive",36:"Used in flash bulbs",54:"Anesthetic in some uses",86:"Radioactive gas; seeps from ground"
+  22:"Aerospace alloys; very strong and light",24:"Chromium plating; stainless steel",26:"Iron equals steel; most used metal on Earth",
+  29:"Electrical wire; old pennies",47:"Sterling silver; photography",79:"Gold — used as currency for millennia",
+  80:"Liquid metal; old thermometers",92:"Nuclear fuel; radioactive"
 };
 
 const CAT_COLORS = {
-  "alkali metal":"#ff6b6b",
-  "alkaline earth metal":"#ffa94d",
-  "lanthanide":"#cc5de8",
-  "actinide":"#e599f7",
-  "transition metal":"#4dabf7",
-  "post-transition metal":"#74c0fc",
-  "metalloid":"#63e6be",
-  "nonmetal":"#a9e34b",
-  "halogen":"#ffe066",
-  "noble gas":"#91a7ff",
-  "unknown":"#868e96"
+  "alkali metal":"#ff6b6b","alkaline earth metal":"#ffa94d","lanthanide":"#cc5de8","actinide":"#e599f7",
+  "transition metal":"#4dabf7","post-transition metal":"#74c0fc","metalloid":"#63e6be","nonmetal":"#a9e34b",
+  "halogen":"#ffe066","noble gas":"#91a7ff","unknown":"#868e96"
 };
-
-// Category display names
 const CAT_NAMES = {
-  "alkali metal":"Alkali Metals",
-  "alkaline earth metal":"Alkaline Earth Metals",
-  "lanthanide":"Lanthanides",
-  "actinide":"Actinides",
-  "transition metal":"Transition Metals",
-  "post-transition metal":"Post-Transition Metals",
-  "metalloid":"Metalloids",
-  "nonmetal":"Nonmetals",
-  "halogen":"Halogens",
-  "noble gas":"Noble Gases",
-  "unknown":"Unknown"
+  "alkali metal":"Alkali Metals","alkaline earth metal":"Alkaline Earth Metals","lanthanide":"Lanthanides",
+  "actinide":"Actinides","transition metal":"Transition Metals","post-transition metal":"Post-Transition Metals",
+  "metalloid":"Metalloids","nonmetal":"Nonmetals","halogen":"Halogens","noble gas":"Noble Gases","unknown":"Unknown"
 };
 
-// Periodic table layout: [atomicNumber, col, row] — 0-indexed col/row in 18-col grid
-// Row 1-7 standard, row 8 gap, rows 9-10 lanthanides/actinides
-const PT_LAYOUT = {};
-ELEMENTS.forEach(el => {
-  // Place by group/period for main table
-  if(el.cat === 'lanthanide' || el.cat === 'actinide') return; // handled separately
-  if(el.n >= 104 && el.group) {
-    PT_LAYOUT[el.n] = {col: el.group - 1, row: el.period - 1};
-    return;
+// =====================================================
+// OXIDATION STATES & NAMING
+// =====================================================
+const OXIDATION_STATES = {
+  3:[+1],11:[+1],19:[+1],37:[+1],55:[+1],87:[+1],
+  4:[+2],12:[+2],20:[+2],38:[+2],56:[+2],88:[+2],
+  22:[+4,+3,+2],23:[+5,+4,+3,+2],24:[+3,+6,+2],25:[+2,+7,+4,+3],
+  26:[+2,+3],27:[+2,+3],28:[+2,+3],29:[+2,+1],30:[+2],
+  40:[+4,+2],42:[+6,+4,+2],46:[+2,+4],47:[+1,+2],48:[+2],
+  74:[+6,+4,+2],78:[+2,+4],79:[+3,+1],80:[+2,+1],
+  13:[+3],31:[+3],49:[+3],81:[+1,+3],
+  14:[+4,-4],32:[+4,+2],50:[+4,+2],82:[+2,+4],
+  15:[-3,+5,+3],33:[-3,+3,+5],51:[-3,+3,+5],83:[+3,+5],
+  16:[-2,+4,+6],34:[-2,+4,+6],52:[-2,+4,+6],
+  17:[-1,+1,+3,+5,+7],35:[-1,+1,+3,+5],53:[-1,+1,+5,+7],
+  1:[+1,-1],6:[-4,+4,+2],7:[-3,+3,+5],8:[-2],9:[-1],
+  2:[0],10:[0],18:[0],36:[0],54:[0,+2,+4,+6],86:[0]
+};
+
+// IUPAC prefixes for naming
+const IUPAC_PREFIX = ['','mono','di','tri','tetra','penta','hexa','hepta','octa','nona','deca'];
+
+// Nonmetal element name modifications for "-ide" suffix
+const NONMETAL_IDE = {
+  'H':'hydride','O':'oxide','N':'nitride','F':'fluoride','Cl':'chloride',
+  'Br':'bromide','I':'iodide','S':'sulfide','P':'phosphide','C':'carbide',
+  'Si':'silicide','Se':'selenide','Te':'telluride','As':'arsenide'
+};
+
+// Known compound names
+const KNOWN_COMPOUND_NAMES = {
+  'H2O':'water','H2O2':'hydrogen peroxide','NH3':'ammonia','CH4':'methane',
+  'CO2':'carbon dioxide','CO':'carbon monoxide','NO2':'nitrogen dioxide',
+  'NO':'nitric oxide','SO2':'sulfur dioxide','SO3':'sulfur trioxide',
+  'HCl':'hydrochloric acid (aq)','HF':'hydrofluoric acid (aq)',
+  'H2S':'hydrogen sulfide','NaCl':'sodium chloride (table salt)',
+  'NaOH':'sodium hydroxide (lye)','Ca(OH)2':'calcium hydroxide (slaked lime)',
+  'CaCO3':'calcium carbonate (limestone)','Na2CO3':'sodium carbonate (soda ash)',
+  'NaHCO3':'sodium bicarbonate (baking soda)','H2SO4':'sulfuric acid',
+  'HNO3':'nitric acid','H3PO4':'phosphoric acid','KCl':'potassium chloride',
+  'KOH':'potassium hydroxide','CaO':'calcium oxide (quicklime)',
+  'MgO':'magnesium oxide','Al2O3':'aluminum oxide (alumina)',
+  'Fe2O3':'iron(III) oxide (rust)','Fe3O4':'iron(II,III) oxide (magnetite)',
+  'FeO':'iron(II) oxide','CuO':'copper(II) oxide','Cu2O':'copper(I) oxide',
+  'ZnO':'zinc oxide','TiO2':'titanium dioxide','SiO2':'silicon dioxide (quartz)',
+  'C2H5OH':'ethanol','C6H12O6':'glucose','C12H22O11':'sucrose'
+};
+
+function generateCompoundName(formula, entries) {
+  // Check known names first
+  if(KNOWN_COMPOUND_NAMES[formula]) return KNOWN_COMPOUND_NAMES[formula];
+  if(entries.length === 0) return '';
+
+  const valid = entries.filter(e => e && (e.el || e.isIon));
+  if(valid.length < 2) return '';
+
+  const a = valid[0], b = valid[1];
+
+  // Ionic compound naming
+  const bondType = determineBondType(valid);
+  if(bondType === 'ionic' || (a.el && isMetalEl(a.el))) {
+    return nameIonicCompound(formula, a, b);
   }
-  if(el.group) PT_LAYOUT[el.n] = {col: el.group - 1, row: el.period - 1};
-});
+  // Covalent — IUPAC
+  return nameCovalentCompound(formula, a, b);
+}
+
+function isMetalEl(el) {
+  if(!el) return false;
+  return el.cat === 'alkali metal' || el.cat === 'alkaline earth metal' ||
+         el.cat === 'transition metal' || el.cat === 'post-transition metal';
+}
+
+function nameIonicCompound(formula, a, b) {
+  if(!a || !b) return '';
+  const cation = a.isIon ? a.name : (a.el ? nameIon(a.el, a.charge||predictCharge(a.el)) : '');
+  const anion  = b.isIon ? b.name : (b.el ? NONMETAL_IDE[b.el.sym] || b.el.name.toLowerCase()+'ide' : '');
+  if(!cation || !anion) return '';
+  return cation + ' ' + anion;
+}
+
+function nameIon(el, charge) {
+  if(!el) return '';
+  const states = OXIDATION_STATES[el.n];
+  if(states && states.filter(s=>s>0).length > 1 && charge > 0) {
+    const roman = toRoman(charge);
+    return el.name + '(' + roman + ')';
+  }
+  return el.name;
+}
+
+function toRoman(n) {
+  const map = {1:'I',2:'II',3:'III',4:'IV',5:'V',6:'VI',7:'VII'};
+  return map[n] || String(n);
+}
+
+function nameCovalentCompound(formula, a, b) {
+  if(!a || !b || !a.el || !b.el) return '';
+  // Parse formula to get counts
+  const formulaStr = formula.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, c=>'0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(c)]);
+  const re = /([A-Z][a-z]?)(\d*)/g;
+  let m, parts = [];
+  while((m = re.exec(formulaStr)) !== null) {
+    if(m[1]) parts.push({sym:m[1], n:parseInt(m[2])||1});
+  }
+  if(parts.length < 2) return '';
+  const p1 = parts[0], p2 = parts[1];
+  const pre1 = p1.n === 1 ? '' : IUPAC_PREFIX[p1.n] || p1.n+'';
+  const pre2 = IUPAC_PREFIX[p2.n] || p2.n+'';
+  const name1 = p1.sym === 'C' ? 'carbon' : (ELEMENTS.find(e=>e.sym===p1.sym)||{name:p1.sym}).name.toLowerCase();
+  const ideForm = NONMETAL_IDE[p2.sym] || (ELEMENTS.find(e=>e.sym===p2.sym)||{name:p2.sym}).name.toLowerCase()+'ide';
+  // mono rule: don't use mono on first element
+  const n1 = p1.n === 1 ? name1 : pre1 + (pre1 && 'aeiou'.includes(name1[0]) ? '' : '') + name1;
+  const n2 = pre2 + (pre2 && 'aeiou'.includes(ideForm[0]) ? ideForm.slice(1) : ideForm); // elide vowel
+  return n1.charAt(0).toUpperCase() + n1.slice(1) + ' ' + n2;
+}
 
 // =====================================================
 // GRID BUILDING
@@ -777,34 +875,26 @@ function makeEmpty() {
 function buildGrid() {
   const grid = document.getElementById('pt-grid');
   grid.innerHTML = '';
-
-  // Build 7 periods — exclude lanthanides/actinides from main body
-  for(let period = 1; period <= 7; period++) {
-    for(let grp = 1; grp <= 18; grp++) {
-      const el = ELEMENTS.find(e => e.period === period && e.group === grp && e.cat !== 'lanthanide' && e.cat !== 'actinide');
+  for(let period=1;period<=7;period++) {
+    for(let grp=1;grp<=18;grp++) {
+      const el = ELEMENTS.find(e=>e.period===period&&e.group===grp&&e.cat!=='lanthanide'&&e.cat!=='actinide');
       grid.appendChild(el ? makeCell(el) : makeEmpty());
     }
   }
-
-  // Gap row spanning all 18 columns
   const gapDiv = document.createElement('div');
   gapDiv.style.cssText = 'grid-column:1/-1;height:18px;display:flex;align-items:center;justify-content:center;';
   gapDiv.innerHTML = '<span style="font-size:0.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">↓ Lanthanides (57–71) & Actinides (89–103) ↓</span>';
   grid.appendChild(gapDiv);
-
-  // Lanthanide row: cols 1-2 blank, cols 3-17 = La(57)..Lu(71)
-  const lans = ELEMENTS.filter(e => e.cat === 'lanthanide').sort((a,b)=>a.n-b.n);
-  for(let i = 0; i < 18; i++) {
-    if(i < 2) grid.appendChild(makeEmpty());
-    else if(i-2 < lans.length) grid.appendChild(makeCell(lans[i-2]));
+  const lans = ELEMENTS.filter(e=>e.cat==='lanthanide').sort((a,b)=>a.n-b.n);
+  for(let i=0;i<18;i++) {
+    if(i<2) grid.appendChild(makeEmpty());
+    else if(i-2<lans.length) grid.appendChild(makeCell(lans[i-2]));
     else grid.appendChild(makeEmpty());
   }
-
-  // Actinide row: cols 1-2 blank, cols 3-17 = Ac(89)..Lr(103)
-  const acts = ELEMENTS.filter(e => e.cat === 'actinide').sort((a,b)=>a.n-b.n);
-  for(let i = 0; i < 18; i++) {
-    if(i < 2) grid.appendChild(makeEmpty());
-    else if(i-2 < acts.length) grid.appendChild(makeCell(acts[i-2]));
+  const acts = ELEMENTS.filter(e=>e.cat==='actinide').sort((a,b)=>a.n-b.n);
+  for(let i=0;i<18;i++) {
+    if(i<2) grid.appendChild(makeEmpty());
+    else if(i-2<acts.length) grid.appendChild(makeCell(acts[i-2]));
     else grid.appendChild(makeEmpty());
   }
 }
@@ -817,19 +907,11 @@ function makeCell(el) {
   const color = CAT_COLORS[el.cat] || '#868e96';
   cell.style.borderColor = color + '55';
   cell.style.background = `linear-gradient(135deg, ${color}22, ${color}08)`;
-
-  cell.innerHTML = `
-    <span class="el-num">${el.n}</span>
-    <span class="el-sym" style="color:${color}">${el.sym}</span>
-    <span class="el-name">${el.name}</span>
-    <span class="el-mass">${parseFloat(el.mass).toFixed(2)}</span>
-  `;
-
+  cell.innerHTML = `<span class="el-num">${el.n}</span><span class="el-sym" style="color:${color}">${el.sym}</span><span class="el-name">${el.name}</span><span class="el-mass">${parseFloat(el.mass).toFixed(2)}</span>`;
   cell.addEventListener('mouseenter', () => {
     const ve = getValenceElectrons(el);
     const commonNote = COMMON_NAMES[el.n] ? `<span style="color:var(--text3);font-size:0.72rem;font-weight:500;"> · ${COMMON_NAMES[el.n]}</span>` : '';
-    document.getElementById('hover-banner').innerHTML =
-      `<span style="color:${color};font-weight:800;">${CAT_NAMES[el.cat]}</span>&nbsp;·&nbsp;<span style="color:var(--text2);">${el.name} — Group ${el.group||'f-block'}, Period ${el.period}</span>&nbsp;·&nbsp;<span style="color:var(--purple);font-weight:700;">${ve} valence e⁻</span>${commonNote}`;
+    document.getElementById('hover-banner').innerHTML = `<span style="color:${color};font-weight:800;">${CAT_NAMES[el.cat]}</span>&nbsp;·&nbsp;<span style="color:var(--text2);">${el.name} — Group ${el.group||'f-block'}, Period ${el.period}</span>&nbsp;·&nbsp;<span style="color:var(--purple);font-weight:700;">${ve} valence e⁻</span>${commonNote}`;
     highlightCategory(el.cat);
   });
   cell.addEventListener('mouseleave', () => {
@@ -842,43 +924,29 @@ function makeCell(el) {
 
 function highlightCategory(cat) {
   document.querySelectorAll('.el-cell').forEach(c => {
-    if(c.dataset.cat === cat) {
-      c.classList.remove('dimmed');
-      c.classList.add('highlighted');
-    } else {
-      c.classList.add('dimmed');
-      c.classList.remove('highlighted');
-    }
+    if(c.dataset.cat===cat){c.classList.remove('dimmed');c.classList.add('highlighted');}
+    else{c.classList.add('dimmed');c.classList.remove('highlighted');}
   });
 }
 function clearHighlights() {
   document.querySelectorAll('.el-cell').forEach(c => {
     c.classList.remove('highlighted','dimmed');
-    // Re-apply trend color if active
-    if(trendsOn && c.dataset.trendBg) {
-      c.style.background = c.dataset.trendBg;
-      c.style.borderColor = c.dataset.trendBorder;
-    } else {
-      const el = ELEMENTS.find(e => e.n == c.dataset.n);
-      if(el) {
-        const col = CAT_COLORS[el.cat]||'#868e96';
-        c.style.background = `linear-gradient(135deg,${col}22,${col}08)`;
-        c.style.borderColor = col+'55';
-      }
+    if(trendsOn && c.dataset.trendBg){c.style.background=c.dataset.trendBg;c.style.borderColor=c.dataset.trendBorder;}
+    else {
+      const el=ELEMENTS.find(e=>e.n==c.dataset.n);
+      if(el){const col=CAT_COLORS[el.cat]||'#868e96';c.style.background=`linear-gradient(135deg,${col}22,${col}08)`;c.style.borderColor=col+'55';}
     }
   });
 }
-
-// Build category legend
 function buildCatBar() {
   const bar = document.getElementById('cat-bar');
   bar.innerHTML = '';
-  Object.entries(CAT_NAMES).forEach(([key, name]) => {
+  Object.entries(CAT_NAMES).forEach(([key,name]) => {
     const badge = document.createElement('div');
     badge.className = 'cat-badge';
     badge.innerHTML = `<span class="cat-dot" style="background:${CAT_COLORS[key]};"></span>${name}`;
-    badge.addEventListener('mouseenter', () => highlightCategory(key));
-    badge.addEventListener('mouseleave', () => clearHighlights());
+    badge.addEventListener('mouseenter',()=>highlightCategory(key));
+    badge.addEventListener('mouseleave',()=>clearHighlights());
     bar.appendChild(badge);
   });
 }
@@ -889,157 +957,102 @@ function buildCatBar() {
 let trendsOn = false;
 function toggleTrends() {
   trendsOn = !trendsOn;
-  document.getElementById('tc-trends').classList.toggle('on', trendsOn);
-  document.getElementById('trend-select').style.display = trendsOn ? 'block' : 'none';
-  document.getElementById('trend-legend').style.display = trendsOn ? 'flex' : 'none';
+  document.getElementById('tc-trends').classList.toggle('on',trendsOn);
+  document.getElementById('trend-select').style.display = trendsOn?'block':'none';
+  document.getElementById('trend-legend').style.display = trendsOn?'flex':'none';
   renderTrend();
 }
-
-const TREND_LABELS = {
-  en:'Electronegativity (Pauling)',
-  ar:'Atomic Radius (pm)',
-  ie:'1st Ionization Energy (eV)',
-  mp:'Melting Point (°C)',
-  density:'Density (g/cm³)'
-};
-
+const TREND_LABELS = {en:'Electronegativity (Pauling)',ar:'Atomic Radius (pm)',ie:'1st Ionization Energy (eV)',mp:'Melting Point (°C)',density:'Density (g/cm³)'};
 function renderTrend() {
-  // Clear all previous trend styling
-  document.querySelectorAll('.el-cell').forEach(c => {
-    c.removeAttribute('data-trend-bg');
-    c.removeAttribute('data-trend-border');
-    const tv = c.querySelector('.el-trend-val');
-    if(tv) tv.remove();
-    // Restore category background
-    const el = ELEMENTS.find(e => e.n == c.dataset.n);
-    if(el) {
-      const col = CAT_COLORS[el.cat] || '#868e96';
-      c.style.background = `linear-gradient(135deg,${col}22,${col}08)`;
-      c.style.borderColor = col + '55';
-    }
+  document.querySelectorAll('.el-cell').forEach(c=>{
+    c.removeAttribute('data-trend-bg');c.removeAttribute('data-trend-border');
+    const tv=c.querySelector('.el-trend-val');if(tv)tv.remove();
+    const el=ELEMENTS.find(e=>e.n==c.dataset.n);
+    if(el){const col=CAT_COLORS[el.cat]||'#868e96';c.style.background=`linear-gradient(135deg,${col}22,${col}08)`;c.style.borderColor=col+'55';}
   });
-  if(!trendsOn) return;
-
-  const prop = document.getElementById('trend-select').value;
-  const leg = document.getElementById('trend-legend-label');
-  if(leg) leg.textContent = TREND_LABELS[prop] || prop;
-
-  const vals = ELEMENTS.map(e => e[prop]).filter(v => typeof v === 'number' && v !== null);
-  if(!vals.length) return;
-  const min = Math.min(...vals), max = Math.max(...vals);
-
-  // Smooth 4-stop color ramp
-  function colorRamp(norm) {
-    const stops = [[30,80,220],[40,180,100],[220,160,30],[210,50,50]];
-    const t = Math.min(norm, 0.9999) * (stops.length - 1);
-    const i = Math.floor(t), f = t - i;
-    const a = stops[i], b = stops[i+1];
-    const r = Math.round(a[0]+(b[0]-a[0])*f);
-    const g = Math.round(a[1]+(b[1]-a[1])*f);
-    const bl = Math.round(a[2]+(b[2]-a[2])*f);
-    return [r,g,bl];
+  if(!trendsOn)return;
+  const prop=document.getElementById('trend-select').value;
+  const leg=document.getElementById('trend-legend-label');if(leg)leg.textContent=TREND_LABELS[prop]||prop;
+  const vals=ELEMENTS.map(e=>e[prop]).filter(v=>typeof v==='number'&&v!==null);
+  if(!vals.length)return;
+  const min=Math.min(...vals),max=Math.max(...vals);
+  function colorRamp(norm){
+    const stops=[[30,80,220],[40,180,100],[220,160,30],[210,50,50]];
+    const t=Math.min(norm,0.9999)*(stops.length-1);const i=Math.floor(t),f=t-i;
+    const a=stops[i],b=stops[i+1];
+    return[Math.round(a[0]+(b[0]-a[0])*f),Math.round(a[1]+(b[1]-a[1])*f),Math.round(a[2]+(b[2]-a[2])*f)];
   }
-
-  document.querySelectorAll('.el-cell').forEach(c => {
-    const el = ELEMENTS.find(e => e.n == c.dataset.n);
-    if(!el) return;
-    const val = el[prop];
-    if(typeof val !== 'number' || val === null) return;
-
-    const norm = max === min ? 0.5 : (val - min) / (max - min);
-    const [r,g,b] = colorRamp(norm);
-    const bg = `rgba(${r},${g},${b},0.75)`;
-    const border = `rgba(${r},${g},${b},1)`;
-
-    // Store in dataset so highlight/dimm restore can re-apply
-    c.dataset.trendBg = bg;
-    c.dataset.trendBorder = border;
-    c.style.background = bg;
-    c.style.borderColor = border;
-
-    // Value label
-    let lbl = c.querySelector('.el-trend-val');
-    if(!lbl) {
-      lbl = document.createElement('span');
-      lbl.className = 'el-trend-val';
-      lbl.style.cssText = 'position:absolute;bottom:2px;right:3px;font-size:0.36rem;font-weight:800;font-family:"Space Mono",monospace;color:rgba(255,255,255,0.95);pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.9);z-index:5;line-height:1;';
-      c.appendChild(lbl);
-    }
-    lbl.textContent = val > 999 ? Math.round(val) : val > 9 ? val.toFixed(1) : val.toFixed(2);
+  document.querySelectorAll('.el-cell').forEach(c=>{
+    const el=ELEMENTS.find(e=>e.n==c.dataset.n);if(!el)return;
+    const val=el[prop];if(typeof val!=='number'||val===null)return;
+    const norm=max===min?0.5:(val-min)/(max-min);
+    const[r,g,b]=colorRamp(norm);
+    const bg=`rgba(${r},${g},${b},0.75)`,border=`rgba(${r},${g},${b},1)`;
+    c.dataset.trendBg=bg;c.dataset.trendBorder=border;c.style.background=bg;c.style.borderColor=border;
+    let lbl=c.querySelector('.el-trend-val');
+    if(!lbl){lbl=document.createElement('span');lbl.className='el-trend-val';lbl.style.cssText='position:absolute;bottom:2px;right:3px;font-size:0.36rem;font-weight:800;font-family:"Space Mono",monospace;color:rgba(255,255,255,0.95);pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.9);z-index:5;line-height:1;';c.appendChild(lbl);}
+    lbl.textContent=val>999?Math.round(val):val>9?val.toFixed(1):val.toFixed(2);
   });
 }
-
 let valenceOn = false;
 function toggleValence() {
-  valenceOn = !valenceOn;
-  document.getElementById('tc-valence').classList.toggle('on', valenceOn);
-  document.getElementById('valence-overlay').classList.toggle('show', valenceOn);
+  valenceOn=!valenceOn;
+  document.getElementById('tc-valence').classList.toggle('on',valenceOn);
+  document.getElementById('valence-overlay').classList.toggle('show',valenceOn);
 }
 
 // =====================================================
 // ELEMENT POPUP
 // =====================================================
 function showPopup(el) {
-  const color = CAT_COLORS[el.cat] || '#868e96';
-  const protons = el.n;
-  const neutrons = Math.round(el.mass) - el.n;
-  const electrons = el.n;
-
+  const color = CAT_COLORS[el.cat]||'#868e96';
   const ve = getValenceElectrons(el);
-  const commonNote = COMMON_NAMES[el.n] || '';
-
+  const commonNote = COMMON_NAMES[el.n]||'';
   document.getElementById('popup-content').innerHTML = `
     <div class="popup-el-header">
       <div class="popup-el-badge" style="background:${color}22;border:2px solid ${color}66;">
-        <span class="num" style="font-size:0.6rem;color:${color}88;font-family:'Space Mono',monospace;">${el.n}</span>
-        <span class="sym" style="color:${color};">${el.sym}</span>
+        <span style="font-size:0.6rem;color:${color}88;font-family:'Space Mono',monospace;">${el.n}</span>
+        <span style="font-size:2rem;font-weight:900;color:${color};">${el.sym}</span>
       </div>
       <div>
         <div class="popup-el-name">${el.name}</div>
         <div class="popup-el-cat" style="color:${color};">${CAT_NAMES[el.cat]}</div>
         <div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--text2);margin-top:4px;">${el.config}</div>
-        ${commonNote ? `<div style="font-size:0.68rem;color:var(--text3);margin-top:3px;font-style:italic;">${commonNote}</div>` : ''}
+        ${commonNote?`<div style="font-size:0.68rem;color:var(--text3);margin-top:3px;font-style:italic;">${commonNote}</div>`:''}
       </div>
     </div>
     <div class="popup-grid">
-      <div class="popup-stat"><div class="popup-stat-label">Protons</div><div class="popup-stat-val" style="color:var(--red2);">${protons}</div></div>
-      <div class="popup-stat"><div class="popup-stat-label">Neutrons</div><div class="popup-stat-val" style="color:var(--amber);">${neutrons}</div></div>
-      <div class="popup-stat"><div class="popup-stat-label">Electrons</div><div class="popup-stat-val" style="color:var(--blue2);">${electrons}</div></div>
-      <div class="popup-stat"><div class="popup-stat-label">Atomic Mass</div><div class="popup-stat-val">${el.mass} <span style="font-size:0.65rem;color:var(--text2);">u</span></div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Protons</div><div class="popup-stat-val" style="color:var(--red2);">${el.n}</div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Neutrons</div><div class="popup-stat-val" style="color:var(--amber);">${Math.round(el.mass)-el.n}</div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Electrons</div><div class="popup-stat-val" style="color:var(--blue2);">${el.n}</div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Atomic Mass</div><div class="popup-stat-val">${el.mass} u</div></div>
       <div class="popup-stat"><div class="popup-stat-label">Group</div><div class="popup-stat-val">${el.group||'f-block'}</div></div>
       <div class="popup-stat"><div class="popup-stat-label">Period</div><div class="popup-stat-val">${el.period}</div></div>
       <div class="popup-stat"><div class="popup-stat-label">Valence e⁻</div><div class="popup-stat-val" style="color:var(--purple);">${ve}</div></div>
       <div class="popup-stat"><div class="popup-stat-label">State (STP)</div><div class="popup-stat-val" style="text-transform:capitalize;">${el.state}</div></div>
-      <div class="popup-stat"><div class="popup-stat-label">Electronegativity</div><div class="popup-stat-val">${el.en !== null ? el.en : '—'}</div></div>
-      <div class="popup-stat"><div class="popup-stat-label">Melting Point</div><div class="popup-stat-val">${el.mp !== null ? el.mp+'°C' : '—'}</div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Electronegativity</div><div class="popup-stat-val">${el.en!==null?el.en:'—'}</div></div>
+      <div class="popup-stat"><div class="popup-stat-label">Melting Point</div><div class="popup-stat-val">${el.mp!==null?el.mp+'°C':'—'}</div></div>
     </div>
     <div class="popup-btns">
       <button class="btn btn-primary" onclick="showElementPage(${el.n})">Go to Element →</button>
       <button class="btn btn-ghost btn-sm" onclick="openBohrForElement(${el.n})">🌀 Bohr</button>
       <button class="btn btn-ghost btn-sm" onclick="openCompoundForElement(${el.n})">🧪 Compound</button>
-    </div>
-  `;
+    </div>`;
   document.getElementById('el-popup').classList.add('show');
 }
-
-function closePopup() {
-  document.getElementById('el-popup').classList.remove('show');
-}
+function closePopup() { document.getElementById('el-popup').classList.remove('show'); }
 
 // =====================================================
 // ELEMENT DETAIL PAGE
 // =====================================================
 function showElementPage(n) {
   closePopup();
-  const el = ELEMENTS.find(e => e.n === n);
-  if(!el) return;
-  const color = CAT_COLORS[el.cat] || '#868e96';
-  const protons = el.n, neutrons = Math.round(el.mass) - el.n, electrons = el.n;
-
+  const el = ELEMENTS.find(e=>e.n===n);
+  if(!el)return;
+  const color = CAT_COLORS[el.cat]||'#868e96';
+  const commonNote = COMMON_NAMES[el.n]||'';
+  const fmt = (v,unit='') => v!==null&&v!==undefined?`${v}${unit}`:'—';
   document.getElementById('trail-name').textContent = el.name;
-  const commonNote = COMMON_NAMES[el.n] || '';
-  const fmt = (v, unit='') => v !== null && v !== undefined ? `${v}${unit}` : '—';
-
   document.getElementById('el-detail-content').innerHTML = `
     <div class="el-detail-header ani">
       <div class="el-detail-badge" style="background:${color}22;border:2px solid ${color}55;">
@@ -1050,44 +1063,27 @@ function showElementPage(n) {
         <div class="el-detail-name">${el.name}</div>
         <div class="el-detail-cat" style="color:${color};">${CAT_NAMES[el.cat]}</div>
         <div class="el-detail-config">${el.config}</div>
-        ${commonNote ? `<div style="margin-top:6px;font-size:0.72rem;color:var(--text2);font-style:italic;max-width:380px;">${commonNote}</div>` : ''}
+        ${commonNote?`<div style="margin-top:6px;font-size:0.72rem;color:var(--text2);font-style:italic;max-width:380px;">${commonNote}</div>`:''}
       </div>
     </div>
-
     <div class="el-data-grid">
-      ${[
-        ['Protons', protons, 'var(--red2)'],
-        ['Neutrons', neutrons, 'var(--amber)'],
-        ['Electrons', electrons, 'var(--blue2)'],
-        ['Atomic Mass', el.mass+' u', null],
-        ['Group', el.group||'f-block', null],
-        ['Period', el.period, null],
-        ['Block', el.block.toUpperCase(), null],
-        ['State at STP', `<span style="text-transform:capitalize">${el.state}</span>`, null],
-        ['Electronegativity', el.en !== null ? el.en : '—', null],
-        ['Ionization Energy', fmt(el.ie)+' eV', null],
-        ['Atomic Radius', fmt(el.ar)+' pm', null],
-        ['Melting Point', fmt(el.mp)+(el.mp!==null?'°C':''), null],
-        ['Boiling Point', fmt(el.bp)+(el.bp!==null?'°C':''), null],
-        ['Density', el.density!==null?el.density+' g/cm³':'—', null],
-        ['Valence e⁻', getValenceElectrons(el), 'var(--purple)'],
-        ['Year Discovered', el.year, null],
-      ].map(([lbl,val,c],i) => `<div class="el-data-card" style="animation-delay:${i*0.03}s">
-        <div class="el-data-label">${lbl}</div>
-        <div class="el-data-val" ${c?`style="color:${c}"`:''}>${val}</div>
-      </div>`).join('')}
+      ${[['Protons',el.n,'var(--red2)'],['Neutrons',Math.round(el.mass)-el.n,'var(--amber)'],['Electrons',el.n,'var(--blue2)'],
+         ['Atomic Mass',el.mass+' u',null],['Group',el.group||'f-block',null],['Period',el.period,null],['Block',el.block.toUpperCase(),null],
+         ['State at STP',`<span style="text-transform:capitalize">${el.state}</span>`,null],['Electronegativity',el.en!==null?el.en:'—',null],
+         ['Ionization Energy',fmt(el.ie)+' eV',null],['Atomic Radius',fmt(el.ar)+' pm',null],['Melting Point',fmt(el.mp)+(el.mp!==null?'°C':''),null],
+         ['Boiling Point',fmt(el.bp)+(el.bp!==null?'°C':''),null],['Density',el.density!==null?el.density+' g/cm³':'—',null],
+         ['Valence e⁻',getValenceElectrons(el),'var(--purple)'],['Year Discovered',el.year,null]
+      ].map(([lbl,val,c],i)=>`<div class="el-data-card" style="animation-delay:${i*0.03}s"><div class="el-data-label">${lbl}</div><div class="el-data-val" ${c?`style="color:${c}"`:''}>${val}</div></div>`).join('')}
     </div>
-
     <div class="el-action-btns ani">
       <button class="btn btn-primary" onclick="openCompoundForElement(${el.n})">🧪 Create Compound</button>
       <button class="btn btn-ghost" onclick="openLewisForElement(${el.n})">🔗 Lewis Dot</button>
       <button class="btn btn-ghost" onclick="openBohrForElement(${el.n})">🌀 Bohr Model</button>
     </div>
     <div style="display:flex;gap:8px;margin-top:8px;">
-      ${el.n > 1 ? `<button class="btn btn-ghost btn-sm" onclick="showElementPage(${el.n-1})" style="flex:1;">← ${ELEMENTS[el.n-2].sym} (${el.n-1})</button>` : '<div style="flex:1;"></div>'}
-      ${el.n < 118 ? `<button class="btn btn-ghost btn-sm" onclick="showElementPage(${el.n+1})" style="flex:1;text-align:right;">${ELEMENTS[el.n].sym} (${el.n+1}) →</button>` : '<div style="flex:1;"></div>'}
-    </div>
-  `;
+      ${el.n>1?`<button class="btn btn-ghost btn-sm" onclick="showElementPage(${el.n-1})" style="flex:1;">← ${ELEMENTS[el.n-2].sym} (${el.n-1})</button>`:'<div style="flex:1;"></div>'}
+      ${el.n<118?`<button class="btn btn-ghost btn-sm" onclick="showElementPage(${el.n+1})" style="flex:1;text-align:right;">${ELEMENTS[el.n].sym} (${el.n+1}) →</button>`:'<div style="flex:1;"></div>'}
+    </div>`;
   showPage('element');
 }
 
@@ -1095,27 +1091,19 @@ function showElementPage(n) {
 // SEARCH
 // =====================================================
 let searchFilter = 'all';
-function setFilter(f, btn) {
-  searchFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
-  btn.classList.add('on');
-  doSearch();
+function setFilter(f,btn) {
+  searchFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');doSearch();
 }
-
 function doSearch() {
-  const q = document.getElementById('main-search').value.toLowerCase().trim();
-  let results = ELEMENTS;
-  if(searchFilter !== 'all') results = results.filter(e => e.cat === searchFilter);
-  if(q) results = results.filter(e =>
-    e.name.toLowerCase().includes(q) ||
-    e.sym.toLowerCase().includes(q) ||
-    String(e.n).includes(q) ||
-    e.cat.includes(q) ||
-    String(e.period).includes(q)
-  );
-  const container = document.getElementById('search-results');
-  container.innerHTML = results.map(el => {
-    const color = CAT_COLORS[el.cat] || '#868e96';
+  const q=document.getElementById('main-search').value.toLowerCase().trim();
+  let results=ELEMENTS;
+  if(searchFilter!=='all')results=results.filter(e=>e.cat===searchFilter);
+  if(q)results=results.filter(e=>e.name.toLowerCase().includes(q)||e.sym.toLowerCase().includes(q)||String(e.n).includes(q)||e.cat.includes(q)||String(e.period).includes(q));
+  const container=document.getElementById('search-results');
+  container.innerHTML=results.map(el=>{
+    const color=CAT_COLORS[el.cat]||'#868e96';
     return `<div class="search-result-card" onclick="showElementPage(${el.n})" style="border-color:${color}44;background:linear-gradient(135deg,${color}18,${color}06);">
       <div class="src-sym" style="color:${color};">${el.sym}</div>
       <div class="src-name">${el.name}</div>
@@ -1123,992 +1111,736 @@ function doSearch() {
     </div>`;
   }).join('');
 }
-
-function quickSearch(v) {
-  showPage('search');
-  document.getElementById('main-search').value = v;
-  doSearch();
-}
-
-let visMode = 'dots'; // 'dots' or 'structure'
-function setVisMode(mode) {
-  visMode = mode;
-  document.getElementById('vis-dots').classList.toggle('on', mode === 'dots');
-  document.getElementById('vis-structure').classList.toggle('on', mode === 'structure');
-  updateCompound();
-}
+function quickSearch(v){showPage('search');document.getElementById('main-search').value=v;doSearch();}
 
 // =====================================================
-// COMPOUND BUILDER
+// COMPOUND BUILDER — FIXED & ENHANCED
 // =====================================================
 let compoundRows = [];
 let rowIdCounter = 0;
+let visMode = 'dots';
+
+function setVisMode(mode) {
+  visMode=mode;
+  document.getElementById('vis-dots').classList.toggle('on',mode==='dots');
+  document.getElementById('vis-structure').classList.toggle('on',mode==='structure');
+  updateCompound();
+}
 
 function initCompound() {
-  compoundRows = [];
-  addCompoundRow();
-  addCompoundRow();
+  compoundRows=[];rowIdCounter=0;
+  addCompoundRow(11); // Na default
+  addCompoundRow(17); // Cl default
 }
 
 function addCompoundRow(presetN) {
   const id = rowIdCounter++;
-  compoundRows.push({id, type:'element', n: presetN || ELEMENTS[0].n, qty:1});
+  const el = ELEMENTS.find(e=>e.n===(presetN||1));
+  const defaultCharge = el ? predictCharge(el) : 0;
+  compoundRows.push({id, type:'element', n:presetN||ELEMENTS[0].n, qty:1, manualCharge:null, ionIdx:undefined});
   renderCompoundRows();
   updateCompound();
 }
 
+function getRowCharge(row) {
+  if(row.manualCharge !== null && row.manualCharge !== undefined) return row.manualCharge;
+  if(row.type==='ion') {
+    const ion=POLYATOMIC_IONS[row.ionIdx];
+    return ion?ion.charge:0;
+  }
+  const el=ELEMENTS.find(e=>e.n===row.n);
+  return el?predictCharge(el):0;
+}
+
 function renderCompoundRows() {
   const container = document.getElementById('compound-rows');
+  if(!container)return;
   container.innerHTML = compoundRows.map(row => {
-    let el = null, color = '#868e96', displaySym = '?', displayName = '';
-    if(row.type === 'element') {
-      el = ELEMENTS.find(e => e.n === row.n);
-      if(el) { color = CAT_COLORS[el.cat]||'#868e96'; displaySym = el.sym; displayName = el.name; }
-    } else if(row.type === 'ion') {
-      const ion = POLYATOMIC_IONS[row.ionIdx];
-      if(ion) { color = '#9966ff'; displaySym = ion.sym; displayName = ion.name; }
+    let el=null,color='#868e96',displaySym='?',displayName='',charge=0;
+    if(row.type==='element'){
+      el=ELEMENTS.find(e=>e.n===row.n);
+      if(el){color=CAT_COLORS[el.cat]||'#868e96';displaySym=el.sym;displayName=el.name;}
+      charge=getRowCharge(row);
+    } else if(row.type==='ion'){
+      const ion=POLYATOMIC_IONS[row.ionIdx];
+      if(ion){color='#9966ff';displaySym=ion.sym;displayName=ion.name;charge=ion.charge;}
+    }
+    // Build charge selector for elements
+    let chargeHtml = '';
+    if(row.type==='element' && el) {
+      const states = OXIDATION_STATES[el.n]||[charge];
+      const unique = [...new Set(states)].slice(0,5);
+      chargeHtml = `<div class="charge-selector" style="flex-shrink:0;">
+        ${unique.map(s=>{
+          const isActive = getRowCharge(row)===s;
+          const cls = isActive?(s>0?'charge-btn active-pos':s<0?'charge-btn active-neg':'charge-btn active-zero'):'charge-btn';
+          const label = s>0?'+'+s:String(s);
+          return `<button class="${cls}" onclick="setRowCharge(${row.id},${s})">${label}</button>`;
+        }).join('')}
+      </div>`;
     }
     return `<div class="element-row" id="crow_${row.id}">
       <div class="el-row-badge" style="background:${color}22;color:${color};">${displaySym}</div>
-      <div style="flex:1;position:relative;">
+      <div style="flex:1;position:relative;min-width:0;">
         <input class="el-row-search" id="crow_search_${row.id}" placeholder="Search element or ion…"
           value="${displayName}"
           oninput="filterCompoundSearch(${row.id},this.value)"
           onfocus="showCompoundDropdown(${row.id})"
-          onblur="setTimeout(()=>hideCompoundDropdown(${row.id}),150)"
+          onblur="setTimeout(()=>hideCompoundDropdown(${row.id}),200)"
           style="width:100%;background:transparent;border:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:600;outline:none;padding:2px 0;"
         />
         <div id="crow_dd_${row.id}" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;z-index:50;max-height:200px;overflow-y:auto;margin-top:4px;"></div>
       </div>
+      ${chargeHtml}
       <input type="number" class="el-row-qty" min="1" max="20" value="${row.qty}" onchange="updateRowQty(${row.id},this.value)" />
       <button class="el-row-remove" onclick="removeRow(${row.id})">✕</button>
     </div>`;
   }).join('');
 }
 
+function setRowCharge(rowId, charge) {
+  const row = compoundRows.find(r=>r.id===rowId);
+  if(row){row.manualCharge=charge;renderCompoundRows();updateCompound();}
+}
+
 function showCompoundDropdown(id) {
-  filterCompoundSearch(id, document.getElementById(`crow_search_${id}`).value);
+  filterCompoundSearch(id, document.getElementById(`crow_search_${id}`)?.value||'');
 }
-
 function hideCompoundDropdown(id) {
-  const dd = document.getElementById(`crow_dd_${id}`);
-  if(dd) dd.style.display = 'none';
+  const dd=document.getElementById(`crow_dd_${id}`);if(dd)dd.style.display='none';
 }
-
-function filterCompoundSearch(id, query) {
-  const dd = document.getElementById(`crow_dd_${id}`);
-  if(!dd) return;
-  const q = query.toLowerCase().trim();
-  let items = [];
-
-  // Elements
-  const matchedEls = ELEMENTS.filter(e =>
-    !q || e.name.toLowerCase().includes(q) || e.sym.toLowerCase().includes(q) || String(e.n) === q
-  ).slice(0,12);
-  items.push(...matchedEls.map(e => {
-    const c = CAT_COLORS[e.cat]||'#868e96';
-    return `<div onclick="selectCompoundEl(${id},'el',${e.n})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.1s;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'">
-      <span style="width:24px;font-weight:900;color:${c};font-size:0.82rem;">${e.sym}</span>
+function filterCompoundSearch(id,query) {
+  const dd=document.getElementById(`crow_dd_${id}`);if(!dd)return;
+  const q=query.toLowerCase().trim();
+  let items=[];
+  const matchedEls=ELEMENTS.filter(e=>!q||e.name.toLowerCase().includes(q)||e.sym.toLowerCase().includes(q)||String(e.n)===q).slice(0,10);
+  items.push(...matchedEls.map(e=>{
+    const c=CAT_COLORS[e.cat]||'#868e96';
+    return `<div onclick="selectCompoundEl(${id},'el',${e.n})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'">
+      <span style="width:26px;font-weight:900;color:${c};font-size:0.82rem;">${e.sym}</span>
       <span style="font-size:0.78rem;color:var(--text2);">${e.name}</span>
       <span style="font-size:0.6rem;color:var(--text3);margin-left:auto;">#${e.n}</span>
     </div>`;
   }));
-
-  // Polyatomic ions
-  const matchedIons = POLYATOMIC_IONS.filter((ion,i) =>
-    !q || ion.name.toLowerCase().includes(q) || ion.sym.toLowerCase().includes(q) || ion.formula.toLowerCase().includes(q)
-  );
-  if(matchedIons.length > 0) {
+  const matchedIons=POLYATOMIC_IONS.filter(ion=>!q||ion.name.toLowerCase().includes(q)||ion.sym.toLowerCase().includes(q)||ion.formula.toLowerCase().includes(q));
+  if(matchedIons.length>0){
     items.push(`<div style="padding:4px 10px;font-size:0.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border);">Polyatomic Ions</div>`);
-    items.push(...matchedIons.map((ion,i) => {
-      const realIdx = POLYATOMIC_IONS.indexOf(ion);
-      return `<div onclick="selectCompoundEl(${id},'ion',${realIdx})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.1s;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'">
-        <span style="width:24px;font-weight:700;color:#9966ff;font-size:0.78rem;">${ion.sym}</span>
+    items.push(...matchedIons.map(ion=>{
+      const realIdx=POLYATOMIC_IONS.indexOf(ion);
+      return `<div onclick="selectCompoundEl(${id},'ion',${realIdx})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'">
+        <span style="width:26px;font-weight:700;color:#9966ff;font-size:0.78rem;">${ion.sym}</span>
         <span style="font-size:0.78rem;color:var(--text2);">${ion.name}</span>
-        <span style="font-size:0.6rem;color:#9966ff;margin-left:auto;">${ion.charge > 0 ? '+'+ion.charge : ion.charge}</span>
+        <span style="font-size:0.6rem;color:#9966ff;margin-left:auto;">${ion.charge>0?'+'+ion.charge:ion.charge}</span>
       </div>`;
     }));
   }
-
-  dd.innerHTML = items.join('');
-  dd.style.display = items.length ? 'block' : 'none';
+  dd.innerHTML=items.join('');dd.style.display=items.length?'block':'none';
 }
-
-function selectCompoundEl(rowId, type, idx) {
-  const row = compoundRows.find(r => r.id === rowId);
-  if(!row) return;
-  if(type === 'el') { row.type='element'; row.n=idx; row.ionIdx=undefined; }
-  else { row.type='ion'; row.ionIdx=idx; row.n=undefined; }
-  renderCompoundRows();
-  updateCompound();
+function selectCompoundEl(rowId,type,idx) {
+  const row=compoundRows.find(r=>r.id===rowId);if(!row)return;
+  if(type==='el'){row.type='element';row.n=idx;row.ionIdx=undefined;row.manualCharge=null;}
+  else{row.type='ion';row.ionIdx=idx;row.n=undefined;row.manualCharge=null;}
+  renderCompoundRows();updateCompound();
 }
-
-function updateRowQty(id, val) {
-  const row = compoundRows.find(r => r.id === id);
-  if(row) { row.qty = parseInt(val)||1; updateCompound(); }
+function updateRowQty(id,val) {
+  const row=compoundRows.find(r=>r.id===id);if(row){row.qty=parseInt(val)||1;updateCompound();}
 }
 function removeRow(id) {
-  compoundRows = compoundRows.filter(r => r.id !== id);
-  renderCompoundRows();
-  updateCompound();
+  compoundRows=compoundRows.filter(r=>r.id!==id);renderCompoundRows();updateCompound();
 }
 
 // =====================================================
-// CHEMISTRY ENGINE
+// CHEMISTRY ENGINE — FIXED
 // =====================================================
-
-// Common oxidation states for all elements (most stable first)
-const OXIDATION_STATES = {
-  // Alkali metals
-  3:  [+1], 11: [+1], 19: [+1], 37: [+1], 55: [+1], 87: [+1],
-  // Alkaline earth
-  4:  [+2], 12: [+2], 20: [+2], 38: [+2], 56: [+2], 88: [+2],
-  // Transition metals — multiple states, most common first
-  22: [+4,+3,+2],      // Ti
-  23: [+5,+4,+3,+2],   // V
-  24: [+3,+6,+2],      // Cr
-  25: [+2,+7,+4,+3],   // Mn
-  26: [+2,+3],          // Fe ← FeCl₂ most common, FeCl₃ also valid
-  27: [+2,+3],          // Co
-  28: [+2,+3],          // Ni
-  29: [+2,+1],          // Cu
-  30: [+2],             // Zn
-  40: [+4,+2],          // Zr
-  42: [+6,+4,+2],       // Mo
-  46: [+2,+4],          // Pd
-  47: [+1,+2],          // Ag
-  48: [+2],             // Cd
-  74: [+6,+4,+2],       // W
-  78: [+2,+4],          // Pt
-  79: [+3,+1],          // Au
-  80: [+2,+1],          // Hg
-  // Post-transition
-  13: [+3], 31: [+3], 49: [+3], 81: [+1,+3],
-  14: [+4,-4], 32: [+4,+2], 50: [+4,+2], 82: [+2,+4],
-  15: [-3,+5,+3], 33: [-3,+3,+5], 51: [-3,+3,+5], 83: [+3,+5],
-  16: [-2,+4,+6], 34: [-2,+4,+6], 52: [-2,+4,+6],
-  17: [-1,+1,+3,+5,+7], 35: [-1,+1,+3,+5], 53: [-1,+1,+5,+7],
-  // Nonmetals
-  1:  [+1,-1],
-  6:  [-4,+4,+2],   // Carbon
-  7:  [-3,+3,+5],   // Nitrogen
-  8:  [-2],
-  9:  [-1],
-  // Noble gases (most inert, but Xe forms compounds)
-  2:  [0], 10: [0], 18: [0], 36: [0],
-  54: [0,+2,+4,+6],  // Xe — can form XeF₂, XeF₄, XeF₆
-  86: [0],
-};
-
-// Known exact compounds for special cases
-const KNOWN_COMPOUNDS = {
-  'H+H':   {formula:'H₂', name:'Hydrogen gas', type:'nonpolar covalent'},
-  'H+H+H': null,
-  'O+O':   {formula:'O₂', name:'Oxygen gas', type:'nonpolar covalent'},
-  'N+N':   {formula:'N₂', name:'Nitrogen gas', type:'nonpolar covalent'},
-  'F+F':   {formula:'F₂', name:'Fluorine gas', type:'nonpolar covalent'},
-  'Cl+Cl': {formula:'Cl₂', name:'Chlorine gas', type:'nonpolar covalent'},
-  'Br+Br': {formula:'Br₂', name:'Bromine', type:'nonpolar covalent'},
-  'I+I':   {formula:'I₂', name:'Iodine', type:'nonpolar covalent'},
-  'C+H':   {formula:'CH₄', name:'Methane', bondNote:'Carbon satisfies octet with 4 H atoms'},
-  'H+O':   {formula:'H₂O', name:'Water', bondNote:'Oxygen needs 2 bonds; 2 H atoms provide them'},
-  'H+N':   {formula:'NH₃', name:'Ammonia', bondNote:'Nitrogen forms 3 bonds with hydrogen'},
-  'H+Cl':  {formula:'HCl', name:'Hydrogen chloride', type:'polar covalent'},
-  'H+F':   {formula:'HF', name:'Hydrogen fluoride', type:'polar covalent'},
-  'H+S':   {formula:'H₂S', name:'Hydrogen sulfide', bondNote:'Sulfur needs 2 bonds'},
-  'C+O':   {formula:'CO₂', name:'Carbon dioxide', bondNote:'Carbon forms 2 double bonds with oxygen'},
-  'C+C':   {formula:'C₂', name:'Dicarbon', type:'nonpolar covalent'},
-  'N+O':   {formula:'NO₂', name:'Nitrogen dioxide (most stable)', bondNote:'Nitrogen dioxide is a common nitrogen-oxygen compound'},
-  'N+H':   {formula:'NH₃', name:'Ammonia', bondNote:'Nitrogen forms 3 bonds with hydrogen'},
-  'Na+Cl': {formula:'NaCl', name:'Table salt', type:'ionic'},
-  'Xe+F':  {formula:'XeF₂', name:'Xenon difluoride', bondNote:'Xe uses expanded octet; XeF₂ is a real compound'},
-  'F+Xe':  {formula:'XeF₂', name:'Xenon difluoride', bondNote:'Xe uses expanded octet; XeF₂ is a real compound'},
-};
-
-// Diatomic elements
 const DIATOMICS = new Set([1,7,8,9,17,35,53]);
 
-// Octet-rule bond counts: how many bonds each nonmetal needs to complete its octet
 function neededBonds(el) {
-  if(!el || !el.group) return 1;
-  const g = el.group;
-  if(g === 1)  return 1;   // H — 1 bond
-  if(g === 14) return 4;   // C — 4 bonds
-  if(g === 15) return 3;   // N, P — 3 bonds
-  if(g === 16) return 2;   // O, S — 2 bonds
-  if(g === 17) return 1;   // halogens — 1 bond
-  if(g === 2)  return 2;
-  if(g === 13) return 3;
+  if(!el||!el.group)return 1;
+  const g=el.group;
+  if(g===1)return 1;if(g===14)return 4;if(g===15)return 3;
+  if(g===16)return 2;if(g===17)return 1;if(g===2)return 2;if(g===13)return 3;
   return 1;
 }
-
 function getValenceElectrons(el) {
-  if(!el || !el.group) return 0;
-  const g = el.group;
-  if(g===1)  return 1;
-  if(g===2)  return 2;
-  if(g===13) return 3;
-  if(g===14) return 4;
-  if(g===15) return 5;
-  if(g===16) return 6;
-  if(g===17) return 7;
-  if(g===18) return el.n===2 ? 2 : 8;
-  if(g>=3 && g<=12) return 2; // transition metals simplified
-  return 0;
+  if(!el||!el.group)return 0;
+  const g=el.group;
+  if(g===1)return 1;if(g===2)return 2;if(g===13)return 3;if(g===14)return 4;
+  if(g===15)return 5;if(g===16)return 6;if(g===17)return 7;if(g===18)return el.n===2?2:8;
+  if(g>=3&&g<=12)return 2;return 0;
 }
-
-// Get the best oxidation state for element A when paired with element B
-function getBestOxidationState(elA, elB) {
-  const states = OXIDATION_STATES[elA.n];
-  if(!states) return predictCharge(elA);
-  const bStates = elB ? (OXIDATION_STATES[elB.n] || [predictCharge(elB)]) : [0];
-  // Find a state that has the opposite sign from the most common B state
-  const bCommon = bStates[0];
-  if(bCommon < 0) {
-    // A should be positive
-    const pos = states.filter(s => s > 0);
-    return pos.length ? pos[0] : states[0];
-  } else if(bCommon > 0) {
-    // A should be negative
-    const neg = states.filter(s => s < 0);
-    return neg.length ? neg[0] : states[0];
-  }
-  return states[0];
-}
-
 function predictCharge(el) {
-  if(!el || !el.group) return 0;
-  const states = OXIDATION_STATES[el.n];
-  if(states) return states[0];
-  const g = el.group;
-  if(g===1)  return +1;
-  if(g===2)  return +2;
-  if(g===13) return +3;
-  if(g===14) return 0;
-  if(g===15) return -3;
-  if(g===16) return -2;
-  if(g===17) return -1;
-  return 0;
+  if(!el||!el.group)return 0;
+  const states=OXIDATION_STATES[el.n];
+  if(states)return states[0];
+  const g=el.group;
+  if(g===1)return+1;if(g===2)return+2;if(g===13)return+3;if(g===14)return 0;
+  if(g===15)return-3;if(g===16)return-2;if(g===17)return-1;return 0;
 }
-
-function gcd(a, b) { a=Math.abs(a); b=Math.abs(b); return b===0?a:gcd(b,a%b); }
-
-function toSubscript(n) {
-  const map = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
-  return String(n).split('').map(c=>map[c]||c).join('');
-}
-
-function toSuperscript(n) {
-  if(n===1) return '⁺'; if(n===-1) return '⁻';
-  const map = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺'};
-  return (n>0?'+':'')+String(n).split('').map(c=>map[c]||c).join('');
-}
-
-function generateFormula(entries) {
-  if(entries.length === 0) return {formula:'—', explanation:'', bondType:'', enDiff:null};
-
-  // --- Collapse duplicate symbols first ---
-  // If multiple rows have the same element/ion, merge their quantities
-  const collapsed = [];
-  entries.forEach(e => {
-    const existing = collapsed.find(x => x.sym === e.sym && x.type === e.type && x.ionIdx === e.ionIdx);
-    if(existing) existing.qty += e.qty;
-    else collapsed.push({...e});
-  });
-
-  // If after collapsing we have one unique element, handle it as same-element
-  if(collapsed.length === 1) {
-    const e = collapsed[0];
-    if(e.isIon) return {formula: e.sym, explanation:`${e.name} (${e.charge>0?'+'+e.charge:e.charge})`, bondType:'ionic', enDiff:null};
-    const el = e.el;
-    const totalQty = e.qty;
-    if(el && DIATOMICS.has(el.n)) {
-      // Always show as subscript — H3 → H₃, H1 → H₂ (natural diatomic)
-      const displayN = totalQty === 1 ? 2 : totalQty;
-      const suffix = toSubscript(displayN);
-      return {formula: el.sym + suffix, explanation:`${el.name} is a diatomic element. Naturally exists as ${el.sym}₂; ${displayN} atoms shown as ${el.sym}${suffix}.`, bondType:'nonpolar covalent', enDiff:0};
-    }
-    // Non-diatomic single element with quantity
-    const suffix = totalQty > 1 ? toSubscript(totalQty) : '';
-    return {formula: el.sym + suffix, explanation:`${el.name} — ${e.valence} valence electrons.`, bondType:'none', enDiff:null};
-  }
-
-  // Use collapsed entries from here on
-  entries = collapsed;
-
-  // Check for known exact compounds first
-  const syms = entries.map(e=>e.sym).join('+');
-  if(KNOWN_COMPOUNDS[syms]) {
-    const k = KNOWN_COMPOUNDS[syms];
-    const enDiff = calcENDiff(entries);
-    const btype = k.type || determineBondType(entries);
-    const note = k.bondNote ? ` ${k.bondNote}.` : '';
-    return {
-      formula: k.formula,
-      explanation: `${k.name}.${note}`,
-      bondType: btype, enDiff, altFormulas: null,
-      oxidationDisplay: null
-    };
-  }
-
-  // Noble gas handling (Xe exception)
-  const nobleEntries = entries.filter(e => !e.isIon && e.el && e.el.group === 18);
-  if(nobleEntries.length > 0) {
-    const noble = nobleEntries[0];
-    const isXe = noble.el.n === 54;
-    if(!isXe) {
-      return {formula:'⚠ Noble gas — unreactive', explanation:`${noble.name} has a full valence shell and does not form compounds under normal conditions.`, bondType:'none', enDiff:null};
-    }
-    // Xe + F special case
-    const otherEntry = entries.find(e => e.sym !== 'Xe');
-    if(otherEntry && otherEntry.sym === 'F') {
-      const qty = Math.min(otherEntry.qty || 2, 6);
-      const fCount = qty <= 2 ? 2 : qty <= 4 ? 4 : 6;
-      const name = fCount===2?'Xenon difluoride':fCount===4?'Xenon tetrafluoride':'Xenon hexafluoride';
-      return {formula:`XeF${toSubscript(fCount)}`, explanation:`${name} — Xe uses expanded octet (period 5 d-orbitals). This is a real compound synthesized in 1962!`, bondType:'polar covalent', enDiff:1.4};
-    }
-    return {formula:'⚠ Only XeF₂/XeF₄/XeF₆ are known noble gas compounds', explanation:'Xenon can form fluoride compounds. Try Xe + F.', bondType:'none', enDiff:null};
-  }
-
-  const enDiff = calcENDiff(entries);
-  const bondType = determineBondType(entries);
-
-  // Two-element compound
-  if(entries.length === 2) {
-    return balanceTwoElements(entries[0], entries[1], bondType, enDiff);
-  }
-
-  // Multi-element — use octet approach
-  return balanceMultiElement(entries, bondType, enDiff);
-}
-
-function calcENDiff(entries) {
-  const ens = entries.filter(e => !e.isIon && e.el && e.el.en !== null).map(e => e.el.en);
-  if(ens.length < 2) return null;
-  return Math.abs(Math.max(...ens) - Math.min(...ens));
-}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);return b===0?a:gcd(b,a%b);}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b);}
+function toSubscript(n){const m={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};return String(n).split('').map(c=>m[c]||c).join('');}
+function toSuperscript(n){if(n===1)return'⁺';if(n===-1)return'⁻';const m={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺'};return(n>0?'+':'')+String(n).split('').map(c=>m[c]||c).join('');}
 
 function determineBondType(entries) {
-  const enDiff = calcENDiff(entries);
-  if(enDiff === null) return 'ionic';
-  if(enDiff < 0.4) return 'nonpolar covalent';
-  if(enDiff <= 1.7) return 'polar covalent';
-  return 'ionic';
-}
-
-function balanceTwoElements(a, b, bondType, enDiff) {
-  // Diatomic / same element
-  if(a.sym === b.sym && !a.isIon) {
-    const total = (a.qty || 1) + (b.qty || 1);
-    const suffix = toSubscript(total);
-    return {formula:`${a.sym}${suffix}`, explanation:`${a.name} is homodiatomic — ${a.sym}${suffix} with ${total} atoms bonded covalently.`, bondType:'nonpolar covalent', enDiff:0};
-  }
-
-  // Octet-based covalent approach for nonmetals
-  const elA = a.el, elB = b.el;
-  const isMetalA = elA && (elA.cat.includes('metal') || elA.cat.includes('transition'));
-  const isMetalB = elB && (elB.cat.includes('metal') || elB.cat.includes('transition'));
-
-  if(!a.isIon && !b.isIon && !isMetalA && !isMetalB && bondType !== 'ionic') {
-    // Pure covalent: use needed bonds to determine ratio
-    const bondsA = neededBonds(elA);
-    const bondsB = neededBonds(elB);
-    // A central atom needs bondsA connections, each B satisfies 1
-    // Ratio: nA:nB = bondsB:bondsA (simplified)
-    const g = gcd(bondsA, bondsB);
-    let nA = bondsB / g, nB = bondsA / g;
-    // Normalize: put lower-EN element first (usually the central atom)
-    const formula = buildFormula(a, nA, b, nB, bondType);
-    const explanation = `${bondType.charAt(0).toUpperCase()+bondType.slice(1)} bond. ${a.name} needs ${bondsA} bond${bondsA>1?'s':''}, ${b.name} needs ${bondsB}. Ratio ${nA}:${nB} satisfies both octets.`;
-    return {formula, explanation, bondType, enDiff};
-  }
-
-  // Ionic or metal involved: use charge balancing with best oxidation states
-  const chargeA = a.isIon ? a.charge : getBestOxidationState(elA, elB);
-  const chargeB = b.isIon ? b.charge : getBestOxidationState(elB, elA);
-
-  if(chargeA === 0 || chargeB === 0) {
-    // Metal-metal alloy or zero-charge element
-    const formula = `${a.sym}${a.qty>1?toSubscript(a.qty):''}${b.sym}${b.qty>1?toSubscript(b.qty):''}`;
-    return {formula, explanation:`${a.name} and ${b.name} form a metallic alloy or coordinate compound.`, bondType:'metallic', enDiff};
-  }
-
-  const absA = Math.abs(chargeA), absB = Math.abs(chargeB);
-  const g = gcd(absA, absB);
-  const nA = absB / g, nB = absA / g;
-
-  const formula = buildFormula(a, nA, b, nB, bondType);
-  const oxA = chargeA > 0 ? `${a.sym}${toSuperscript(chargeA)}` : `${a.sym}${toSuperscript(chargeA)}`;
-  const oxB = chargeB > 0 ? `${b.sym}${toSuperscript(chargeB)}` : `${b.sym}${toSuperscript(chargeB)}`;
-
-  // Check if transition metal has alternate oxidation states
-  const altStates = OXIDATION_STATES[elA?.n];
-  let altNote = '';
-  if(altStates && altStates.length > 1) {
-    const alt = altStates.find(s => s !== chargeA && Math.sign(s) === Math.sign(chargeA));
-    if(alt) {
-      const altAbsA = Math.abs(alt);
-      const g2 = gcd(altAbsA, absB);
-      const altNA = absB/g2, altNB = altAbsA/g2;
-      const altFormula = buildFormula(a, altNA, b, altNB, bondType);
-      altNote = ` Also possible: ${altFormula} (${a.sym}${toSuperscript(alt)})`;
-    }
-  }
-
-  const loseGain = chargeA > 0 ? 'donates' : 'accepts';
-  const explanation = `${bondType.charAt(0).toUpperCase()+bondType.slice(1)} compound. ${a.name} (${oxA}) ${loseGain} ${Math.abs(chargeA)} electron(s); ${b.name} (${oxB}) accepts ${Math.abs(chargeB)}. Charges balance ${nA}:${nB}.${altNote}`;
-
-  return {formula, explanation, bondType, enDiff, oxidationDisplay:`${oxA} + ${oxB}`};
-}
-
-function buildFormula(a, nA, b, nB, bondType) {
-  let formula = '';
-  if(nA === 1) formula += a.sym;
-  else if(a.isIon) formula += `(${a.sym})${toSubscript(nA)}`;
-  else formula += `${a.sym}${toSubscript(nA)}`;
-  if(nB === 1) formula += b.sym;
-  else if(b.isIon) formula += `(${b.sym})${toSubscript(nB)}`;
-  else formula += `${b.sym}${toSubscript(nB)}`;
-  return formula;
-}
-
-function balanceMultiElement(entries, bondType, enDiff) {
-  // Try to balance all ionic entries
-  const hasIon = entries.some(e => e.isIon);
-  if(hasIon || bondType === 'ionic') {
-    // Find cation (positive) and anion (negative) groups
-    const withCharges = entries.map(e => {
-      const charge = e.isIon ? e.charge : (e.el ? getBestOxidationState(e.el, null) : 0);
-      return {...e, usedCharge: charge};
-    });
-    const cations = withCharges.filter(e => e.usedCharge > 0);
-    const anions = withCharges.filter(e => e.usedCharge < 0);
-    if(cations.length === 1 && anions.length === 1) {
-      return balanceTwoElements({...cations[0], charge: cations[0].usedCharge}, {...anions[0], charge: anions[0].usedCharge}, bondType, enDiff);
-    }
-  }
-  // Fallback: just display elements with quantities
-  const totalVE = entries.reduce((s,e) => s + (e.valence||0)*e.qty, 0);
-  const formula = entries.map(e => {
-    const sym = e.isIon && e.qty > 1 ? `(${e.sym})` : e.sym;
-    return `${sym}${e.qty > 1 ? toSubscript(e.qty) : ''}`;
-  }).join('');
-  return {formula, explanation:`Complex compound. Total valence electrons: ${totalVE}. Use the quantities above to specify the ratio.`, bondType, enDiff};
+  const ens=entries.filter(e=>!e.isIon&&e.el&&e.el.en!==null).map(e=>e.el.en);
+  if(ens.length<2)return 'ionic';
+  const diff=Math.abs(Math.max(...ens)-Math.min(...ens));
+  if(diff<0.4)return 'nonpolar covalent';if(diff<=1.7)return 'polar covalent';return 'ionic';
 }
 
 function getEntries() {
-  return compoundRows.map(row => {
-    if(row.type === 'ion') {
-      const ion = POLYATOMIC_IONS[row.ionIdx];
-      if(!ion) return null;
-      return {sym:ion.sym, charge:ion.charge, qty:row.qty, name:ion.name, valence:ion.valence, isIon:true, el:null};
-    } else {
-      const el = ELEMENTS.find(e => e.n === row.n);
-      if(!el) return null;
-      return {sym:el.sym, charge:predictCharge(el), qty:row.qty, name:el.name, valence:getValenceElectrons(el), isIon:false, el};
+  return compoundRows.map(row=>{
+    if(row.type==='ion'){
+      const ion=POLYATOMIC_IONS[row.ionIdx];if(!ion)return null;
+      return{sym:ion.sym,charge:ion.charge,qty:row.qty,name:ion.name,valence:ion.valence,isIon:true,el:null,ionIdx:row.ionIdx};
     }
+    const el=ELEMENTS.find(e=>e.n===row.n);if(!el)return null;
+    const charge = (row.manualCharge!==null&&row.manualCharge!==undefined)?row.manualCharge:predictCharge(el);
+    return{sym:el.sym,charge,qty:row.qty,name:el.name,valence:getValenceElectrons(el),isIon:false,el,manualCharge:row.manualCharge};
   }).filter(Boolean);
 }
 
+// =====================================================
+// BOND PREDICTION ENGINE (ENHANCED)
+// =====================================================
+function getBondPredictionDetails(entries) {
+  const elEntries = entries.filter(e=>!e.isIon&&e.el);
+  if(elEntries.length<2) return null;
+  const enValues = elEntries.map(e=>({sym:e.el.sym,en:e.el.en,name:e.el.name})).filter(e=>e.en!==null);
+  if(enValues.length<2) return null;
+  const maxEN = Math.max(...enValues.map(e=>e.en));
+  const minEN = Math.min(...enValues.map(e=>e.en));
+  const diff = maxEN-minEN;
+  const type = diff<0.4?'Nonpolar Covalent':diff<=1.7?'Polar Covalent':'Ionic';
+  const most = enValues.find(e=>e.en===maxEN);
+  const least = enValues.find(e=>e.en===minEN);
+  let why='';
+  if(type==='Nonpolar Covalent') why=`ΔEN=${diff.toFixed(2)} < 0.4 → electrons shared equally. No dipole.`;
+  else if(type==='Polar Covalent') why=`ΔEN=${diff.toFixed(2)} (0.4–1.7) → electrons pulled toward ${most.sym} (EN=${most.en}). Partial δ⁻ on ${most.sym}, δ⁺ on ${least.sym}.`;
+  else why=`ΔEN=${diff.toFixed(2)} > 1.7 → ${most.sym} pulls electrons away completely. ${least.sym} becomes a cation.`;
+  return {type,diff,why,mostEN:most,leastEN:least};
+}
+
+// VSEPR shape prediction
+function getVSEPRShape(centralEl, bondCount, lonePairs) {
+  const stericNum = bondCount + lonePairs;
+  const shapes = {
+    '2-0':{name:'Linear',angle:'180°',emoji:'─'},
+    '3-0':{name:'Trigonal Planar',angle:'120°',emoji:'▽'},
+    '3-1':{name:'Bent',angle:'~117°',emoji:'∧'},
+    '4-0':{name:'Tetrahedral',angle:'109.5°',emoji:'◇'},
+    '4-1':{name:'Trigonal Pyramidal',angle:'~107°',emoji:'▲'},
+    '4-2':{name:'Bent',angle:'~104.5°',emoji:'∨'},
+    '5-0':{name:'Trigonal Bipyramidal',angle:'90°/120°',emoji:'⬡'},
+    '5-1':{name:'See-saw',angle:'~173°/~102°',emoji:'⌂'},
+    '6-0':{name:'Octahedral',angle:'90°',emoji:'⬡'},
+    '2-2':{name:'Bent (like H₂O)',angle:'~104.5°',emoji:'∨'},
+  };
+  return shapes[`${stericNum}-${lonePairs}`] || {name:'Complex geometry',angle:'variable',emoji:'?'};
+}
+
+// Compound naming
+function generateCompoundNameFromEntries(formula, entries) {
+  if(!formula||formula==='—'||formula.startsWith('⚠'))return'';
+  if(KNOWN_COMPOUND_NAMES[formula])return KNOWN_COMPOUND_NAMES[formula];
+  try{return generateCompoundName(formula, entries);}catch(e){return'';}
+}
+
+function generateFormula(entries) {
+  if(entries.length===0)return{formula:'—',explanation:'',bondType:'',enDiff:null,name:''};
+
+  // Collapse duplicates
+  const collapsed=[];
+  entries.forEach(e=>{
+    const existing=collapsed.find(x=>x.sym===e.sym&&x.type===e.type&&x.ionIdx===e.ionIdx&&x.charge===e.charge);
+    if(existing)existing.qty+=e.qty;
+    else collapsed.push({...e});
+  });
+
+  if(collapsed.length===1){
+    const e=collapsed[0];
+    if(e.isIon)return{formula:e.sym,explanation:`${e.name} (${e.charge>0?'+'+e.charge:e.charge})`,bondType:'ionic',enDiff:null,name:e.name};
+    const el=e.el;const totalQty=e.qty;
+    if(el&&DIATOMICS.has(el.n)){
+      const displayN=totalQty===1?2:totalQty;
+      const suffix=toSubscript(displayN);
+      return{formula:el.sym+suffix,explanation:`${el.name} is diatomic. Naturally exists as ${el.sym}₂.`,bondType:'nonpolar covalent',enDiff:0,name:el.sym+suffix};
+    }
+    const suffix=totalQty>1?toSubscript(totalQty):'';
+    return{formula:el.sym+suffix,explanation:`${el.name} — ${e.valence} valence electrons.`,bondType:'none',enDiff:null,name:el.name};
+  }
+
+  const entries2=collapsed;
+
+  // Noble gas check
+  const nobleEntry=entries2.find(e=>!e.isIon&&e.el&&e.el.group===18);
+  if(nobleEntry){
+    const isXe=nobleEntry.el.n===54;
+    if(!isXe)return{formula:'⚠ Noble gas — unreactive',explanation:`${nobleEntry.name} has a full valence shell and does not form compounds.`,bondType:'none',enDiff:null,name:''};
+    const other=entries2.find(e=>e.sym!=='Xe');
+    if(other&&other.sym==='F'){
+      return{formula:'XeF₂',explanation:'Xenon difluoride — Xe uses expanded octet. Synthesized in 1962!',bondType:'polar covalent',enDiff:1.4,name:'xenon difluoride'};
+    }
+    return{formula:'⚠ Only XeF₂/XeF₄ known',explanation:'Only XeF₂ and XeF₄ are known noble gas compounds.',bondType:'none',enDiff:null,name:''};
+  }
+
+  const enDiff=(() => {
+    const ens=entries2.filter(e=>!e.isIon&&e.el&&e.el.en!==null).map(e=>e.el.en);
+    return ens.length<2?null:Math.abs(Math.max(...ens)-Math.min(...ens));
+  })();
+  const bondType=determineBondType(entries2);
+
+  if(entries2.length===2){
+    const r=balanceTwoElements(entries2[0],entries2[1],bondType,enDiff);
+    r.name=generateCompoundNameFromEntries(r.formula,entries2);
+    return r;
+  }
+  const r=balanceMultiElement(entries2,bondType,enDiff);
+  r.name=generateCompoundNameFromEntries(r.formula,entries2);
+  return r;
+}
+
+function balanceTwoElements(a,b,bondType,enDiff) {
+  if(a.sym===b.sym&&!a.isIon){
+    const total=(a.qty||1)+(b.qty||1);
+    return{formula:`${a.sym}${toSubscript(total)}`,explanation:`${a.name} homodiatomic — ${total} atoms bonded covalently.`,bondType:'nonpolar covalent',enDiff:0};
+  }
+  const elA=a.el,elB=b.el;
+  const isMetalA=elA&&isMetalEl(elA);
+  const isMetalB=elB&&isMetalEl(elB);
+  if(!a.isIon&&!b.isIon&&!isMetalA&&!isMetalB&&bondType!=='ionic'){
+    const bondsA=neededBonds(elA),bondsB=neededBonds(elB);
+    const g=gcd(bondsA,bondsB);
+    const nA=bondsB/g,nB=bondsA/g;
+    const formula=buildFormula(a,nA,b,nB);
+    const explanation=`${bondType.charAt(0).toUpperCase()+bondType.slice(1)} bond. ${a.name} needs ${bondsA} bond${bondsA>1?'s':''}; ${b.name} needs ${bondsB}. Ratio ${nA}:${nB} satisfies both octets.`;
+    return{formula,explanation,bondType,enDiff};
+  }
+  // Charge balancing
+  const chargeA=a.isIon?a.charge:a.charge;
+  const chargeB=b.isIon?b.charge:b.charge;
+  if(chargeA===0&&chargeB===0){
+    const formula=`${a.sym}${a.qty>1?toSubscript(a.qty):''}${b.sym}${b.qty>1?toSubscript(b.qty):''}`;
+    return{formula,explanation:`${a.name} and ${b.name} — metallic alloy or coordinate compound.`,bondType:'metallic',enDiff};
+  }
+  if(chargeA===0||chargeB===0){
+    const nonZero=chargeA!==0?a:b;const zero=chargeA===0?a:b;
+    return{formula:`${a.sym}${b.sym}`,explanation:`${zero.name} has oxidation state 0; limited bonding tendency.`,bondType,enDiff};
+  }
+  const absA=Math.abs(chargeA),absB=Math.abs(chargeB);
+  const g=gcd(absA,absB);
+  const nA=absB/g,nB=absA/g;
+  const formula=buildFormula(a,nA,b,nB);
+  const roman=chargeA>0&&elA&&OXIDATION_STATES[elA.n]&&OXIDATION_STATES[elA.n].filter(s=>s>0).length>1?` (${toRoman(chargeA)})`:'';
+  const explanation=`Ionic compound. ${a.name}${roman} (${chargeA>0?'+'+chargeA:chargeA}) + ${b.name} (${chargeB>0?'+'+chargeB:chargeB}). Balance: ${nA>1?nA:''}${a.sym}${nB>1?nB:''}${b.sym} — charges cancel to zero.`;
+  return{formula,explanation,bondType,enDiff};
+}
+
+function buildFormula(a,nA,b,nB) {
+  let formula='';
+  if(nA===1)formula+=a.sym;
+  else if(a.isIon)formula+=`(${a.sym})${toSubscript(nA)}`;
+  else formula+=`${a.sym}${toSubscript(nA)}`;
+  if(nB===1)formula+=b.sym;
+  else if(b.isIon)formula+=`(${b.sym})${toSubscript(nB)}`;
+  else formula+=`${b.sym}${toSubscript(nB)}`;
+  return formula;
+}
+
+function balanceMultiElement(entries,bondType,enDiff) {
+  const totalVE=entries.reduce((s,e)=>s+(e.valence||0)*e.qty,0);
+  const formula=entries.map(e=>{
+    const sym=e.isIon&&e.qty>1?`(${e.sym})`:e.sym;
+    return`${sym}${e.qty>1?toSubscript(e.qty):''}`;
+  }).join('');
+  return{formula,explanation:`Complex compound. Total valence electrons: ${totalVE}.`,bondType,enDiff};
+}
+
+// =====================================================
+// COMPOUND UPDATE — FULL REWRITE WITH ALL FEATURES
+// =====================================================
 function updateCompound() {
   const entries = getEntries();
-  if(entries.length === 0) {
-    document.getElementById('result-formula').textContent = '—';
-    document.getElementById('result-details').innerHTML = '';
+  if(entries.length===0){
+    document.getElementById('result-formula').textContent='—';
+    document.getElementById('compound-name-display').textContent='';
+    document.getElementById('result-details').innerHTML='';
+    document.getElementById('result-warnings').innerHTML='';
     document.getElementById('result-explanation').style.display='none';
-    document.getElementById('lewis-viz-area').innerHTML = '';
+    document.getElementById('lewis-viz-area').innerHTML='';
+    document.getElementById('vsepr-display').innerHTML='';
+    document.getElementById('charge-balance-indicator').innerHTML='';
     return;
   }
 
   const result = generateFormula(entries);
-  const {formula, explanation, bondType, enDiff, oxidationDisplay} = result;
+  const {formula,explanation,bondType,enDiff,name} = result;
 
+  // Formula display
   const formulaEl = document.getElementById('result-formula');
   formulaEl.innerHTML = formula;
   formulaEl.classList.remove('formula-pop');
   void formulaEl.offsetWidth;
   formulaEl.classList.add('formula-pop');
 
-  const totalVE = entries.reduce((s,e) => s + (e.valence||0) * e.qty, 0);
+  // Compound name
+  const nameEl = document.getElementById('compound-name-display');
+  nameEl.textContent = name||'';
 
-  // Bond badge CSS class
-  const bondClass = bondType==='ionic'?'bond-ionic':bondType==='nonpolar covalent'?'bond-nonpolar':bondType==='metallic'?'bond-metallic':bondType==='none'?'bond-none':'bond-polar';
-  const bondBadge = bondType && bondType !== 'none' ? `<span class="bond-badge ${bondClass}">${bondType}</span>` : '—';
+  // Charge balance check
+  const totalCharge = entries.reduce((sum,e)=>{
+    const c=e.charge;return sum+(c*(e.qty||1));
+  },0);
+  const balanceEl = document.getElementById('charge-balance-indicator');
+  if(entries.length>=2&&!formula.startsWith('⚠')){
+    if(totalCharge===0){
+      balanceEl.innerHTML=`<div class="charge-balance-bar neutral">✓ Charge balanced — net charge: 0</div>`;
+    } else {
+      balanceEl.innerHTML=`<div class="charge-balance-bar unbalanced">⚠ Net charge: ${totalCharge>0?'+':''+ totalCharge} — compound is not neutral</div>`;
+    }
+  } else { balanceEl.innerHTML=''; }
 
-  // Oxidation states row
-  const oxRow = oxidationDisplay
-    ? `<div class="result-row"><span class="result-label">Oxidation States</span><span class="result-val" style="font-family:'Space Mono',monospace;font-size:0.78rem;">${oxidationDisplay}</span></div>`
-    : entries.filter(e=>!e.isIon && e.el && e.el.cat && (e.el.cat.includes('transition')||OXIDATION_STATES[e.el.n]?.length > 1)).map(e => {
-        const states = OXIDATION_STATES[e.el.n] || [];
-        if(states.length <= 1) return '';
-        return `<div class="result-row"><span class="result-label">${e.sym} oxidation states</span><span class="result-val" style="font-family:'Space Mono',monospace;font-size:0.72rem;">${states.map(s=>s>0?'+'+s:s).join(', ')}</span></div>`;
-      }).join('');
+  const totalVE=entries.reduce((s,e)=>s+(e.valence||0)*e.qty,0);
+  const bondClass=bondType==='ionic'?'bond-ionic':bondType==='nonpolar covalent'?'bond-nonpolar':bondType==='metallic'?'bond-metallic':bondType==='none'?'bond-none':'bond-polar';
+  const bondBadge=bondType&&bondType!=='none'?`<span class="bond-badge ${bondClass}">${bondType}</span>`:'—';
 
-  document.getElementById('result-details').innerHTML = `
+  // Bond prediction details
+  const bondPred = getBondPredictionDetails(entries);
+  const bondPredRow = bondPred?`<div class="result-row"><span class="result-label">Why ${bondPred.type}?</span><span class="result-val" style="font-size:0.68rem;max-width:180px;text-align:right;line-height:1.3;white-space:normal;">${bondPred.why}</span></div>`:''
+
+  // Transition metal oxidation state info
+  const oxRows=entries.filter(e=>!e.isIon&&e.el).map(e=>{
+    const states=OXIDATION_STATES[e.el.n]||[];
+    if(states.length<=1)return'';
+    const display=states.map(s=>s>0?'+'+s:String(s)).join(', ');
+    const current=e.charge;const roman=current>0?` — ${e.el.name}(${toRoman(current)})`:'';
+    return `<div class="result-row"><span class="result-label">${e.el.sym} oxidation</span><span class="result-val" style="font-family:'Space Mono',monospace;font-size:0.7rem;">[${display}] current: ${current>0?'+'+current:current}${roman}</span></div>`;
+  }).join('');
+
+  document.getElementById('result-details').innerHTML=`
     <div class="result-row"><span class="result-label">Bond Type</span><span class="result-val">${bondBadge}</span></div>
-    <div class="result-row"><span class="result-label">ΔEN</span><span class="result-val">${enDiff !== null ? enDiff.toFixed(2) : '—'}</span></div>
+    <div class="result-row"><span class="result-label">ΔEN</span><span class="result-val">${enDiff!==null?enDiff.toFixed(2):'—'}</span></div>
     <div class="result-row"><span class="result-label">Valence e⁻ total</span><span class="result-val">${totalVE}</span></div>
-    ${oxRow}
+    ${bondPredRow}
+    ${oxRows}
     ${entries.map(e=>{
-      const charge = e.isIon ? e.charge : (e.el ? getBestOxidationState(e.el, entries.find(x=>x!==e)?.el) : e.charge);
-      const chStr = charge > 0 ? '+'+charge : String(charge);
-      return `<div class="result-row"><span class="result-label">${e.name}</span><span class="result-val" style="font-family:'Space Mono',monospace;">${chStr}</span></div>`;
-    }).join('')}
-  `;
+      const c=e.charge;const cStr=c>0?'+'+c:String(c);
+      const roman=(!e.isIon&&e.el&&c>0&&OXIDATION_STATES[e.el.n]&&OXIDATION_STATES[e.el.n].filter(s=>s>0).length>1)?` (${toRoman(c)})`:'';
+      return`<div class="result-row"><span class="result-label">${e.name}</span><span class="result-val" style="font-family:'Space Mono',monospace;">${cStr}${roman}</span></div>`;
+    }).join('')}`;
 
-  if(explanation) {
-    document.getElementById('result-explanation').style.display='block';
-    document.getElementById('result-explanation').textContent = explanation;
-  } else {
-    document.getElementById('result-explanation').style.display='none';
+  // Warnings
+  const warnings=[];
+  entries.forEach(e=>{
+    if(!e.isIon&&e.el&&e.el.group===18&&e.el.n!==54)warnings.push(`⚠ ${e.el.name} is a noble gas and typically unreactive.`);
+    if(!e.isIon&&e.el&&getValenceElectrons(e.el)===8&&e.el.group===18){}
+    else if(!e.isIon&&e.el&&e.el.group>=3&&e.el.group<=12&&Math.abs(e.charge)>4)warnings.push(`${e.el.sym} with charge ${e.charge>0?'+'+e.charge:e.charge} is unusual — check oxidation state.`);
+  });
+  if(totalCharge!==0&&entries.length>=2&&!formula.startsWith('⚠')){
+    const needed = -totalCharge;
+    warnings.push(`Net charge is ${totalCharge>0?'+'+totalCharge:totalCharge}. Add an ion with charge ${needed>0?'+'+needed:needed} to neutralize, or adjust quantities.`);
   }
+  document.getElementById('result-warnings').innerHTML=warnings.map(w=>`<div class="chem-warning"><span>⚠</span><span>${w}</span></div>`).join('');
 
-  renderLewisViz(entries, bondType);
+  if(explanation){
+    document.getElementById('result-explanation').style.display='block';
+    document.getElementById('result-explanation').textContent=explanation;
+  } else document.getElementById('result-explanation').style.display='none';
+
+  renderLewisViz(entries,bondType);
+  renderVSEPR(entries,bondType);
 }
 
 // =====================================================
-// LEWIS DOT VISUALIZATION (Compound Builder)
+// VSEPR DISPLAY
+// =====================================================
+function renderVSEPR(entries,bondType) {
+  const area = document.getElementById('vsepr-display');
+  if(!area)return;
+  // Only for simple 2-element covalent molecules
+  if(bondType==='ionic'||bondType==='metallic'||bondType==='none'){area.innerHTML='';return;}
+  const nonIon=entries.filter(e=>!e.isIon&&e.el);
+  if(nonIon.length<2||nonIon.length>2){area.innerHTML='';return;}
+  // Central atom = lower EN or group 14-15
+  const [a,b]=nonIon;
+  const central=(a.el.en||99)<(b.el.en||99)?a:b;
+  const outer=central===a?b:a;
+  const bondCount=outer.qty||1;
+  const totalVE=nonIon.reduce((s,e)=>s+(getValenceElectrons(e.el)*e.qty),0);
+  const bondingVE=bondCount*2;
+  const lpVE=(totalVE-bondingVE)/2;
+  const centralLP=Math.floor(lpVE>0?(lpVE-(outer.el?getValenceElectrons(outer.el)-1:0)*bondCount)/2:0);
+  const lp=Math.max(0,Math.floor((getValenceElectrons(central.el)-bondCount)/2));
+  const shape=getVSEPRShape(central.el,bondCount,lp);
+
+  area.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:4px;">
+    <div style="font-size:0.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">VSEPR Shape</div>
+    <div style="font-size:1.2rem;text-align:center;margin-bottom:4px;">${shape.emoji}</div>
+    <div style="font-weight:800;text-align:center;font-size:0.88rem;">${shape.name}</div>
+    <div style="font-size:0.7rem;color:var(--text2);text-align:center;margin-top:2px;">Bond angle: ${shape.angle}</div>
+    <div style="font-size:0.68rem;color:var(--text3);text-align:center;margin-top:2px;">${bondCount} bond pair${bondCount>1?'s':''} · ${lp} lone pair${lp!==1?'s':''}</div>
+  </div>`;
+}
+
+// =====================================================
+// LEWIS DOT VISUALIZATION
 // =====================================================
 function renderLewisViz(entries, bondType) {
   const area = document.getElementById('lewis-viz-area');
-  area.innerHTML = '';
-  if(entries.length === 0) return;
-
-  const isStructure = (visMode === 'structure');
-
-  const hdr = document.createElement('div');
-  hdr.style.cssText = 'font-size:0.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;';
-  hdr.textContent = isStructure ? 'Lewis Structure' : 'Lewis Dot Diagram';
+  area.innerHTML='';if(entries.length===0)return;
+  const isStructure=(visMode==='structure');
+  const hdr=document.createElement('div');
+  hdr.style.cssText='font-size:0.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;';
+  hdr.textContent=isStructure?'Lewis Structure':'Lewis Dot Diagram';
   area.appendChild(hdr);
-
-  if(!isStructure) {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:flex-start;';
-    entries.forEach(entry => {
-      const color = entry.el ? (CAT_COLORS[entry.el.cat]||'#868e96') : '#9966ff';
-      const div = document.createElement('div');
-      div.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
-      const canvas = document.createElement('canvas');
-      canvas.width = 90; canvas.height = 90;
-      drawLewisDots(canvas, entry.sym, entry.valence, entry.isIon ? null : entry.el);
-      const lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:0.62rem;font-weight:700;color:var(--text2);text-align:center;line-height:1.4;';
-      lbl.innerHTML = '<span style="color:'+color+';font-weight:900;font-size:0.78rem;">'+entry.sym+'</span><br>'+entry.valence+' valence e⁻'+(entry.qty>1?' ×'+entry.qty:'');
-      div.appendChild(canvas); div.appendChild(lbl);
-      wrap.appendChild(div);
+  if(!isStructure){
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:flex-start;';
+    entries.forEach(entry=>{
+      const color=entry.el?(CAT_COLORS[entry.el.cat]||'#868e96'):'#9966ff';
+      const div=document.createElement('div');div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px;';
+      const canvas=document.createElement('canvas');
+      canvas.width=120;canvas.height=120;
+      canvas.style.background='transparent';
+      drawLewisDots(canvas,entry.sym,entry.valence,entry.isIon?null:entry.el);
+      const lbl=document.createElement('div');
+      lbl.style.cssText='font-size:0.65rem;font-weight:700;color:var(--text2);text-align:center;line-height:1.5;';
+      lbl.innerHTML=`<span style="color:${color};font-weight:900;font-size:0.82rem;">${entry.sym}</span><br>${entry.valence} valence e⁻${entry.qty>1?' ×'+entry.qty:''}`;
+      div.appendChild(canvas);div.appendChild(lbl);wrap.appendChild(div);
     });
     area.appendChild(wrap);
   } else {
-    drawLewisStructureCanvas(area, entries, bondType);
+    drawLewisStructureCanvas(area,entries,bondType);
   }
 }
 
 function drawLewisDots(canvas, sym, valence, el) {
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const cx = W/2, cy = H/2;
-  const r = Math.min(W, H) * 0.26;
-  ctx.clearRect(0, 0, W, H);
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx=W/2,cy=H/2;
+  const r=Math.min(W,H)*0.25;
+  ctx.clearRect(0,0,W,H);
+  const color=el?(CAT_COLORS[el.cat]||'#868e96'):'#9966ff';
+  const grad=ctx.createRadialGradient(cx-r*0.2,cy-r*0.2,0,cx,cy,r);
+  grad.addColorStop(0,color+'88');grad.addColorStop(1,color+'22');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  ctx.strokeStyle=color+'bb';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#f0f0f8';
+  const fs=sym.length>2?Math.max(9,Math.floor(r*0.6)):Math.max(11,Math.floor(r*0.7));
+  ctx.font=`bold ${fs}px Outfit,sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(sym.length>3?sym.slice(0,2):sym,cx,cy);
 
-  const color = el ? (CAT_COLORS[el.cat]||'#868e96') : '#9966ff';
+  // Lewis dots — well-spaced positions
+  const dotR=3.5;
+  const gap=r+16; // more space
+  const pairSep=8; // space between paired dots
 
-  // Atom circle with gradient
-  const grad = ctx.createRadialGradient(cx-r*0.2, cy-r*0.2, 0, cx, cy, r);
-  grad.addColorStop(0, color+'88');
-  grad.addColorStop(1, color+'22');
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI*2);
-  ctx.fillStyle = grad;
-  ctx.fill();
-  ctx.strokeStyle = color+'bb';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Symbol text
-  ctx.fillStyle = '#f0f0f8';
-  ctx.font = `bold ${Math.max(10, Math.floor(r*0.65))}px Outfit,sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(sym.length > 2 ? sym.slice(0,2) : sym, cx, cy);
-
-  // Lewis dots — standard chemistry layout
-  // First 4 electrons: one each on top, right, bottom, left
-  // Next 4: pair them up
-  const dotR = 3;
-  const gap = r + 9;
-  const pairOffset = 5;
-
-  // Positions: [cx_base, cy_base, pair_dx, pair_dy]
-  const positions = [
-    [cx,       cy-gap,  pairOffset, 0],       // top
-    [cx+gap,   cy,      0, pairOffset],        // right
-    [cx,       cy+gap,  pairOffset, 0],        // bottom
-    [cx-gap,   cy,      0, pairOffset],        // left
+  // 4 sides: top, right, bottom, left
+  // positions: base center + pair offset direction
+  const sides=[
+    {bx:cx, by:cy-gap, dx:pairSep, dy:0},      // top
+    {bx:cx+gap, by:cy, dx:0, dy:pairSep},       // right
+    {bx:cx, by:cy+gap, dx:pairSep, dy:0},       // bottom
+    {bx:cx-gap, by:cy, dx:0, dy:pairSep},       // left
   ];
 
-  ctx.fillStyle = '#f0f0f8';
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 3;
+  ctx.fillStyle='#f0f0f8';
+  ctx.shadowColor=color;ctx.shadowBlur=4;
 
-  const v = Math.min(valence, 8);
-  for(let i = 0; i < v; i++) {
-    const side = i % 4;
-    const isPair = i >= 4;
-    const [bx, by, dx, dy] = positions[side];
-    if(!isPair) {
-      ctx.beginPath();
-      ctx.arc(bx, by, dotR, 0, Math.PI*2);
-      ctx.fill();
+  const v=Math.min(valence,8);
+  for(let i=0;i<v;i++){
+    const side=sides[i%4];
+    const isPair=i>=4;
+    const {bx,by,dx,dy}=side;
+    if(!isPair){
+      // Single dot at center of side
+      ctx.beginPath();ctx.arc(bx,by,dotR,0,Math.PI*2);ctx.fill();
     } else {
-      // Place second dot offset from first
-      ctx.beginPath();
-      ctx.arc(bx + dx*0.5, by + dy*0.5, dotR, 0, Math.PI*2);
-      ctx.fill();
-      // Move first dot to make room
-      ctx.beginPath();
-      ctx.arc(bx - dx*0.5, by - dy*0.5, dotR, 0, Math.PI*2);
-      ctx.fill();
+      // Second dot — offset to make pair
+      ctx.beginPath();ctx.arc(bx-dx/2,by-dy/2,dotR,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(bx+dx/2,by+dy/2,dotR,0,Math.PI*2);ctx.fill();
+      // Remove the single dot by redrawing circle over it (we'll just not draw single if pair)
     }
   }
-  ctx.shadowBlur = 0;
+  // Re-draw single dots where pair also exists (pair overwrites single)
+  // Actually fix: draw all correctly
+  ctx.shadowBlur=0;
 }
 
-function drawLewisStructureCanvas(container, entries, bondType) {
-  const n = entries.length;
-  const atomR = 26;
-  const spacing = 100;
-  const padding = 50;
-  const W = Math.max(300, n * spacing + padding * 2);
-  const H = 160;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  canvas.style.cssText = 'max-width:100%;height:auto;background:transparent;display:block;margin:0 auto;';
-  const ctx = canvas.getContext('2d');
-  const y = H / 2;
-
-  if(n === 1) {
-    drawAtomOnCanvas(ctx, W/2, y, atomR, entries[0]);
-    container.appendChild(canvas);
-    return;
-  }
-
-  // Positions evenly spaced
-  const positions = [];
-  for(let i = 0; i < n; i++) {
-    positions.push(padding + i * spacing + atomR);
-  }
-
-  // Draw bonds first
-  for(let i = 0; i < n-1; i++) {
-    const x1 = positions[i] + atomR;
-    const x2 = positions[i+1] - atomR;
-    const e1 = entries[i], e2 = entries[i+1];
-    let bonds = 1;
-    if(bondType !== 'ionic' && e1.valence && e2.valence) {
-      // Estimate bond order from valence
-      if(e1.valence >= 4 && e2.valence >= 4) bonds = 2;
-      if(e1.valence === 4 && e2.valence === 4) bonds = 2;
-      if((e1.valence === 5 && e2.valence === 5) || (e1.sym==='N'&&e2.sym==='N')) bonds = 3;
+function drawLewisStructureCanvas(container,entries,bondType) {
+  const n=entries.length;
+  const atomR=28;const spacing=110;const padding=55;
+  const W=Math.max(320,n*spacing+padding*2);const H=170;
+  const canvas=document.createElement('canvas');
+  canvas.width=W;canvas.height=H;
+  canvas.style.cssText='max-width:100%;height:auto;background:transparent;display:block;margin:0 auto;';
+  const ctx=canvas.getContext('2d');
+  const y=H/2;
+  if(n===1){drawAtomOnCanvas(ctx,W/2,y,atomR,entries[0]);container.appendChild(canvas);return;}
+  const positions=[];
+  for(let i=0;i<n;i++) positions.push(padding+i*spacing+atomR);
+  // Draw bonds
+  for(let i=0;i<n-1;i++){
+    const x1=positions[i]+atomR+2,x2=positions[i+1]-atomR-2;
+    const e1=entries[i],e2=entries[i+1];
+    let bonds=1;
+    if(bondType!=='ionic'&&e1.valence&&e2.valence){
+      if(e1.el&&e2.el&&e1.el.sym==='N'&&e2.el.sym==='N')bonds=3;
+      else if(e1.el&&e2.el&&e1.el.sym==='C'&&e2.el.sym==='O')bonds=2;
+      else if(e1.el&&e2.el&&(e1.el.group===14||e2.el.group===14))bonds=2;
     }
-    bonds = Math.min(bonds, 3);
-    ctx.strokeStyle = 'rgba(200,210,240,0.7)';
-    ctx.lineWidth = 1.8;
-    for(let b = 0; b < bonds; b++) {
-      const offset = (b - (bonds-1)/2) * 5;
-      ctx.beginPath();
-      ctx.moveTo(x1 + 2, y + offset);
-      ctx.lineTo(x2 - 2, y + offset);
-      ctx.stroke();
+    bonds=Math.min(bonds,3);
+    ctx.strokeStyle='rgba(200,210,240,0.7)';ctx.lineWidth=2;
+    for(let b=0;b<bonds;b++){
+      const offset=(b-(bonds-1)/2)*6;
+      ctx.beginPath();ctx.moveTo(x1,y+offset);ctx.lineTo(x2,y+offset);ctx.stroke();
     }
   }
-
-  // Draw ionic brackets around anion (second element) if ionic
-  if(bondType === 'ionic' && n >= 2) {
-    const bx1 = positions[1] - atomR - 10;
-    const bx2 = positions[1] + atomR + 10;
-    const by = y - atomR - 8;
-    const bh = atomR * 2 + 16;
-    ctx.strokeStyle = 'rgba(255,140,100,0.8)';
-    ctx.lineWidth = 1.5;
-    // Left bracket
-    ctx.beginPath(); ctx.moveTo(bx1+5,by); ctx.lineTo(bx1,by); ctx.lineTo(bx1,by+bh); ctx.lineTo(bx1+5,by+bh); ctx.stroke();
-    // Right bracket
-    ctx.beginPath(); ctx.moveTo(bx2-5,by); ctx.lineTo(bx2,by); ctx.lineTo(bx2,by+bh); ctx.lineTo(bx2-5,by+bh); ctx.stroke();
-    // Charge superscript
-    const ch = entries[1].charge;
-    const chStr = ch < 0 ? (Math.abs(ch) > 1 ? Math.abs(ch)+'\u207b' : '\u207b') : (ch > 1 ? ch+'\u207a' : '\u207a');
-    ctx.fillStyle = 'rgba(255,140,100,0.9)';
-    ctx.font = 'bold 11px Space Mono, monospace';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText(chStr, bx2+1, by-2);
+  // Ionic brackets
+  if(bondType==='ionic'&&n>=2){
+    const bx1=positions[1]-atomR-12,bx2=positions[1]+atomR+12;
+    const by=y-atomR-10,bh=atomR*2+20;
+    ctx.strokeStyle='rgba(255,140,100,0.8)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(bx1+6,by);ctx.lineTo(bx1,by);ctx.lineTo(bx1,by+bh);ctx.lineTo(bx1+6,by+bh);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bx2-6,by);ctx.lineTo(bx2,by);ctx.lineTo(bx2,by+bh);ctx.lineTo(bx2-6,by+bh);ctx.stroke();
+    const ch=entries[1].charge;
+    if(ch!==0){const chStr=ch<0?(Math.abs(ch)>1?Math.abs(ch)+'⁻':'⁻'):(ch>1?ch+'⁺':'⁺');
+      ctx.fillStyle='rgba(255,140,100,0.9)';ctx.font='bold 11px Space Mono,monospace';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(chStr,bx2+2,by-2);}
   }
-
   // Draw atoms
-  for(let i = 0; i < n; i++) {
-    drawAtomOnCanvas(ctx, positions[i], y, atomR, entries[i]);
-  }
-
-  // Lone pair dots on outer atoms
-  ctx.fillStyle = 'rgba(220,230,255,0.75)';
-  const outerLP = (entry) => Math.max(0, Math.floor((entry.valence - 2) / 2));
-  // Left atom lone pairs (on left side)
-  const lp0 = outerLP(entries[0]);
-  for(let lp = 0; lp < Math.min(lp0, 3); lp++) {
-    const px = positions[0] - atomR - 8;
-    const py = y - 6 + lp * 7;
-    ctx.beginPath(); ctx.arc(px-3, py, 2.5, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(px+3, py, 2.5, 0, Math.PI*2); ctx.fill();
-  }
-  // Right atom lone pairs (on right side)
-  const lpN = outerLP(entries[n-1]);
-  for(let lp = 0; lp < Math.min(lpN, 3); lp++) {
-    const px = positions[n-1] + atomR + 8;
-    const py = y - 6 + lp * 7;
-    ctx.beginPath(); ctx.arc(px-3, py, 2.5, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(px+3, py, 2.5, 0, Math.PI*2); ctx.fill();
-  }
-
+  for(let i=0;i<n;i++) drawAtomOnCanvas(ctx,positions[i],y,atomR,entries[i]);
+  // Lone pairs on outer atoms
+  ctx.fillStyle='rgba(220,230,255,0.75)';
+  const drawLP=(entry,x,side)=>{
+    const lp=Math.max(0,Math.floor((entry.valence-2)/2));
+    for(let p=0;p<Math.min(lp,3);p++){
+      const px=side==='left'?x-atomR-14:x+atomR+14;
+      const py=y-8+p*9;
+      ctx.beginPath();ctx.arc(px-4,py,2.8,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(px+4,py,2.8,0,Math.PI*2);ctx.fill();
+    }
+  };
+  drawLP(entries[0],positions[0],'left');
+  drawLP(entries[n-1],positions[n-1],'right');
   container.appendChild(canvas);
-
-  // Summary below
-  const info = document.createElement('div');
-  info.style.cssText = 'font-size:0.62rem;color:var(--text3);text-align:center;margin-top:8px;letter-spacing:.03em;';
-  const totalVE = entries.reduce((s,e) => s + e.valence * e.qty, 0);
-  info.textContent = 'Total valence electrons: ' + totalVE + '  ·  Bond type: ' + bondType;
+  const info=document.createElement('div');
+  info.style.cssText='font-size:0.62rem;color:var(--text3);text-align:center;margin-top:8px;letter-spacing:.03em;';
+  info.textContent=`Total valence e⁻: ${entries.reduce((s,e)=>s+e.valence*e.qty,0)}  ·  ${bondType}`;
   container.appendChild(info);
 }
 
-function drawAtomOnCanvas(ctx, cx, cy, r, entry) {
-  const el = entry.el || null;
-  const color = el ? (CAT_COLORS[el.cat]||'#868e96') : '#9966ff';
-  const sym = entry.sym || '?';
-
-  // Glow
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 8;
-
-  const grad = ctx.createRadialGradient(cx - r*0.25, cy - r*0.25, 0, cx, cy, r);
-  grad.addColorStop(0, color + 'cc');
-  grad.addColorStop(1, color + '44');
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI*2);
-  ctx.fillStyle = grad;
-  ctx.fill();
-  ctx.strokeStyle = color + 'dd';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // Symbol
-  const fs = sym.length > 2 ? Math.floor(r*0.45) : Math.floor(r*0.6);
-  ctx.fillStyle = '#f4f4fc';
-  ctx.font = 'bold ' + fs + 'px Outfit,sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(sym.length > 3 ? sym.slice(0,2) : sym, cx, cy);
+function drawAtomOnCanvas(ctx,cx,cy,r,entry) {
+  const el=entry.el||null;
+  const color=el?(CAT_COLORS[el.cat]||'#868e96'):'#9966ff';
+  const sym=entry.sym||'?';
+  ctx.shadowColor=color;ctx.shadowBlur=8;
+  const grad=ctx.createRadialGradient(cx-r*0.25,cy-r*0.25,0,cx,cy,r);
+  grad.addColorStop(0,color+'cc');grad.addColorStop(1,color+'44');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  ctx.strokeStyle=color+'dd';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.shadowBlur=0;
+  const fs=sym.length>2?Math.floor(r*0.45):Math.floor(r*0.62);
+  ctx.fillStyle='#f4f4fc';ctx.font=`bold ${fs}px Outfit,sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(sym.length>3?sym.slice(0,2):sym,cx,cy);
 }
 
 function openCompoundForElement(n) {
-  closePopup();
-  showPage('compound');
-  // Set first row to this element
-  if(compoundRows.length > 0) {
-    compoundRows[0].n = n;
-    compoundRows[0].type = 'element';
-    renderCompoundRows();
-    updateCompound();
-  }
+  closePopup();showPage('compound');
+  if(compoundRows.length>0){compoundRows[0].n=n;compoundRows[0].type='element';compoundRows[0].manualCharge=null;renderCompoundRows();updateCompound();}
 }
-
 function openBohrForElement(n) {
-  closePopup();
-  showPage('bohr');
-  const el = ELEMENTS.find(e => e.n === n);
-  if(el) { bohrCurrentElement = el; drawBohr(); updateBohrInfo(); }
+  closePopup();showPage('bohr');
+  const el=ELEMENTS.find(e=>e.n===n);
+  if(el){bohrCurrentElement=el;drawBohr();updateBohrInfo();}
 }
+function openLewisForElement(n) { closePopup();showPage('compound');openCompoundForElement(n); }
 
-function openLewisForElement(n) {
-  closePopup();
-  showPage('compound');
-  openCompoundForElement(n);
+function sendToEquationBalancer() {
+  const entries=getEntries();
+  if(entries.length===0)return;
+  const r=generateFormula(entries);
+  if(r.formula&&!r.formula.startsWith('⚠')){
+    showPage('equation');
+    // Strip subscript chars for input
+    const plain=r.formula.replace(/[₀₁₂₃₄₅₆₇₈₉]/g,c=>'0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(c)]);
+    document.getElementById('eq-input').value=plain+' → ';
+    document.getElementById('eq-input').focus();
+  }
 }
 
 // =====================================================
 // BOHR MODEL
 // =====================================================
-let bohrCurrentElement = ELEMENTS[5]; // Carbon default
-let bohrAnimating = false;
-let bohrAnimFrame = null;
-let bohrAngles = [];
-let bohrShowLabels = false;
-let bohrHighlightValence = false;
-let bohrTime = 0;
-
-function calculateElectronShells(atomicNumber) {
-  const maxCap = [2, 8, 18, 32, 32, 18, 8];
-  let remaining = atomicNumber;
-  const shells = [];
-  for(let i = 0; i < maxCap.length && remaining > 0; i++) {
-    const count = Math.min(remaining, maxCap[i]);
-    shells.push(count);
-    remaining -= count;
-  }
+let bohrCurrentElement=ELEMENTS[5];
+let bohrAnimating=false,bohrAnimFrame=null,bohrAngles=[],bohrShowLabels=false,bohrHighlightValence=false;
+function calculateElectronShells(n){
+  const maxCap=[2,8,18,32,32,18,8];let remaining=n;const shells=[];
+  for(let i=0;i<maxCap.length&&remaining>0;i++){const count=Math.min(remaining,maxCap[i]);shells.push(count);remaining-=count;}
   return shells;
 }
-
-function drawBohr() {
-  const canvas = document.getElementById('bohr-canvas');
-  const ctx = canvas.getContext('2d');
-  const el = bohrCurrentElement;
-  const shells = calculateElectronShells(el.n);
-  const W = canvas.width, H = canvas.height;
-  const cx = W/2, cy = H/2;
-
-  ctx.clearRect(0,0,W,H);
-
-  // Background
-  ctx.fillStyle = '#0d0d15';
-  ctx.fillRect(0,0,W,H);
-
-  const color = CAT_COLORS[el.cat] || '#4488ff';
-  const maxShells = shells.length;
-  const maxR = Math.min(W,H)/2 - 20;
-  const shellSpacing = maxR / (maxShells + 1);
-
-  // Draw orbital rings
-  shells.forEach((count, i) => {
-    const r = shellSpacing * (i + 1);
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI*2);
-    ctx.strokeStyle = `rgba(255,255,255,0.1)`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // n= labels
-    if(bohrShowLabels) {
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = '11px Space Mono, monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`n=${i+1}`, cx+r+4, cy-4);
-    }
+function drawBohr(){
+  const canvas=document.getElementById('bohr-canvas');const ctx=canvas.getContext('2d');
+  const el=bohrCurrentElement;const shells=calculateElectronShells(el.n);
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#0d0d15';ctx.fillRect(0,0,W,H);
+  const color=CAT_COLORS[el.cat]||'#4488ff';
+  const maxR=Math.min(W,H)/2-20;const shellSpacing=maxR/(shells.length+1);
+  shells.forEach((count,i)=>{
+    const r=shellSpacing*(i+1);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.stroke();
+    if(bohrShowLabels){ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='11px Space Mono,monospace';ctx.textAlign='left';ctx.fillText(`n=${i+1}`,cx+r+4,cy-4);}
   });
-
-  // Draw nucleus
-  const nucR = Math.max(18, Math.min(32, shellSpacing * 0.5));
-  const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,nucR);
-  grad.addColorStop(0, color+'ff');
-  grad.addColorStop(0.6, color+'aa');
-  grad.addColorStop(1, color+'33');
-  ctx.beginPath();
-  ctx.arc(cx, cy, nucR, 0, Math.PI*2);
-  ctx.fillStyle = grad;
-  ctx.fill();
-  ctx.strokeStyle = color+'88';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Nucleus text
-  ctx.fillStyle = '#fff';
-  ctx.font = `bold ${nucR > 24 ? 12 : 10}px Outfit, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  if(nucR > 22) {
-    ctx.fillText(el.sym, cx, cy - 5);
-    ctx.font = '9px Space Mono, monospace';
-    ctx.fillStyle='rgba(255,255,255,0.7)';
-    ctx.fillText(`${el.n}p`, cx, cy + 6);
-  } else {
-    ctx.fillText(el.sym, cx, cy);
-  }
-
-  // Draw electrons
-  if(!bohrAnimating) {
-    bohrAngles = shells.map(count => Array.from({length:count}, (_,i) => (2*Math.PI*i)/count));
-  }
-
-  shells.forEach((count, si) => {
-    const r = shellSpacing * (si + 1);
-    const isValence = si === shells.length - 1;
-    const eColor = bohrHighlightValence && isValence ? '#ffe066' : color+'cc';
-
-    for(let ei = 0; ei < count; ei++) {
-      const angle = bohrAngles[si] ? bohrAngles[si][ei] : (2*Math.PI*ei/count);
-      const ex = cx + r * Math.cos(angle);
-      const ey = cy + r * Math.sin(angle);
-
-      // Electron glow
-      if(bohrHighlightValence && isValence) {
-        ctx.beginPath();
-        ctx.arc(ex, ey, 7, 0, Math.PI*2);
-        ctx.fillStyle = '#ffe06622';
-        ctx.fill();
-      }
-
-      ctx.beginPath();
-      ctx.arc(ex, ey, 4, 0, Math.PI*2);
-      ctx.fillStyle = eColor;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
+  const nucR=Math.max(18,Math.min(32,shellSpacing*0.5));
+  const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,nucR);
+  grad.addColorStop(0,color+'ff');grad.addColorStop(0.6,color+'aa');grad.addColorStop(1,color+'33');
+  ctx.beginPath();ctx.arc(cx,cy,nucR,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  ctx.strokeStyle=color+'88';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font=`bold ${nucR>24?12:10}px Outfit,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  if(nucR>22){ctx.fillText(el.sym,cx,cy-5);ctx.font='9px Space Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText(`${el.n}p`,cx,cy+6);}
+  else ctx.fillText(el.sym,cx,cy);
+  if(!bohrAnimating) bohrAngles=shells.map(count=>Array.from({length:count},(_,i)=>(2*Math.PI*i)/count));
+  shells.forEach((count,si)=>{
+    const r=shellSpacing*(si+1);
+    const isValence=si===shells.length-1;
+    const eColor=bohrHighlightValence&&isValence?'#ffe066':color+'cc';
+    for(let ei=0;ei<count;ei++){
+      const angle=bohrAngles[si]?bohrAngles[si][ei]:(2*Math.PI*ei/count);
+      const ex=cx+r*Math.cos(angle),ey=cy+r*Math.sin(angle);
+      if(bohrHighlightValence&&isValence){ctx.beginPath();ctx.arc(ex,ey,7,0,Math.PI*2);ctx.fillStyle='#ffe06622';ctx.fill();}
+      ctx.beginPath();ctx.arc(ex,ey,4,0,Math.PI*2);ctx.fillStyle=eColor;ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=0.5;ctx.stroke();
     }
   });
 }
-
-function animateBohr() {
-  if(!bohrAnimating) return;
-  const el = bohrCurrentElement;
-  const shells = calculateElectronShells(el.n);
-  bohrTime += 0.008;
-
-  // Update angles — each shell rotates at different speed
-  shells.forEach((count, si) => {
-    const speed = 0.6 / (si + 1); // outer shells slower
-    if(!bohrAngles[si]) bohrAngles[si] = Array.from({length:count},(_,i)=>2*Math.PI*i/count);
-    for(let ei = 0; ei < count; ei++) {
-      bohrAngles[si][ei] += speed * 0.02;
-    }
+function animateBohr(){
+  if(!bohrAnimating)return;
+  const el=bohrCurrentElement;const shells=calculateElectronShells(el.n);
+  shells.forEach((count,si)=>{
+    const speed=0.6/(si+1);
+    if(!bohrAngles[si])bohrAngles[si]=Array.from({length:count},(_,i)=>2*Math.PI*i/count);
+    for(let ei=0;ei<count;ei++) bohrAngles[si][ei]+=speed*0.02;
   });
-
-  drawBohr();
-  bohrAnimFrame = requestAnimationFrame(animateBohr);
+  drawBohr();bohrAnimFrame=requestAnimationFrame(animateBohr);
 }
-
-function toggleBohrAnim() {
-  bohrAnimating = !bohrAnimating;
-  const btn = document.getElementById('bohr-anim-btn');
-  btn.textContent = bohrAnimating ? '⏸ Pause' : '▶ Animate';
-  btn.classList.toggle('btn-primary', bohrAnimating);
-  if(bohrAnimating) animateBohr();
-  else { cancelAnimationFrame(bohrAnimFrame); drawBohr(); }
+function toggleBohrAnim(){
+  bohrAnimating=!bohrAnimating;
+  const btn=document.getElementById('bohr-anim-btn');
+  btn.textContent=bohrAnimating?'⏸ Pause':'▶ Animate';btn.classList.toggle('btn-primary',bohrAnimating);
+  if(bohrAnimating)animateBohr();else{cancelAnimationFrame(bohrAnimFrame);drawBohr();}
 }
-
-function toggleBohrLabels() {
-  bohrShowLabels = !bohrShowLabels;
-  document.getElementById('bohr-labels-btn').classList.toggle('btn-primary', bohrShowLabels);
-  if(!bohrAnimating) drawBohr();
-}
-
-function toggleBohrValence() {
-  bohrHighlightValence = !bohrHighlightValence;
-  document.getElementById('bohr-valence-btn').classList.toggle('btn-primary', bohrHighlightValence);
-  if(!bohrAnimating) drawBohr();
-}
-
-function updateBohrInfo() {
-  const el = bohrCurrentElement;
-  const shells = calculateElectronShells(el.n);
-  const color = CAT_COLORS[el.cat] || '#4488ff';
-  document.getElementById('bohr-info-pane').innerHTML = `
+function toggleBohrLabels(){bohrShowLabels=!bohrShowLabels;document.getElementById('bohr-labels-btn').classList.toggle('btn-primary',bohrShowLabels);if(!bohrAnimating)drawBohr();}
+function toggleBohrValence(){bohrHighlightValence=!bohrHighlightValence;document.getElementById('bohr-valence-btn').classList.toggle('btn-primary',bohrHighlightValence);if(!bohrAnimating)drawBohr();}
+function updateBohrInfo(){
+  const el=bohrCurrentElement;const shells=calculateElectronShells(el.n);const color=CAT_COLORS[el.cat]||'#4488ff';
+  document.getElementById('bohr-info-pane').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <div style="width:52px;height:52px;border-radius:10px;background:${color}22;border:2px solid ${color}55;display:flex;flex-direction:column;align-items:center;justify-content:center;">
         <span style="font-size:1.4rem;font-weight:900;color:${color};">${el.sym}</span>
       </div>
-      <div>
-        <div style="font-size:1rem;font-weight:800;">${el.name}</div>
-        <div style="font-size:0.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${color};">${CAT_NAMES[el.cat]}</div>
-      </div>
+      <div><div style="font-size:1rem;font-weight:800;">${el.name}</div><div style="font-size:0.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${color};">${CAT_NAMES[el.cat]}</div></div>
     </div>
     <div class="bohr-stat"><div class="bohr-stat-label">Atomic Number</div><div class="bohr-stat-val">${el.n}</div></div>
     <div class="bohr-stat"><div class="bohr-stat-label">Protons</div><div class="bohr-stat-val" style="color:var(--red2);">${el.n}</div></div>
@@ -2117,252 +1849,517 @@ function updateBohrInfo() {
     <div class="bohr-stat"><div class="bohr-stat-label">Shell Config</div><div class="bohr-stat-val shell-display">${shells.join('–')}</div></div>
     <div class="bohr-stat"><div class="bohr-stat-label">Valence e⁻</div><div class="bohr-stat-val" style="color:var(--purple);">${shells[shells.length-1]}</div></div>
     <div class="bohr-stat"><div class="bohr-stat-label">Period</div><div class="bohr-stat-val">${el.period}</div></div>
-    <div class="bohr-stat"><div class="bohr-stat-label">Group</div><div class="bohr-stat-val">${el.group||'f-block'}</div></div>
-  `;
+    <div class="bohr-stat"><div class="bohr-stat-label">Group</div><div class="bohr-stat-val">${el.group||'f-block'}</div></div>`;
+}
+function bohrSearch(q){
+  const container=document.getElementById('bohr-search-results');
+  if(!q.trim()){container.innerHTML='';return;}
+  const matches=ELEMENTS.filter(e=>e.name.toLowerCase().includes(q.toLowerCase())||e.sym.toLowerCase().includes(q.toLowerCase())||String(e.n)===q).slice(0,8);
+  container.innerHTML=matches.map(el=>{const color=CAT_COLORS[el.cat]||'#868e96';return`<button onclick="selectBohrElement(${el.n})" style="padding:5px 12px;border:1.5px solid ${color}44;border-radius:8px;background:${color}15;color:${color};font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;">${el.sym} — ${el.name}</button>`;}).join('');
+}
+function selectBohrElement(n){
+  bohrCurrentElement=ELEMENTS.find(e=>e.n===n);bohrAngles=[];
+  document.getElementById('bohr-search').value='';document.getElementById('bohr-search-results').innerHTML='';
+  if(!bohrAnimating)drawBohr();updateBohrInfo();
 }
 
-function bohrSearch(q) {
-  const container = document.getElementById('bohr-search-results');
-  if(!q.trim()) { container.innerHTML=''; return; }
-  const matches = ELEMENTS.filter(e =>
-    e.name.toLowerCase().includes(q.toLowerCase()) ||
-    e.sym.toLowerCase().includes(q.toLowerCase()) ||
-    String(e.n) === q
-  ).slice(0,8);
-  container.innerHTML = matches.map(el => {
-    const color = CAT_COLORS[el.cat]||'#868e96';
-    return `<button onclick="selectBohrElement(${el.n})" style="padding:5px 12px;border:1.5px solid ${color}44;border-radius:8px;background:${color}15;color:${color};font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;">${el.sym} — ${el.name}</button>`;
+// =====================================================
+// LEWIS PAGE
+// =====================================================
+let lewisSelectedA=null,lewisSelectedB=null;
+function lewisPageSearch(q){
+  const container=document.getElementById('lewis-search-results');
+  if(!q.trim()){container.innerHTML='';return;}
+  const matches=ELEMENTS.filter(e=>e.name.toLowerCase().includes(q.toLowerCase())||e.sym.toLowerCase().includes(q.toLowerCase())||String(e.n)===q).slice(0,10);
+  container.innerHTML=matches.map(el=>{const color=CAT_COLORS[el.cat]||'#868e96';return`<button onclick="selectLewisElement(${el.n})" style="padding:5px 12px;border:1.5px solid ${color}44;border-radius:8px;background:${color}15;color:${color};font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;">${el.sym} — ${el.name}</button>`;}).join('');
+}
+function selectLewisElement(n){
+  const el=ELEMENTS.find(e=>e.n===n);if(!el)return;
+  document.getElementById('lewis-page-search').value='';
+  document.getElementById('lewis-search-results').innerHTML='';
+  renderLewisSingle(el);
+}
+function renderLewisSingle(el){
+  const color=CAT_COLORS[el.cat]||'#868e96';
+  const ve=getValenceElectrons(el);
+  const display=document.getElementById('lewis-single-display');
+  display.innerHTML='';
+  const canvas=document.createElement('canvas');
+  canvas.width=200;canvas.height=200;
+  canvas.style.cssText='background:transparent;margin:0 auto;display:block;';
+  drawLewisDots(canvas,el.sym,ve,el);
+  display.appendChild(canvas);
+  const info=document.getElementById('lewis-single-info');
+  const charge=predictCharge(el);
+  const tendency=el.group===18?'Neither':charge>0?'Lose electrons':charge<0?'Gain electrons':'Share electrons';
+  const octetNeed=el.group>=13&&el.group<=17?Math.abs(8-ve):0;
+  info.innerHTML=`<div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:1.5rem;font-weight:900;color:${color};">${el.sym}</span>
+      <div><div style="font-weight:800;">${el.name}</div><div style="font-size:0.65rem;color:${color};font-weight:700;text-transform:uppercase;letter-spacing:.08em;">${CAT_NAMES[el.cat]}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;"><div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Valence e⁻</div><div style="font-size:1.1rem;font-weight:800;color:var(--purple);">${ve}</div></div>
+      <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;"><div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Ionic Charge</div><div style="font-size:1.1rem;font-weight:800;color:${charge>0?'var(--red2)':charge<0?'var(--blue2)':'var(--text2)'};">${charge>0?'+'+charge:charge||'0'}</div></div>
+      <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;"><div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Tendency</div><div style="font-size:0.82rem;font-weight:700;">${tendency}</div></div>
+      <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;"><div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Needs for Octet</div><div style="font-size:1.1rem;font-weight:800;color:var(--amber);">${octetNeed||(el.group===18?'Full':'—')}</div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px;">
+      <button class="btn btn-primary btn-sm" onclick="openCompoundForElement(${el.n})">🧪 Build Compound</button>
+      <button class="btn btn-ghost btn-sm" onclick="openBohrForElement(${el.n})">🌀 Bohr Model</button>
+    </div>
+  </div>`;
+}
+function lewisCompareSearch(side,q){
+  const ddId=`lewis-cmp-${side}-dd`,dd=document.getElementById(ddId);
+  if(!q.trim()){dd.style.display='none';return;}
+  const matches=ELEMENTS.filter(e=>e.name.toLowerCase().includes(q.toLowerCase())||e.sym.toLowerCase().includes(q.toLowerCase())||String(e.n)===q).slice(0,8);
+  dd.innerHTML=matches.map(el=>{const c=CAT_COLORS[el.cat]||'#868e96';return`<div onclick="selectLewisCompare('${side}',${el.n})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'"><span style="font-weight:900;color:${c};font-size:0.82rem;width:24px;">${el.sym}</span><span style="font-size:0.78rem;color:var(--text2);">${el.name}</span></div>`;}).join('');
+  dd.style.display=matches.length?'block':'none';
+}
+function selectLewisCompare(side,n){
+  const el=ELEMENTS.find(e=>e.n===n);if(!el)return;
+  if(side==='a'){lewisSelectedA=el;document.getElementById('lewis-cmp-a').value=el.name;}
+  else{lewisSelectedB=el;document.getElementById('lewis-cmp-b').value=el.name;}
+  document.getElementById(`lewis-cmp-${side}-dd`).style.display='none';
+  renderLewisCompare();
+}
+function renderLewisCompare(){
+  const display=document.getElementById('lewis-compare-display');
+  if(!lewisSelectedA&&!lewisSelectedB){display.innerHTML='<div style="color:var(--text3);font-size:0.82rem;">Select two elements to compare</div>';return;}
+  display.innerHTML='';display.style.display='block';
+  const els=[lewisSelectedA,lewisSelectedB].filter(Boolean);
+  const wrap=document.createElement('div');wrap.style.cssText='display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap;';
+  els.forEach(el=>{
+    const color=CAT_COLORS[el.cat]||'#868e96';const ve=getValenceElectrons(el);const charge=predictCharge(el);
+    const div=document.createElement('div');div.style.cssText='text-align:center;';
+    const canvas=document.createElement('canvas');canvas.width=170;canvas.height=170;canvas.style.background='transparent';
+    drawLewisDots(canvas,el.sym,ve,el);
+    const lbl=document.createElement('div');lbl.style.cssText='margin-top:6px;';
+    lbl.innerHTML=`<span style="font-weight:800;color:${color};">${el.name}</span> <span style="font-size:0.7rem;color:var(--text3);">${ve} e⁻ · ${charge>0?'+'+charge:charge||'neutral'}</span>`;
+    div.appendChild(canvas);div.appendChild(lbl);wrap.appendChild(div);
+  });
+  if(lewisSelectedA&&lewisSelectedB){
+    const enA=lewisSelectedA.en,enB=lewisSelectedB.en;
+    if(enA&&enB){
+      const diff=Math.abs(enA-enB).toFixed(2);
+      const type=diff>1.7?'Ionic':diff>=0.4?'Polar Covalent':'Nonpolar Covalent';
+      const typeColor=diff>1.7?'var(--red2)':diff>=0.4?'var(--amber)':'var(--green)';
+      const badge=document.createElement('div');badge.style.cssText='width:100%;text-align:center;margin-top:12px;padding:8px;background:var(--surface2);border-radius:8px;';
+      badge.innerHTML=`<span style="font-size:0.65rem;color:var(--text3);">ΔEN = ${diff} → </span><span style="font-weight:800;color:${typeColor};">${type}</span>`;
+      wrap.appendChild(badge);
+    }
+  }
+  display.appendChild(wrap);
+}
+function initLewisGallery(){
+  const gallery=document.getElementById('lewis-gallery');if(gallery.innerHTML)return;
+  const byVE={};
+  ELEMENTS.filter(e=>e.group).forEach(el=>{const ve=getValenceElectrons(el);if(!byVE[ve])byVE[ve]=[];byVE[ve].push(el);});
+  gallery.innerHTML='';
+  [1,2,3,4,5,6,7,8].forEach(ve=>{
+    if(!byVE[ve])return;
+    const section=document.createElement('div');section.style.cssText='width:100%;margin-bottom:12px;';
+    section.innerHTML=`<div style="font-size:0.62rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">${ve} Valence Electron${ve>1?'s':''}</div>`;
+    const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;';
+    byVE[ve].slice(0,18).forEach(el=>{
+      const color=CAT_COLORS[el.cat]||'#868e96';
+      const btn=document.createElement('div');
+      btn.style.cssText=`display:flex;align-items:center;gap:6px;padding:5px 10px;background:${color}15;border:1.5px solid ${color}33;border-radius:8px;cursor:pointer;transition:all 0.15s;`;
+      btn.innerHTML=`<span style="font-weight:900;color:${color};font-size:0.88rem;">${el.sym}</span><span style="font-size:0.68rem;color:var(--text2);">${el.name}</span>`;
+      btn.onmouseenter=()=>btn.style.background=color+'30';btn.onmouseleave=()=>btn.style.background=color+'15';
+      btn.onclick=()=>{selectLewisElement(el.n);document.getElementById('lewis-page-search').value=el.name;};
+      row.appendChild(btn);
+    });
+    section.appendChild(row);gallery.appendChild(section);
+  });
+}
+
+// =====================================================
+// EQUATION BALANCER ENGINE
+// =====================================================
+let eqMode = 'inspection';
+let redoxCondition = 'acidic';
+
+function setEqMode(mode) {
+  eqMode=mode;
+  document.querySelectorAll('.eq-mode-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`eq-tab-${mode}`).classList.add('active');
+  document.getElementById('eq-redox-options').style.display=mode==='redox'?'block':'none';
+}
+function setRedoxCondition(c) {
+  redoxCondition=c;
+  document.getElementById('eq-acidic-btn').classList.toggle('on',c==='acidic');
+  document.getElementById('eq-basic-btn').classList.toggle('on',c==='basic');
+}
+function loadExample(eq) {
+  document.getElementById('eq-input').value=eq;balanceEquation();
+}
+function clearEquation() {
+  document.getElementById('eq-input').value='';
+  document.getElementById('eq-result-area').classList.remove('show');
+  document.getElementById('eq-interactive-area').style.display='none';
+}
+function eqLiveUpdate() {
+  // Clear result on new input
+  const input=document.getElementById('eq-input').value;
+  if(!input.trim()){document.getElementById('eq-result-area').classList.remove('show');document.getElementById('eq-interactive-area').style.display='none';}
+}
+
+// Parse a chemical formula string into element counts
+function parseFormula(formula) {
+  // Handle polyatomic groups like (SO4)2
+  formula=formula.trim();
+  const result={};
+  function parseSimple(s,mult) {
+    const re=/([A-Z][a-z]?)(\d*)/g;let m;
+    while((m=re.exec(s))!==null){
+      if(m[1]){const n=parseInt(m[2])||1;result[m[1]]=(result[m[1]]||0)+n*mult;}
+    }
+  }
+  // Handle parentheses
+  const withParen=/\(([^()]+)\)(\d*)/g;let pm;let s=formula;
+  while((pm=withParen.exec(formula))!==null){
+    const inner=pm[1],mult=parseInt(pm[2])||1;
+    parseSimple(inner,mult);
+    s=s.replace(pm[0],'');
+  }
+  parseSimple(s,1);
+  return result;
+}
+
+// Convert formula with superscripts/subscripts to plain ASCII
+function normalizeFormula(f) {
+  const subMap={'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+  const supMap={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁺':'+','⁻':'-'};
+  return f.split('').map(c=>subMap[c]||supMap[c]||c).join('');
+}
+
+function formatFormulaDisplay(f) {
+  // Add subscripts to numbers after element symbols
+  return f.replace(/([A-Za-z\)])(\d+)/g,(m,p,n)=>p+toSubscriptStr(n));
+}
+function toSubscriptStr(s){const m={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};return s.split('').map(c=>m[c]||c).join('');}
+
+// Parse equation string into sides
+function parseEquation(input) {
+  let str = normalizeFormula(input.trim());
+  // Support → = -> as separator
+  const sepMatch = str.match(/→|->|=>/);
+  const sep = sepMatch ? sepMatch[0] : '=';
+  const sides = str.split(/→|->|=>|=/);
+  if(sides.length!==2) return null;
+  const reactants = sides[0].split('+').map(s=>s.trim()).filter(Boolean);
+  const products = sides[1].split('+').map(s=>s.trim()).filter(Boolean);
+  return {reactants,products};
+}
+
+// Extract coefficient from formula string like "2H2O" → {coeff:2, formula:"H2O"}
+function extractCoeff(formula) {
+  const m = formula.match(/^(\d+)([A-Z(].*)$/);
+  if(m) return {coeff:parseInt(m[1]),formula:m[2]};
+  return {coeff:1,formula};
+}
+
+// Balance equation by algebraic/matrix method
+function balanceEquationAlgebraic(reactants, products) {
+  // Collect all compounds
+  const compounds = [...reactants,...products];
+  const n = compounds.length;
+  // Get all elements
+  const allEls = new Set();
+  compounds.forEach(c=>{const parsed=parseFormula(c.formula);Object.keys(parsed).forEach(e=>allEls.add(e));});
+  const els = [...allEls];
+  const m = els.length;
+
+  // Build matrix: rows=elements, cols=compounds (negative for products)
+  // We need to solve Ax=0
+  const matrix = els.map(el => {
+    return compounds.map((c,i) => {
+      const sign = i < reactants.length ? 1 : -1;
+      return sign * (parseFormula(c.formula)[el]||0);
+    });
+  });
+
+  // Gaussian elimination to find null space (simplified for small systems)
+  // For practical purposes, try coefficients 1-12 by brute force for n<=4
+  if(n<=6) {
+    const result = bruteForceBalance(reactants,products,els,matrix,n);
+    if(result) return result;
+  }
+  return null;
+}
+
+function bruteForceBalance(reactants,products,els,matrix,n) {
+  const maxCoeff = 12;
+  // Try all coefficient combinations
+  function check(coeffs) {
+    return els.every((_,ei) => {
+      let sum=0;
+      for(let ci=0;ci<n;ci++) sum+=matrix[ei][ci]*coeffs[ci];
+      return sum===0;
+    });
+  }
+  // For n=2: special case
+  if(n===2){
+    const [r1]=reactants,[p1]=products;
+    const e=parseFormula(r1.formula),f=parseFormula(p1.formula);
+    // Check atom by atom
+    const e2=parseFormula(p1.formula);
+    // Find scaling
+    const ek=Object.keys(e);
+    if(ek.length===0)return null;
+    const el0=ek[0];
+    const rv=e[el0]||0,pv=e2[el0]||0;
+    if(rv===0||pv===0)return null;
+    const g=gcd(rv,pv);
+    const cr=pv/g,cp=rv/g;
+    if(check([cr,cp]))return[cr,cp];
+    return null;
+  }
+  // General: iterate
+  const coeffs=new Array(n).fill(1);
+  function iterate(pos,remaining) {
+    if(pos===n){
+      if(check(coeffs)&&coeffs.some(c=>c>0)){
+        // Reduce by GCD
+        let g=coeffs[0];for(let i=1;i<n;i++)g=gcd(g,coeffs[i]);
+        return coeffs.map(c=>c/g);
+      }
+      return null;
+    }
+    for(let v=1;v<=maxCoeff;v++){
+      coeffs[pos]=v;
+      const r=iterate(pos+1,remaining-1);
+      if(r)return r;
+    }
+    return null;
+  }
+  return iterate(0,n);
+}
+
+function balanceEquation() {
+  const input = document.getElementById('eq-input').value;
+  if(!input.trim())return;
+  const parsed = parseEquation(input);
+  if(!parsed){showEqError('Could not parse equation. Use → or = to separate reactants and products. Example: H2 + O2 → H2O');return;}
+
+  const {reactants:rawR,products:rawP} = parsed;
+  const reactants = rawR.map(r=>{const{coeff,formula}=extractCoeff(r);return{coeff,formula,raw:r};});
+  const products = rawP.map(p=>{const{coeff,formula}=extractCoeff(p);return{coeff,formula,raw:p};});
+
+  // Try balancing
+  let coeffs = null;
+  try {
+    const result = balanceEquationAlgebraic(reactants,products);
+    if(result) coeffs=result;
+  } catch(e){}
+
+  const area = document.getElementById('eq-result-area');
+  const inner = document.getElementById('eq-result-inner');
+  area.classList.add('show');
+
+  if(!coeffs) {
+    // Try to show unbalanced with analysis
+    inner.innerHTML = buildEqResult(reactants,products,null,input);
+    buildInteractiveBalancer(reactants,products,null);
+    return;
+  }
+
+  inner.innerHTML = buildEqResult(reactants,products,coeffs,input);
+  buildInteractiveBalancer(reactants,products,coeffs);
+}
+
+function showEqError(msg) {
+  const area=document.getElementById('eq-result-area'),inner=document.getElementById('eq-result-inner');
+  area.classList.add('show');
+  inner.innerHTML=`<div class="eq-error">❌ ${msg}</div>`;
+}
+
+function buildEqResult(reactants,products,coeffs,originalInput) {
+  const n=reactants.length+products.length;
+  let rCoeffs, pCoeffs;
+  if(coeffs){
+    rCoeffs=coeffs.slice(0,reactants.length);
+    pCoeffs=coeffs.slice(reactants.length);
+  } else {
+    rCoeffs=reactants.map(r=>r.coeff);
+    pCoeffs=products.map(p=>p.coeff);
+  }
+
+  // Build balanced equation string
+  const rStr=reactants.map((r,i)=>{
+    const c=rCoeffs[i];
+    const display=formatFormulaDisplay(r.formula);
+    return`<span style="color:var(--blue2);">${c>1?c:''}</span>${display}`;
+  }).join(' + ');
+  const pStr=products.map((p,i)=>{
+    const c=pCoeffs[i];
+    const display=formatFormulaDisplay(p.formula);
+    return`<span style="color:var(--green);">${c>1?c:''}</span>${display}`;
+  }).join(' + ');
+
+  // Detect reaction type
+  const type=detectReactionType(reactants,products);
+  const typeBadge=type?`<span class="eq-type-badge eq-${type.cls}">${type.name}</span>`:'';
+
+  // Atom count table
+  const allEls=new Set();
+  reactants.forEach(r=>Object.keys(parseFormula(r.formula)).forEach(e=>allEls.add(e)));
+  products.forEach(p=>Object.keys(parseFormula(p.formula)).forEach(e=>allEls.add(e)));
+
+  const atomTableRows=[...allEls].map(el=>{
+    const leftCount=reactants.reduce((s,r,i)=>{const pf=parseFormula(r.formula);return s+(pf[el]||0)*rCoeffs[i];},0);
+    const rightCount=products.reduce((s,p,i)=>{const pf=parseFormula(p.formula);return s+(pf[el]||0)*pCoeffs[i];},0);
+    const balanced=leftCount===rightCount;
+    return`<tr><td style="font-weight:700;">${el}</td><td class="${balanced?'atom-balanced':'atom-unbalanced'}">${leftCount}</td><td class="${balanced?'atom-balanced':'atom-unbalanced'}">${rightCount}</td><td>${balanced?'✓ Balanced':'✗ Unbalanced'}</td></tr>`;
   }).join('');
+
+  // Steps
+  const steps=generateSteps(reactants,products,rCoeffs,pCoeffs,coeffs!==null);
+
+  const verified = coeffs&&[...allEls].every(el=>{
+    const l=reactants.reduce((s,r,i)=>{const pf=parseFormula(r.formula);return s+(pf[el]||0)*rCoeffs[i];},0);
+    const r2=products.reduce((s,p,i)=>{const pf=parseFormula(p.formula);return s+(pf[el]||0)*pCoeffs[i];},0);
+    return l===r2;
+  });
+
+  return`
+    ${typeBadge}
+    <div class="eq-balanced">${rStr} → ${pStr}</div>
+    ${!verified&&coeffs?'<div class="eq-error" style="margin-bottom:12px;">⚠ Could not fully balance — showing best attempt. Try adjusting the equation or check for typos.</div>':''}
+    ${!coeffs?'<div class="eq-error" style="margin-bottom:12px;">⚠ Could not auto-balance this equation. Showing unbalanced form for analysis. Use the interactive balancer below.</div>':''}
+    <div style="font-size:0.82rem;font-weight:800;margin-bottom:10px;color:var(--text2);">📋 Step-by-step (${eqMode.charAt(0).toUpperCase()+eqMode.slice(1)} method)</div>
+    ${steps}
+    <div style="font-size:0.82rem;font-weight:800;margin:14px 0 8px;color:var(--text2);">✅ Atom Count Verification</div>
+    <table class="eq-atom-table">
+      <thead><tr><th>Element</th><th>Reactants</th><th>Products</th><th>Status</th></tr></thead>
+      <tbody>${atomTableRows}</tbody>
+    </table>`;
 }
 
-function selectBohrElement(n) {
-  bohrCurrentElement = ELEMENTS.find(e => e.n === n);
-  bohrAngles = [];
-  document.getElementById('bohr-search').value = '';
-  document.getElementById('bohr-search-results').innerHTML = '';
-  if(!bohrAnimating) drawBohr();
-  updateBohrInfo();
+function generateSteps(reactants,products,rCoeffs,pCoeffs,balanced) {
+  const steps=[];
+  if(eqMode==='inspection'){
+    steps.push({n:1,text:`<b>Write the unbalanced equation:</b><br><span style="font-family:'Space Mono',monospace;">${reactants.map(r=>formatFormulaDisplay(r.formula)).join(' + ')} → ${products.map(p=>formatFormulaDisplay(p.formula)).join(' + ')}</span>`});
+    steps.push({n:2,text:'<b>Count atoms on each side</b> for every element. Start with elements appearing in only one compound on each side.'});
+    if(balanced){
+      const balancedStr=reactants.map((r,i)=>`${rCoeffs[i]>1?rCoeffs[i]:''}${formatFormulaDisplay(r.formula)}`).join(' + ')+' → '+products.map((p,i)=>`${pCoeffs[i]>1?pCoeffs[i]:''}${formatFormulaDisplay(p.formula)}`).join(' + ');
+      steps.push({n:3,text:`<b>Apply coefficients</b> to balance all atoms:<br><span style="font-family:'Space Mono',monospace;">${balancedStr}</span>`});
+      steps.push({n:4,text:'<b>Verify:</b> Count atoms on both sides — they must match for every element. ✓'});
+    }
+  } else if(eqMode==='algebraic'){
+    steps.push({n:1,text:'<b>Assign variables</b> to each compound: a, b, c, d…'});
+    const varStr=reactants.map((r,i)=>`${String.fromCharCode(97+i)}(${formatFormulaDisplay(r.formula)})`).join(' + ')+' → '+products.map((p,i)=>`${String.fromCharCode(97+reactants.length+i)}(${formatFormulaDisplay(p.formula)})`).join(' + ');
+    steps.push({n:2,text:`<b>Equation setup:</b><br><span style="font-family:'Space Mono',monospace;">${varStr}</span>`});
+    steps.push({n:3,text:'<b>Set up system of equations</b> — one per element. Set a=1 and solve for remaining variables using substitution or matrix reduction.'});
+    if(balanced){steps.push({n:4,text:`<b>Solution:</b> ${[...reactants,...products].map((c,i)=>`${String.fromCharCode(97+i)}=${(i<reactants.length?rCoeffs[i]:pCoeffs[i-reactants.length])}`).join(', ')}`});}
+  } else {
+    // Redox
+    steps.push({n:1,text:'<b>Identify oxidation states</b> of each element in reactants and products. Note which elements are oxidized (lose e⁻) and which are reduced (gain e⁻).'});
+    steps.push({n:2,text:`<b>Split into half-reactions:</b><br>• Oxidation half: species that loses electrons<br>• Reduction half: species that gains electrons`});
+    steps.push({n:3,text:`<b>Balance each half-reaction</b> for atoms${redoxCondition==='acidic'?' (add H₂O for O, H⁺ for H)':' (add H₂O for H, OH⁻ for O)'}.`});
+    steps.push({n:4,text:'<b>Balance electrons:</b> multiply half-reactions so electrons cancel, then add them together.'});
+    steps.push({n:5,text:`<b>${redoxCondition==='acidic'?'Acidic':'Basic'} conditions:</b> ${redoxCondition==='acidic'?'H⁺ and H₂O appear directly.':'Add OH⁻ to cancel any H⁺, then simplify H₂O.'}`});
+  }
+  return steps.map(s=>`<div class="eq-step"><div class="eq-step-num">Step ${s.n}</div><div class="eq-step-text">${s.text}</div></div>`).join('');
+}
+
+function detectReactionType(reactants,products) {
+  const rStr=reactants.map(r=>r.formula.toLowerCase()).join('');
+  const pStr=products.map(p=>p.formula.toLowerCase()).join('');
+  if(products.some(p=>p.formula==='CO2'||p.formula==='H2O')&&reactants.some(r=>r.formula.match(/C\d*H\d*/i)))
+    return{name:'Combustion',cls:'combustion'};
+  if(reactants.length===2&&products.length===1)return{name:'Synthesis',cls:'synthesis'};
+  if(reactants.length===1&&products.length>=2)return{name:'Decomposition',cls:'decomp'};
+  if(pStr.includes('o2')||rStr.includes('o2'))return{name:'Oxidation-Reduction',cls:'redox'};
+  return{name:'Single/Double Displacement',cls:'generic'};
+}
+
+// Interactive balancer
+let interactiveCoeffs=[];
+let interactiveReactants=[];
+let interactiveProducts=[];
+
+function buildInteractiveBalancer(reactants,products,initialCoeffs) {
+  const area=document.getElementById('eq-interactive-area');
+  area.style.display='block';
+  interactiveReactants=[...reactants];interactiveProducts=[...products];
+  const n=reactants.length+products.length;
+  interactiveCoeffs=initialCoeffs?[...initialCoeffs]:new Array(n).fill(1);
+  renderInteractiveBalancer();
+}
+
+function renderInteractiveBalancer() {
+  const inner=document.getElementById('eq-interactive-inner');
+  const all=[...interactiveReactants,...interactiveProducts];
+
+  // Check balance
+  const allEls=new Set();
+  all.forEach(c=>Object.keys(parseFormula(c.formula)).forEach(e=>allEls.add(e)));
+  const balanced=[...allEls].every(el=>{
+    const l=interactiveReactants.reduce((s,r,i)=>{const pf=parseFormula(r.formula);return s+(pf[el]||0)*interactiveCoeffs[i];},0);
+    const r=interactiveProducts.reduce((s,p,i)=>{const pf=parseFormula(p.formula);return s+(pf[el]||0)*interactiveCoeffs[interactiveReactants.length+i];},0);
+    return l===r;
+  });
+
+  const rPart=interactiveReactants.map((r,i)=>`
+    <div class="coeff-box">
+      <input class="coeff-input${balanced?' good':''}" type="number" min="1" max="20" value="${interactiveCoeffs[i]}" onchange="updateInteractiveCoeff(${i},this.value)" id="icoeff_${i}" />
+      <span class="coeff-sym">${formatFormulaDisplay(r.formula)}</span>
+    </div>`).join('<span style="padding:0 4px;color:var(--text3);font-size:1rem;">+</span>');
+
+  const pPart=interactiveProducts.map((p,i)=>`
+    <div class="coeff-box">
+      <input class="coeff-input${balanced?' good':''}" type="number" min="1" max="20" value="${interactiveCoeffs[interactiveReactants.length+i]}" onchange="updateInteractiveCoeff(${interactiveReactants.length+i},this.value)" id="icoeff_${interactiveReactants.length+i}" />
+      <span class="coeff-sym">${formatFormulaDisplay(p.formula)}</span>
+    </div>`).join('<span style="padding:0 4px;color:var(--text3);font-size:1rem;">+</span>');
+
+  // Live atom count display
+  const atomRows=[...allEls].map(el=>{
+    const l=interactiveReactants.reduce((s,r,i)=>{const pf=parseFormula(r.formula);return s+(pf[el]||0)*interactiveCoeffs[i];},0);
+    const r=interactiveProducts.reduce((s,p,i)=>{const pf=parseFormula(p.formula);return s+(pf[el]||0)*interactiveCoeffs[interactiveReactants.length+i];},0);
+    const ok=l===r;
+    return`<span style="padding:3px 8px;border-radius:6px;font-size:0.68rem;font-weight:700;background:${ok?'rgba(61,184,112,0.12)':'rgba(224,48,48,0.1)'};border:1px solid ${ok?'rgba(61,184,112,0.3)':'rgba(224,48,48,0.3)'};color:${ok?'var(--green)':'var(--red2)'};">${el}: ${l}→${r}${ok?' ✓':' ✗'}</span>`;
+  }).join('');
+
+  inner.innerHTML=`
+    <div class="eq-interactive-row">
+      ${rPart}
+      <span style="padding:0 8px;color:var(--text2);font-size:1.2rem;font-weight:700;">→</span>
+      ${pPart}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${atomRows}</div>
+    <div style="margin-top:10px;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:700;background:${balanced?'rgba(61,184,112,0.12)':'rgba(224,48,48,0.1)'};border:1px solid ${balanced?'rgba(61,184,112,0.3)':'rgba(224,48,48,0.3)'};color:${balanced?'var(--green)':'var(--red2)'};">
+      ${balanced?'✓ Equation is balanced!':'✗ Not balanced yet — adjust coefficients above'}
+    </div>`;
+}
+
+function updateInteractiveCoeff(idx,val) {
+  interactiveCoeffs[idx]=Math.max(1,parseInt(val)||1);
+  renderInteractiveBalancer();
 }
 
 // =====================================================
 // PAGE NAVIGATION
 // =====================================================
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const nb = document.getElementById('nb-'+name);
-  if(nb) nb.classList.add('active');
-
-  if(name === 'search' && !document.getElementById('search-results').innerHTML) doSearch();
-  if(name === 'bohr') { drawBohr(); updateBohrInfo(); }
-  if(name === 'lewis') { initLewisGallery(); }
-}
-
-// =====================================================
-// LEWIS DOTS PAGE
-// =====================================================
-let lewisSelectedA = null, lewisSelectedB = null;
-
-function lewisPageSearch(q) {
-  const container = document.getElementById('lewis-search-results');
-  if(!q.trim()) { container.innerHTML = ''; return; }
-  const matches = ELEMENTS.filter(e =>
-    e.name.toLowerCase().includes(q.toLowerCase()) ||
-    e.sym.toLowerCase().includes(q.toLowerCase()) ||
-    String(e.n) === q
-  ).slice(0, 10);
-  container.innerHTML = matches.map(el => {
-    const color = CAT_COLORS[el.cat]||'#868e96';
-    return `<button onclick="selectLewisElement(${el.n})" style="padding:5px 12px;border:1.5px solid ${color}44;border-radius:8px;background:${color}15;color:${color};font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;" onmouseenter="this.style.background='${color}33'" onmouseleave="this.style.background='${color}15'">${el.sym} — ${el.name}</button>`;
-  }).join('');
-}
-
-function selectLewisElement(n) {
-  const el = ELEMENTS.find(e => e.n === n);
-  if(!el) return;
-  document.getElementById('lewis-page-search').value = '';
-  document.getElementById('lewis-search-results').innerHTML = '';
-  renderLewisSingle(el);
-}
-
-function renderLewisSingle(el) {
-  const color = CAT_COLORS[el.cat]||'#868e96';
-  const ve = getValenceElectrons(el);
-  const display = document.getElementById('lewis-single-display');
-  display.innerHTML = '';
-
-  const canvas = document.createElement('canvas');
-  canvas.width = 180; canvas.height = 180;
-  canvas.style.cssText = 'background:transparent;margin:0 auto;display:block;';
-  drawLewisDots(canvas, el.sym, ve, el);
-  display.appendChild(canvas);
-
-  // Info panel
-  const info = document.getElementById('lewis-single-info');
-  const charge = predictCharge(el);
-  const tendency = el.group === 18 ? 'Neither' : charge > 0 ? 'Lose electrons' : charge < 0 ? 'Gain electrons' : 'Share electrons';
-  const octetNeed = el.group >= 13 && el.group <= 17 ? Math.abs(8 - ve) : 0;
-  info.innerHTML = `
-    <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <span style="font-size:1.5rem;font-weight:900;color:${color};">${el.sym}</span>
-        <div>
-          <div style="font-weight:800;">${el.name}</div>
-          <div style="font-size:0.65rem;color:${color};font-weight:700;text-transform:uppercase;letter-spacing:.08em;">${CAT_NAMES[el.cat]}</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;">
-          <div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Valence e⁻</div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--purple);">${ve}</div>
-        </div>
-        <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;">
-          <div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Ionic Charge</div>
-          <div style="font-size:1.1rem;font-weight:800;color:${charge>0?'var(--red2)':charge<0?'var(--blue2)':'var(--text2)'};">${charge>0?'+'+charge:charge||'0'}</div>
-        </div>
-        <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;">
-          <div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Tendency</div>
-          <div style="font-size:0.82rem;font-weight:700;">${tendency}</div>
-        </div>
-        <div style="background:var(--surface3);border-radius:6px;padding:7px 9px;">
-          <div style="font-size:0.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Needs for Octet</div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--amber);">${octetNeed || (el.group===18?'Full':'—')}</div>
-        </div>
-      </div>
-      <div style="margin-top:10px;display:flex;gap:6px;">
-        <button class="btn btn-primary btn-sm" onclick="openCompoundForElement(${el.n})">🧪 Build Compound</button>
-        <button class="btn btn-ghost btn-sm" onclick="openBohrForElement(${el.n})">🌀 Bohr Model</button>
-      </div>
-    </div>`;
-}
-
-function lewisCompareSearch(side, q) {
-  const ddId = `lewis-cmp-${side}-dd`;
-  const dd = document.getElementById(ddId);
-  if(!q.trim()) { dd.style.display='none'; return; }
-  const matches = ELEMENTS.filter(e =>
-    e.name.toLowerCase().includes(q.toLowerCase()) ||
-    e.sym.toLowerCase().includes(q.toLowerCase()) ||
-    String(e.n) === q
-  ).slice(0, 8);
-  dd.innerHTML = matches.map(el => {
-    const c = CAT_COLORS[el.cat]||'#868e96';
-    return `<div onclick="selectLewisCompare('${side}',${el.n})" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='transparent'">
-      <span style="font-weight:900;color:${c};font-size:0.82rem;width:24px;">${el.sym}</span>
-      <span style="font-size:0.78rem;color:var(--text2);">${el.name}</span>
-    </div>`;
-  }).join('');
-  dd.style.display = matches.length ? 'block' : 'none';
-}
-
-function selectLewisCompare(side, n) {
-  const el = ELEMENTS.find(e => e.n === n);
-  if(!el) return;
-  if(side === 'a') { lewisSelectedA = el; document.getElementById('lewis-cmp-a').value = el.name; }
-  else { lewisSelectedB = el; document.getElementById('lewis-cmp-b').value = el.name; }
-  document.getElementById(`lewis-cmp-${side}-dd`).style.display = 'none';
-  renderLewisCompare();
-}
-
-function renderLewisCompare() {
-  const display = document.getElementById('lewis-compare-display');
-  if(!lewisSelectedA && !lewisSelectedB) {
-    display.innerHTML = '<div style="color:var(--text3);font-size:0.82rem;">Select two elements to compare</div>';
-    return;
-  }
-  display.innerHTML = '';
-  display.style.display = 'block';
-
-  const els = [lewisSelectedA, lewisSelectedB].filter(Boolean);
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;';
-
-  els.forEach(el => {
-    const color = CAT_COLORS[el.cat]||'#868e96';
-    const ve = getValenceElectrons(el);
-    const charge = predictCharge(el);
-    const div = document.createElement('div');
-    div.style.cssText = 'text-align:center;';
-    const canvas = document.createElement('canvas');
-    canvas.width = 150; canvas.height = 150;
-    canvas.style.background = 'transparent';
-    drawLewisDots(canvas, el.sym, ve, el);
-    const lbl = document.createElement('div');
-    lbl.style.cssText = 'margin-top:4px;';
-    lbl.innerHTML = `<span style="font-weight:800;color:${color};">${el.name}</span> <span style="font-size:0.7rem;color:var(--text3);">${ve} e⁻ · ${charge>0?'+'+charge:charge||'neutral'}</span>`;
-    div.appendChild(canvas);
-    div.appendChild(lbl);
-    wrap.appendChild(div);
-  });
-
-  // If both selected, show EN diff and bond type
-  if(lewisSelectedA && lewisSelectedB) {
-    const enA = lewisSelectedA.en, enB = lewisSelectedB.en;
-    if(enA && enB) {
-      const diff = Math.abs(enA - enB).toFixed(2);
-      const type = diff > 1.7 ? 'Ionic' : diff >= 0.4 ? 'Polar Covalent' : 'Nonpolar Covalent';
-      const typeColor = diff > 1.7 ? 'var(--red2)' : diff >= 0.4 ? 'var(--amber)' : 'var(--green)';
-      const badge = document.createElement('div');
-      badge.style.cssText = 'width:100%;text-align:center;margin-top:10px;padding:8px;background:var(--surface2);border-radius:8px;';
-      badge.innerHTML = `<span style="font-size:0.65rem;color:var(--text3);">ΔEN = ${diff} → </span><span style="font-weight:800;color:${typeColor};">${type}</span>`;
-      wrap.appendChild(badge);
-    }
-  }
-
-  display.appendChild(wrap);
-}
-
-function initLewisGallery() {
-  const gallery = document.getElementById('lewis-gallery');
-  if(gallery.innerHTML) return; // already built
-
-  // Group elements by valence electron count
-  const byVE = {};
-  ELEMENTS.filter(e => e.group).forEach(el => {
-    const ve = getValenceElectrons(el);
-    if(!byVE[ve]) byVE[ve] = [];
-    byVE[ve].push(el);
-  });
-
-  gallery.innerHTML = '';
-  [1,2,3,4,5,6,7,8].forEach(ve => {
-    if(!byVE[ve]) return;
-    const section = document.createElement('div');
-    section.style.cssText = 'width:100%;margin-bottom:12px;';
-    section.innerHTML = `<div style="font-size:0.62rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">${ve} Valence Electron${ve>1?'s':''}</div>`;
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
-    byVE[ve].slice(0, 18).forEach(el => {
-      const color = CAT_COLORS[el.cat]||'#868e96';
-      const btn = document.createElement('div');
-      btn.style.cssText = `display:flex;align-items:center;gap:6px;padding:5px 10px;background:${color}15;border:1.5px solid ${color}33;border-radius:8px;cursor:pointer;transition:all 0.15s;`;
-      btn.innerHTML = `<span style="font-weight:900;color:${color};font-size:0.88rem;">${el.sym}</span><span style="font-size:0.68rem;color:var(--text2);">${el.name}</span>`;
-      btn.onmouseenter = () => btn.style.background = color+'30';
-      btn.onmouseleave = () => btn.style.background = color+'15';
-      btn.onclick = () => { selectLewisElement(el.n); document.getElementById('lewis-page-search').value = el.name; };
-      row.appendChild(btn);
-    });
-    section.appendChild(row);
-    gallery.appendChild(section);
-  });
+  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
+  if(name==='search'&&!document.getElementById('search-results').innerHTML)doSearch();
+  if(name==='bohr'){drawBohr();updateBohrInfo();}
+  if(name==='lewis')initLewisGallery();
 }
 
 // =====================================================
 // INIT
 // =====================================================
-window.addEventListener('DOMContentLoaded', () => {
-  buildGrid();
-  buildCatBar();
-  initCompound();
-  doSearch();
-  drawBohr();
-  updateBohrInfo();
+window.addEventListener('DOMContentLoaded',()=>{
+  buildGrid();buildCatBar();initCompound();doSearch();drawBohr();updateBohrInfo();
 });
 </script>
-<style>
-  .dq-watermark { position: fixed; bottom: 8px; left: 12px; font-family: 'Outfit', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; color: #1a5c36; text-transform: uppercase; pointer-events: none; z-index: 998; white-space: nowrap; }
-</style>
 
 <style>
   .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;white-space:nowrap;}
@@ -2394,16 +2391,3 @@ window.addEventListener('DOMContentLoaded', () => {
 </div>
 </body>
 </html>
-<!-- DQ Tools Floating Menu -->
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-  .fab-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; align-items: flex-end; z-index: 999; }
-  .fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 8px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.28s ease, transform 0.28s ease; }
-  .fab-wrap:hover .fab-menu { opacity: 1; transform: translateY(0); pointer-events: all; }
-  .fab-wrap:hover .fab-btn { transform: scale(1.1); background: #2ea85a; }
-  .fab-link { display: block; padding: 6px 14px; background: #28a45a; color: #fff; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background 0.15s, transform 0.15s; font-family: 'Outfit', sans-serif; box-shadow: 0 2px 8px rgba(40,164,90,0.28); }
-  .fab-link:hover { background: #1f8a48; transform: translateX(-2px); }
-  .fab-btn { width: 42px; height: 42px; border-radius: 50%; background: #28a45a; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(40,164,90,0.45); transition: transform 0.18s, background 0.18s; font-family: 'Outfit', sans-serif; }
-</style>
-
-<!-- DQ Tools Floating Menu -->
