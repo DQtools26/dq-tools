@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TNYF9DN593');</script>
+  <script src="dq-auth.js" defer></script>
+  <title>DQstudy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════ THEMES ═══════════════ */
+:root {
+  --bg:#090c12; --bg2:#0e1320; --surface:#121a28; --surface2:#192233; --surface3:#1e2a3d;
+  --border:#1e3048; --border2:#2a4468; --border3:#3a5a80;
+  --text:#e8eef8; --text2:#7a9abf; --text3:#3d5878; --text4:#1e3048;
+  --accent:#3a7fff; --accent2:#60a0ff; --accent-dim:rgba(58,127,255,.12);
+  --green:#2dcc6f; --green2:#4de888; --green-dim:rgba(45,204,111,.1);
+  --red:#e03030; --red2:#ff6060; --red-dim:rgba(224,48,48,.1);
+  --amber:#e89020; --amber2:#ffb347; --amber-dim:rgba(232,144,32,.1);
+  --purple:#9b59b6; --purple2:#c17de0; --purple-dim:rgba(155,89,182,.1);
+  --teal:#1abc9c; --teal2:#2eead4; --teal-dim:rgba(26,188,156,.1);
+  --pink:#e91e8c; --pink2:#ff6ec7; --pink-dim:rgba(233,30,140,.1);
+  --card-radius:18px; --radius:10px; --radius-sm:7px;
+  --shadow:0 4px 24px rgba(0,0,0,.4); --shadow-sm:0 2px 12px rgba(0,0,0,.3);
+  --font:'Outfit',sans-serif; --mono:'Space Mono',monospace;
+  --transition:.18s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"] {
+  --bg:#f0f4ff; --bg2:#e8edf8; --surface:#fff; --surface2:#f4f7ff; --surface3:#eaf0ff;
+  --border:#d0daf0; --border2:#b8c8e8; --border3:#98b0d8;
+  --text:#1a2340; --text2:#4a6090; --text3:#8098c0; --text4:#b8c8e8;
+  --shadow:0 4px 24px rgba(0,60,180,.08); --shadow-sm:0 2px 12px rgba(0,60,180,.06);
+}
+[data-theme="candy"] {
+  --bg:#fff0f8; --bg2:#ffe8f5; --surface:#fff; --surface2:#fff0fb; --surface3:#ffe4f7;
+  --border:#f0c0de; --border2:#e8a0cc; --border3:#e080ba;
+  --text:#4a1040; --text2:#a04080; --text3:#c080a0; --text4:#e0b0d0;
+  --accent:#e91e8c; --accent2:#ff6ec7;
+}
+[data-theme="ocean"] {
+  --bg:#020d1a; --bg2:#051526; --surface:#071e35; --surface2:#0a2545; --surface3:#0d2e55;
+  --border:#103568; --border2:#184888; --border3:#2060a8;
+  --text:#c8e8ff; --text2:#5a9acf; --text3:#2a5a8f; --text4:#103568;
+  --accent:#00bfff; --accent2:#40dfff;
+}
+[data-theme="forest"] {
+  --bg:#060d08; --bg2:#091408; --surface:#0d1f0f; --surface2:#122814; --surface3:#183520;
+  --border:#1a4020; --border2:#226030; --border3:#2e8040;
+  --text:#d4f0d8; --text2:#5a9060; --text3:#2a5830; --text4:#1a4020;
+  --accent:#2dcc6f; --accent2:#4de888;
+}
+[data-theme="sunset"] {
+  --bg:#120808; --bg2:#1a0c0a; --surface:#221210; --surface2:#2e1a15; --surface3:#3a221c;
+  --border:#502820; --border2:#703830; --border3:#904840;
+  --text:#ffe8d8; --text2:#c07060; --text3:#804840; --text4:#502828;
+  --accent:#ff6b35; --accent2:#ff9060;
+}
+[data-theme="midnight"] {
+  --bg:#05050f; --bg2:#08080f; --surface:#0d0d20; --surface2:#121228; --surface3:#181830;
+  --border:#1e1e48; --border2:#2a2a68; --border3:#3a3a88;
+  --text:#d8d8ff; --text2:#6868a0; --text3:#3030608; --text4:#1e1e48;
+  --accent:#7c5cff; --accent2:#a080ff;
+}
+[data-theme="neon"] {
+  --bg:#000005; --bg2:#020208; --surface:#05050e; --surface2:#080810; --surface3:#0c0c18;
+  --border:#0a0a28; --border2:#141460; --border3:#2020a0;
+  --text:#00ffcc; --text2:#00aa88; --text3:#006655; --text4:#003322;
+  --accent:#00ffcc; --accent2:#80ffee;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; transition:background .3s, color .3s; overflow-x:hidden; }
+
+/* ═══════════════ GRADIENT BAR ═══════════════ */
+#gbar { position:fixed; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--green),var(--purple),var(--pink),var(--accent2)); background-size:400%; animation:barShift 8s linear infinite; z-index:1001; }
+@keyframes barShift { 0%{background-position:0%} 100%{background-position:400%} }
+
+/* ═══════════════ TOPNAV ═══════════════ */
+#topnav {
+  position:fixed; top:3px; left:0; right:0; height:52px;
+  background:rgba(var(--bg-rgb,9,12,18),.95); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border); z-index:200;
+  display:flex; align-items:center; padding:0 20px; gap:12px;
+}
+.nav-logo { font-size:1.05rem; font-weight:900; letter-spacing:-.03em; cursor:pointer; }
+.nav-logo em { color:var(--accent2); font-style:normal; }
+.nav-links { display:flex; gap:2px; margin-left:8px; }
+.nav-link { padding:5px 12px; border-radius:8px; font-size:.75rem; font-weight:700; color:var(--text2); cursor:pointer; border:none; background:none; font-family:inherit; transition:all var(--transition); }
+.nav-link:hover { background:var(--surface2); color:var(--text); }
+.nav-link.active { background:var(--accent-dim); color:var(--accent2); }
+.nav-spacer { flex:1; }
+.nav-icon-btn { width:34px; height:34px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.9rem; transition:all var(--transition); }
+.nav-icon-btn:hover { border-color:var(--border2); color:var(--text); background:var(--surface2); }
+
+/* DQ auth btn */
+#dq-auth-btn { display:flex;align-items:center;gap:6px; background:var(--surface);border:1px solid var(--border2); border-radius:100px;padding:4px 12px 4px 5px; font-family:var(--font);font-size:.68rem;font-weight:700; color:var(--text2);cursor:pointer;transition:all var(--transition); white-space:nowrap;flex-shrink:0; }
+#dq-auth-btn:hover { border-color:var(--accent); color:var(--text); }
+#dq-auth-btn.logged-in { border-color:rgba(77,232,136,.4); }
+#dq-auth-avatar { width:22px;height:22px;border-radius:50%; background:linear-gradient(135deg,var(--green),var(--accent)); display:flex;align-items:center;justify-content:center; font-size:.75rem;overflow:hidden;flex-shrink:0; }
+#dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+/* ═══════════════ LAYOUT ═══════════════ */
+#app { display:flex; min-height:100vh; padding-top:55px; }
+
+/* ═══════════════ SIDEBAR ═══════════════ */
+#sidebar {
+  width:250px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border);
+  position:fixed; top:55px; bottom:0; left:0; overflow-y:auto; z-index:100;
+  display:flex; flex-direction:column; transition:transform .25s ease;
+}
+#sidebar.hidden { transform:translateX(-100%); }
+#sb-head { padding:14px 12px 10px; }
+.sb-new { width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all var(--transition); }
+.sb-new:hover { filter:brightness(1.15); transform:translateY(-1px); box-shadow:0 4px 16px rgba(58,127,255,.35); }
+#sb-search { width:100%; margin-top:8px; padding:8px 12px; background:var(--surface); border:1px solid var(--border); border-radius:9px; color:var(--text); font-family:inherit; font-size:.78rem; outline:none; transition:.15s; }
+#sb-search:focus { border-color:var(--border2); }
+#sb-search::placeholder { color:var(--text3); }
+
+#sb-body { flex:1; overflow-y:auto; padding:6px 8px; }
+.sb-section-label { font-size:.58rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); padding:8px 6px 4px; }
+.sb-set {
+  padding:9px 10px; border-radius:10px; cursor:pointer; margin-bottom:3px;
+  transition:all var(--transition); border:1px solid transparent; display:flex; align-items:center; gap:10px;
+}
+.sb-set:hover { background:var(--surface); border-color:var(--border); }
+.sb-set.active { background:var(--accent-dim); border-color:rgba(58,127,255,.35); }
+.sb-set-icon { width:30px; height:30px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+.sb-set-info { flex:1; min-width:0; }
+.sb-set-name { font-size:.8rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sb-set-sub { font-size:.6rem; color:var(--text3); margin-top:1px; }
+.sb-folder {
+  padding:7px 10px; border-radius:9px; cursor:pointer; margin-bottom:2px;
+  transition:all var(--transition); display:flex; align-items:center; gap:8px; color:var(--text2); font-size:.78rem; font-weight:600;
+}
+.sb-folder:hover { background:var(--surface); color:var(--text); }
+.sb-folder .arrow { margin-left:auto; font-size:.65rem; transition:.2s; }
+.sb-folder.open .arrow { transform:rotate(90deg); }
+.sb-folder-sets { padding-left:14px; display:none; }
+.sb-folder.open + .sb-folder-sets { display:block; }
+
+#sb-foot { border-top:1px solid var(--border); padding:8px; }
+.sb-foot-btn { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; color:var(--text2); font-size:.75rem; font-weight:600; cursor:pointer; border:none; background:none; font-family:inherit; width:100%; transition:all var(--transition); }
+.sb-foot-btn:hover { background:var(--surface); color:var(--text); }
+
+/* ═══════════════ MAIN ═══════════════ */
+#main { margin-left:250px; flex:1; min-height:calc(100vh - 55px); position:relative; }
+
+/* ═══════════════ VIEWS (all hidden by default) ═══════════════ */
+.view { display:none; }
+.view.active { display:flex; flex-direction:column; }
+
+/* ═══════════════ LANDING (pre-login) ═══════════════ */
+#view-landing {
+  min-height:calc(100vh - 55px); align-items:center; justify-content:center;
+  background:var(--bg); position:relative; overflow:hidden; padding:40px 20px;
+}
+.landing-bg {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.landing-bg-blob {
+  position:absolute; border-radius:50%; filter:blur(80px); opacity:.18;
+}
+.blob1 { width:500px; height:500px; background:var(--accent); top:-100px; right:-100px; animation:blobFloat 10s ease-in-out infinite; }
+.blob2 { width:400px; height:400px; background:var(--green); bottom:-80px; left:-80px; animation:blobFloat 13s ease-in-out infinite reverse; }
+.blob3 { width:300px; height:300px; background:var(--purple); top:50%; left:50%; transform:translate(-50%,-50%); animation:blobFloat 8s ease-in-out infinite 2s; }
+@keyframes blobFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-20px) scale(1.05)} 66%{transform:translate(-10px,15px) scale(.97)} }
+.landing-content { position:relative; z-index:1; text-align:center; max-width:600px; }
+.landing-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(58,127,255,.3); border-radius:100px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:20px; animation:fadeIn .5s ease; }
+.landing-title { font-size:clamp(2.5rem,6vw,4rem); font-weight:900; letter-spacing:-.05em; line-height:.95; margin-bottom:14px; animation:fadeInUp .5s .1s both; }
+.landing-title .hl { background:linear-gradient(135deg,var(--accent2),var(--green2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.landing-sub { font-size:1.05rem; color:var(--text2); line-height:1.7; margin-bottom:30px; animation:fadeInUp .5s .2s both; }
+.landing-cta { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; animation:fadeInUp .5s .3s both; }
+.landing-features { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:40px; animation:fadeInUp .5s .4s both; }
+.landing-feat { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:left; }
+.landing-feat-icon { font-size:1.5rem; margin-bottom:8px; }
+.landing-feat-title { font-size:.85rem; font-weight:800; margin-bottom:3px; }
+.landing-feat-sub { font-size:.72rem; color:var(--text2); line-height:1.5; }
+
+/* ═══════════════ HOME (logged in) ═══════════════ */
+#view-home { padding:28px; min-height:calc(100vh - 55px); }
+.home-greeting { font-size:1.6rem; font-weight:900; letter-spacing:-.03em; margin-bottom:4px; }
+.home-sub { color:var(--text2); font-size:.88rem; margin-bottom:24px; }
+.home-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); }
+.stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.stat-n { font-size:2rem; font-weight:900; line-height:1; }
+.stat-label { font-size:.68rem; color:var(--text2); margin-top:3px; font-weight:600; }
+.stat-icon { font-size:1.2rem; margin-bottom:6px; }
+.home-section-title { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.home-section-title a { color:var(--accent2); font-size:.6rem; margin-left:auto; cursor:pointer; font-weight:700; }
+.recent-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-bottom:24px; }
+.recent-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); position:relative; overflow:hidden; }
+.recent-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--green)); }
+.recent-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.recent-card-icon { font-size:1.6rem; margin-bottom:8px; }
+.recent-card-name { font-size:.88rem; font-weight:800; margin-bottom:3px; line-height:1.3; }
+.recent-card-meta { font-size:.65rem; color:var(--text3); }
+.recent-card-count { font-size:.62rem; font-weight:800; color:var(--text2); margin-top:4px; }
+.recent-card-bar { height:3px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; }
+.recent-card-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:2px; transition:width .6s ease; }
+.home-add-card { background:var(--surface); border:2px dashed var(--border2); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:120px; color:var(--text3); font-size:.82rem; gap:6px; font-weight:700; }
+.home-add-card:hover { border-color:var(--accent); color:var(--accent2); background:var(--accent-dim); }
+.streak-row { display:flex; gap:10px; margin-bottom:24px; }
+.streak-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; align-items:center; gap:14px; }
+.streak-icon { font-size:2rem; }
+.streak-info { flex:1; }
+.streak-n { font-size:1.5rem; font-weight:900; }
+.streak-label { font-size:.68rem; color:var(--text2); font-weight:600; }
+
+/* ═══════════════ SET PAGE ═══════════════ */
+#view-set { padding:24px; }
+.set-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+.set-big-icon { width:72px; height:72px; border-radius:18px; background:var(--surface2); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2.2rem; cursor:pointer; transition:all var(--transition); flex-shrink:0; }
+.set-big-icon:hover { border-color:var(--border2); transform:scale(1.05); }
+.set-header-info { flex:1; }
+.set-title { font-size:1.8rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:6px; }
+.set-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.chip { font-size:.62rem; font-weight:800; letter-spacing:.05em; padding:3px 9px; border-radius:100px; border:1px solid; display:inline-flex; align-items:center; gap:4px; }
+.chip-blue { color:var(--accent2); border-color:rgba(58,127,255,.3); background:var(--accent-dim); }
+.chip-green { color:var(--green2); border-color:rgba(45,204,111,.3); background:var(--green-dim); }
+.chip-purple { color:var(--purple2); border-color:rgba(155,89,182,.3); background:var(--purple-dim); }
+.chip-amber { color:var(--amber2); border-color:rgba(232,144,32,.3); background:var(--amber-dim); }
+.chip-red { color:var(--red2); border-color:rgba(224,48,48,.3); background:var(--red-dim); }
+.set-header-actions { display:flex; gap:8px; align-items:flex-start; }
+
+/* Study mode picker */
+.mode-picker { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:20px; }
+.mode-btn {
+  background:var(--surface); border:2px solid var(--border); border-radius:14px;
+  padding:14px 8px; cursor:pointer; transition:all var(--transition); text-align:center; position:relative; overflow:hidden;
+}
+.mode-btn:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.mode-btn.selected { border-color:var(--accent); background:var(--accent-dim); }
+.mode-btn-icon { font-size:1.6rem; margin-bottom:6px; display:block; }
+.mode-btn-name { font-size:.75rem; font-weight:800; }
+.mode-btn-desc { font-size:.6rem; color:var(--text2); margin-top:2px; line-height:1.3; }
+.mode-btn.selected .mode-btn-name { color:var(--accent2); }
+
+.start-bar { display:flex; gap:10px; align-items:center; margin-bottom:24px; }
+.start-big { flex:1; padding:14px; background:linear-gradient(135deg,var(--accent),var(--teal)); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:1rem; font-weight:900; cursor:pointer; transition:all var(--transition); letter-spacing:.01em; }
+.start-big:hover { filter:brightness(1.12); transform:translateY(-2px); box-shadow:0 6px 20px rgba(58,127,255,.4); }
+.start-opt { padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:.75rem; font-weight:700; color:var(--text2); cursor:pointer; transition:all var(--transition); white-space:nowrap; }
+.start-opt:hover { border-color:var(--border2); color:var(--text); }
+.start-opt.on { background:var(--accent-dim); border-color:rgba(58,127,255,.4); color:var(--accent2); }
+
+/* Cards grid */
+.cards-grid { columns:2; gap:10px; margin-bottom:20px; }
+.card-tile { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px; break-inside:avoid; transition:all var(--transition); display:flex; gap:10px; }
+.card-tile:hover { border-color:var(--border2); }
+.card-front-text { font-size:.85rem; font-weight:700; flex:1; }
+.card-sep { width:1px; background:var(--border); flex-shrink:0; }
+.card-back-text { font-size:.8rem; color:var(--text2); flex:1; }
+.card-star { background:none; border:none; cursor:pointer; font-size:1rem; opacity:.35; transition:.15s; flex-shrink:0; line-height:1; }
+.card-star.on { opacity:1; }
+.card-mastery-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:6px; }
+.dot-know { background:var(--green); }
+.dot-review { background:var(--red); }
+.dot-unseen { background:var(--border2); }
+
+/* ═══════════════ STUDY VIEWS ═══════════════ */
+#view-flashcard, #view-quiz, #view-results, #view-learn, #view-matching { min-height:calc(100vh - 55px); }
+
+/* Study topbar */
+.study-nav { display:flex; align-items:center; gap:12px; padding:14px 24px; border-bottom:1px solid var(--border); background:var(--bg2); position:sticky; top:0; z-index:10; }
+.study-back { background:none; border:1px solid var(--border); border-radius:8px; padding:6px 12px; color:var(--text2); font-family:inherit; font-size:.75rem; font-weight:700; cursor:pointer; transition:all var(--transition); }
+.study-back:hover { border-color:var(--border2); color:var(--text); }
+.study-title { font-size:.88rem; font-weight:800; }
+.study-prog-track { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+.study-prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:3px; transition:width .4s ease; }
+.study-count { font-size:.72rem; font-weight:700; color:var(--text2); white-space:nowrap; font-family:var(--mono); }
+
+/* ── FLASHCARDS ── */
+#view-flashcard { flex-direction:column; }
+.fc-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:16px; }
+.fc-options-row { display:flex; gap:8px; align-items:center; }
+.fc-opt-chip { padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:var(--surface); font-family:inherit; font-size:.7rem; font-weight:700; color:var(--text2); cursor:pointer; transition:all var(--transition); }
+.fc-opt-chip:hover { border-color:var(--border2); color:var(--text); }
+.fc-opt-chip.on { background:var(--accent-dim); border-color:rgba(58,127,255,.4); color:var(--accent2); }
+
+/* The actual card */
+.fc-stage { width:100%; max-width:680px; }
+.fc-card-wrap { perspective:1400px; width:100%; margin-bottom:0; }
+.fc-card {
+  width:100%; min-height:280px; position:relative; transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1); cursor:pointer; user-select:none;
+}
+.fc-card.flipped { transform:rotateY(180deg); }
+.fc-face {
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--surface); border:2px solid var(--border); border-radius:22px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:36px; text-align:center; box-shadow:var(--shadow);
+}
+.fc-face.back { transform:rotateY(180deg); background:var(--surface2); border-color:var(--border2); }
+.fc-face-tag { font-size:.6rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); margin-bottom:16px; padding:4px 10px; border-radius:100px; border:1px solid var(--border); background:var(--surface3); }
+.fc-face-text { font-size:clamp(1rem,3vw,1.6rem); font-weight:700; line-height:1.5; color:var(--text); }
+.fc-face-hint { font-size:.65rem; color:var(--text3); margin-top:14px; }
+.fc-star-btn { position:absolute; top:14px; right:14px; background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:.3; transition:.15s; }
+.fc-star-btn.on { opacity:1; }
+
+/* FC mastery counters */
+.fc-mastery-bar { width:100%; max-width:680px; display:flex; gap:8px; }
+.fc-m-pill { flex:1; padding:8px; border-radius:10px; text-align:center; font-size:.7rem; font-weight:800; }
+.fc-m-pill.know { background:var(--green-dim); color:var(--green2); border:1px solid rgba(45,204,111,.2); }
+.fc-m-pill.review { background:var(--red-dim); color:var(--red2); border:1px solid rgba(224,48,48,.2); }
+.fc-m-pill.unseen { background:var(--surface); color:var(--text3); border:1px solid var(--border); }
+.fc-m-n { font-size:1.1rem; font-weight:900; display:block; }
+
+/* FC action buttons */
+.fc-actions { display:flex; gap:10px; width:100%; max-width:560px; }
+.fc-action {
+  flex:1; padding:14px; border-radius:14px; border:2px solid; font-family:inherit;
+  font-size:.78rem; font-weight:800; cursor:pointer; transition:all var(--transition);
+  display:flex; flex-direction:column; align-items:center; gap:5px; line-height:1.2;
+}
+.fc-action-icon { font-size:1.4rem; }
+.fc-action.review { background:var(--red-dim); border-color:rgba(224,48,48,.35); color:var(--red2); }
+.fc-action.review:hover { background:rgba(224,48,48,.18); transform:scale(1.03); }
+.fc-action.skip { background:var(--surface); border-color:var(--border2); color:var(--text2); }
+.fc-action.skip:hover { background:var(--surface2); }
+.fc-action.know { background:var(--green-dim); border-color:rgba(45,204,111,.35); color:var(--green2); }
+.fc-action.know:hover { background:rgba(45,204,111,.18); transform:scale(1.03); }
+
+/* ── QUIZ ── */
+#view-quiz { flex-direction:column; }
+.quiz-body { flex:1; padding:24px; display:flex; flex-direction:column; align-items:center; }
+.quiz-wrap { width:100%; max-width:700px; }
+.quiz-q-card { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:28px; margin-bottom:16px; box-shadow:var(--shadow-sm); }
+.quiz-q-type { font-size:.6rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.quiz-q-text { font-size:1.2rem; font-weight:700; line-height:1.5; }
+.quiz-timer { font-family:var(--mono); font-size:1rem; color:var(--amber2); font-weight:700; background:var(--amber-dim); border:1px solid rgba(232,144,32,.3); border-radius:8px; padding:4px 12px; }
+.quiz-timer.urgent { color:var(--red2); background:var(--red-dim); border-color:rgba(224,48,48,.3); animation:pulse .5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt {
+  padding:13px 16px; border-radius:12px; border:2px solid var(--border); background:var(--surface2);
+  cursor:pointer; font-family:inherit; font-size:.9rem; font-weight:600; color:var(--text);
+  transition:all var(--transition); text-align:left; display:flex; align-items:center; gap:12px;
+}
+.quiz-opt:hover:not([disabled]) { border-color:var(--border2); background:var(--surface3); }
+.quiz-opt.selected { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
+.quiz-opt.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.quiz-opt.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); }
+.quiz-opt-letter { width:26px; height:26px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:900; flex-shrink:0; font-family:var(--mono); }
+.quiz-opt.selected .quiz-opt-letter { background:var(--accent); color:#fff; }
+.quiz-opt.correct .quiz-opt-letter { background:var(--green); color:#fff; }
+.quiz-opt.wrong .quiz-opt-letter { background:var(--red); color:#fff; }
+.quiz-tf-row { display:flex; gap:12px; }
+.quiz-tf-btn { flex:1; padding:18px; border-radius:14px; border:2px solid var(--border); background:var(--surface2); cursor:pointer; font-family:inherit; font-size:1rem; font-weight:800; text-align:center; transition:all var(--transition); }
+.quiz-tf-btn:hover:not([disabled]) { border-color:var(--border2); }
+.quiz-tf-btn.selected { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
+.quiz-tf-btn.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.quiz-tf-btn.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); }
+.quiz-explanation { padding:12px 14px; border-radius:10px; font-size:.82rem; font-weight:600; margin-top:10px; }
+.quiz-explanation.correct { background:var(--green-dim); color:var(--green2); border:1px solid rgba(45,204,111,.25); }
+.quiz-explanation.wrong { background:var(--red-dim); color:var(--red2); border:1px solid rgba(224,48,48,.25); }
+.quiz-next { width:100%; padding:14px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:.92rem; font-weight:800; cursor:pointer; transition:all var(--transition); margin-top:10px; display:none; }
+.quiz-next:hover { filter:brightness(1.1); }
+.quiz-next.show { display:block; }
+
+/* ── MATCHING ── */
+#view-matching { flex-direction:column; }
+.match-body { flex:1; padding:24px; display:flex; flex-direction:column; align-items:center; }
+.match-wrap { width:100%; max-width:700px; }
+.match-instructions { text-align:center; color:var(--text2); font-size:.82rem; margin-bottom:20px; }
+.match-cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.match-col-head { font-size:.62rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; padding-left:4px; }
+.match-item {
+  padding:12px 14px; border-radius:12px; border:2px solid var(--border); background:var(--surface2);
+  cursor:pointer; font-size:.82rem; font-weight:600; transition:all var(--transition);
+  text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center;
+  margin-bottom:8px; line-height:1.3;
+}
+.match-item:hover:not(.matched) { border-color:var(--border2); background:var(--surface3); }
+.match-item.sel-a { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
+.match-item.sel-b { border-color:var(--purple); background:var(--purple-dim); color:var(--purple2); }
+.match-item.matched { border-color:var(--green); background:var(--green-dim); color:var(--green2); opacity:.75; pointer-events:none; }
+.match-item.wrong-flash { border-color:var(--red); background:var(--red-dim); animation:shake .35s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+/* ── LEARN ── */
+#view-learn { flex-direction:column; }
+.learn-body { flex:1; padding:24px; display:flex; flex-direction:column; align-items:center; }
+.learn-wrap { width:100%; max-width:680px; }
+.learn-status-row { display:flex; gap:10px; margin-bottom:18px; }
+.learn-status-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; }
+.learn-status-n { font-size:1.6rem; font-weight:900; }
+.learn-status-label { font-size:.65rem; color:var(--text2); font-weight:600; }
+.learn-n-known .learn-status-n { color:var(--green2); }
+.learn-n-left .learn-status-n { color:var(--amber2); }
+.learn-n-round .learn-status-n { color:var(--accent2); }
+.learn-card { background:var(--surface); border:2px solid var(--border); border-radius:18px; padding:26px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.learn-prompt-tag { font-size:.6rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.learn-question { font-size:1.2rem; font-weight:800; margin-bottom:18px; line-height:1.4; }
+.learn-inp { width:100%; background:var(--surface2); border:2px solid var(--border); border-radius:10px; padding:12px 16px; color:var(--text); font-family:inherit; font-size:.95rem; outline:none; transition:.18s; }
+.learn-inp:focus { border-color:var(--accent2); }
+.learn-inp.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.learn-inp.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); }
+.learn-actions { display:flex; gap:8px; margin-top:10px; }
+.learn-submit { flex:1; padding:11px; background:var(--accent); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:.88rem; font-weight:800; cursor:pointer; transition:all var(--transition); }
+.learn-submit:hover { filter:brightness(1.1); }
+.learn-feedback { padding:12px 14px; border-radius:10px; font-size:.85rem; font-weight:700; margin-top:10px; display:none; align-items:center; gap:8px; }
+.learn-feedback.show { display:flex; }
+.learn-feedback.correct { background:var(--green-dim); color:var(--green2); border:1px solid rgba(45,204,111,.25); }
+.learn-feedback.wrong { background:var(--red-dim); color:var(--red2); border:1px solid rgba(224,48,48,.25); }
+.learn-hint-box { background:var(--amber-dim); border:1px solid rgba(232,144,32,.25); border-radius:10px; padding:10px 14px; font-size:.8rem; color:var(--amber2); margin-top:8px; display:none; }
+.learn-hint-box.show { display:block; }
+
+/* ── RESULTS ── */
+#view-results { flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 55px); padding:40px 20px; text-align:center; position:relative; overflow:hidden; }
+.results-emoji { font-size:4rem; margin-bottom:10px; animation:popIn .4s ease; }
+.results-pct { font-size:5.5rem; font-weight:900; letter-spacing:-.06em; line-height:1; margin-bottom:6px; animation:popIn .4s .1s both; }
+.results-pct.great { background:linear-gradient(135deg,var(--green2),var(--teal2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.results-pct.ok { background:linear-gradient(135deg,var(--amber2),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.results-pct.bad { background:linear-gradient(135deg,var(--red2),var(--purple2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.results-msg { font-size:1.4rem; font-weight:900; margin-bottom:6px; animation:fadeInUp .4s .15s both; }
+.results-sub { color:var(--text2); font-size:.88rem; margin-bottom:24px; animation:fadeInUp .4s .2s both; }
+.results-breakdown { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:20px 24px; width:100%; max-width:460px; margin-bottom:20px; animation:fadeInUp .4s .25s both; }
+.res-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:.85rem; }
+.res-row:last-child { border-bottom:none; }
+.res-label { color:var(--text2); }
+.res-val { font-weight:800; }
+.res-correct { color:var(--green2); }
+.res-wrong { color:var(--red2); }
+.results-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; animation:fadeInUp .4s .3s both; }
+#confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
+
+/* ═══════════════ TRACKING ═══════════════ */
+#view-tracking { padding:24px; }
+.track-section-head { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; margin-top:20px; }
+.track-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:4px; }
+.track-stat { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; transition:all var(--transition); cursor:pointer; }
+.track-stat:hover { border-color:var(--border2); transform:translateY(-1px); }
+.track-stat-icon { font-size:1.4rem; margin-bottom:8px; }
+.track-stat-n { font-size:2rem; font-weight:900; line-height:1; }
+.track-stat-label { font-size:.68rem; color:var(--text2); margin-top:3px; }
+.track-set-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:8px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:all var(--transition); }
+.track-set-row:hover { border-color:var(--border2); transform:translateX(2px); }
+.track-set-icon-big { font-size:1.6rem; flex-shrink:0; }
+.track-set-info { flex:1; }
+.track-set-name { font-size:.9rem; font-weight:800; }
+.track-set-sub { font-size:.65rem; color:var(--text2); margin-top:2px; }
+.track-mastery-track { height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:6px; }
+.track-mastery-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:3px; }
+.track-pct { font-size:.75rem; font-weight:900; min-width:38px; text-align:right; }
+
+/* ═══════════════ SETTINGS ═══════════════ */
+#view-settings { padding:24px; max-width:680px; margin:0 auto; }
+.settings-title { font-size:1.3rem; font-weight:900; margin-bottom:18px; }
+.settings-section { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:12px; }
+.settings-section-title { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+.theme-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.theme-option { padding:10px 8px; border-radius:10px; border:2px solid var(--border); cursor:pointer; text-align:center; transition:all var(--transition); }
+.theme-option:hover { border-color:var(--border2); }
+.theme-option.active { border-color:var(--accent); background:var(--accent-dim); }
+.theme-option-icon { font-size:1.2rem; display:block; margin-bottom:4px; }
+.theme-option-name { font-size:.65rem; font-weight:700; }
+.settings-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); }
+.settings-toggle-row:last-child { border-bottom:none; }
+.settings-toggle-label { font-size:.82rem; font-weight:600; }
+.settings-toggle-sub { font-size:.68rem; color:var(--text2); }
+.toggle { width:38px; height:20px; border-radius:100px; background:var(--border2); cursor:pointer; position:relative; transition:.2s; flex-shrink:0; border:none; }
+.toggle.on { background:var(--accent); }
+.toggle::after { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:#fff; top:3px; left:3px; transition:.2s; }
+.toggle.on::after { transform:translateX(18px); }
+.vol-row { display:flex; align-items:center; gap:10px; }
+.vol-range { flex:1; accent-color:var(--accent); height:4px; }
+
+/* ═══════════════ MODALS ═══════════════ */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:800; display:none; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(6px); }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--border2); border-radius:22px; width:100%; max-width:700px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 20px 80px rgba(0,0,0,.6); animation:modalIn .22s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.96) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-head { padding:18px 22px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.modal-title { font-size:1rem; font-weight:900; flex:1; }
+.modal-close { width:28px; height:28px; border-radius:50%; border:none; background:var(--surface2); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:.15s; }
+.modal-close:hover { background:var(--surface3); color:var(--text); }
+.modal-body { padding:20px 22px; overflow-y:auto; flex:1; }
+.modal-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+
+/* Create set modal tabs */
+.modal-tabs { display:flex; gap:4px; background:var(--surface); border-radius:10px; padding:4px; margin-bottom:18px; }
+.mtab { flex:1; padding:8px; border-radius:7px; border:none; background:none; font-family:inherit; font-size:.75rem; font-weight:800; color:var(--text2); cursor:pointer; transition:.15s; }
+.mtab.active { background:var(--surface2); color:var(--text); }
+
+/* Fields */
+.field { margin-bottom:14px; }
+.field-row { display:grid; gap:10px; margin-bottom:14px; }
+.flabel { font-size:.65rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:var(--text2); margin-bottom:5px; display:block; }
+.finp { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text); font-family:inherit; font-size:.88rem; outline:none; transition:.15s; }
+.finp:focus { border-color:var(--accent2); box-shadow:0 0 0 3px rgba(58,127,255,.1); }
+select.finp { cursor:pointer; }
+textarea.finp { resize:vertical; min-height:50px; }
+
+/* FC builder pairs */
+.fc-pair-list { display:flex; flex-direction:column; gap:8px; }
+.fc-pair { display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; }
+.fc-pair-n { font-size:.68rem; font-weight:900; color:var(--text3); padding-top:11px; min-width:20px; text-align:right; flex-shrink:0; }
+.fc-pair textarea { flex:1; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-family:inherit; font-size:.82rem; outline:none; resize:none; min-height:56px; transition:.15s; line-height:1.4; }
+.fc-pair textarea:focus { border-color:var(--accent2); }
+.fc-pair-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:.9rem; padding:9px 4px; transition:.15s; flex-shrink:0; }
+.fc-pair-del:hover { color:var(--red2); }
+
+/* Import */
+.import-fmts { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:14px; }
+.import-fmt { padding:12px; border-radius:10px; border:2px solid var(--border); background:var(--surface2); cursor:pointer; transition:.15s; }
+.import-fmt.active { border-color:var(--accent); background:var(--accent-dim); }
+.import-fmt-name { font-size:.78rem; font-weight:800; }
+.import-fmt-ex { font-size:.62rem; color:var(--text2); margin-top:3px; font-family:var(--mono); }
+.import-fmt.active .import-fmt-name { color:var(--accent2); }
+.import-textarea { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:12px; color:var(--text); font-family:var(--mono); font-size:.75rem; resize:vertical; min-height:140px; outline:none; transition:.15s; line-height:1.5; }
+.import-textarea:focus { border-color:var(--accent2); }
+.import-preview { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; margin-top:10px; max-height:130px; overflow-y:auto; }
+.import-preview-item { display:flex; gap:8px; padding:4px 0; border-bottom:1px solid var(--border); font-size:.72rem; }
+.import-preview-item:last-child { border-bottom:none; }
+.ipf { font-weight:700; color:var(--text); }
+.ipb { color:var(--text2); }
+
+/* ═══════════════ BUTTONS ═══════════════ */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 18px; border-radius:10px; font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; transition:all var(--transition); border:none; white-space:nowrap; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 14px rgba(58,127,255,.3); }
+.btn-green { background:var(--green); color:#000; }
+.btn-green:hover { filter:brightness(1.1); transform:translateY(-1px); }
+.btn-ghost { background:transparent; color:var(--text2); border:1.5px solid var(--border2); }
+.btn-ghost:hover { border-color:var(--border3); color:var(--text); background:var(--surface2); }
+.btn-danger { background:var(--red-dim); color:var(--red2); border:1px solid rgba(224,48,48,.25); }
+.btn-danger:hover { background:rgba(224,48,48,.18); }
+.btn-sm { padding:7px 13px; font-size:.73rem; }
+.btn-lg { padding:14px 24px; font-size:.95rem; }
+.btn-icon { width:36px; height:36px; padding:0; border-radius:10px; font-size:1rem; }
+
+/* ═══════════════ EMPTY STATE ═══════════════ */
+.empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; text-align:center; }
+.empty-icon { font-size:3.5rem; margin-bottom:14px; opacity:.4; }
+.empty-title { font-size:1.2rem; font-weight:900; margin-bottom:6px; }
+.empty-sub { font-size:.82rem; color:var(--text2); margin-bottom:20px; line-height:1.6; max-width:320px; }
+
+/* ═══════════════ ANIMATIONS ═══════════════ */
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes popIn { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+@keyframes slideInRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.anim-up { animation:fadeInUp .25s ease; }
+.anim-pop { animation:popIn .2s ease; }
+.anim-right { animation:slideInRight .25s ease; }
+
+/* ═══════════════ WATERMARK + FAB ═══════════════ */
+.dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font); font-size:.55rem;font-weight:700;letter-spacing:.12em;color:#1a5c36; text-transform:uppercase;pointer-events:none;z-index:998;white-space:nowrap; }
+.fab2-wrap { position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column; align-items:flex-end;gap:8px;z-index:999; }
+.fab2-toggle { width:34px;height:34px;border-radius:50%;background:#28a45a;border:none; color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center; justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4); transition:transform .18s,background .18s;flex-shrink:0; }
+.fab2-toggle:hover { background:#2ea85a;transform:scale(1.08); }
+.fab2-toggle.open { transform:rotate(45deg) scale(1.08);background:#1f8a48; }
+.fab2-items { display:flex;flex-direction:column;align-items:flex-end;gap:7px; overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease; }
+.fab2-items.open { max-height:300px;opacity:1; }
+.fab2-item { display:flex;align-items:center;position:relative; }
+.fab2-label { background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700; letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap; border:1px solid #2e2e42;opacity:0;transform:translateX(6px); transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px; }
+.fab2-item:hover .fab2-label { opacity:1;transform:translateX(0); }
+.fab2-icon { width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff; display:flex;align-items:center;justify-content:center;font-size:.78rem; text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3); transition:background .15s,transform .15s;flex-shrink:0; }
+.fab2-icon:hover { background:#1f8a48;transform:scale(1.12); }
+
+/* ═══════════════ SCROLLBAR ═══════════════ */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+</style>
+</head>
+<body data-theme="dark">
+
+<canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+
+<div id="gbar"></div>
+
+<!-- ═══════ TOPNAV ═══════ -->
+<nav id="topnav">
+  <div class="nav-logo" onclick="goHome()">DQ<em>study</em></div>
+  <div class="nav-links" id="nav-links" style="display:none">
+    <button class="nav-link" onclick="goHome()">🏠 Home</button>
+    <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
+    <button class="nav-link" onclick="showView('settings')">⚙️ Settings</button>
+  </div>
+  <div class="nav-spacer"></div>
+  <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
+  <button class="nav-icon-btn" title="Theme" onclick="showView('settings')">🎨</button>
+  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+    <div id="dq-auth-avatar">👤</div>
+    <span id="dq-auth-label">Sign In</span>
+  </button>
+</nav>
+
+<!-- ═══════ LAYOUT ═══════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="hidden">
+    <div id="sb-head">
+      <button class="sb-new" onclick="openCreateModal()">＋ New Study Set</button>
+      <input id="sb-search" placeholder="🔍 Search sets…" oninput="renderSidebar(this.value)">
+    </div>
+    <div id="sb-body"></div>
+    <div id="sb-foot">
+      <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress Tracker</button>
+      <button class="sb-foot-btn" onclick="showFolders()"><span>📁</span> Folders</button>
+      <button class="sb-foot-btn" onclick="showView('settings')"><span>⚙️</span> Settings</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+
+    <!-- ═══ LANDING (pre-login) ═══ -->
+    <div class="view" id="view-landing">
+      <div class="landing-bg">
+        <div class="landing-bg-blob blob1"></div>
+        <div class="landing-bg-blob blob2"></div>
+        <div class="landing-bg-blob blob3"></div>
+      </div>
+      <div class="landing-content">
+        <div class="landing-badge">✨ Part of DQ Tools</div>
+        <div class="landing-title">Study Smarter.<br><span class="hl">Remember More.</span></div>
+        <p class="landing-sub">Flashcards, quizzes, matching, and more — all synced to your DQ Account so your progress follows you everywhere.</p>
+        <div class="landing-cta">
+          <button class="btn btn-primary btn-lg" onclick="DQAuth?.openModal()">Get Started Free</button>
+          <button class="btn btn-ghost btn-lg" onclick="continueWithout()">Continue Without Account</button>
+        </div>
+        <div class="landing-features">
+          <div class="landing-feat"><div class="landing-feat-icon">📇</div><div class="landing-feat-title">Flashcards</div><div class="landing-feat-sub">Flip, track mastery, and star cards for later review.</div></div>
+          <div class="landing-feat"><div class="landing-feat-icon">❓</div><div class="landing-feat-title">Quizzes & Tests</div><div class="landing-feat-sub">Auto-generated multiple choice, true/false, and timed tests.</div></div>
+          <div class="landing-feat"><div class="landing-feat-icon">🧠</div><div class="landing-feat-title">Learn Mode</div><div class="landing-feat-sub">Type-in answers with smart retry until you know it cold.</div></div>
+          <div class="landing-feat"><div class="landing-feat-icon">🔗</div><div class="landing-feat-title">Matching</div><div class="landing-feat-sub">Click-to-match terms and definitions interactively.</div></div>
+          <div class="landing-feat"><div class="landing-feat-icon">📊</div><div class="landing-feat-title">Progress Tracking</div><div class="landing-feat-sub">See mastery %, streaks, and history for every set.</div></div>
+          <div class="landing-feat"><div class="landing-feat-icon">☁️</div><div class="landing-feat-title">Cloud Sync</div><div class="landing-feat-sub">Your sets and progress sync instantly across devices.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HOME ═══ -->
+    <div class="view" id="view-home" style="padding:28px;">
+      <div class="home-greeting" id="home-greeting">Welcome back! 👋</div>
+      <div class="home-sub" id="home-sub">Pick up where you left off, or start something new.</div>
+      <div class="home-stats" id="home-stats"></div>
+      <div class="streak-row" id="streak-row"></div>
+      <div class="home-section-title">Recent Sets <a onclick="renderAllSetsView()">View all →</a></div>
+      <div class="recent-grid" id="recent-grid"></div>
+    </div>
+
+    <!-- ═══ SET PAGE ═══ -->
+    <div class="view" id="view-set" style="padding:24px;">
+      <div class="set-header" id="set-header"></div>
+      <div class="mode-picker" id="mode-picker"></div>
+      <div class="start-bar" id="start-bar"></div>
+      <div class="home-section-title" id="cards-section-head">Cards <span id="cards-count-label" style="color:var(--text2);font-weight:600;font-size:.7rem;text-transform:none;letter-spacing:0;margin-left:4px;"></span></div>
+      <div class="cards-grid" id="cards-grid"></div>
+    </div>
+
+    <!-- ═══ FLASHCARD VIEW ═══ -->
+    <div class="view" id="view-flashcard">
+      <div class="study-nav">
+        <button class="study-back" onclick="exitStudy()">← Back</button>
+        <div class="study-title" id="fc-title">Flashcards</div>
+        <div class="study-prog-track"><div class="study-prog-fill" id="fc-prog" style="width:0%"></div></div>
+        <div class="study-count" id="fc-count">0/0</div>
+      </div>
+      <div class="fc-body">
+        <div class="fc-options-row">
+          <button class="fc-opt-chip" id="chip-shuffle" onclick="toggleFCShuffle()">🔀 Shuffle</button>
+          <button class="fc-opt-chip" id="chip-dir" onclick="toggleFCDir()">📖 Front → Back</button>
+          <span style="flex:1"></span>
+          <button class="fc-opt-chip" onclick="exitStudy()">✕ Exit</button>
+        </div>
+        <div class="fc-stage">
+          <div class="fc-card-wrap">
+            <div class="fc-card" id="fc-card" onclick="fcFlip()">
+              <div class="fc-face front" id="fc-front">
+                <div class="fc-face-tag" id="fc-front-tag">TERM</div>
+                <div class="fc-face-text" id="fc-front-text"></div>
+                <div class="fc-face-hint">Tap to see definition</div>
+                <button class="fc-star-btn" id="fc-star" onclick="event.stopPropagation();fcToggleStar()">⭐</button>
+              </div>
+              <div class="fc-face back" id="fc-back">
+                <div class="fc-face-tag" id="fc-back-tag">DEFINITION</div>
+                <div class="fc-face-text" id="fc-back-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-mastery-bar">
+          <div class="fc-m-pill know"><span class="fc-m-n" id="fc-know-n">0</span>Know</div>
+          <div class="fc-m-pill review"><span class="fc-m-n" id="fc-review-n">0</span>Review</div>
+          <div class="fc-m-pill unseen"><span class="fc-m-n" id="fc-unseen-n">0</span>Unseen</div>
+        </div>
+        <div class="fc-actions">
+          <button class="fc-action review" onclick="fcMark('review')"><span class="fc-action-icon">✕</span>Need Review</button>
+          <button class="fc-action skip" onclick="fcNext()"><span class="fc-action-icon">→</span>Skip</button>
+          <button class="fc-action know" onclick="fcMark('know')"><span class="fc-action-icon">✓</span>I Know This</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ QUIZ VIEW ═══ -->
+    <div class="view" id="view-quiz">
+      <div class="study-nav">
+        <button class="study-back" onclick="exitStudy()">← Back</button>
+        <div class="study-title" id="quiz-title">Quiz</div>
+        <div class="study-prog-track"><div class="study-prog-fill" id="quiz-prog" style="width:0%"></div></div>
+        <div class="study-count" id="quiz-count">1/10</div>
+        <div class="quiz-timer" id="quiz-timer" style="display:none">0:00</div>
+      </div>
+      <div class="quiz-body">
+        <div class="quiz-wrap" id="quiz-wrap"></div>
+      </div>
+    </div>
+
+    <!-- ═══ MATCHING VIEW ═══ -->
+    <div class="view" id="view-matching">
+      <div class="study-nav">
+        <button class="study-back" onclick="exitStudy()">← Back</button>
+        <div class="study-title">Matching</div>
+        <div class="study-prog-track"><div class="study-prog-fill" id="match-prog" style="width:0%"></div></div>
+        <div class="study-count" id="match-count">0 matched</div>
+      </div>
+      <div class="match-body">
+        <div class="match-wrap">
+          <div class="match-instructions">Select a term, then select its matching definition.</div>
+          <div class="match-cols" id="match-cols"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LEARN VIEW ═══ -->
+    <div class="view" id="view-learn">
+      <div class="study-nav">
+        <button class="study-back" onclick="exitStudy()">← Back</button>
+        <div class="study-title" id="learn-title">Learn</div>
+        <div class="study-prog-track"><div class="study-prog-fill" id="learn-prog" style="width:0%"></div></div>
+        <div class="study-count" id="learn-count-nav">0/0</div>
+      </div>
+      <div class="learn-body">
+        <div class="learn-wrap">
+          <div class="learn-status-row">
+            <div class="learn-status-card learn-n-known"><div class="learn-status-n" id="learn-known-n">0</div><div class="learn-status-label">Known</div></div>
+            <div class="learn-status-card learn-n-left"><div class="learn-status-n" id="learn-left-n">0</div><div class="learn-status-label">Left</div></div>
+            <div class="learn-status-card learn-n-round"><div class="learn-status-n" id="learn-round-n">1</div><div class="learn-status-label">Round</div></div>
+          </div>
+          <div id="learn-card-area"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RESULTS VIEW ═══ -->
+    <div class="view" id="view-results" style="flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 55px);padding:40px 20px;text-align:center;">
+      <div class="results-emoji" id="results-emoji">🎉</div>
+      <div class="results-pct great" id="results-pct">—</div>
+      <div class="results-msg" id="results-msg">—</div>
+      <div class="results-sub" id="results-sub"></div>
+      <div class="results-breakdown" id="results-breakdown"></div>
+      <div class="results-actions" id="results-actions"></div>
+    </div>
+
+    <!-- ═══ TRACKING VIEW ═══ -->
+    <div class="view" id="view-tracking" style="padding:28px;">
+      <div style="font-size:1.5rem;font-weight:900;margin-bottom:6px;">📊 Progress Tracker</div>
+      <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Track your mastery across all study sets.</div>
+      <div class="track-stats-grid" id="track-stats-grid"></div>
+      <div class="track-section-head">Set Mastery</div>
+      <div id="track-sets-list"></div>
+    </div>
+
+    <!-- ═══ SETTINGS VIEW ═══ -->
+    <div class="view" id="view-settings" style="padding:28px;max-width:680px;">
+      <div style="font-size:1.5rem;font-weight:900;margin-bottom:18px;">⚙️ Settings</div>
+      <div class="settings-section">
+        <div class="settings-section-title">🎨 Theme</div>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">🔊 Sound</div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Sound Effects</div><div class="settings-toggle-sub">Plays sounds on interactions</div></div>
+          <button class="toggle" id="sound-toggle" onclick="toggleSoundSetting()"></button>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="flabel" style="margin-bottom:6px;">Volume</div>
+          <div class="vol-row"><span>🔈</span><input type="range" class="vol-range" id="vol-range" min="0" max="1" step="0.05" value="0.5" oninput="setVolume(this.value)"><span>🔊</span></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">💾 Data</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Clear All Data</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">ℹ️ About</div>
+        <div style="font-size:.78rem;color:var(--text2);line-height:1.7;">DQstudy — Part of the DQ Tools suite. Built for students. Data saved locally and synced to your DQ Account when signed in.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ CREATE SET MODAL ═══ -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="create-modal-title">✨ New Study Set</div>
+      <button class="modal-close" onclick="closeModal('create-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row" style="grid-template-columns:2fr 1fr 1fr;">
+        <div class="field"><label class="flabel">Set Name *</label><input class="finp" id="inp-name" placeholder="e.g. Chapter 5 Vocabulary"></div>
+        <div class="field"><label class="flabel">Class</label><input class="finp" id="inp-class" placeholder="Biology"></div>
+        <div class="field"><label class="flabel">Unit</label><input class="finp" id="inp-unit" placeholder="Unit 4"></div>
+      </div>
+      <div class="field-row" style="grid-template-columns:1fr 3fr;">
+        <div class="field"><label class="flabel">Icon</label><input class="finp" id="inp-icon" placeholder="📖" maxlength="4"></div>
+        <div class="field"><label class="flabel">Notes</label><input class="finp" id="inp-notes" placeholder="Optional notes…"></div>
+      </div>
+      <div class="modal-tabs">
+        <button class="mtab active" id="mtab-fc" onclick="switchModalTab('fc')">📇 Flashcards</button>
+        <button class="mtab" id="mtab-import" onclick="switchModalTab('import')">📥 Import</button>
+      </div>
+      <!-- Flashcard tab -->
+      <div id="tab-fc">
+        <div class="fc-pair-list" id="fc-pair-list"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="addPair()">＋ Add Card</button>
+      </div>
+      <!-- Import tab -->
+      <div id="tab-import" style="display:none">
+        <div class="import-fmts">
+          <div class="import-fmt active" onclick="setImportFmt('comma',this)"><div class="import-fmt-name">Comma Separated</div><div class="import-fmt-ex">term, definition</div></div>
+          <div class="import-fmt" onclick="setImportFmt('tab',this)"><div class="import-fmt-name">Tab Separated</div><div class="import-fmt-ex">term[TAB]definition</div></div>
+          <div class="import-fmt" onclick="setImportFmt('semi',this)"><div class="import-fmt-name">Semicolon</div><div class="import-fmt-ex">term; definition</div></div>
+          <div class="import-fmt" onclick="setImportFmt('auto',this)"><div class="import-fmt-name">🧠 Auto-Detect</div><div class="import-fmt-ex">figures it out for you</div></div>
+        </div>
+        <textarea class="import-textarea" id="import-ta" placeholder="Paste your data here…" oninput="previewImport()"></textarea>
+        <div id="import-preview" style="display:none" class="import-preview"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('create-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSet()">💾 Save Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- Watermark + FAB -->
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms & Policies</span><a class="fab2-icon" href="termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Home</span><a class="fab2-icon" href="index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="mathcalc.html">🧮</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtasks</span><a class="fab2-icon" href="dqtasks.html">✅</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DQstudy v2 — Full Logic
+═══════════════════════════════════════════════════ */
+
+// ── GLOBAL STATE ──
+let sets = [];       // all study sets
+let folders = [];    // folders
+let currentSetId = null;
+let isLoggedIn = false;
+let editingId = null;
+let importFmt = 'comma';
+let fcPairs = [];
+let soundEnabled = true;
+let volume = 0.5;
+let currentTheme = 'dark';
+
+// ── STUDY SESSION STATE ──
+let sessionCards = [];
+let sessionMode = null;
+let fcIdx = 0, fcKnown = new Set(), fcReview = new Set(), fcShuffle = false, fcDir = 'normal';
+let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false, quizTimerInt = null, quizSecs = 0, isTestMode = false;
+let matchSel = null, matchMatched = 0;
+let learnQueue = [], learnKnown = new Set(), learnRound = 1, learnIdx = 0;
+
+// ─────────────────────────────────────────────────
+// SOUNDS
+// ─────────────────────────────────────────────────
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+function getACtx() { if (!actx) actx = new AudioCtx(); return actx; }
+
+function playTone(freq, type='sine', dur=0.08, vol=0.18, delay=0) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getACtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+    gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+    gain.gain.linearRampToValueAtTime(vol * volume, ctx.currentTime + delay + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+    osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + dur + 0.01);
+  } catch(e) {}
+}
+function sndCorrect() { playTone(523,.sine,.07,.15); playTone(659,.sine,.07,.15,0.07); playTone(784,.sine,.1,.12,0.14); }
+function sndWrong()   { playTone(220,.sawtooth,.12,.12); playTone(196,.sawtooth,.1,.1,0.08); }
+function sndFlip()    { playTone(440,.sine,.04,.08); }
+function sndClick()   { playTone(660,.sine,.04,.06); }
+function sndComplete(){ [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',.12,.14,i*.08)); }
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+  const t = document.getElementById('sound-toggle');
+  if (t) t.classList.toggle('on', soundEnabled);
+  saveSettings();
+}
+function toggleSoundSetting() { toggleSound(); }
+function setVolume(v) { volume = parseFloat(v); saveSettings(); }
+
+// ─────────────────────────────────────────────────
+// THEMES
+// ─────────────────────────────────────────────────
+const THEMES = [
+  {id:'dark',      icon:'🌙', name:'Dark'},
+  {id:'light',     icon:'☀️', name:'Light'},
+  {id:'ocean',     icon:'🌊', name:'Ocean'},
+  {id:'forest',    icon:'🌲', name:'Forest'},
+  {id:'sunset',    icon:'🌅', name:'Sunset'},
+  {id:'midnight',  icon:'🌌', name:'Midnight'},
+  {id:'candy',     icon:'🍬', name:'Candy'},
+  {id:'neon',      icon:'⚡', name:'Neon'},
+];
+function setTheme(id) {
+  currentTheme = id;
+  document.body.setAttribute('data-theme', id);
+  document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('active', el.dataset.tid === id));
+  saveSettings();
+}
+function renderThemeGrid() {
+  document.getElementById('theme-grid').innerHTML = THEMES.map(t => `
+    <div class="theme-option${t.id === currentTheme ? ' active' : ''}" data-tid="${t.id}" onclick="setTheme('${t.id}')">
+      <span class="theme-option-icon">${t.icon}</span>
+      <div class="theme-option-name">${t.name}</div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────────
+// SETTINGS PERSISTENCE
+// ─────────────────────────────────────────────────
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('dqstudy-settings') || '{}');
+    if (s.theme) setTheme(s.theme);
+    if (s.soundEnabled !== undefined) soundEnabled = s.soundEnabled;
+    if (s.volume !== undefined) { volume = s.volume; const r = document.getElementById('vol-range'); if (r) r.value = volume; }
+  } catch(_) {}
+  document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+  const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
+}
+function saveSettings() {
+  localStorage.setItem('dqstudy-settings', JSON.stringify({theme:currentTheme, soundEnabled, volume}));
+}
+
+// ─────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────
+window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+  if (!user) { showLanding(); return; }
+  isLoggedIn = true;
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('nav-links').style.display = '';
+  const saved = await DQAuth.loadData('dqstudy');
+  if (saved) { sets = saved.sets || []; folders = saved.folders || []; }
+  renderSidebar();
+  goHome();
+});
+
+setTimeout(() => {
+  // If auth never fires and no one logged in, show landing
+  if (!isLoggedIn) { showLanding(); }
+}, 2000);
+
+function showLanding() {
+  document.getElementById('sidebar').classList.add('hidden');
+  document.getElementById('nav-links').style.display = 'none';
+  showView('landing');
+}
+
+function continueWithout() {
+  isLoggedIn = false;
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('nav-links').style.display = '';
+  // Load from localStorage only
+  try { const s = JSON.parse(localStorage.getItem('dqstudy-local') || '{}'); sets = s.sets||[]; folders = s.folders||[]; } catch(_) {}
+  renderSidebar();
+  goHome();
+}
+
+async function autoSave() {
+  if (isLoggedIn) {
+    DQAuth.saveData('dqstudy', {sets, folders});
+  } else {
+    localStorage.setItem('dqstudy-local', JSON.stringify({sets, folders}));
+  }
+}
+
+// ─────────────────────────────────────────────────
+// ROUTING
+// ─────────────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + id);
+  if (el) { el.classList.add('active'); }
+  // Update nav
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const nl = document.querySelector(`.nav-link[onclick*="${id}"]`);
+  if (nl) nl.classList.add('active');
+  // Stop quiz timer if leaving quiz
+  if (id !== 'quiz' && quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
+}
+
+function goHome() {
+  renderHome();
+  showView('home');
+}
+
+// ─────────────────────────────────────────────────
+// HOME
+// ─────────────────────────────────────────────────
+function renderHome() {
+  const user = DQAuth?.getUser?.();
+  const profile = DQAuth?.getProfile?.();
+  const name = profile?.displayName || user?.displayName || 'there';
+  const hrs = new Date().getHours();
+  const greet = hrs < 12 ? 'Good morning' : hrs < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('home-greeting').textContent = `${greet}, ${name}! 👋`;
+
+  const totalCards = sets.reduce((n,s) => n + allCards(s).length, 0);
+  const totalPlays = sets.reduce((n,s) => n + (s.plays||0), 0);
+  const allHist = sets.flatMap(s => s.history||[]);
+  const avgScore = allHist.length ? Math.round(allHist.reduce((n,h) => n + (h.score/h.total*100), 0) / allHist.length) : 0;
+  const knownCards = sets.reduce((n,s) => n + (s.cards||[]).filter(c=>c.mastery==='know').length, 0);
+
+  document.getElementById('home-stats').innerHTML = [
+    ['📚', sets.length, 'Study Sets', 'sets'],
+    ['📇', totalCards, 'Total Cards', ''],
+    ['▶', totalPlays, 'Sessions', ''],
+    ['🧠', knownCards, 'Cards Mastered', ''],
+  ].map(([icon,n,label]) => `
+    <div class="stat-card">
+      <div class="stat-icon">${icon}</div>
+      <div class="stat-n">${n}</div>
+      <div class="stat-label">${label}</div>
+    </div>
+  `).join('');
+
+  // Streak + avg score row
+  document.getElementById('streak-row').innerHTML = `
+    <div class="streak-card" style="border-color:${avgScore>=80?'rgba(45,204,111,.3)':avgScore>=60?'rgba(232,144,32,.3)':'var(--border)'}">
+      <div class="streak-icon">${avgScore>=80?'🏆':avgScore>=60?'📈':'📊'}</div>
+      <div class="streak-info"><div class="streak-n" style="color:${avgScore>=80?'var(--green2)':avgScore>=60?'var(--amber2)':'var(--text2)'}">${allHist.length?avgScore+'%':'—'}</div><div class="streak-label">Average Quiz Score</div></div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-icon">⚡</div>
+      <div class="streak-info"><div class="streak-n" style="color:var(--accent2)">${totalPlays}</div><div class="streak-label">Total Study Sessions</div></div>
+    </div>
+  `;
+
+  // Recent sets grid
+  const recent = sets.slice().sort((a,b) => (b.updated||b.created||0) - (a.updated||a.created||0)).slice(0,5);
+  const grid = document.getElementById('recent-grid');
+  if (!sets.length) {
+    grid.innerHTML = `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>Create your first set</span></div>`;
+  } else {
+    grid.innerHTML = recent.map(s => {
+      const cards = allCards(s);
+      const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length / cards.length * 100) : 0;
+      const lastHist = (s.history||[]).slice(-1)[0];
+      return `<div class="recent-card" onclick="openSet('${s.id}')">
+        <div class="recent-card-icon">${s.icon||'📖'}</div>
+        <div class="recent-card-name">${esc(s.name)}</div>
+        <div class="recent-card-meta">${s.class||''} ${s.unit?'· '+s.unit:''}</div>
+        <div class="recent-card-count">${cards.length} cards${lastHist?' · Last: '+Math.round(lastHist.score/lastHist.total*100)+'%':''}</div>
+        <div class="recent-card-bar"><div class="recent-card-fill" style="width:${mastery}%"></div></div>
+      </div>`;
+    }).join('') + `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>New Set</span></div>`;
+  }
+}
+
+// ─────────────────────────────────────────────────
+// SIDEBAR
+// ─────────────────────────────────────────────────
+function renderSidebar(filter='') {
+  const body = document.getElementById('sb-body');
+  const filtered = filter ? sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase())) : sets;
+  if (!filtered.length) {
+    body.innerHTML = '<div style="padding:20px 10px;font-size:.72rem;color:var(--text3);text-align:center;">' + (filter ? 'No sets found.' : 'No sets yet!') + '</div>';
+    return;
+  }
+  // Group by folder
+  body.innerHTML = `<div class="sb-section-label">All Sets</div>` +
+    filtered.map(s => `
+      <div class="sb-set${s.id===currentSetId?' active':''}" onclick="openSet('${s.id}')">
+        <div class="sb-set-icon">${s.icon||'📖'}</div>
+        <div class="sb-set-info">
+          <div class="sb-set-name">${esc(s.name)}</div>
+          <div class="sb-set-sub">${allCards(s).length} cards${s.class?' · '+s.class:''}</div>
+        </div>
+      </div>
+    `).join('');
+}
+
+// ─────────────────────────────────────────────────
+// SET PAGE
+// ─────────────────────────────────────────────────
+const MODES = [
+  {id:'flashcards', icon:'📇', name:'Flashcards', desc:'Flip through cards'},
+  {id:'quiz',       icon:'❓', name:'Quiz',       desc:'Multiple choice + T/F'},
+  {id:'test',       icon:'⏱', name:'Test',       desc:'Timed quiz mode'},
+  {id:'matching',   icon:'🔗', name:'Matching',   desc:'Match terms to defs'},
+  {id:'learn',      icon:'🧠', name:'Learn',      desc:'Type-in answers'},
+];
+let selectedMode = 'flashcards';
+let optShuffle = false, optStarred = false, optReview = false;
+
+function openSet(id) {
+  currentSetId = id;
+  const s = getSet(id);
+  if (!s) return;
+  renderSidebar();
+  renderSetPage(s);
+  showView('set');
+  sndClick();
+}
+
+function renderSetPage(s) {
+  const cards = allCards(s);
+  const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+  const lastHist = (s.history||[]).slice(-1)[0];
+
+  document.getElementById('set-header').innerHTML = `
+    <div class="set-big-icon" onclick="cycleIcon()">${s.icon||'📖'}</div>
+    <div class="set-header-info">
+      <div class="set-title">${esc(s.name)}</div>
+      <div class="set-chips">
+        ${s.class ? `<span class="chip chip-blue">${esc(s.class)}</span>` : ''}
+        ${s.unit ? `<span class="chip chip-purple">${esc(s.unit)}</span>` : ''}
+        <span class="chip chip-green">${cards.length} cards</span>
+        <span class="chip chip-amber">${s.plays||0} plays</span>
+        ${mastery >= 80 ? '<span class="chip chip-green">🏆 Mastered</span>' : ''}
+        ${lastHist ? `<span class="chip chip-blue">Last: ${Math.round(lastHist.score/lastHist.total*100)}%</span>` : ''}
+      </div>
+      ${s.notes ? `<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>` : ''}
+    </div>
+    <div class="set-header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>
+    </div>
+  `;
+
+  document.getElementById('mode-picker').innerHTML = MODES.map(m => `
+    <div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
+      <span class="mode-btn-icon">${m.icon}</span>
+      <div class="mode-btn-name">${m.name}</div>
+      <div class="mode-btn-desc">${m.desc}</div>
+    </div>
+  `).join('');
+
+  renderStartBar();
+  renderCardsGrid(s);
+}
+
+function selectMode(id, el) {
+  selectedMode = id;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  renderStartBar();
+  sndClick();
+}
+
+function renderStartBar() {
+  document.getElementById('start-bar').innerHTML = `
+    <button class="start-big" onclick="launchStudy()">▶ Start ${MODES.find(m=>m.id===selectedMode)?.name||'Study'}</button>
+    <button class="start-opt${optShuffle?' on':''}" onclick="optShuffle=!optShuffle;renderStartBar();">🔀 Shuffle</button>
+    <button class="start-opt${optStarred?' on':''}" onclick="optStarred=!optStarred;renderStartBar();">⭐ Starred</button>
+    <button class="start-opt${optReview?' on':''}" onclick="optReview=!optReview;renderStartBar();">📌 Review Only</button>
+  `;
+}
+
+function renderCardsGrid(s) {
+  const cards = allCards(s);
+  document.getElementById('cards-count-label').textContent = `(${cards.length})`;
+  document.getElementById('cards-grid').innerHTML = cards.map((c, i) => `
+    <div class="card-tile">
+      <div class="card-mastery-dot dot-${c.mastery||'unseen'}"></div>
+      <div class="card-front-text">${esc(c.front)}</div>
+      <div class="card-sep"></div>
+      <div class="card-back-text">${esc(c.back)}</div>
+      <button class="card-star${c.starred?' on':''}" onclick="toggleStar(${i})" title="Star">⭐</button>
+    </div>
+  `).join('') || '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No cards yet</div><div class="empty-sub">Edit this set to add cards.</div></div>';
+}
+
+function toggleStar(idx) {
+  const s = getSet(currentSetId);
+  const cards = allCards(s);
+  cards[idx].starred = !cards[idx].starred;
+  autoSave();
+  renderCardsGrid(s);
+}
+
+function cycleIcon() {
+  const icons = ['📖','📚','🧠','⚡','🔬','🧪','📐','🎯','💡','🌊','🔭','🧬','📝','🎓','💻','🦠','🌍','🏔','🎵','⚽'];
+  const s = getSet(currentSetId); if (!s) return;
+  s.icon = icons[(icons.indexOf(s.icon)+1) % icons.length];
+  autoSave(); renderSidebar(); renderSetPage(s);
+}
+
+function deleteSet() {
+  if (!confirm('Delete this study set? This cannot be undone.')) return;
+  sets = sets.filter(s => s.id !== currentSetId);
+  currentSetId = null;
+  autoSave(); renderSidebar(); goHome();
+}
+
+// ─────────────────────────────────────────────────
+// LAUNCH STUDY
+// ─────────────────────────────────────────────────
+function launchStudy() {
+  const s = getSet(currentSetId); if (!s) return;
+  let cards = allCards(s);
+  if (optStarred) cards = cards.filter(c => c.starred);
+  if (optReview) cards = cards.filter(c => c.mastery === 'review');
+  if (!cards.length) { alert('No cards match your filter!'); return; }
+  if (optShuffle || selectedMode !== 'flashcards') cards = shuffle([...cards]);
+  s.plays = (s.plays||0) + 1;
+  s.updated = Date.now();
+  sessionCards = cards;
+  sessionMode = selectedMode;
+  autoSave();
+  sndClick();
+
+  if (selectedMode === 'flashcards') startFlashcards();
+  else if (selectedMode === 'quiz' || selectedMode === 'test') startQuiz(selectedMode === 'test');
+  else if (selectedMode === 'matching') startMatching();
+  else if (selectedMode === 'learn') startLearn();
+}
+
+// ─────────────────────────────────────────────────
+// FLASHCARDS
+// ─────────────────────────────────────────────────
+function startFlashcards() {
+  fcIdx = 0; fcKnown = new Set(); fcReview = new Set(); fcShuffle = false; fcDir = 'normal';
+  document.getElementById('chip-shuffle').classList.remove('on');
+  document.getElementById('chip-dir').textContent = '📖 Front → Back';
+  showView('flashcard');
+  document.getElementById('fc-title').textContent = getSet(currentSetId)?.name || 'Flashcards';
+  renderFCCard();
+}
+
+function renderFCCard() {
+  const card = sessionCards[fcIdx];
+  if (!card) return;
+  const front = fcDir === 'normal' ? card.front : card.back;
+  const back  = fcDir === 'normal' ? card.back  : card.front;
+  document.getElementById('fc-front-text').textContent = front;
+  document.getElementById('fc-back-text').textContent = back;
+  document.getElementById('fc-front-tag').textContent = fcDir === 'normal' ? 'TERM' : 'DEFINITION';
+  document.getElementById('fc-back-tag').textContent  = fcDir === 'normal' ? 'DEFINITION' : 'TERM';
+  document.getElementById('fc-card').classList.remove('flipped');
+  document.getElementById('fc-star').classList.toggle('on', !!card.starred);
+  const pct = (fcIdx / sessionCards.length) * 100;
+  document.getElementById('fc-prog').style.width = pct + '%';
+  document.getElementById('fc-count').textContent = (fcIdx+1) + '/' + sessionCards.length;
+  updateFCMastery();
+}
+
+function fcFlip() {
+  document.getElementById('fc-card').classList.toggle('flipped');
+  sndFlip();
+}
+
+function fcMark(status) {
+  const card = sessionCards[fcIdx];
+  card.mastery = status;
+  if (status === 'know') { fcKnown.add(fcIdx); fcReview.delete(fcIdx); sndCorrect(); }
+  else { fcReview.add(fcIdx); fcKnown.delete(fcIdx); sndWrong(); }
+  autoSave();
+  fcNext();
+}
+
+function fcNext() {
+  if (fcIdx < sessionCards.length - 1) { fcIdx++; renderFCCard(); }
+  else {
+    const s = getSet(currentSetId);
+    if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:fcKnown.size,total:sessionCards.length,mode:'Flashcards'}); autoSave(); }
+    showResults(fcKnown.size, sessionCards.length, 'Flashcards');
+  }
+}
+
+function updateFCMastery() {
+  document.getElementById('fc-know-n').textContent = fcKnown.size;
+  document.getElementById('fc-review-n').textContent = fcReview.size;
+  document.getElementById('fc-unseen-n').textContent = sessionCards.length - fcKnown.size - fcReview.size;
+}
+
+function toggleFCShuffle() {
+  fcShuffle = !fcShuffle;
+  document.getElementById('chip-shuffle').classList.toggle('on', fcShuffle);
+  if (fcShuffle) sessionCards = shuffle([...sessionCards]);
+  fcIdx = 0; renderFCCard();
+}
+
+function toggleFCDir() {
+  fcDir = fcDir === 'normal' ? 'reverse' : 'normal';
+  document.getElementById('chip-dir').textContent = fcDir === 'normal' ? '📖 Front → Back' : '📖 Back → Front';
+  renderFCCard();
+}
+
+function fcToggleStar() {
+  const card = sessionCards[fcIdx];
+  card.starred = !card.starred;
+  document.getElementById('fc-star').classList.toggle('on', card.starred);
+  autoSave();
+  sndClick();
+}
+
+// ─────────────────────────────────────────────────
+// QUIZ
+// ─────────────────────────────────────────────────
+function startQuiz(timed=false) {
+  isTestMode = timed;
+  quizQs = buildQuizQs(sessionCards, Math.min(20, sessionCards.length));
+  quizIdx = 0; quizScore = 0; quizAnswered = false; quizSecs = 0;
+  if (quizTimerInt) clearInterval(quizTimerInt);
+  const timerEl = document.getElementById('quiz-timer');
+  if (timed) {
+    timerEl.style.display = '';
+    timerEl.textContent = '0:00';
+    timerEl.classList.remove('urgent');
+    quizTimerInt = setInterval(() => {
+      quizSecs++;
+      const m = Math.floor(quizSecs/60), s = quizSecs%60;
+      timerEl.textContent = m+':'+(s<10?'0':'')+s;
+    }, 1000);
+  } else {
+    timerEl.style.display = 'none';
+  }
+  document.getElementById('quiz-title').textContent = timed ? 'Test Mode' : 'Quiz';
+  showView('quiz');
+  renderQuizQ();
+}
+
+function buildQuizQs(cards, n) {
+  const pool = shuffle([...cards]).slice(0, n);
+  return pool.map(card => {
+    const isTF = Math.random() < 0.3;
+    if (isTF) {
+      const useCorrect = Math.random() > 0.5;
+      const other = cards.filter(c => c.back !== card.back);
+      const shown = useCorrect ? card.back : (other.length ? other[Math.floor(Math.random()*other.length)].back : card.back);
+      return {type:'tf', q:card.front, shown, correct:useCorrect};
+    } else {
+      const others = shuffle(cards.filter(c => c.back !== card.back)).slice(0,3).map(c=>c.back);
+      const opts = shuffle([card.back, ...others]);
+      return {type:'mc', q:card.front, correct:card.back, opts};
+    }
+  });
+}
+
+function renderQuizQ() {
+  if (quizIdx >= quizQs.length) { finishQuiz(); return; }
+  const q = quizQs[quizIdx];
+  quizAnswered = false;
+  document.getElementById('quiz-prog').style.width = (quizIdx/quizQs.length*100)+'%';
+  document.getElementById('quiz-count').textContent = (quizIdx+1)+'/'+quizQs.length;
+  const wrap = document.getElementById('quiz-wrap');
+
+  if (q.type === 'mc') {
+    wrap.innerHTML = `
+      <div class="quiz-q-card">
+        <div class="quiz-q-type">Multiple Choice</div>
+        <div class="quiz-q-text">${esc(q.q)}</div>
+      </div>
+      <div class="quiz-options">${q.opts.map((o,i)=>`
+        <button class="quiz-opt" onclick="answerMC(this,'${esc(o)}','${esc(q.correct)}')">
+          <span class="quiz-opt-letter">${'ABCD'[i]}</span>${esc(o)}
+        </button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="quiz-expl" style="display:none"></div>
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <div class="quiz-q-card">
+        <div class="quiz-q-type">True or False</div>
+        <div class="quiz-q-text">${esc(q.q)}</div>
+        <div style="margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:.88rem;">Definition shown: <strong>${esc(q.shown)}</strong></div>
+      </div>
+      <div class="quiz-tf-row">
+        <button class="quiz-tf-btn" onclick="answerTF(this,true,${q.correct})">✓ True</button>
+        <button class="quiz-tf-btn" onclick="answerTF(this,false,${q.correct})">✗ False</button>
+      </div>
+      <div class="quiz-explanation" id="quiz-expl" style="display:none"></div>
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>
+    `;
+  }
+}
+
+function answerMC(btn, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent.trim().slice(1).trim() === correct) b.classList.add('correct'); });
+  }
+  showQuizExpl(isCorrect, correct);
+  if (isCorrect) { quizScore++; sndCorrect(); } else sndWrong();
+  document.getElementById('quiz-next').classList.add('show');
+}
+
+function answerTF(btn, ans, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.quiz-tf-btn').forEach(b => b.disabled = true);
+  const isCorrect = ans === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) { document.querySelectorAll('.quiz-tf-btn').forEach(b => { if ((b.textContent.includes('True') && correct)||(b.textContent.includes('False') && !correct)) b.classList.add('correct'); }); }
+  showQuizExpl(isCorrect, correct ? 'True' : 'False');
+  if (isCorrect) { quizScore++; sndCorrect(); } else sndWrong();
+  document.getElementById('quiz-next').classList.add('show');
+}
+
+function showQuizExpl(correct, answer) {
+  const el = document.getElementById('quiz-expl');
+  el.style.display = '';
+  el.className = 'quiz-explanation ' + (correct ? 'correct' : 'wrong');
+  el.textContent = correct ? '✓ Correct!' : '✗ Incorrect. Answer: ' + answer;
+}
+
+function quizNext() { quizIdx++; renderQuizQ(); sndClick(); }
+
+function finishQuiz() {
+  if (quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
+  const s = getSet(currentSetId);
+  if (s) {
+    s.history = s.history||[];
+    s.history.push({date:Date.now(), score:quizScore, total:quizQs.length, mode:isTestMode?'Test':'Quiz', time:quizSecs});
+    autoSave();
+  }
+  showResults(quizScore, quizQs.length, isTestMode ? 'Test' : 'Quiz');
+}
+
+// ─────────────────────────────────────────────────
+// MATCHING
+// ─────────────────────────────────────────────────
+let matchTotal = 0;
+function startMatching() {
+  const pairs = shuffle([...sessionCards]).slice(0, Math.min(8, sessionCards.length));
+  matchTotal = pairs.length;
+  matchMatched = 0; matchSel = null;
+  const lefts  = shuffle(pairs.map(p => ({text:p.front, id:p.front+'__'+p.back})));
+  const rights = shuffle(pairs.map(p => ({text:p.back,  id:p.front+'__'+p.back})));
+  document.getElementById('match-prog').style.width = '0%';
+  document.getElementById('match-count').textContent = '0 matched';
+  document.getElementById('match-cols').innerHTML = `
+    <div>
+      <div class="match-col-head">Terms</div>
+      ${lefts.map(l=>`<div class="match-item" data-id="${esc(l.id)}" data-side="left" onclick="matchClick(this)">${esc(l.text)}</div>`).join('')}
+    </div>
+    <div>
+      <div class="match-col-head">Definitions</div>
+      ${rights.map(r=>`<div class="match-item" data-id="${esc(r.id)}" data-side="right" onclick="matchClick(this)">${esc(r.text)}</div>`).join('')}
+    </div>
+  `;
+  showView('matching');
+}
+
+function matchClick(el) {
+  if (el.classList.contains('matched')) return;
+  const side = el.dataset.side;
+  if (!matchSel) {
+    // First selection must be left side
+    if (side !== 'left') return;
+    matchSel = el;
+    document.querySelectorAll('.match-item.sel-a').forEach(e=>e.classList.remove('sel-a'));
+    el.classList.add('sel-a');
+    sndClick();
+    return;
+  }
+  // Second selection must be right side
+  if (side !== 'right') {
+    // Reselect left
+    document.querySelectorAll('.match-item.sel-a').forEach(e=>e.classList.remove('sel-a'));
+    matchSel = el;
+    el.classList.add('sel-a');
+    return;
+  }
+  const correct = matchSel.dataset.id === el.dataset.id;
+  if (correct) {
+    matchSel.classList.remove('sel-a'); matchSel.classList.add('matched');
+    el.classList.add('matched');
+    matchMatched++;
+    sndCorrect();
+    const pct = matchMatched/matchTotal*100;
+    document.getElementById('match-prog').style.width = pct+'%';
+    document.getElementById('match-count').textContent = matchMatched+' matched';
+    matchSel = null;
+    if (matchMatched === matchTotal) {
+      setTimeout(() => {
+        const s = getSet(currentSetId);
+        if (s) { s.history=s.history||[]; s.history.push({date:Date.now(),score:matchTotal,total:matchTotal,mode:'Matching'}); autoSave(); }
+        showResults(matchTotal, matchTotal, 'Matching');
+      }, 500);
+    }
+  } else {
+    el.classList.add('wrong-flash');
+    matchSel.classList.add('wrong-flash');
+    const wrongA = matchSel;
+    setTimeout(() => { el.classList.remove('wrong-flash'); wrongA.classList.remove('wrong-flash','sel-a'); }, 400);
+    matchSel = null;
+    sndWrong();
+  }
+}
+
+// ─────────────────────────────────────────────────
+// LEARN
+// ─────────────────────────────────────────────────
+function startLearn() {
+  learnQueue = shuffle([...sessionCards]);
+  learnKnown = new Set(); learnRound = 1; learnIdx = 0;
+  document.getElementById('learn-title').textContent = getSet(currentSetId)?.name || 'Learn';
+  showView('learn');
+  renderLearnCard();
+}
+
+function renderLearnCard() {
+  const remaining = learnQueue.filter((_,i) => !learnKnown.has(i));
+  document.getElementById('learn-known-n').textContent = learnKnown.size;
+  document.getElementById('learn-left-n').textContent = remaining.length;
+  document.getElementById('learn-round-n').textContent = learnRound;
+  const pct = (learnKnown.size / learnQueue.length) * 100;
+  document.getElementById('learn-prog').style.width = pct+'%';
+  document.getElementById('learn-count-nav').textContent = learnKnown.size+'/'+learnQueue.length;
+
+  if (!remaining.length) {
+    const s = getSet(currentSetId);
+    if (s) { s.history=s.history||[]; s.history.push({date:Date.now(),score:learnQueue.length,total:learnQueue.length,mode:'Learn'}); autoSave(); }
+    showResults(learnQueue.length, learnQueue.length, 'Learn');
+    return;
+  }
+  // Pick first in remaining
+  learnIdx = learnQueue.indexOf(remaining[0]);
+  const card = learnQueue[learnIdx];
+
+  document.getElementById('learn-card-area').innerHTML = `
+    <div class="learn-card anim-pop">
+      <div class="learn-prompt-tag">What is the definition of…</div>
+      <div class="learn-question">${esc(card.front)}</div>
+      <input class="learn-inp" id="learn-input" placeholder="Type your answer…" autocomplete="off" onkeydown="if(event.key==='Enter')submitLearn()">
+      <div class="learn-actions">
+        <button class="learn-submit" onclick="submitLearn()">Check →</button>
+        <button class="btn btn-ghost btn-sm" onclick="showLearnHint()">💡 Hint</button>
+        <button class="btn btn-ghost btn-sm" onclick="skipLearnCard()">Skip →</button>
+        <button class="btn btn-ghost btn-sm" onclick="markLearnKnown()">✓ I Know</button>
+      </div>
+      <div class="learn-hint-box" id="learn-hint">First letter: <strong>${esc(card.back[0]||'?')}</strong> (${card.back.length} characters)</div>
+      <div class="learn-feedback" id="learn-feedback"></div>
+    </div>
+  `;
+  document.getElementById('learn-input').focus();
+}
+
+function submitLearn() {
+  const inp = document.getElementById('learn-input');
+  const fb = document.getElementById('learn-feedback');
+  const card = learnQueue[learnIdx];
+  const val = inp.value.trim();
+  if (!val) return;
+  const correct = val.toLowerCase() === card.back.toLowerCase();
+  fb.className = 'learn-feedback show ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML = correct ? `✓ Correct! <strong>${esc(card.back)}</strong>` : `✗ Incorrect. Answer: <strong>${esc(card.back)}</strong>`;
+  inp.classList.add(correct ? 'correct' : 'wrong');
+  inp.disabled = true;
+  if (correct) { learnKnown.add(learnIdx); sndCorrect(); } else sndWrong();
+  setTimeout(renderLearnCard, correct ? 900 : 1600);
+}
+
+function showLearnHint() { document.getElementById('learn-hint').classList.add('show'); }
+function skipLearnCard() { renderLearnCard(); }
+function markLearnKnown() { learnKnown.add(learnIdx); renderLearnCard(); sndCorrect(); }
+
+// ─────────────────────────────────────────────────
+// RESULTS
+// ─────────────────────────────────────────────────
+function showResults(score, total, mode) {
+  if (quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
+  const pct = total > 0 ? Math.round(score/total*100) : 0;
+  const isGreat = pct >= 80, isOk = pct >= 60;
+  const emojis = isGreat ? ['🎉','🏆','🌟','🔥','💪'] : isOk ? ['👍','📈','💡','😊'] : ['📚','💪','🔄','😤'];
+  const msgs = isGreat
+    ? ['Excellent work!','You crushed it!','Outstanding!','Perfect execution!','You\'re on fire!']
+    : isOk
+    ? ['Good effort!','Keep it up!','Nice work!','You\'re improving!']
+    : ['Keep studying!','Practice makes perfect!','You\'ll get there!','Don\'t give up!'];
+  document.getElementById('results-emoji').textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  document.getElementById('results-pct').textContent = pct+'%';
+  document.getElementById('results-pct').className = 'results-pct ' + (isGreat?'great':isOk?'ok':'bad');
+  document.getElementById('results-msg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('results-sub').textContent = score + ' out of ' + total + ' correct · ' + mode;
+  const hist = (getSet(currentSetId)?.history||[]);
+  const prev = hist.slice(-2,-1)[0];
+  const improved = prev && (score/total > prev.score/prev.total);
+  document.getElementById('results-breakdown').innerHTML = `
+    <div class="res-row"><div class="res-label">Mode</div><div class="res-val">${mode}</div></div>
+    <div class="res-row"><div class="res-label">Correct</div><div class="res-val res-correct">${score}</div></div>
+    <div class="res-row"><div class="res-label">Incorrect</div><div class="res-val res-wrong">${total-score}</div></div>
+    <div class="res-row"><div class="res-label">Total</div><div class="res-val">${total}</div></div>
+    ${improved ? `<div class="res-row"><div class="res-label">📈 Improvement</div><div class="res-val" style="color:var(--green2)">+${Math.round((score/total - prev.score/prev.total)*100)}%</div></div>` : ''}
+    ${pct===100 ? `<div class="res-row"><div class="res-label">🏆 Achievement</div><div class="res-val" style="color:var(--amber2)">Perfect Score!</div></div>` : ''}
+  `;
+  document.getElementById('results-actions').innerHTML = `
+    <button class="btn btn-primary" onclick="retryStudy()">🔁 Try Again</button>
+    <button class="btn btn-ghost" onclick="openSet('${currentSetId}')">← Back to Set</button>
+    <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+  `;
+  showView('results');
+  if (isGreat) { sndComplete(); launchConfetti(); } else { sndWrong(); }
+}
+
+function exitStudy() { openSet(currentSetId); }
+function retryStudy() { launchStudy(); }
+
+// ─────────────────────────────────────────────────
+// CONFETTI
+// ─────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = '';
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#3a7fff','#4de888','#c17de0','#ffb347','#ff6060','#2eead4','#ff6ec7'];
+  const pieces = Array.from({length:150}, () => ({
+    x: Math.random()*canvas.width, y: -20,
+    r: Math.random()*7+3, color: colors[Math.floor(Math.random()*colors.length)],
+    vx: (Math.random()-.5)*5, vy: Math.random()*4+2,
+    angle: Math.random()*360, va: (Math.random()-.5)*8, shape: Math.random()>.5?'rect':'circle'
+  }));
+  let frame = 0;
+  const anim = setInterval(() => {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle*Math.PI/180); ctx.fillStyle = p.color;
+      if (p.shape === 'rect') ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      else { ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.angle+=p.va; p.vy+=0.06;
+    });
+    frame++;
+    if (frame > 220) { clearInterval(anim); ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
+  }, 16);
+}
+
+// ─────────────────────────────────────────────────
+// TRACKING
+// ─────────────────────────────────────────────────
+function showTracking() {
+  const allH = sets.flatMap(s=>s.history||[]);
+  const avgScore = allH.length ? Math.round(allH.reduce((n,h)=>n+h.score/h.total*100,0)/allH.length) : 0;
+  document.getElementById('track-stats-grid').innerHTML = [
+    ['📚', sets.length, 'Study Sets'],
+    ['📇', sets.reduce((n,s)=>n+allCards(s).length,0), 'Total Cards'],
+    ['▶', sets.reduce((n,s)=>n+(s.plays||0),0), 'Sessions'],
+    ['📊', avgScore+'%', 'Avg Score'],
+  ].map(([icon,n,label])=>`<div class="track-stat"><div class="track-stat-icon">${icon}</div><div class="track-stat-n">${n}</div><div class="track-stat-label">${label}</div></div>`).join('');
+
+  document.getElementById('track-sets-list').innerHTML = sets.map(s => {
+    const cards = allCards(s);
+    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    const hist = (s.history||[]).slice(-1)[0];
+    return `<div class="track-set-row" onclick="openSet('${s.id}')">
+      <div class="track-set-icon-big">${s.icon||'📖'}</div>
+      <div class="track-set-info">
+        <div class="track-set-name">${esc(s.name)}</div>
+        <div class="track-set-sub">${s.class||''} ${s.unit?'· '+s.unit:''} · ${cards.length} cards${hist?' · Last: '+Math.round(hist.score/hist.total*100)+'%':''}</div>
+        <div class="track-mastery-track"><div class="track-mastery-fill" style="width:${mastery}%"></div></div>
+      </div>
+      <div class="track-pct" style="color:${mastery>=80?'var(--green2)':mastery>=60?'var(--amber2)':'var(--text2)'}">${mastery}%</div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">No data yet</div><div class="empty-sub">Study some sets to see your progress here.</div></div>';
+  showView('tracking');
+}
+
+// ─────────────────────────────────────────────────
+// FOLDERS (placeholder)
+// ─────────────────────────────────────────────────
+function showFolders() {
+  alert('Folders coming soon! You\'ll be able to group your sets by class, subject, or anything you want.');
+}
+
+// ─────────────────────────────────────────────────
+// CREATE / EDIT SET MODAL
+// ─────────────────────────────────────────────────
+function openCreateModal() {
+  if (!isLoggedIn) { const ok = confirm('You\'re not signed in. Data will only be saved locally. Continue?'); if (!ok) return; }
+  editingId = null;
+  document.getElementById('create-modal-title').textContent = '✨ New Study Set';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-class').value = '';
+  document.getElementById('inp-unit').value = '';
+  document.getElementById('inp-icon').value = '';
+  document.getElementById('inp-notes').value = '';
+  fcPairs = [{front:'',back:''},{front:'',back:''},{front:'',back:''}];
+  document.getElementById('import-ta').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  switchModalTab('fc');
+  renderPairList();
+  openModal('create-modal');
+}
+
+function openEditModal() {
+  const s = getSet(currentSetId); if (!s) return;
+  editingId = s.id;
+  document.getElementById('create-modal-title').textContent = '✏️ Edit Set';
+  document.getElementById('inp-name').value = s.name;
+  document.getElementById('inp-class').value = s.class||'';
+  document.getElementById('inp-unit').value = s.unit||'';
+  document.getElementById('inp-icon').value = s.icon||'';
+  document.getElementById('inp-notes').value = s.notes||'';
+  fcPairs = (s.cards||[]).map(c=>({front:c.front,back:c.back}));
+  if (!fcPairs.length) fcPairs = [{front:'',back:''}];
+  switchModalTab('fc');
+  renderPairList();
+  openModal('create-modal');
+}
+
+function saveSet() {
+  const name = document.getElementById('inp-name').value.trim();
+  if (!name) { document.getElementById('inp-name').focus(); document.getElementById('inp-name').style.borderColor='var(--red)'; return; }
+  document.getElementById('inp-name').style.borderColor = '';
+
+  // Collect flashcards from pairs
+  const rawPairs = fcPairs.filter(p => p.front.trim() || p.back.trim())
+    .map(p => ({front:p.front.trim(), back:p.back.trim(), starred:false, mastery:'unseen'}));
+
+  // Collect import
+  const importRaw = document.getElementById('import-ta').value.trim();
+  const importCards = importRaw ? parseImport(importRaw, importFmt).map(p=>({front:p.front,back:p.back,starred:false,mastery:'unseen'})) : [];
+
+  const cards = [...rawPairs, ...importCards];
+  if (!cards.length) { alert('Please add at least one card.'); return; }
+
+  const setData = {
+    name, class:document.getElementById('inp-class').value.trim(),
+    unit:document.getElementById('inp-unit').value.trim(),
+    icon:document.getElementById('inp-icon').value.trim()||'📖',
+    notes:document.getElementById('inp-notes').value.trim(),
+    cards, history:[], plays:0
+  };
+
+  if (editingId) {
+    const s = getSet(editingId);
+    if (s) {
+      s.name=setData.name; s.class=setData.class; s.unit=setData.unit;
+      s.icon=setData.icon; s.notes=setData.notes; s.cards=setData.cards;
+      // Preserve history + plays
+      s.updated = Date.now();
+    }
+  } else {
+    sets.push({...setData, id:Date.now(), created:Date.now(), updated:Date.now()});
+    currentSetId = sets[sets.length-1].id;
+  }
+  autoSave(); closeModal('create-modal'); renderSidebar();
+  openSet(currentSetId); sndComplete();
+}
+
+function renderPairList() {
+  document.getElementById('fc-pair-list').innerHTML = fcPairs.map((p,i) => `
+    <div class="fc-pair">
+      <span class="fc-pair-n">${i+1}</span>
+      <textarea placeholder="Term / Front" oninput="fcPairs[${i}].front=this.value">${esc(p.front)}</textarea>
+      <textarea placeholder="Definition / Back" oninput="fcPairs[${i}].back=this.value">${esc(p.back)}</textarea>
+      <button class="fc-pair-del" onclick="removePair(${i})" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+function addPair() { fcPairs.push({front:'',back:''}); renderPairList(); sndClick(); }
+function removePair(i) { if (fcPairs.length > 1) { fcPairs.splice(i,1); renderPairList(); } }
+
+function switchModalTab(tab) {
+  document.getElementById('tab-fc').style.display = tab==='fc' ? '' : 'none';
+  document.getElementById('tab-import').style.display = tab==='import' ? '' : 'none';
+  document.getElementById('mtab-fc').classList.toggle('active', tab==='fc');
+  document.getElementById('mtab-import').classList.toggle('active', tab==='import');
+}
+
+function setImportFmt(fmt, el) {
+  importFmt = fmt;
+  document.querySelectorAll('.import-fmt').forEach(f=>f.classList.remove('active'));
+  if (el) el.classList.add('active');
+  previewImport();
+}
+
+function parseImport(raw, fmt) {
+  const lines = raw.split('\n').filter(l=>l.trim());
+  return lines.map(line => {
+    let sep;
+    if (fmt==='auto') sep = line.includes('\t') ? '\t' : line.includes(';') ? ';' : ',';
+    else if (fmt==='tab') sep = '\t';
+    else if (fmt==='semi') sep = ';';
+    else sep = ',';
+    const idx = line.indexOf(sep);
+    if (idx < 0) return null;
+    return {front: line.slice(0,idx).trim(), back: line.slice(idx+sep.length).trim()};
+  }).filter(Boolean).filter(p=>p.front||p.back);
+}
+
+function previewImport() {
+  const raw = document.getElementById('import-ta').value.trim();
+  const prev = document.getElementById('import-preview');
+  if (!raw) { prev.style.display='none'; return; }
+  const parsed = parseImport(raw, importFmt);
+  prev.style.display = '';
+  prev.innerHTML = `<div style="font-size:.62rem;font-weight:900;color:var(--text3);margin-bottom:6px;">${parsed.length} cards detected</div>`
+    + parsed.slice(0,6).map(p=>`<div class="import-preview-item"><span class="ipf">${esc(p.front)}</span><span class="ipb">→ ${esc(p.back)}</span></div>`).join('')
+    + (parsed.length>6 ? `<div style="font-size:.62rem;color:var(--text3);padding-top:4px;">+${parsed.length-6} more…</div>` : '');
+}
+
+// ─────────────────────────────────────────────────
+// EXPORT
+// ─────────────────────────────────────────────────
+function exportAllData() {
+  const blob = new Blob([JSON.stringify({sets,folders},null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'dqstudy-export.json'; a.click();
+}
+
+function clearAllData() {
+  if (!confirm('Clear ALL study data? This cannot be undone.')) return;
+  sets=[]; folders=[]; currentSetId=null;
+  autoSave(); renderSidebar(); goHome();
+}
+
+function renderAllSetsView() {
+  // For now just scroll to sidebar - full view could be added later
+  document.getElementById('sidebar').scrollIntoView({behavior:'smooth'});
+}
+
+// ─────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────
+function getSet(id) { return sets.find(s => s.id == id); }
+function allCards(s) { return s.cards||[]; }
+function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─────────────────────────────────────────────────
+// PATCH: override showView for tracking
+// ─────────────────────────────────────────────────
+var _origShowView = showView;
+window.showView = function(id) {
+  if (id === 'tracking') { showTracking(); return; }
+  _origShowView(id);
+};
+
+// Close modal on overlay click
+document.getElementById('create-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('create-modal'); });
+
+// ─────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────
+loadSettings();
+renderThemeGrid();
+</script>
+</body>
+</html>
