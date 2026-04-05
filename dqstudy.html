@@ -81,9 +81,10 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 /* ═══════════════ TOPNAV ═══════════════ */
 #topnav {
   position:fixed; top:3px; left:0; right:0; height:52px;
-  background:rgba(var(--bg-rgb,9,12,18),.95); backdrop-filter:blur(20px);
+  background:var(--bg2); backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border); z-index:200;
   display:flex; align-items:center; padding:0 20px; gap:12px;
+  transition:background .3s, border-color .3s;
 }
 .nav-logo { font-size:1.05rem; font-weight:900; letter-spacing:-.03em; cursor:pointer; }
 .nav-logo em { color:var(--accent2); font-style:normal; }
@@ -148,17 +149,21 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 /* ═══════════════ MAIN ═══════════════ */
 #main { margin-left:250px; flex:1; min-height:calc(100vh - 55px); position:relative; }
 
-/* ═══════════════ VIEWS ═══════════════ */
+/* ═══════════════ VIEWS (all hidden by default) ═══════════════ */
 .view { display:none; }
 .view.active { display:flex; flex-direction:column; }
 
-/* ═══════════════ LANDING ═══════════════ */
+/* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
   min-height:calc(100vh - 55px); align-items:center; justify-content:center;
   background:var(--bg); position:relative; overflow:hidden; padding:40px 20px;
 }
-.landing-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
-.landing-bg-blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:.18; }
+.landing-bg {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.landing-bg-blob {
+  position:absolute; border-radius:50%; filter:blur(80px); opacity:.18;
+}
 .blob1 { width:500px; height:500px; background:var(--accent); top:-100px; right:-100px; animation:blobFloat 10s ease-in-out infinite; }
 .blob2 { width:400px; height:400px; background:var(--green); bottom:-80px; left:-80px; animation:blobFloat 13s ease-in-out infinite reverse; }
 .blob3 { width:300px; height:300px; background:var(--purple); top:50%; left:50%; transform:translate(-50%,-50%); animation:blobFloat 8s ease-in-out infinite 2s; }
@@ -175,7 +180,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .landing-feat-title { font-size:.85rem; font-weight:800; margin-bottom:3px; }
 .landing-feat-sub { font-size:.72rem; color:var(--text2); line-height:1.5; }
 
-/* ═══════════════ HOME ═══════════════ */
+/* ═══════════════ HOME (logged in) ═══════════════ */
 #view-home { padding:28px; min-height:calc(100vh - 55px); }
 .home-greeting { font-size:1.6rem; font-weight:900; letter-spacing:-.03em; margin-bottom:4px; }
 .home-sub { color:var(--text2); font-size:.88rem; margin-bottom:24px; }
@@ -206,32 +211,6 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .streak-n { font-size:1.5rem; font-weight:900; }
 .streak-label { font-size:.68rem; color:var(--text2); font-weight:600; }
 
-/* ═══════════════ ALL SETS VIEW ═══════════════ */
-#view-allsets { padding:28px; }
-.allsets-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:16px; }
-.allsets-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); position:relative; overflow:hidden; }
-.allsets-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--green)); }
-.allsets-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
-.allsets-filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:4px; }
-.allsets-filter-inp { flex:1; min-width:160px; padding:8px 14px; background:var(--surface); border:1px solid var(--border); border-radius:9px; color:var(--text); font-family:inherit; font-size:.82rem; outline:none; transition:.15s; }
-.allsets-filter-inp:focus { border-color:var(--border2); }
-
-/* ═══════════════ FOLDERS VIEW ═══════════════ */
-#view-folders { padding:28px; }
-.folders-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:16px; }
-.folder-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; cursor:pointer; transition:all var(--transition); }
-.folder-card:hover { border-color:var(--border2); transform:translateY(-2px); }
-.folder-card-icon { font-size:2rem; margin-bottom:8px; }
-.folder-card-name { font-size:.9rem; font-weight:800; }
-.folder-card-sub { font-size:.68rem; color:var(--text3); margin-top:3px; }
-.folder-add-card { background:var(--surface); border:2px dashed var(--border2); border-radius:14px; padding:18px; cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100px; color:var(--text3); font-size:.82rem; gap:6px; font-weight:700; }
-.folder-add-card:hover { border-color:var(--accent); color:var(--accent2); background:var(--accent-dim); }
-/* Folder detail */
-.folder-detail-head { display:flex; align-items:center; gap:14px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
-.folder-detail-icon { font-size:2.5rem; }
-.folder-detail-name { font-size:1.4rem; font-weight:900; }
-.folder-detail-sub { font-size:.75rem; color:var(--text2); margin-top:2px; }
-
 /* ═══════════════ SET PAGE ═══════════════ */
 #view-set { padding:24px; }
 .set-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
@@ -248,9 +227,12 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .chip-red { color:var(--red2); border-color:rgba(224,48,48,.3); background:var(--red-dim); }
 .set-header-actions { display:flex; gap:8px; align-items:flex-start; }
 
-/* Mode picker */
+/* Study mode picker */
 .mode-picker { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:20px; }
-.mode-btn { background:var(--surface); border:2px solid var(--border); border-radius:14px; padding:14px 8px; cursor:pointer; transition:all var(--transition); text-align:center; position:relative; overflow:hidden; }
+.mode-btn {
+  background:var(--surface); border:2px solid var(--border); border-radius:14px;
+  padding:14px 8px; cursor:pointer; transition:all var(--transition); text-align:center; position:relative; overflow:hidden;
+}
 .mode-btn:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
 .mode-btn.selected { border-color:var(--accent); background:var(--accent-dim); }
 .mode-btn-icon { font-size:1.6rem; margin-bottom:6px; display:block; }
@@ -298,15 +280,21 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .fc-opt-chip { padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:var(--surface); font-family:inherit; font-size:.7rem; font-weight:700; color:var(--text2); cursor:pointer; transition:all var(--transition); }
 .fc-opt-chip:hover { border-color:var(--border2); color:var(--text); }
 .fc-opt-chip.on { background:var(--accent-dim); border-color:rgba(58,127,255,.4); color:var(--accent2); }
-/* keyboard hint */
-.fc-kbd-hint { font-size:.62rem; color:var(--text3); display:flex; gap:10px; align-items:center; }
-.fc-kbd-hint kbd { background:var(--surface2); border:1px solid var(--border2); border-radius:4px; padding:2px 6px; font-family:var(--mono); font-size:.6rem; color:var(--text2); }
 
+/* The actual card */
 .fc-stage { width:100%; max-width:680px; }
 .fc-card-wrap { perspective:1400px; width:100%; margin-bottom:0; }
-.fc-card { width:100%; min-height:280px; position:relative; transform-style:preserve-3d; transition:transform .5s cubic-bezier(.4,0,.2,1); cursor:pointer; user-select:none; }
+.fc-card {
+  width:100%; min-height:280px; position:relative; transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1); cursor:pointer; user-select:none;
+}
 .fc-card.flipped { transform:rotateY(180deg); }
-.fc-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; background:var(--surface); border:2px solid var(--border); border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px; text-align:center; box-shadow:var(--shadow); }
+.fc-face {
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--surface); border:2px solid var(--border); border-radius:22px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:36px; text-align:center; box-shadow:var(--shadow);
+}
 .fc-face.back { transform:rotateY(180deg); background:var(--surface2); border-color:var(--border2); }
 .fc-face-tag { font-size:.6rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); margin-bottom:16px; padding:4px 10px; border-radius:100px; border:1px solid var(--border); background:var(--surface3); }
 .fc-face-text { font-size:clamp(1rem,3vw,1.6rem); font-weight:700; line-height:1.5; color:var(--text); }
@@ -314,6 +302,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .fc-star-btn { position:absolute; top:14px; right:14px; background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:.3; transition:.15s; }
 .fc-star-btn.on { opacity:1; }
 
+/* FC mastery counters */
 .fc-mastery-bar { width:100%; max-width:680px; display:flex; gap:8px; }
 .fc-m-pill { flex:1; padding:8px; border-radius:10px; text-align:center; font-size:.7rem; font-weight:800; }
 .fc-m-pill.know { background:var(--green-dim); color:var(--green2); border:1px solid rgba(45,204,111,.2); }
@@ -321,8 +310,13 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .fc-m-pill.unseen { background:var(--surface); color:var(--text3); border:1px solid var(--border); }
 .fc-m-n { font-size:1.1rem; font-weight:900; display:block; }
 
+/* FC action buttons */
 .fc-actions { display:flex; gap:10px; width:100%; max-width:560px; }
-.fc-action { flex:1; padding:14px; border-radius:14px; border:2px solid; font-family:inherit; font-size:.78rem; font-weight:800; cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; align-items:center; gap:5px; line-height:1.2; }
+.fc-action {
+  flex:1; padding:14px; border-radius:14px; border:2px solid; font-family:inherit;
+  font-size:.78rem; font-weight:800; cursor:pointer; transition:all var(--transition);
+  display:flex; flex-direction:column; align-items:center; gap:5px; line-height:1.2;
+}
 .fc-action-icon { font-size:1.4rem; }
 .fc-action.review { background:var(--red-dim); border-color:rgba(224,48,48,.35); color:var(--red2); }
 .fc-action.review:hover { background:rgba(224,48,48,.18); transform:scale(1.03); }
@@ -342,7 +336,11 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .quiz-timer.urgent { color:var(--red2); background:var(--red-dim); border-color:rgba(224,48,48,.3); animation:pulse .5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
 .quiz-options { display:flex; flex-direction:column; gap:8px; }
-.quiz-opt { padding:13px 16px; border-radius:12px; border:2px solid var(--border); background:var(--surface2); cursor:pointer; font-family:inherit; font-size:.9rem; font-weight:600; color:var(--text); transition:all var(--transition); text-align:left; display:flex; align-items:center; gap:12px; }
+.quiz-opt {
+  padding:13px 16px; border-radius:12px; border:2px solid var(--border); background:var(--surface2);
+  cursor:pointer; font-family:inherit; font-size:.9rem; font-weight:600; color:var(--text);
+  transition:all var(--transition); text-align:left; display:flex; align-items:center; gap:12px;
+}
 .quiz-opt:hover:not([disabled]) { border-color:var(--border2); background:var(--surface3); }
 .quiz-opt.selected { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
 .quiz-opt.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
@@ -371,7 +369,12 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .match-instructions { text-align:center; color:var(--text2); font-size:.82rem; margin-bottom:20px; }
 .match-cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .match-col-head { font-size:.62rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; padding-left:4px; }
-.match-item { padding:12px 14px; border-radius:12px; border:2px solid var(--border); background:var(--surface2); cursor:pointer; font-size:.82rem; font-weight:600; transition:all var(--transition); text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center; margin-bottom:8px; line-height:1.3; }
+.match-item {
+  padding:12px 14px; border-radius:12px; border:2px solid var(--border); background:var(--surface2);
+  cursor:pointer; font-size:.82rem; font-weight:600; transition:all var(--transition);
+  text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center;
+  margin-bottom:8px; line-height:1.3;
+}
 .match-item:hover:not(.matched) { border-color:var(--border2); background:var(--surface3); }
 .match-item.sel-a { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
 .match-item.sel-b { border-color:var(--purple); background:var(--purple-dim); color:var(--purple2); }
@@ -479,7 +482,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .modal-body { padding:20px 22px; overflow-y:auto; flex:1; }
 .modal-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
 
-/* Modal tabs */
+/* Create set modal tabs */
 .modal-tabs { display:flex; gap:4px; background:var(--surface); border-radius:10px; padding:4px; margin-bottom:18px; }
 .mtab { flex:1; padding:8px; border-radius:7px; border:none; background:none; font-family:inherit; font-size:.75rem; font-weight:800; color:var(--text2); cursor:pointer; transition:.15s; }
 .mtab.active { background:var(--surface2); color:var(--text); }
@@ -516,12 +519,6 @@ textarea.finp { resize:vertical; min-height:50px; }
 .import-preview-item:last-child { border-bottom:none; }
 .ipf { font-weight:700; color:var(--text); }
 .ipb { color:var(--text2); }
-
-/* Folder modal */
-.folder-icon-picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-.folder-icon-opt { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:.15s; }
-.folder-icon-opt:hover { border-color:var(--border2); background:var(--surface3); }
-.folder-icon-opt.active { border-color:var(--accent); background:var(--accent-dim); }
 
 /* ═══════════════ BUTTONS ═══════════════ */
 .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 18px; border-radius:10px; font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; transition:all var(--transition); border:none; white-space:nowrap; }
@@ -566,6 +563,11 @@ textarea.finp { resize:vertical; min-height:50px; }
 .fab2-icon { width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff; display:flex;align-items:center;justify-content:center;font-size:.78rem; text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3); transition:background .15s,transform .15s;flex-shrink:0; }
 .fab2-icon:hover { background:#1f8a48;transform:scale(1.12); }
 
+#sidebar { transition:width .22s ease, transform .22s ease; }
+#sidebar.collapsed { width:0; overflow:hidden; border-right:none; }
+#main { transition:margin-left .22s ease; }
+#main.sb-collapsed { margin-left:0; }
+
 /* ═══════════════ SCROLLBAR ═══════════════ */
 ::-webkit-scrollbar { width:5px; height:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
@@ -575,15 +577,17 @@ textarea.finp { resize:vertical; min-height:50px; }
 <body data-theme="dark">
 
 <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;display:none;opacity:.18;"></canvas>
+
 <div id="gbar"></div>
 
 <!-- ═══════ TOPNAV ═══════ -->
 <nav id="topnav">
+  <button class="nav-icon-btn" id="sb-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar" style="display:none">☰</button>
   <div class="nav-logo" onclick="goHome()">DQ<em>study</em></div>
   <div class="nav-links" id="nav-links" style="display:none">
     <button class="nav-link" onclick="goHome()">🏠 Home</button>
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
-    <button class="nav-link" onclick="showFolders()">📁 Folders</button>
     <button class="nav-link" onclick="showView('settings')">⚙️ Settings</button>
   </div>
   <div class="nav-spacer"></div>
@@ -597,16 +601,21 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 <!-- ═══════ LAYOUT ═══════ -->
 <div id="app">
+
   <!-- SIDEBAR -->
   <aside id="sidebar" class="hidden">
     <div id="sb-head">
-      <button class="sb-new" onclick="openCreateModal()">＋ New Study Set</button>
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+        <button class="sb-new" style="flex:1" onclick="openCreateModal()">＋ New Set</button>
+        <button onclick="toggleSidebar()" title="Collapse" style="width:34px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.9rem;flex-shrink:0;" id="sb-collapse-btn">◀</button>
+      </div>
       <input id="sb-search" placeholder="🔍 Search sets…" oninput="renderSidebar(this.value)">
     </div>
     <div id="sb-body"></div>
     <div id="sb-foot">
-      <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress Tracker</button>
+      <button class="sb-foot-btn" onclick="showAllSets()"><span>📚</span> View All Sets</button>
       <button class="sb-foot-btn" onclick="showFolders()"><span>📁</span> Folders</button>
+      <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress</button>
       <button class="sb-foot-btn" onclick="showView('settings')"><span>⚙️</span> Settings</button>
     </div>
   </aside>
@@ -614,7 +623,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <!-- MAIN -->
   <main id="main">
 
-    <!-- LANDING -->
+    <!-- ═══ LANDING (pre-login) ═══ -->
     <div class="view" id="view-landing">
       <div class="landing-bg">
         <div class="landing-bg-blob blob1"></div>
@@ -625,9 +634,8 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div class="landing-badge">✨ Part of DQ Tools</div>
         <div class="landing-title">Study Smarter.<br><span class="hl">Remember More.</span></div>
         <p class="landing-sub">Flashcards, quizzes, matching, and more — all synced to your DQ Account so your progress follows you everywhere.</p>
-        <div class="landing-cta">
-          <button class="btn btn-primary btn-lg" onclick="if(typeof DQAuth!=='undefined')DQAuth.openModal()">Get Started Free</button>
-          <button class="btn btn-ghost btn-lg" onclick="continueWithout()">Continue Without Account</button>
+        <div class="landing-cta" id="landing-cta">
+          <!-- filled by updateLandingCTA() -->
         </div>
         <div class="landing-features">
           <div class="landing-feat"><div class="landing-feat-icon">📇</div><div class="landing-feat-title">Flashcards</div><div class="landing-feat-sub">Flip, track mastery, and star cards for later review.</div></div>
@@ -640,40 +648,24 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
     </div>
 
-    <!-- HOME -->
-    <div class="view" id="view-home" style="padding:28px;">
-      <div class="home-greeting" id="home-greeting">Welcome back! 👋</div>
-      <div class="home-sub" id="home-sub">Pick up where you left off, or start something new.</div>
-      <div class="home-stats" id="home-stats"></div>
-      <div class="streak-row" id="streak-row"></div>
-      <div class="home-section-title">Recent Sets <a onclick="renderAllSetsView()">View all →</a></div>
-      <div class="recent-grid" id="recent-grid"></div>
+    <!-- ═══ HOME ═══ -->
+    <div class="view" id="view-home" style="padding:28px;position:relative;overflow:hidden;">
+      <div class="landing-bg" style="opacity:.35;">
+        <div class="landing-bg-blob blob1"></div>
+        <div class="landing-bg-blob blob2"></div>
+        <div class="landing-bg-blob blob3"></div>
+      </div>
+      <div style="position:relative;z-index:1;">
+        <div class="home-greeting" id="home-greeting">Welcome back! 👋</div>
+        <div class="home-sub" id="home-sub">Pick up where you left off, or start something new.</div>
+        <div class="home-stats" id="home-stats"></div>
+        <div class="streak-row" id="streak-row"></div>
+        <div class="home-section-title">Recent Sets <a onclick="renderAllSetsView()">View all →</a></div>
+        <div class="recent-grid" id="recent-grid"></div>
+      </div>
     </div>
 
-    <!-- ALL SETS VIEW -->
-    <div class="view" id="view-allsets" style="padding:28px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-        <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
-        <div style="font-size:1.4rem;font-weight:900;">📚 All Study Sets</div>
-      </div>
-      <div class="allsets-filter-row" style="margin-top:14px;">
-        <input class="allsets-filter-inp" id="allsets-search" placeholder="🔍 Search sets…" oninput="renderAllSetsGrid(this.value)">
-        <button class="btn btn-primary btn-sm" onclick="openCreateModal()">＋ New Set</button>
-      </div>
-      <div class="allsets-grid" id="allsets-grid"></div>
-    </div>
-
-    <!-- FOLDERS VIEW -->
-    <div class="view" id="view-folders" style="padding:28px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-        <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
-        <div style="font-size:1.4rem;font-weight:900;">📁 Folders</div>
-        <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="openCreateFolderModal()">＋ New Folder</button>
-      </div>
-      <div class="folders-grid" id="folders-grid"></div>
-    </div>
-
-    <!-- SET PAGE -->
+    <!-- ═══ SET PAGE ═══ -->
     <div class="view" id="view-set" style="padding:24px;">
       <div class="set-header" id="set-header"></div>
       <div class="mode-picker" id="mode-picker"></div>
@@ -682,7 +674,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="cards-grid" id="cards-grid"></div>
     </div>
 
-    <!-- FLASHCARD VIEW -->
+    <!-- ═══ FLASHCARD VIEW ═══ -->
     <div class="view" id="view-flashcard">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
@@ -695,7 +687,6 @@ textarea.finp { resize:vertical; min-height:50px; }
           <button class="fc-opt-chip" id="chip-shuffle" onclick="toggleFCShuffle()">🔀 Shuffle</button>
           <button class="fc-opt-chip" id="chip-dir" onclick="toggleFCDir()">📖 Front → Back</button>
           <span style="flex:1"></span>
-          <div class="fc-kbd-hint"><kbd>Space</kbd> flip &nbsp; <kbd>←</kbd> review &nbsp; <kbd>→</kbd> know &nbsp; <kbd>↓</kbd> skip</div>
           <button class="fc-opt-chip" onclick="exitStudy()">✕ Exit</button>
         </div>
         <div class="fc-stage">
@@ -724,10 +715,15 @@ textarea.finp { resize:vertical; min-height:50px; }
           <button class="fc-action skip" onclick="fcNext()"><span class="fc-action-icon">→</span>Skip</button>
           <button class="fc-action know" onclick="fcMark('know')"><span class="fc-action-icon">✓</span>I Know This</button>
         </div>
+        <!-- flip-only mode nav -->
+        <div id="fc-flip-nav" style="display:none;display:flex;gap:10px;width:100%;max-width:560px;">
+          <button class="fc-action skip" style="flex:1;" onclick="fcPrev()"><span class="fc-action-icon">←</span>Prev</button>
+          <button class="fc-action skip" style="flex:1;" onclick="fcNext()"><span class="fc-action-icon">→</span>Next</button>
+        </div>
       </div>
     </div>
 
-    <!-- QUIZ VIEW -->
+    <!-- ═══ QUIZ VIEW ═══ -->
     <div class="view" id="view-quiz">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
@@ -741,7 +737,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
     </div>
 
-    <!-- MATCHING VIEW -->
+    <!-- ═══ MATCHING VIEW ═══ -->
     <div class="view" id="view-matching">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
@@ -757,7 +753,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
     </div>
 
-    <!-- LEARN VIEW -->
+    <!-- ═══ LEARN VIEW ═══ -->
     <div class="view" id="view-learn">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
@@ -777,7 +773,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
     </div>
 
-    <!-- RESULTS VIEW -->
+    <!-- ═══ RESULTS VIEW ═══ -->
     <div class="view" id="view-results" style="flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 55px);padding:40px 20px;text-align:center;">
       <div class="results-emoji" id="results-emoji">🎉</div>
       <div class="results-pct great" id="results-pct">—</div>
@@ -787,7 +783,49 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="results-actions" id="results-actions"></div>
     </div>
 
-    <!-- TRACKING VIEW -->
+    <!-- ═══ SPEED ROUND VIEW ═══ -->
+    <div class="view" id="view-speed" style="flex-direction:column;">
+      <div class="study-nav">
+        <button class="study-back" onclick="exitSpeedRound()">← Back</button>
+        <div class="study-title">⚡ Speed Round</div>
+        <div class="study-prog-track"><div class="study-prog-fill" id="speed-prog" style="width:0%"></div></div>
+        <div class="study-count" id="speed-count">0/0</div>
+      </div>
+      <!-- arena -->
+      <div id="speed-arena" style="flex:1;position:relative;overflow:hidden;background:var(--bg);min-height:400px;">
+        <!-- term card fixed at top -->
+        <div id="speed-term-card" style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--surface);border:2px solid var(--border2);border-radius:16px;padding:14px 24px;text-align:center;z-index:10;max-width:90%;box-shadow:var(--shadow);">
+          <div style="font-size:.55rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">TAP THE CORRECT ANSWER</div>
+          <div id="speed-term" style="font-size:1.2rem;font-weight:800;line-height:1.4;"></div>
+        </div>
+        <!-- score badges -->
+        <div style="position:absolute;top:16px;right:16px;z-index:10;display:flex;flex-direction:column;gap:6px;text-align:center;">
+          <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.3);border-radius:10px;padding:6px 12px;">
+            <div id="speed-know-n" style="font-size:1.4rem;font-weight:900;color:var(--green2);">0</div>
+            <div style="font-size:.55rem;color:var(--green2);font-weight:700;">CORRECT</div>
+          </div>
+          <div style="background:var(--red-dim);border:1px solid rgba(224,48,48,.3);border-radius:10px;padding:6px 12px;">
+            <div id="speed-miss-n" style="font-size:1.4rem;font-weight:900;color:var(--red2);">0</div>
+            <div style="font-size:.55rem;color:var(--red2);font-weight:700;">MISSED</div>
+          </div>
+        </div>
+        <!-- timer ring top-left -->
+        <div style="position:absolute;top:16px;left:16px;z-index:10;">
+          <div style="position:relative;width:56px;height:56px;">
+            <svg width="56" height="56" style="transform:rotate(-90deg);">
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--border)" stroke-width="5"/>
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--accent)" stroke-width="5"
+                stroke-dasharray="138.2" id="speed-ring" stroke-linecap="round"
+                style="transition:stroke-dashoffset .1s linear,stroke .3s;"/>
+            </svg>
+            <div id="speed-timer-n" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;font-family:var(--mono);"></div>
+          </div>
+        </div>
+        <!-- floating bubbles injected by JS here -->
+      </div>
+    </div>
+
+    <!-- ═══ TRACKING VIEW ═══ -->
     <div class="view" id="view-tracking" style="padding:28px;">
       <div style="font-size:1.5rem;font-weight:900;margin-bottom:6px;">📊 Progress Tracker</div>
       <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Track your mastery across all study sets.</div>
@@ -796,7 +834,44 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div id="track-sets-list"></div>
     </div>
 
-    <!-- SETTINGS VIEW -->
+    <!-- ═══ ALL SETS VIEW ═══ -->
+    <div class="view" id="view-allsets" style="padding:28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+        <div style="font-size:1.5rem;font-weight:900;">📚 All Sets</div>
+        <button class="btn btn-primary btn-sm" onclick="openCreateModal()">＋ New Set</button>
+        <input id="allsets-search" class="finp" placeholder="🔍 Search…" style="max-width:220px;padding:7px 12px;font-size:.8rem;" oninput="renderAllSetsGrid(this.value)">
+        <span style="margin-left:auto;font-size:.78rem;color:var(--text2);" id="allsets-count"></span>
+      </div>
+      <div id="allsets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;"></div>
+    </div>
+
+    <!-- ═══ FOLDERS VIEW ═══ -->
+    <div class="view" id="view-folders" style="padding:28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+        <div style="font-size:1.5rem;font-weight:900;">📁 Folders</div>
+        <button class="btn btn-primary btn-sm" onclick="createFolder()">＋ New Folder</button>
+      </div>
+      <div id="folders-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;"></div>
+      <!-- Folder open view -->
+      <div id="folder-open" style="display:none;margin-top:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="btn btn-ghost btn-sm" onclick="closeFolderOpen()">← Back</button>
+          <div style="font-size:1.1rem;font-weight:900;" id="folder-open-title"></div>
+          <button class="btn btn-ghost btn-sm" onclick="renameFolderCurrent()">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFolderCurrent()">🗑</button>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Add a set to this folder</div>
+          <select class="finp" id="folder-add-select" style="max-width:320px;">
+            <option value="">— pick a set —</option>
+          </select>
+          <button class="btn btn-primary btn-sm" style="margin-left:8px;" onclick="addSetToFolder()">Add</button>
+        </div>
+        <div id="folder-sets-list"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS VIEW ═══ -->
     <div class="view" id="view-settings" style="padding:28px;max-width:680px;">
       <div style="font-size:1.5rem;font-weight:900;margin-bottom:18px;">⚙️ Settings</div>
       <div class="settings-section">
@@ -815,6 +890,18 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">✨ Animated Background</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;" id="bg-anim-grid">
+          <div class="theme-option active" data-bg="none" onclick="setBgAnim('none',this)"><span class="theme-option-icon">🚫</span><div class="theme-option-name">Off</div></div>
+          <div class="theme-option" data-bg="matrix" onclick="setBgAnim('matrix',this)"><span class="theme-option-icon">🟩</span><div class="theme-option-name">Matrix</div></div>
+          <div class="theme-option" data-bg="particles" onclick="setBgAnim('particles',this)"><span class="theme-option-icon">✨</span><div class="theme-option-name">Particles</div></div>
+          <div class="theme-option" data-bg="bubbles" onclick="setBgAnim('bubbles',this)"><span class="theme-option-icon">🫧</span><div class="theme-option-name">Bubbles</div></div>
+          <div class="theme-option" data-bg="stars" onclick="setBgAnim('stars',this)"><span class="theme-option-icon">🌌</span><div class="theme-option-name">Starfield</div></div>
+          <div class="theme-option" data-bg="rain" onclick="setBgAnim('rain',this)"><span class="theme-option-icon">🌧</span><div class="theme-option-name">Rain</div></div>
+        </div>
+        <div style="font-size:.7rem;color:var(--text3);">Animated backgrounds appear behind all content. May affect performance on older devices.</div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">💾 Data</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
@@ -830,7 +917,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   </main>
 </div>
 
-<!-- CREATE SET MODAL -->
+<!-- ═══ CREATE SET MODAL ═══ -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal">
     <div class="modal-head">
@@ -851,10 +938,12 @@ textarea.finp { resize:vertical; min-height:50px; }
         <button class="mtab active" id="mtab-fc" onclick="switchModalTab('fc')">📇 Flashcards</button>
         <button class="mtab" id="mtab-import" onclick="switchModalTab('import')">📥 Import</button>
       </div>
+      <!-- Flashcard tab -->
       <div id="tab-fc">
         <div class="fc-pair-list" id="fc-pair-list"></div>
         <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="addPair()">＋ Add Card</button>
       </div>
+      <!-- Import tab -->
       <div id="tab-import" style="display:none">
         <div class="import-fmts">
           <div class="import-fmt active" onclick="setImportFmt('comma',this)"><div class="import-fmt-name">Comma Separated</div><div class="import-fmt-ex">term, definition</div></div>
@@ -873,32 +962,23 @@ textarea.finp { resize:vertical; min-height:50px; }
   </div>
 </div>
 
-<!-- CREATE FOLDER MODAL -->
-<div class="modal-overlay" id="folder-modal">
-  <div class="modal" style="max-width:440px;">
+<!-- Watermark + FAB -->
+
+<!-- ═══ STUDY OPTIONS MODAL ═══ -->
+<div class="modal-overlay" id="study-opts-modal">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-head">
-      <div class="modal-title" id="folder-modal-title">📁 New Folder</div>
-      <button class="modal-close" onclick="closeModal('folder-modal')">✕</button>
+      <div class="modal-title" id="study-opts-title">⚡ Study Options</div>
+      <button class="modal-close" onclick="closeModal('study-opts-modal')">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="field"><label class="flabel">Folder Name *</label><input class="finp" id="folder-inp-name" placeholder="e.g. AP Biology"></div>
-      <div class="field">
-        <label class="flabel">Icon</label>
-        <div class="folder-icon-picker" id="folder-icon-picker"></div>
-      </div>
-      <div class="field" id="folder-sets-field">
-        <label class="flabel">Add Sets to Folder</label>
-        <div id="folder-sets-picker" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;max-height:200px;overflow-y:auto;"></div>
-      </div>
-    </div>
+    <div class="modal-body" id="study-opts-body"></div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('folder-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveFolder()">💾 Save Folder</button>
+      <button class="btn btn-ghost" onclick="closeModal('study-opts-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmLaunch()">▶ Start</button>
     </div>
   </div>
 </div>
 
-<!-- Watermark + FAB -->
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
 <div class="fab2-wrap">
   <div class="fab2-items" id="fab2menu">
@@ -915,16 +995,15 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 <script>
 /* ═══════════════════════════════════════════════════
-   DQstudy v2.1 — Fixed: All Sets, Folders, Learn skip, Keyboard nav
+   DQstudy v2 — Full Logic
 ═══════════════════════════════════════════════════ */
 
 // ── GLOBAL STATE ──
-let sets = [];
-let folders = [];
+let sets = [];       // all study sets
+let folders = [];    // folders
 let currentSetId = null;
 let isLoggedIn = false;
 let editingId = null;
-let editingFolderId = null;
 let importFmt = 'comma';
 let fcPairs = [];
 let soundEnabled = true;
@@ -935,10 +1014,11 @@ let currentTheme = 'dark';
 let sessionCards = [];
 let sessionMode = null;
 let fcIdx = 0, fcKnown = new Set(), fcReview = new Set(), fcShuffle = false, fcDir = 'normal';
-let fcFlipped = false;
 let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false, quizTimerInt = null, quizSecs = 0, isTestMode = false;
-let matchSel = null, matchMatched = 0, matchTotal = 0;
+let matchSel = null, matchMatched = 0;
 let learnQueue = [], learnKnown = new Set(), learnRound = 1, learnIdx = 0;
+let speedCards = [], speedIdx = 0, speedKnow = 0, speedMiss = 0;
+let speedTimerInt = null, speedSecsLeft = 5, speedAnswered = false;
 
 // ─────────────────────────────────────────────────
 // SOUNDS
@@ -946,11 +1026,13 @@ let learnQueue = [], learnKnown = new Set(), learnRound = 1, learnIdx = 0;
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let actx = null;
 function getACtx() { if (!actx) actx = new AudioCtx(); return actx; }
+
 function playTone(freq, type='sine', dur=0.08, vol=0.18, delay=0) {
   if (!soundEnabled) return;
   try {
     const ctx = getACtx();
-    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
     osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
     gain.gain.setValueAtTime(0, ctx.currentTime + delay);
@@ -968,7 +1050,8 @@ function sndComplete(){ [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',.12,
 function toggleSound() {
   soundEnabled = !soundEnabled;
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
-  const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
+  const t = document.getElementById('sound-toggle');
+  if (t) t.classList.toggle('on', soundEnabled);
   saveSettings();
 }
 function toggleSoundSetting() { toggleSound(); }
@@ -978,10 +1061,14 @@ function setVolume(v) { volume = parseFloat(v); saveSettings(); }
 // THEMES
 // ─────────────────────────────────────────────────
 const THEMES = [
-  {id:'dark',icon:'🌙',name:'Dark'},{id:'light',icon:'☀️',name:'Light'},
-  {id:'ocean',icon:'🌊',name:'Ocean'},{id:'forest',icon:'🌲',name:'Forest'},
-  {id:'sunset',icon:'🌅',name:'Sunset'},{id:'midnight',icon:'🌌',name:'Midnight'},
-  {id:'candy',icon:'🍬',name:'Candy'},{id:'neon',icon:'⚡',name:'Neon'},
+  {id:'dark',      icon:'🌙', name:'Dark'},
+  {id:'light',     icon:'☀️', name:'Light'},
+  {id:'ocean',     icon:'🌊', name:'Ocean'},
+  {id:'forest',    icon:'🌲', name:'Forest'},
+  {id:'sunset',    icon:'🌅', name:'Sunset'},
+  {id:'midnight',  icon:'🌌', name:'Midnight'},
+  {id:'candy',     icon:'🍬', name:'Candy'},
+  {id:'neon',      icon:'⚡', name:'Neon'},
 ];
 function setTheme(id) {
   currentTheme = id;
@@ -991,97 +1078,187 @@ function setTheme(id) {
 }
 function renderThemeGrid() {
   document.getElementById('theme-grid').innerHTML = THEMES.map(t => `
-    <div class="theme-option${t.id===currentTheme?' active':''}" data-tid="${t.id}" onclick="setTheme('${t.id}')">
+    <div class="theme-option${t.id === currentTheme ? ' active' : ''}" data-tid="${t.id}" onclick="setTheme('${t.id}')">
       <span class="theme-option-icon">${t.icon}</span>
       <div class="theme-option-name">${t.name}</div>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
 // ─────────────────────────────────────────────────
-// SETTINGS
+// SETTINGS PERSISTENCE
 // ─────────────────────────────────────────────────
 function loadSettings() {
   try {
     const s = JSON.parse(localStorage.getItem('dqstudy-settings') || '{}');
     if (s.theme) setTheme(s.theme);
     if (s.soundEnabled !== undefined) soundEnabled = s.soundEnabled;
-    if (s.volume !== undefined) { volume = s.volume; const r = document.getElementById('vol-range'); if(r) r.value = volume; }
+    if (s.volume !== undefined) { volume = s.volume; const r = document.getElementById('vol-range'); if (r) r.value = volume; }
+    if (s.bgAnim && s.bgAnim !== 'none') {
+      bgAnim = s.bgAnim;
+      // start after a short delay so canvas is ready
+      setTimeout(() => {
+        const el = document.querySelector(`#bg-anim-grid [data-bg="${bgAnim}"]`);
+        setBgAnim(bgAnim, el);
+      }, 300);
+    }
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
-  const t = document.getElementById('sound-toggle'); if(t) t.classList.toggle('on', soundEnabled);
+  const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
 }
 function saveSettings() {
-  localStorage.setItem('dqstudy-settings', JSON.stringify({theme:currentTheme, soundEnabled, volume}));
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim};
+  localStorage.setItem('dqstudy-settings', JSON.stringify(s));
+  // Also push settings up to cloud if logged in
+  if (isLoggedIn && typeof DQAuth !== 'undefined') {
+    DQAuth.saveData('dqstudy-settings', s);
+  }
 }
 
 // ─────────────────────────────────────────────────
-// AUTH
+// AUTH + DATA — always local, cloud is a bonus
 // ─────────────────────────────────────────────────
-window.addEventListener('dq:authready', async ({ detail: { user } }) => {
-  if (!user) { showLanding(); return; }
-  isLoggedIn = true;
-  document.getElementById('sidebar').classList.remove('hidden');
-  document.getElementById('nav-links').style.display = '';
-  const saved = await DQAuth.loadData('dqstudy');
-  if (saved) { sets = saved.sets || []; folders = saved.folders || []; }
-  renderSidebar();
-  goHome();
-});
 
-setTimeout(() => {
-  if (!isLoggedIn && typeof DQAuth !== 'undefined') showLanding();
-}, 2000);
-
-function showLanding() {
-  document.getElementById('sidebar').classList.add('hidden');
-  document.getElementById('nav-links').style.display = 'none';
-  _baseShowView('landing');
+function loadLocal() {
+  try { const s = JSON.parse(localStorage.getItem('dqstudy-local') || '{}'); sets = s.sets||[]; folders = s.folders||[]; return s.savedAt||0; } catch(_) { return 0; }
 }
 
-function continueWithout() {
-  isLoggedIn = false;
-  document.getElementById('sidebar').classList.remove('hidden');
-  document.getElementById('nav-links').style.display = '';
-  try { const s = JSON.parse(localStorage.getItem('dqstudy-local') || '{}'); sets = s.sets||[]; folders = s.folders||[]; } catch(_) {}
-  renderSidebar();
-  goHome();
+function saveLocal() {
+  localStorage.setItem('dqstudy-local', JSON.stringify({sets, folders, savedAt: Date.now()}));
 }
 
 async function autoSave() {
-  if (isLoggedIn) DQAuth.saveData('dqstudy', {sets, folders});
-  else localStorage.setItem('dqstudy-local', JSON.stringify({sets, folders}));
+  saveLocal();
+  if (isLoggedIn && typeof DQAuth !== 'undefined') {
+    DQAuth.saveData('dqstudy', {sets, folders, savedAt: Date.now()});
+  }
+}
+
+function bootApp() {
+  document.getElementById('topnav').style.display = '';
+  document.getElementById('app').style.paddingTop = '';
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('sidebar').classList.remove('collapsed');
+  document.getElementById('main').classList.remove('sb-collapsed');
+  document.getElementById('nav-links').style.display = '';
+  document.getElementById('sb-toggle-btn').style.display = '';
+  renderSidebar();
+  goHome();
+}
+
+// Always load local data in the background so it's ready
+const localTimestamp = loadLocal();
+
+// Always show landing first
+showLanding();
+
+// Then try cloud auth
+window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+  if (!user) {
+    // Not logged in — init sidebar/nav in background but stay on landing
+    renderSidebar();
+    updateLandingCTA();
+    return;
+  }
+  isLoggedIn = true;
+  updateLandingCTA(); // update to "Continue as Name"
+  if (typeof DQAuth === 'undefined') return;
+  try {
+    // Load settings from cloud and merge (cloud wins if newer)
+    const cloudSettings = await DQAuth.loadData('dqstudy-settings');
+    if (cloudSettings) {
+      if (cloudSettings.theme) setTheme(cloudSettings.theme);
+      if (cloudSettings.soundEnabled !== undefined) {
+        soundEnabled = cloudSettings.soundEnabled;
+        document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+        const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
+      }
+      if (cloudSettings.volume !== undefined) {
+        volume = cloudSettings.volume;
+        const r = document.getElementById('vol-range'); if (r) r.value = volume;
+      }
+      if (cloudSettings.bgAnim && cloudSettings.bgAnim !== 'none') {
+        const el = document.querySelector(`#bg-anim-grid [data-bg="${cloudSettings.bgAnim}"]`);
+        setBgAnim(cloudSettings.bgAnim, el);
+      }
+      // Save merged settings back to localStorage
+      saveSettings();
+    }
+    const cloud = await DQAuth.loadData('dqstudy');
+    if (cloud && (cloud.savedAt||0) > localTimestamp) {
+      sets = cloud.sets || sets;
+      folders = cloud.folders || folders;
+      saveLocal();
+    } else if (sets.length > 0) {
+      DQAuth.saveData('dqstudy', {sets, folders, savedAt: localTimestamp});
+    }
+  } catch(_) {}
+});
+
+function showLanding() {
+  document.getElementById('topnav').style.display = '';
+  document.getElementById('app').style.paddingTop = '';
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('sidebar').classList.add('collapsed');
+  document.getElementById('main').classList.add('sb-collapsed');
+  document.getElementById('nav-links').style.display = 'none';
+  document.getElementById('sb-toggle-btn').style.display = '';
+  showView('landing');
+  updateLandingCTA();
+}
+
+function updateLandingCTA() {
+  const cta = document.getElementById('landing-cta');
+  if (!cta) return;
+  const user = typeof DQAuth !== 'undefined' ? DQAuth.getUser?.() : null;
+  const profile = typeof DQAuth !== 'undefined' ? DQAuth.getProfile?.() : null;
+  const name = profile?.displayName || user?.displayName || user?.email?.split('@')[0] || null;
+  const safeName = (name||'Me').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if (user) {
+    cta.innerHTML = `
+      <button class="btn btn-primary btn-lg" onclick="bootApp()">▶ Continue as ${safeName}</button>
+      <button class="btn btn-ghost btn-lg" onclick="if(typeof DQAuth!=='undefined'){DQAuth.signOut();location.reload();}">Sign Out</button>
+    `;
+  } else {
+    cta.innerHTML = `
+      <button class="btn btn-primary btn-lg" onclick="if(typeof DQAuth!=='undefined')DQAuth.openModal()">🚀 Create a Free Account</button>
+      <button class="btn btn-ghost btn-lg" onclick="continueWithout()">Continue Without Signing In</button>
+    `;
+  }
+}
+
+function continueWithout() {
+  bootApp();
 }
 
 // ─────────────────────────────────────────────────
 // ROUTING
 // ─────────────────────────────────────────────────
-function _baseShowView(id) {
+function showView(id) {
+  if (id === 'tracking') { showTracking(); return; }
+  if (id === 'folders') { showFolders(); return; }
+  if (id === 'allsets') { showAllSets(); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const el = document.getElementById('view-' + id);
-  if (el) el.classList.add('active');
+  if (el) { el.classList.add('active'); }
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   const nl = document.querySelector(`.nav-link[onclick*="${id}"]`);
   if (nl) nl.classList.add('active');
   if (id !== 'quiz' && quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
-  // Remove flashcard keyboard listener when leaving flashcard view
-  if (id !== 'flashcard') document.removeEventListener('keydown', fcKeyHandler);
 }
 
-function showView(id) {
-  if (id === 'tracking') { showTracking(); return; }
-  if (id === 'folders') { showFolders(); return; }
-  _baseShowView(id);
+function goHome() {
+  renderHome();
+  showView('home');
 }
-
-function goHome() { renderHome(); _baseShowView('home'); }
 
 // ─────────────────────────────────────────────────
 // HOME
 // ─────────────────────────────────────────────────
 function renderHome() {
-  const user = (typeof DQAuth !== 'undefined' && DQAuth.getUser) ? DQAuth.getUser() : null;
-  const profile = (typeof DQAuth !== 'undefined' && DQAuth.getProfile) ? DQAuth.getProfile() : null;
-  const name = (profile && profile.displayName) || (user && user.displayName) || 'there';
+  const user = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  const profile = (typeof DQAuth !== 'undefined') ? DQAuth.getProfile?.() : null;
+  const name = profile?.displayName || user?.displayName || 'there';
   const hrs = new Date().getHours();
   const greet = hrs < 12 ? 'Good morning' : hrs < 17 ? 'Good afternoon' : 'Good evening';
   document.getElementById('home-greeting').textContent = `${greet}, ${name}! 👋`;
@@ -1093,12 +1270,19 @@ function renderHome() {
   const knownCards = sets.reduce((n,s) => n + (s.cards||[]).filter(c=>c.mastery==='know').length, 0);
 
   document.getElementById('home-stats').innerHTML = [
-    ['📚', sets.length, 'Study Sets'],
-    ['📇', totalCards, 'Total Cards'],
-    ['▶', totalPlays, 'Sessions'],
-    ['🧠', knownCards, 'Cards Mastered'],
-  ].map(([icon,n,label]) => `<div class="stat-card"><div class="stat-icon">${icon}</div><div class="stat-n">${n}</div><div class="stat-label">${label}</div></div>`).join('');
+    ['📚', sets.length, 'Study Sets', 'sets'],
+    ['📇', totalCards, 'Total Cards', ''],
+    ['▶', totalPlays, 'Sessions', ''],
+    ['🧠', knownCards, 'Cards Mastered', ''],
+  ].map(([icon,n,label]) => `
+    <div class="stat-card">
+      <div class="stat-icon">${icon}</div>
+      <div class="stat-n">${n}</div>
+      <div class="stat-label">${label}</div>
+    </div>
+  `).join('');
 
+  // Streak + avg score row
   document.getElementById('streak-row').innerHTML = `
     <div class="streak-card" style="border-color:${avgScore>=80?'rgba(45,204,111,.3)':avgScore>=60?'rgba(232,144,32,.3)':'var(--border)'}">
       <div class="streak-icon">${avgScore>=80?'🏆':avgScore>=60?'📈':'📊'}</div>
@@ -1107,8 +1291,10 @@ function renderHome() {
     <div class="streak-card">
       <div class="streak-icon">⚡</div>
       <div class="streak-info"><div class="streak-n" style="color:var(--accent2)">${totalPlays}</div><div class="streak-label">Total Study Sessions</div></div>
-    </div>`;
+    </div>
+  `;
 
+  // Recent sets grid
   const recent = sets.slice().sort((a,b) => (b.updated||b.created||0) - (a.updated||a.created||0)).slice(0,5);
   const grid = document.getElementById('recent-grid');
   if (!sets.length) {
@@ -1116,7 +1302,7 @@ function renderHome() {
   } else {
     grid.innerHTML = recent.map(s => {
       const cards = allCards(s);
-      const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+      const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length / cards.length * 100) : 0;
       const lastHist = (s.history||[]).slice(-1)[0];
       return `<div class="recent-card" onclick="openSet('${s.id}')">
         <div class="recent-card-icon">${s.icon||'📖'}</div>
@@ -1130,200 +1316,91 @@ function renderHome() {
 }
 
 // ─────────────────────────────────────────────────
-// ALL SETS VIEW  (FIX #1: real page instead of scroll)
-// ─────────────────────────────────────────────────
-function renderAllSetsView() {
-  renderAllSetsGrid('');
-  document.getElementById('allsets-search').value = '';
-  _baseShowView('allsets');
-}
-
-function renderAllSetsGrid(filter) {
-  const filtered = filter
-    ? sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || (s.class||'').toLowerCase().includes(filter.toLowerCase()))
-    : sets.slice().sort((a,b) => (b.updated||b.created||0) - (a.updated||a.created||0));
-
-  const grid = document.getElementById('allsets-grid');
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">📭</div><div class="empty-title">${filter?'No sets match "'+esc(filter)+'"':'No sets yet'}</div><div class="empty-sub">Create a new study set to get started.</div><button class="btn btn-primary" onclick="openCreateModal()">＋ New Set</button></div>`;
-    return;
-  }
-  grid.innerHTML = filtered.map(s => {
-    const cards = allCards(s);
-    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
-    const lastHist = (s.history||[]).slice(-1)[0];
-    return `<div class="allsets-card" onclick="openSet('${s.id}')">
-      <div style="font-size:1.8rem;margin-bottom:8px;">${s.icon||'📖'}</div>
-      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px;line-height:1.3;">${esc(s.name)}</div>
-      <div style="font-size:.65rem;color:var(--text3);">${s.class||''} ${s.unit?'· '+s.unit:''}</div>
-      <div style="font-size:.65rem;font-weight:700;color:var(--text2);margin-top:6px;">${cards.length} cards${lastHist?' · Last: '+Math.round(lastHist.score/lastHist.total*100)+'%':''}</div>
-      <div class="recent-card-bar" style="margin-top:10px;"><div class="recent-card-fill" style="width:${mastery}%"></div></div>
-      <div style="font-size:.6rem;color:${mastery>=80?'var(--green2)':mastery>=60?'var(--amber2)':'var(--text3)'};margin-top:4px;font-weight:700;">${mastery}% mastered</div>
-    </div>`;
-  }).join('');
-}
-
-// ─────────────────────────────────────────────────
 // SIDEBAR
 // ─────────────────────────────────────────────────
 function renderSidebar(filter='') {
   const body = document.getElementById('sb-body');
-  const filtered = filter ? sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase())) : sets;
-  if (!filtered.length) {
-    body.innerHTML = `<div style="padding:20px 10px;font-size:.72rem;color:var(--text3);text-align:center;">${filter?'No sets found.':'No sets yet!'}</div>`;
+  let html = '';
+
+  if (filter) {
+    // Search mode — show matching sets
+    const filtered = sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+    html = filtered.length
+      ? `<div class="sb-section-label">Results</div>` + filtered.map(s => sbSetItem(s)).join('')
+      : '<div style="padding:16px 10px;font-size:.72rem;color:var(--text3);text-align:center;">No sets found.</div>';
+    body.innerHTML = html;
     return;
   }
-  body.innerHTML = `<div class="sb-section-label">All Sets</div>` +
-    filtered.map(s => `
-      <div class="sb-set${s.id===currentSetId?' active':''}" onclick="openSet('${s.id}')">
-        <div class="sb-set-icon">${s.icon||'📖'}</div>
-        <div class="sb-set-info">
-          <div class="sb-set-name">${esc(s.name)}</div>
-          <div class="sb-set-sub">${allCards(s).length} cards${s.class?' · '+s.class:''}</div>
-        </div>
-      </div>`).join('');
-}
 
-// ─────────────────────────────────────────────────
-// FOLDERS  (FIX #2: real UI)
-// ─────────────────────────────────────────────────
-const FOLDER_ICONS = ['📁','📚','🧪','🔬','📐','🎓','🌍','🎵','💻','⚽','🧠','🔭','📝','🏆','🎯','🌱','🎨','🔑'];
-let folderIconSel = '📁';
-
-function showFolders() {
-  renderFoldersGrid();
-  _baseShowView('folders');
-}
-
-function renderFoldersGrid() {
-  const grid = document.getElementById('folders-grid');
-  if (!folders.length) {
-    grid.innerHTML = `
-      <div class="folder-add-card" onclick="openCreateFolderModal()"><span style="font-size:2rem;">＋</span><span>Create your first folder</span></div>`;
-    return;
+  // Pinned sets
+  const pinned = sets.filter(s => s.pinned);
+  if (pinned.length) {
+    html += `<div class="sb-section-label">📌 Pinned</div>` + pinned.map(s => sbSetItem(s)).join('');
   }
-  grid.innerHTML = folders.map(f => {
-    const setCount = (f.setIds||[]).length;
-    return `<div class="folder-card" onclick="openFolderDetail('${f.id}')">
-      <div class="folder-card-icon">${f.icon||'📁'}</div>
-      <div class="folder-card-name">${esc(f.name)}</div>
-      <div class="folder-card-sub">${setCount} set${setCount!==1?'s':''}</div>
-    </div>`;
-  }).join('') + `<div class="folder-add-card" onclick="openCreateFolderModal()"><span style="font-size:1.4rem;">＋</span><span>New Folder</span></div>`;
-}
 
-function openFolderDetail(id) {
-  const f = folders.find(x => x.id == id); if (!f) return;
-  const folderSets = sets.filter(s => (f.setIds||[]).includes(s.id));
-  const grid = document.getElementById('folders-grid');
-  grid.innerHTML = `
-    <div class="folder-detail-head" style="grid-column:1/-1;">
-      <button class="btn btn-ghost btn-sm" onclick="renderFoldersGrid()">← All Folders</button>
-      <span style="font-size:2rem;">${f.icon||'📁'}</span>
-      <div>
-        <div class="folder-detail-name">${esc(f.name)}</div>
-        <div class="folder-detail-sub">${folderSets.length} sets</div>
+  // Folders
+  if (folders.length) {
+    html += `<div class="sb-section-label">📁 Folders</div>`;
+    html += folders.map(f => {
+      const fSets = (f.setIds||[]).map(id => sets.find(s=>s.id==id)).filter(Boolean);
+      const isOpen = f._open;
+      return `<div class="sb-folder${isOpen?' open':''}" onclick="toggleSbFolder(${f.id},this)">
+        <span>${f.icon||'📁'}</span> ${esc(f.name)}
+        <span style="margin-left:auto;font-size:.6rem;color:var(--text3);">${fSets.length}</span>
+        <span class="arrow">▶</span>
       </div>
-      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="openEditFolderModal('${f.id}')">✏️ Edit</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteFolder('${f.id}')">🗑</button>
-    </div>
-    ${folderSets.length ? folderSets.map(s => {
-      const cards = allCards(s);
-      const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
-      return `<div class="folder-card" onclick="openSet('${s.id}')">
-        <div class="folder-card-icon">${s.icon||'📖'}</div>
-        <div class="folder-card-name">${esc(s.name)}</div>
-        <div class="folder-card-sub">${cards.length} cards · ${mastery}% mastered</div>
+      <div class="sb-folder-sets" id="sbf-${f.id}" style="${isOpen?'display:block':''}">
+        ${fSets.map(s => sbSetItem(s)).join('') || '<div style="padding:4px 10px;font-size:.7rem;color:var(--text3);">Empty</div>'}
       </div>`;
-    }).join('') : `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">📭</div><div class="empty-title">No sets in this folder</div><div class="empty-sub">Edit the folder to add sets.</div></div>`}
-  `;
-  document.getElementById('folders-grid').style.gridColumn = '';
-}
-
-function openCreateFolderModal() {
-  editingFolderId = null;
-  folderIconSel = '📁';
-  document.getElementById('folder-modal-title').textContent = '📁 New Folder';
-  document.getElementById('folder-inp-name').value = '';
-  renderFolderIconPicker();
-  renderFolderSetsPicker([]);
-  openModal('folder-modal');
-}
-
-function openEditFolderModal(id) {
-  const f = folders.find(x => x.id == id); if (!f) return;
-  editingFolderId = id;
-  folderIconSel = f.icon || '📁';
-  document.getElementById('folder-modal-title').textContent = '✏️ Edit Folder';
-  document.getElementById('folder-inp-name').value = f.name;
-  renderFolderIconPicker();
-  renderFolderSetsPicker(f.setIds||[]);
-  openModal('folder-modal');
-}
-
-function renderFolderIconPicker() {
-  document.getElementById('folder-icon-picker').innerHTML = FOLDER_ICONS.map(icon =>
-    `<div class="folder-icon-opt${icon===folderIconSel?' active':''}" onclick="selectFolderIcon('${icon}',this)">${icon}</div>`
-  ).join('');
-}
-
-function selectFolderIcon(icon, el) {
-  folderIconSel = icon;
-  document.querySelectorAll('.folder-icon-opt').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function renderFolderSetsPicker(selectedIds) {
-  document.getElementById('folder-sets-picker').innerHTML = sets.map(s =>
-    `<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;background:var(--surface);border:1px solid var(--border);">
-      <input type="checkbox" data-sid="${s.id}" ${selectedIds.includes(s.id)?'checked':''} style="accent-color:var(--accent);">
-      <span style="font-size:.9rem;">${s.icon||'📖'}</span>
-      <span style="font-size:.82rem;font-weight:700;">${esc(s.name)}</span>
-    </label>`
-  ).join('') || '<div style="font-size:.75rem;color:var(--text3);">No sets yet. Create a set first.</div>';
-}
-
-function saveFolder() {
-  const name = document.getElementById('folder-inp-name').value.trim();
-  if (!name) { document.getElementById('folder-inp-name').focus(); return; }
-  const selectedIds = [...document.querySelectorAll('#folder-sets-picker input:checked')].map(el => parseInt(el.dataset.sid));
-  if (editingFolderId) {
-    const f = folders.find(x => x.id == editingFolderId);
-    if (f) { f.name = name; f.icon = folderIconSel; f.setIds = selectedIds; }
-  } else {
-    folders.push({ id: Date.now(), name, icon: folderIconSel, setIds: selectedIds, created: Date.now() });
+    }).join('');
   }
-  autoSave();
-  closeModal('folder-modal');
-  renderFoldersGrid();
+
+  if (!pinned.length && !folders.length) {
+    html += '<div style="padding:16px 10px;font-size:.72rem;color:var(--text3);text-align:center;line-height:1.6;">Pin sets or create folders<br>to see them here.</div>';
+  }
+
+  body.innerHTML = html;
 }
 
-function deleteFolder(id) {
-  if (!confirm('Delete this folder? Sets inside will not be deleted.')) return;
-  folders = folders.filter(f => f.id != id);
-  autoSave();
-  renderFoldersGrid();
+function sbSetItem(s) {
+  return `<div class="sb-set${s.id===currentSetId?' active':''}" onclick="openSet('${s.id}')">
+    <div class="sb-set-icon">${s.icon||'📖'}</div>
+    <div class="sb-set-info">
+      <div class="sb-set-name">${esc(s.name)}</div>
+      <div class="sb-set-sub">${allCards(s).length} cards${s.class?' · '+s.class:''}</div>
+    </div>
+    ${s.pinned ? '<span style="font-size:.7rem;opacity:.6;">📌</span>' : ''}
+  </div>`;
+}
+
+function toggleSbFolder(id, el) {
+  const f = folders.find(fl => fl.id == id);
+  if (!f) return;
+  f._open = !f._open;
+  renderSidebar();
 }
 
 // ─────────────────────────────────────────────────
 // SET PAGE
 // ─────────────────────────────────────────────────
 const MODES = [
-  {id:'flashcards',icon:'📇',name:'Flashcards',desc:'Flip through cards'},
-  {id:'quiz',icon:'❓',name:'Quiz',desc:'Multiple choice + T/F'},
-  {id:'test',icon:'⏱',name:'Test',desc:'Timed quiz mode'},
-  {id:'matching',icon:'🔗',name:'Matching',desc:'Match terms to defs'},
-  {id:'learn',icon:'🧠',name:'Learn',desc:'Type-in answers'},
+  {id:'flashcards', icon:'📇', name:'Flashcards', desc:'Flip through cards'},
+  {id:'quiz',       icon:'❓', name:'Quiz',       desc:'Multiple choice + T/F'},
+  {id:'test',       icon:'⏱', name:'Test',       desc:'Timed quiz mode'},
+  {id:'matching',   icon:'🔗', name:'Matching',   desc:'Match terms to defs'},
+  {id:'learn',      icon:'🧠', name:'Learn',      desc:'Type-in answers'},
+  {id:'speed',      icon:'⚡', name:'Speed Round', desc:'5 sec per card!'},
 ];
 let selectedMode = 'flashcards';
 let optShuffle = false, optStarred = false, optReview = false;
 
 function openSet(id) {
   currentSetId = id;
-  const s = getSet(id); if (!s) return;
+  const s = getSet(id);
+  if (!s) return;
   renderSidebar();
   renderSetPage(s);
-  _baseShowView('set');
+  showView('set');
   sndClick();
 }
 
@@ -1331,30 +1408,37 @@ function renderSetPage(s) {
   const cards = allCards(s);
   const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
   const lastHist = (s.history||[]).slice(-1)[0];
+
   document.getElementById('set-header').innerHTML = `
     <div class="set-big-icon" onclick="cycleIcon()">${s.icon||'📖'}</div>
     <div class="set-header-info">
       <div class="set-title">${esc(s.name)}</div>
       <div class="set-chips">
-        ${s.class?`<span class="chip chip-blue">${esc(s.class)}</span>`:''}
-        ${s.unit?`<span class="chip chip-purple">${esc(s.unit)}</span>`:''}
+        ${s.class ? `<span class="chip chip-blue">${esc(s.class)}</span>` : ''}
+        ${s.unit ? `<span class="chip chip-purple">${esc(s.unit)}</span>` : ''}
         <span class="chip chip-green">${cards.length} cards</span>
         <span class="chip chip-amber">${s.plays||0} plays</span>
-        ${mastery>=80?'<span class="chip chip-green">🏆 Mastered</span>':''}
-        ${lastHist?`<span class="chip chip-blue">Last: ${Math.round(lastHist.score/lastHist.total*100)}%</span>`:''}
+        ${mastery >= 80 ? '<span class="chip chip-green">🏆 Mastered</span>' : ''}
+        ${lastHist ? `<span class="chip chip-blue">Last: ${Math.round(lastHist.score/lastHist.total*100)}%</span>` : ''}
+        <span class="chip" style="color:var(--text3);border-color:var(--border);background:transparent;font-family:var(--mono);">ID #${String(s.id).slice(-6)}</span>
       </div>
-      ${s.notes?`<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>`:''}
+      ${s.notes ? `<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>` : ''}
     </div>
     <div class="set-header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>
       <button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>
       <button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>
-    </div>`;
-  document.getElementById('mode-picker').innerHTML = MODES.map(m =>
-    `<div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
+    </div>
+  `;
+
+  document.getElementById('mode-picker').innerHTML = MODES.map(m => `
+    <div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
       <span class="mode-btn-icon">${m.icon}</span>
       <div class="mode-btn-name">${m.name}</div>
       <div class="mode-btn-desc">${m.desc}</div>
-    </div>`).join('');
+    </div>
+  `).join('');
+
   renderStartBar();
   renderCardsGrid(s);
 }
@@ -1363,33 +1447,172 @@ function selectMode(id, el) {
   selectedMode = id;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
   if (el) el.classList.add('selected');
-  renderStartBar(); sndClick();
+  renderStartBar();
+  sndClick();
 }
 
 function renderStartBar() {
   document.getElementById('start-bar').innerHTML = `
-    <button class="start-big" onclick="launchStudy()">▶ Start ${(MODES.find(m=>m.id===selectedMode)||{name:'Study'}).name}</button>
+    <button class="start-big" onclick="openStudyOpts()">▶ Start ${MODES.find(m=>m.id===selectedMode)?.name||'Study'}</button>
     <button class="start-opt${optShuffle?' on':''}" onclick="optShuffle=!optShuffle;renderStartBar();">🔀 Shuffle</button>
     <button class="start-opt${optStarred?' on':''}" onclick="optStarred=!optStarred;renderStartBar();">⭐ Starred</button>
-    <button class="start-opt${optReview?' on':''}" onclick="optReview=!optReview;renderStartBar();">📌 Review Only</button>`;
+    <button class="start-opt${optReview?' on':''}" onclick="optReview=!optReview;renderStartBar();">📌 Review Only</button>
+  `;
+}
+
+// Study options per mode
+let studyOpts = {};
+
+function openStudyOpts() {
+  const s = getSet(currentSetId);
+  const total = s ? allCards(s).length : 0;
+  const mode = selectedMode;
+  studyOpts = {};
+
+  document.getElementById('study-opts-title').textContent = 
+    MODES.find(m=>m.id===mode)?.icon + ' ' + MODES.find(m=>m.id===mode)?.name + ' Options';
+
+  let body = '';
+
+  if (mode === 'flashcards') {
+    body = `
+      <div class="field"><label class="flabel">Direction</label>
+        <select class="finp" id="opt-fc-dir">
+          <option value="normal">Front → Back (Term → Definition)</option>
+          <option value="reverse">Back → Front (Definition → Term)</option>
+          <option value="both">Both directions</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Timer per card</label>
+        <select class="finp" id="opt-fc-timer">
+          <option value="0">No timer (free flip)</option>
+          <option value="10">10 seconds</option>
+          <option value="15">15 seconds</option>
+          <option value="30">30 seconds</option>
+        </select>
+      </div>
+      <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-top:8px;"><input type="checkbox" id="opt-fc-flip-mode"> Just flip through (no Know/Miss tracking)</label>
+    `;
+  } else if (mode === 'quiz' || mode === 'test') {
+    body = `
+      <div class="field"><label class="flabel">Number of questions</label>
+        <input type="range" class="launcher-range" id="opt-q-count" min="5" max="${Math.min(50,total)}" value="${Math.min(20,total)}" oninput="document.getElementById('opt-q-count-val').textContent=this.value">
+        <div style="font-size:.82rem;color:var(--accent2);font-weight:700;margin-top:4px;"><span id="opt-q-count-val">${Math.min(20,total)}</span> questions</div>
+      </div>
+      <div class="field"><label class="flabel">Question types</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-bottom:6px;"><input type="checkbox" id="opt-q-mc" checked> Multiple Choice</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-bottom:6px;"><input type="checkbox" id="opt-q-tf" checked> True / False</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><input type="checkbox" id="opt-q-written"> Written (type the answer)</label>
+      </div>
+      ${mode === 'test' ? `
+      <div class="field"><label class="flabel">Time limit</label>
+        <select class="finp" id="opt-test-time">
+          <option value="0">No limit</option>
+          <option value="60">1 minute</option>
+          <option value="120">2 minutes</option>
+          <option value="180">3 minutes</option>
+          <option value="300">5 minutes</option>
+          <option value="600">10 minutes</option>
+        </select>
+      </div>` : ''}
+    `;
+  } else if (mode === 'matching') {
+    body = `
+      <div class="field"><label class="flabel">Number of pairs</label>
+        <select class="finp" id="opt-match-pairs">
+          <option value="4">4 pairs</option>
+          <option value="6" selected>6 pairs</option>
+          <option value="8">8 pairs</option>
+          <option value="10">10 pairs</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Match style</label>
+        <select class="finp" id="opt-match-style">
+          <option value="term-def">Term → Definition</option>
+          <option value="def-term">Definition → Term</option>
+        </select>
+      </div>
+    `;
+  } else if (mode === 'speed') {
+    const total = sessionCards.length;
+    body = `
+      <div class="field"><label class="flabel">Seconds per card</label>
+        <select class="finp" id="opt-speed-secs">
+          <option value="3">3 seconds (hard)</option>
+          <option value="5" selected>5 seconds (normal)</option>
+          <option value="8">8 seconds (easy)</option>
+          <option value="10">10 seconds (relaxed)</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Answer bubbles</label>
+        <select class="finp" id="opt-speed-bubbles">
+          <option value="2">2 bubbles (easier)</option>
+          <option value="4" selected>4 bubbles (normal)</option>
+          <option value="6">6 bubbles (harder)</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Rounds</label>
+        <select class="finp" id="opt-speed-rounds">
+          <option value="1" selected>1 round (${total} cards)</option>
+          <option value="2">2 rounds (${total*2} cards)</option>
+          <option value="3">3 rounds (${total*3} cards)</option>
+        </select>
+      </div>
+    `;
+  } else {
+    // learn, no options yet
+    body = `<div style="font-size:.82rem;color:var(--text2);padding:8px 0;">No extra options for this mode. Hit Start to begin!</div>`;
+  }
+
+  document.getElementById('study-opts-body').innerHTML = body;
+  openModal('study-opts-modal');
+}
+
+function confirmLaunch() {
+  // Read options
+  const mode = selectedMode;
+  if (mode === 'flashcards') {
+    studyOpts.fcDir = document.getElementById('opt-fc-dir')?.value || 'normal';
+    studyOpts.fcTimer = parseInt(document.getElementById('opt-fc-timer')?.value || '0');
+    studyOpts.fcFlipOnly = document.getElementById('opt-fc-flip-mode')?.checked || false;
+  } else if (mode === 'quiz' || mode === 'test') {
+    studyOpts.qCount = parseInt(document.getElementById('opt-q-count')?.value || '20');
+    studyOpts.useMC = document.getElementById('opt-q-mc')?.checked !== false;
+    studyOpts.useTF = document.getElementById('opt-q-tf')?.checked !== false;
+    studyOpts.useWritten = document.getElementById('opt-q-written')?.checked || false;
+    studyOpts.testTimeLimit = parseInt(document.getElementById('opt-test-time')?.value || '0');
+  } else if (mode === 'matching') {
+    studyOpts.matchPairs = parseInt(document.getElementById('opt-match-pairs')?.value || '6');
+    studyOpts.matchStyle = document.getElementById('opt-match-style')?.value || 'term-def';
+  } else if (mode === 'speed') {
+    studyOpts.speedSecs = parseInt(document.getElementById('opt-speed-secs')?.value || '5');
+    studyOpts.speedBubbles = parseInt(document.getElementById('opt-speed-bubbles')?.value || '4');
+    studyOpts.speedRounds = parseInt(document.getElementById('opt-speed-rounds')?.value || '1');
+  }
+  closeModal('study-opts-modal');
+  launchStudy();
 }
 
 function renderCardsGrid(s) {
   const cards = allCards(s);
   document.getElementById('cards-count-label').textContent = `(${cards.length})`;
-  document.getElementById('cards-grid').innerHTML = cards.map((c,i) => `
+  document.getElementById('cards-grid').innerHTML = cards.map((c, i) => `
     <div class="card-tile">
       <div class="card-mastery-dot dot-${c.mastery||'unseen'}"></div>
       <div class="card-front-text">${esc(c.front)}</div>
       <div class="card-sep"></div>
       <div class="card-back-text">${esc(c.back)}</div>
       <button class="card-star${c.starred?' on':''}" onclick="toggleStar(${i})" title="Star">⭐</button>
-    </div>`).join('') || '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No cards yet</div><div class="empty-sub">Edit this set to add cards.</div></div>';
+    </div>
+  `).join('') || '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No cards yet</div><div class="empty-sub">Edit this set to add cards.</div></div>';
 }
 
 function toggleStar(idx) {
-  const s = getSet(currentSetId); allCards(s)[idx].starred = !allCards(s)[idx].starred;
-  autoSave(); renderCardsGrid(s);
+  const s = getSet(currentSetId);
+  const cards = allCards(s);
+  cards[idx].starred = !cards[idx].starred;
+  autoSave();
+  renderCardsGrid(s);
 }
 
 function cycleIcon() {
@@ -1402,7 +1625,8 @@ function cycleIcon() {
 function deleteSet() {
   if (!confirm('Delete this study set? This cannot be undone.')) return;
   sets = sets.filter(s => s.id !== currentSetId);
-  currentSetId = null; autoSave(); renderSidebar(); goHome();
+  currentSetId = null;
+  autoSave(); renderSidebar(); goHome();
 }
 
 // ─────────────────────────────────────────────────
@@ -1412,83 +1636,108 @@ function launchStudy() {
   const s = getSet(currentSetId); if (!s) return;
   let cards = allCards(s);
   if (optStarred) cards = cards.filter(c => c.starred);
-  if (optReview)  cards = cards.filter(c => c.mastery === 'review');
+  if (optReview) cards = cards.filter(c => c.mastery === 'review');
   if (!cards.length) { alert('No cards match your filter!'); return; }
   if (optShuffle || selectedMode !== 'flashcards') cards = shuffle([...cards]);
-  s.plays = (s.plays||0) + 1; s.updated = Date.now();
-  sessionCards = cards; sessionMode = selectedMode;
-  autoSave(); sndClick();
+  s.plays = (s.plays||0) + 1;
+  s.updated = Date.now();
+  sessionCards = cards;
+  sessionMode = selectedMode;
+  autoSave();
+  sndClick();
+
   if (selectedMode === 'flashcards') startFlashcards();
   else if (selectedMode === 'quiz' || selectedMode === 'test') startQuiz(selectedMode === 'test');
   else if (selectedMode === 'matching') startMatching();
   else if (selectedMode === 'learn') startLearn();
+  else if (selectedMode === 'speed') startSpeedRound();
 }
 
 // ─────────────────────────────────────────────────
-// FLASHCARDS  (FIX #3: keyboard navigation)
+// FLASHCARDS
 // ─────────────────────────────────────────────────
 function startFlashcards() {
-  fcIdx = 0; fcKnown = new Set(); fcReview = new Set(); fcShuffle = false; fcDir = 'normal'; fcFlipped = false;
+  fcIdx = 0; fcKnown = new Set(); fcReview = new Set();
+  fcShuffle = false;
+  fcDir = studyOpts.fcDir || 'normal';
+  // if both directions, duplicate cards reversed
+  if (fcDir === 'both') {
+    const reversed = sessionCards.map(c => ({...c, front:c.back, back:c.front, _reversed:true}));
+    sessionCards = shuffle([...sessionCards, ...reversed]);
+    fcDir = 'normal';
+  }
   document.getElementById('chip-shuffle').classList.remove('on');
   document.getElementById('chip-dir').textContent = '📖 Front → Back';
-  _baseShowView('flashcard');
-  document.getElementById('fc-title').textContent = (getSet(currentSetId)||{name:'Flashcards'}).name;
+  showView('flashcard');
+  document.getElementById('fc-title').textContent = getSet(currentSetId)?.name || 'Flashcards';
+  // Show/hide action buttons based on flip-only mode
+  const actions = document.querySelector('.fc-actions');
+  const flipNav = document.getElementById('fc-flip-nav');
+  const masteryBar = document.querySelector('.fc-mastery-bar');
+  if (studyOpts.fcFlipOnly) {
+    if (actions) actions.style.display = 'none';
+    if (flipNav) flipNav.style.display = 'flex';
+    if (masteryBar) masteryBar.style.display = 'none';
+  } else {
+    if (actions) actions.style.display = '';
+    if (flipNav) flipNav.style.display = 'none';
+    if (masteryBar) masteryBar.style.display = '';
+  }
   renderFCCard();
-  // Attach keyboard handler
-  document.removeEventListener('keydown', fcKeyHandler);
-  document.addEventListener('keydown', fcKeyHandler);
-}
-
-function fcKeyHandler(e) {
-  // Don't fire if user is typing in an input
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); fcFlip(); }
-  else if (e.key === 'ArrowRight') { e.preventDefault(); fcMark('know'); }
-  else if (e.key === 'ArrowLeft')  { e.preventDefault(); fcMark('review'); }
-  else if (e.key === 'ArrowDown')  { e.preventDefault(); fcNext(); }
 }
 
 function renderFCCard() {
-  const card = sessionCards[fcIdx]; if (!card) return;
+  const card = sessionCards[fcIdx];
+  if (!card) return;
   const front = fcDir === 'normal' ? card.front : card.back;
   const back  = fcDir === 'normal' ? card.back  : card.front;
   document.getElementById('fc-front-text').textContent = front;
-  document.getElementById('fc-back-text').textContent  = back;
-  document.getElementById('fc-front-tag').textContent  = fcDir === 'normal' ? 'TERM' : 'DEFINITION';
-  document.getElementById('fc-back-tag').textContent   = fcDir === 'normal' ? 'DEFINITION' : 'TERM';
+  document.getElementById('fc-back-text').textContent = back;
+  document.getElementById('fc-front-tag').textContent = fcDir === 'normal' ? 'TERM' : 'DEFINITION';
+  document.getElementById('fc-back-tag').textContent  = fcDir === 'normal' ? 'DEFINITION' : 'TERM';
   document.getElementById('fc-card').classList.remove('flipped');
   document.getElementById('fc-star').classList.toggle('on', !!card.starred);
-  fcFlipped = false;
-  document.getElementById('fc-prog').style.width = (fcIdx / sessionCards.length * 100) + '%';
+  const pct = (fcIdx / sessionCards.length) * 100;
+  document.getElementById('fc-prog').style.width = pct + '%';
   document.getElementById('fc-count').textContent = (fcIdx+1) + '/' + sessionCards.length;
   updateFCMastery();
 }
 
 function fcFlip() {
   document.getElementById('fc-card').classList.toggle('flipped');
-  fcFlipped = !fcFlipped;
   sndFlip();
 }
 
 function fcMark(status) {
-  const card = sessionCards[fcIdx]; card.mastery = status;
+  const card = sessionCards[fcIdx];
+  card.mastery = status;
   if (status === 'know') { fcKnown.add(fcIdx); fcReview.delete(fcIdx); sndCorrect(); }
   else { fcReview.add(fcIdx); fcKnown.delete(fcIdx); sndWrong(); }
-  autoSave(); fcNext();
+  autoSave();
+  fcNext();
+}
+
+function fcPrev() {
+  if (fcIdx > 0) { fcIdx--; renderFCCard(); }
 }
 
 function fcNext() {
+  if (studyOpts.fcFlipOnly) {
+    // In flip mode, loop around
+    fcIdx = (fcIdx + 1) % sessionCards.length;
+    renderFCCard();
+    return;
+  }
   if (fcIdx < sessionCards.length - 1) { fcIdx++; renderFCCard(); }
   else {
     const s = getSet(currentSetId);
     if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:fcKnown.size,total:sessionCards.length,mode:'Flashcards'}); autoSave(); }
-    document.removeEventListener('keydown', fcKeyHandler);
     showResults(fcKnown.size, sessionCards.length, 'Flashcards');
   }
 }
 
 function updateFCMastery() {
-  document.getElementById('fc-know-n').textContent   = fcKnown.size;
+  document.getElementById('fc-know-n').textContent = fcKnown.size;
   document.getElementById('fc-review-n').textContent = fcReview.size;
   document.getElementById('fc-unseen-n').textContent = sessionCards.length - fcKnown.size - fcReview.size;
 }
@@ -1507,9 +1756,11 @@ function toggleFCDir() {
 }
 
 function fcToggleStar() {
-  const card = sessionCards[fcIdx]; card.starred = !card.starred;
+  const card = sessionCards[fcIdx];
+  card.starred = !card.starred;
   document.getElementById('fc-star').classList.toggle('on', card.starred);
-  autoSave(); sndClick();
+  autoSave();
+  sndClick();
 }
 
 // ─────────────────────────────────────────────────
@@ -1517,33 +1768,55 @@ function fcToggleStar() {
 // ─────────────────────────────────────────────────
 function startQuiz(timed=false) {
   isTestMode = timed;
-  quizQs = buildQuizQs(sessionCards, Math.min(20, sessionCards.length));
+  const qCount = studyOpts.qCount || Math.min(20, sessionCards.length);
+  const useMC = studyOpts.useMC !== false;
+  const useTF = studyOpts.useTF !== false;
+  const useWritten = studyOpts.useWritten || false;
+  quizQs = buildQuizQs(sessionCards, Math.min(qCount, sessionCards.length), useMC, useTF, useWritten);
   quizIdx = 0; quizScore = 0; quizAnswered = false; quizSecs = 0;
   if (quizTimerInt) clearInterval(quizTimerInt);
   const timerEl = document.getElementById('quiz-timer');
+  const timeLimit = studyOpts.testTimeLimit || 0;
   if (timed) {
     timerEl.style.display = '';
-    timerEl.textContent = '0:00'; timerEl.classList.remove('urgent');
+    timerEl.textContent = '0:00';
+    timerEl.classList.remove('urgent');
     quizTimerInt = setInterval(() => {
       quizSecs++;
       const m = Math.floor(quizSecs/60), s = quizSecs%60;
       timerEl.textContent = m+':'+(s<10?'0':'')+s;
+      // Count-down if time limit set
+      if (timeLimit > 0) {
+        const left = timeLimit - quizSecs;
+        timerEl.textContent = Math.floor(left/60)+':'+(Math.abs(left%60)<10?'0':'')+Math.abs(left%60);
+        timerEl.classList.toggle('urgent', left <= 10);
+        if (left <= 0) { clearInterval(quizTimerInt); finishQuiz(); }
+      }
     }, 1000);
-  } else { timerEl.style.display = 'none'; }
+  } else {
+    timerEl.style.display = 'none';
+  }
   document.getElementById('quiz-title').textContent = timed ? 'Test Mode' : 'Quiz';
-  _baseShowView('quiz');
+  showView('quiz');
   renderQuizQ();
 }
 
-function buildQuizQs(cards, n) {
+function buildQuizQs(cards, n, useMC=true, useTF=true, useWritten=false) {
+  if (!useMC && !useTF && !useWritten) useMC = true;
   const pool = shuffle([...cards]).slice(0, n);
   return pool.map(card => {
-    const isTF = Math.random() < 0.3;
-    if (isTF) {
+    const types = [];
+    if (useMC) types.push('mc');
+    if (useTF) types.push('tf');
+    if (useWritten) types.push('written');
+    const type = types[Math.floor(Math.random() * types.length)];
+    if (type === 'tf') {
       const useCorrect = Math.random() > 0.5;
       const other = cards.filter(c => c.back !== card.back);
       const shown = useCorrect ? card.back : (other.length ? other[Math.floor(Math.random()*other.length)].back : card.back);
       return {type:'tf', q:card.front, shown, correct:useCorrect};
+    } else if (type === 'written') {
+      return {type:'written', q:card.front, correct:card.back};
     } else {
       const others = shuffle(cards.filter(c => c.back !== card.back)).slice(0,3).map(c=>c.back);
       const opts = shuffle([card.back, ...others]);
@@ -1554,20 +1827,40 @@ function buildQuizQs(cards, n) {
 
 function renderQuizQ() {
   if (quizIdx >= quizQs.length) { finishQuiz(); return; }
-  const q = quizQs[quizIdx]; quizAnswered = false;
+  const q = quizQs[quizIdx];
+  quizAnswered = false;
   document.getElementById('quiz-prog').style.width = (quizIdx/quizQs.length*100)+'%';
   document.getElementById('quiz-count').textContent = (quizIdx+1)+'/'+quizQs.length;
   const wrap = document.getElementById('quiz-wrap');
+
   if (q.type === 'mc') {
     wrap.innerHTML = `
-      <div class="quiz-q-card"><div class="quiz-q-type">Multiple Choice</div><div class="quiz-q-text">${esc(q.q)}</div></div>
+      <div class="quiz-q-card">
+        <div class="quiz-q-type">Multiple Choice</div>
+        <div class="quiz-q-text">${esc(q.q)}</div>
+      </div>
       <div class="quiz-options">${q.opts.map((o,i)=>`
         <button class="quiz-opt" onclick="answerMC(this,'${esc(o)}','${esc(q.correct)}')">
           <span class="quiz-opt-letter">${'ABCD'[i]}</span>${esc(o)}
         </button>`).join('')}
       </div>
       <div class="quiz-explanation" id="quiz-expl" style="display:none"></div>
-      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>`;
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>
+    `;
+  } else if (q.type === 'written') {
+    wrap.innerHTML = `
+      <div class="quiz-q-card">
+        <div class="quiz-q-type">Written Answer</div>
+        <div class="quiz-q-text">${esc(q.q)}</div>
+      </div>
+      <input class="learn-inp" id="written-inp" placeholder="Type your answer…" autocomplete="off" style="margin-bottom:8px;" onkeydown="if(event.key==='Enter')answerWritten('${esc(q.correct)}')">
+      <div style="display:flex;gap:8px;">
+        <button class="quiz-next show" style="flex:1;" onclick="answerWritten('${esc(q.correct)}')">Check →</button>
+      </div>
+      <div class="quiz-explanation" id="quiz-expl" style="display:none"></div>
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>
+    `;
+    setTimeout(() => document.getElementById('written-inp')?.focus(), 50);
   } else {
     wrap.innerHTML = `
       <div class="quiz-q-card">
@@ -1580,28 +1873,48 @@ function renderQuizQ() {
         <button class="quiz-tf-btn" onclick="answerTF(this,false,${q.correct})">✗ False</button>
       </div>
       <div class="quiz-explanation" id="quiz-expl" style="display:none"></div>
-      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>`;
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">Next Question →</button>
+    `;
   }
 }
 
 function answerMC(btn, chosen, correct) {
-  if (quizAnswered) return; quizAnswered = true;
+  if (quizAnswered) return;
+  quizAnswered = true;
   document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
   const isCorrect = chosen === correct;
   btn.classList.add(isCorrect ? 'correct' : 'wrong');
-  if (!isCorrect) document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent.trim().slice(1).trim() === correct) b.classList.add('correct'); });
+  if (!isCorrect) {
+    document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent.trim().slice(1).trim() === correct) b.classList.add('correct'); });
+  }
   showQuizExpl(isCorrect, correct);
   if (isCorrect) { quizScore++; sndCorrect(); } else sndWrong();
   document.getElementById('quiz-next').classList.add('show');
 }
 
 function answerTF(btn, ans, correct) {
-  if (quizAnswered) return; quizAnswered = true;
+  if (quizAnswered) return;
+  quizAnswered = true;
   document.querySelectorAll('.quiz-tf-btn').forEach(b => b.disabled = true);
   const isCorrect = ans === correct;
   btn.classList.add(isCorrect ? 'correct' : 'wrong');
-  if (!isCorrect) document.querySelectorAll('.quiz-tf-btn').forEach(b => { if ((b.textContent.includes('True')&&correct)||(b.textContent.includes('False')&&!correct)) b.classList.add('correct'); });
+  if (!isCorrect) { document.querySelectorAll('.quiz-tf-btn').forEach(b => { if ((b.textContent.includes('True') && correct)||(b.textContent.includes('False') && !correct)) b.classList.add('correct'); }); }
   showQuizExpl(isCorrect, correct ? 'True' : 'False');
+  if (isCorrect) { quizScore++; sndCorrect(); } else sndWrong();
+  document.getElementById('quiz-next').classList.add('show');
+}
+
+function answerWritten(correct) {
+  if (quizAnswered) return;
+  const inp = document.getElementById('written-inp');
+  if (!inp) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  quizAnswered = true;
+  inp.disabled = true;
+  const isCorrect = val.toLowerCase() === correct.toLowerCase();
+  inp.classList.add(isCorrect ? 'correct' : 'wrong');
+  showQuizExpl(isCorrect, correct);
   if (isCorrect) { quizScore++; sndCorrect(); } else sndWrong();
   document.getElementById('quiz-next').classList.add('show');
 }
@@ -1618,50 +1931,70 @@ function quizNext() { quizIdx++; renderQuizQ(); sndClick(); }
 function finishQuiz() {
   if (quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
   const s = getSet(currentSetId);
-  if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:quizScore,total:quizQs.length,mode:isTestMode?'Test':'Quiz',time:quizSecs}); autoSave(); }
+  if (s) {
+    s.history = s.history||[];
+    s.history.push({date:Date.now(), score:quizScore, total:quizQs.length, mode:isTestMode?'Test':'Quiz', time:quizSecs});
+    autoSave();
+  }
   showResults(quizScore, quizQs.length, isTestMode ? 'Test' : 'Quiz');
 }
 
 // ─────────────────────────────────────────────────
 // MATCHING
 // ─────────────────────────────────────────────────
+let matchTotal = 0;
 function startMatching() {
-  const pairs = shuffle([...sessionCards]).slice(0, Math.min(8, sessionCards.length));
-  matchTotal = pairs.length; matchMatched = 0; matchSel = null;
-  const lefts  = shuffle(pairs.map(p => ({text:p.front, id:p.front+'__'+p.back})));
-  const rights = shuffle(pairs.map(p => ({text:p.back,  id:p.front+'__'+p.back})));
+  const pairCount = studyOpts.matchPairs || 6;
+  const style = studyOpts.matchStyle || 'term-def';
+  const pairs = shuffle([...sessionCards]).slice(0, Math.min(pairCount, sessionCards.length));
+  matchTotal = pairs.length;
+  matchMatched = 0; matchSel = null;
+  // style: term-def = left is front, right is back. def-term = reversed
+  const lefts  = shuffle(pairs.map(p => style === 'def-term' ? ({text:p.back,  id:p.front+'__'+p.back}) : ({text:p.front, id:p.front+'__'+p.back})));
+  const rights = shuffle(pairs.map(p => style === 'def-term' ? ({text:p.front, id:p.front+'__'+p.back}) : ({text:p.back,  id:p.front+'__'+p.back})));
   document.getElementById('match-prog').style.width = '0%';
   document.getElementById('match-count').textContent = '0 matched';
   document.getElementById('match-cols').innerHTML = `
     <div>
-      <div class="match-col-head">Terms</div>
+      <div class="match-col-head">${style === 'def-term' ? 'Definitions' : 'Terms'}</div>
       ${lefts.map(l=>`<div class="match-item" data-id="${esc(l.id)}" data-side="left" onclick="matchClick(this)">${esc(l.text)}</div>`).join('')}
     </div>
     <div>
-      <div class="match-col-head">Definitions</div>
+      <div class="match-col-head">${style === 'def-term' ? 'Terms' : 'Definitions'}</div>
       ${rights.map(r=>`<div class="match-item" data-id="${esc(r.id)}" data-side="right" onclick="matchClick(this)">${esc(r.text)}</div>`).join('')}
-    </div>`;
-  _baseShowView('matching');
+    </div>
+  `;
+  showView('matching');
 }
 
 function matchClick(el) {
   if (el.classList.contains('matched')) return;
   const side = el.dataset.side;
   if (!matchSel) {
+    // First selection must be left side
     if (side !== 'left') return;
     matchSel = el;
     document.querySelectorAll('.match-item.sel-a').forEach(e=>e.classList.remove('sel-a'));
-    el.classList.add('sel-a'); sndClick(); return;
+    el.classList.add('sel-a');
+    sndClick();
+    return;
   }
+  // Second selection must be right side
   if (side !== 'right') {
+    // Reselect left
     document.querySelectorAll('.match-item.sel-a').forEach(e=>e.classList.remove('sel-a'));
-    matchSel = el; el.classList.add('sel-a'); return;
+    matchSel = el;
+    el.classList.add('sel-a');
+    return;
   }
   const correct = matchSel.dataset.id === el.dataset.id;
   if (correct) {
-    matchSel.classList.remove('sel-a'); matchSel.classList.add('matched'); el.classList.add('matched');
-    matchMatched++; sndCorrect();
-    document.getElementById('match-prog').style.width = (matchMatched/matchTotal*100)+'%';
+    matchSel.classList.remove('sel-a'); matchSel.classList.add('matched');
+    el.classList.add('matched');
+    matchMatched++;
+    sndCorrect();
+    const pct = matchMatched/matchTotal*100;
+    document.getElementById('match-prog').style.width = pct+'%';
     document.getElementById('match-count').textContent = matchMatched+' matched';
     matchSel = null;
     if (matchMatched === matchTotal) {
@@ -1672,95 +2005,81 @@ function matchClick(el) {
       }, 500);
     }
   } else {
-    el.classList.add('wrong-flash'); matchSel.classList.add('wrong-flash');
+    el.classList.add('wrong-flash');
+    matchSel.classList.add('wrong-flash');
     const wrongA = matchSel;
     setTimeout(() => { el.classList.remove('wrong-flash'); wrongA.classList.remove('wrong-flash','sel-a'); }, 400);
-    matchSel = null; sndWrong();
+    matchSel = null;
+    sndWrong();
   }
 }
 
 // ─────────────────────────────────────────────────
-// LEARN  (FIX #4: skip actually advances to next card)
+// LEARN
 // ─────────────────────────────────────────────────
 function startLearn() {
   learnQueue = shuffle([...sessionCards]);
   learnKnown = new Set(); learnRound = 1; learnIdx = 0;
-  document.getElementById('learn-title').textContent = (getSet(currentSetId)||{name:'Learn'}).name;
-  _baseShowView('learn');
+  document.getElementById('learn-title').textContent = getSet(currentSetId)?.name || 'Learn';
+  showView('learn');
   renderLearnCard();
 }
 
 function renderLearnCard() {
   const remaining = learnQueue.filter((_,i) => !learnKnown.has(i));
   document.getElementById('learn-known-n').textContent = learnKnown.size;
-  document.getElementById('learn-left-n').textContent  = remaining.length;
+  document.getElementById('learn-left-n').textContent = remaining.length;
   document.getElementById('learn-round-n').textContent = learnRound;
-  const pct = learnKnown.size / learnQueue.length * 100;
+  const pct = (learnKnown.size / learnQueue.length) * 100;
   document.getElementById('learn-prog').style.width = pct+'%';
   document.getElementById('learn-count-nav').textContent = learnKnown.size+'/'+learnQueue.length;
 
   if (!remaining.length) {
     const s = getSet(currentSetId);
     if (s) { s.history=s.history||[]; s.history.push({date:Date.now(),score:learnQueue.length,total:learnQueue.length,mode:'Learn'}); autoSave(); }
-    showResults(learnQueue.length, learnQueue.length, 'Learn'); return;
+    showResults(learnQueue.length, learnQueue.length, 'Learn');
+    return;
   }
-
-  // Pick current card — rotate through remaining cards with learnIdx
-  // learnIdx tracks position within remaining list
-  if (learnIdx >= remaining.length) { learnIdx = 0; learnRound++; }
-  const card = remaining[learnIdx];
-  // Store the actual queue index for marking known
-  const queueIdx = learnQueue.indexOf(card);
+  // Pick first in remaining
+  learnIdx = learnQueue.indexOf(remaining[0]);
+  const card = learnQueue[learnIdx];
 
   document.getElementById('learn-card-area').innerHTML = `
     <div class="learn-card anim-pop">
       <div class="learn-prompt-tag">What is the definition of…</div>
       <div class="learn-question">${esc(card.front)}</div>
-      <input class="learn-inp" id="learn-input" placeholder="Type your answer…" autocomplete="off" onkeydown="if(event.key==='Enter')submitLearn(${queueIdx})">
+      <input class="learn-inp" id="learn-input" placeholder="Type your answer…" autocomplete="off" onkeydown="if(event.key==='Enter')submitLearn()">
       <div class="learn-actions">
-        <button class="learn-submit" onclick="submitLearn(${queueIdx})">Check →</button>
-        <button class="btn btn-ghost btn-sm" onclick="showLearnHint('${esc(card.back)}')">💡 Hint</button>
+        <button class="learn-submit" onclick="submitLearn()">Check →</button>
+        <button class="btn btn-ghost btn-sm" onclick="showLearnHint()">💡 Hint</button>
         <button class="btn btn-ghost btn-sm" onclick="skipLearnCard()">Skip →</button>
-        <button class="btn btn-ghost btn-sm" onclick="markLearnKnown(${queueIdx})">✓ I Know</button>
+        <button class="btn btn-ghost btn-sm" onclick="markLearnKnown()">✓ I Know</button>
       </div>
       <div class="learn-hint-box" id="learn-hint">First letter: <strong>${esc(card.back[0]||'?')}</strong> (${card.back.length} characters)</div>
       <div class="learn-feedback" id="learn-feedback"></div>
-    </div>`;
+    </div>
+  `;
   document.getElementById('learn-input').focus();
 }
 
-function submitLearn(queueIdx) {
+function submitLearn() {
   const inp = document.getElementById('learn-input');
-  const fb  = document.getElementById('learn-feedback');
-  const card = learnQueue[queueIdx];
-  const val = inp.value.trim(); if (!val) return;
+  const fb = document.getElementById('learn-feedback');
+  const card = learnQueue[learnIdx];
+  const val = inp.value.trim();
+  if (!val) return;
   const correct = val.toLowerCase() === card.back.toLowerCase();
   fb.className = 'learn-feedback show ' + (correct ? 'correct' : 'wrong');
-  fb.innerHTML  = correct ? `✓ Correct! <strong>${esc(card.back)}</strong>` : `✗ Incorrect. Answer: <strong>${esc(card.back)}</strong>`;
+  fb.innerHTML = correct ? `✓ Correct! <strong>${esc(card.back)}</strong>` : `✗ Incorrect. Answer: <strong>${esc(card.back)}</strong>`;
   inp.classList.add(correct ? 'correct' : 'wrong');
   inp.disabled = true;
-  if (correct) { learnKnown.add(queueIdx); learnIdx++; sndCorrect(); }
-  else sndWrong();
-  setTimeout(() => { if (correct) renderLearnCard(); else { learnIdx++; renderLearnCard(); } }, correct ? 900 : 1600);
+  if (correct) { learnKnown.add(learnIdx); sndCorrect(); } else sndWrong();
+  setTimeout(renderLearnCard, correct ? 900 : 1600);
 }
 
-function showLearnHint(back) {
-  const box = document.getElementById('learn-hint');
-  if (box) box.classList.add('show');
-}
-
-function skipLearnCard() {
-  // FIX: actually advance to next card in remaining list
-  learnIdx++;
-  renderLearnCard();
-}
-
-function markLearnKnown(queueIdx) {
-  learnKnown.add(queueIdx);
-  learnIdx++;
-  renderLearnCard();
-  sndCorrect();
-}
+function showLearnHint() { document.getElementById('learn-hint').classList.add('show'); }
+function skipLearnCard() { renderLearnCard(); }
+function markLearnKnown() { learnKnown.add(learnIdx); renderLearnCard(); sndCorrect(); }
 
 // ─────────────────────────────────────────────────
 // RESULTS
@@ -1770,14 +2089,17 @@ function showResults(score, total, mode) {
   const pct = total > 0 ? Math.round(score/total*100) : 0;
   const isGreat = pct >= 80, isOk = pct >= 60;
   const emojis = isGreat ? ['🎉','🏆','🌟','🔥','💪'] : isOk ? ['👍','📈','💡','😊'] : ['📚','💪','🔄','😤'];
-  const msgs   = isGreat ? ['Excellent work!','You crushed it!','Outstanding!','Perfect execution!'] : isOk ? ['Good effort!','Keep it up!','Nice work!'] : ['Keep studying!','Practice makes perfect!','Don\'t give up!'];
+  const msgs = isGreat
+    ? ['Excellent work!','You crushed it!','Outstanding!','Perfect execution!','You\'re on fire!']
+    : isOk
+    ? ['Good effort!','Keep it up!','Nice work!','You\'re improving!']
+    : ['Keep studying!','Practice makes perfect!','You\'ll get there!','Don\'t give up!'];
   document.getElementById('results-emoji').textContent = emojis[Math.floor(Math.random()*emojis.length)];
-  document.getElementById('results-pct').textContent   = pct+'%';
-  document.getElementById('results-pct').className     = 'results-pct ' + (isGreat?'great':isOk?'ok':'bad');
-  document.getElementById('results-msg').textContent   = msgs[Math.floor(Math.random()*msgs.length)];
-  document.getElementById('results-sub').textContent   = score + ' out of ' + total + ' correct · ' + mode;
-  const s = getSet(currentSetId);
-  const hist = (s && s.history) ? s.history : [];
+  document.getElementById('results-pct').textContent = pct+'%';
+  document.getElementById('results-pct').className = 'results-pct ' + (isGreat?'great':isOk?'ok':'bad');
+  document.getElementById('results-msg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('results-sub').textContent = score + ' out of ' + total + ' correct · ' + mode;
+  const hist = (getSet(currentSetId)?.history||[]);
   const prev = hist.slice(-2,-1)[0];
   const improved = prev && (score/total > prev.score/prev.total);
   document.getElementById('results-breakdown').innerHTML = `
@@ -1785,17 +2107,187 @@ function showResults(score, total, mode) {
     <div class="res-row"><div class="res-label">Correct</div><div class="res-val res-correct">${score}</div></div>
     <div class="res-row"><div class="res-label">Incorrect</div><div class="res-val res-wrong">${total-score}</div></div>
     <div class="res-row"><div class="res-label">Total</div><div class="res-val">${total}</div></div>
-    ${improved?`<div class="res-row"><div class="res-label">📈 Improvement</div><div class="res-val" style="color:var(--green2)">+${Math.round((score/total-prev.score/prev.total)*100)}%</div></div>`:''}
-    ${pct===100?`<div class="res-row"><div class="res-label">🏆 Achievement</div><div class="res-val" style="color:var(--amber2)">Perfect Score!</div></div>`:''}`;
+    ${improved ? `<div class="res-row"><div class="res-label">📈 Improvement</div><div class="res-val" style="color:var(--green2)">+${Math.round((score/total - prev.score/prev.total)*100)}%</div></div>` : ''}
+    ${pct===100 ? `<div class="res-row"><div class="res-label">🏆 Achievement</div><div class="res-val" style="color:var(--amber2)">Perfect Score!</div></div>` : ''}
+  `;
   document.getElementById('results-actions').innerHTML = `
     <button class="btn btn-primary" onclick="retryStudy()">🔁 Try Again</button>
     <button class="btn btn-ghost" onclick="openSet('${currentSetId}')">← Back to Set</button>
-    <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>`;
-  _baseShowView('results');
-  if (isGreat) { sndComplete(); launchConfetti(); } else sndWrong();
+    <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+  `;
+  showView('results');
+  if (isGreat) { sndComplete(); launchConfetti(); } else { sndWrong(); }
 }
 
-function exitStudy()  { openSet(currentSetId); }
+function exitStudy() { openSet(currentSetId); }
+// ─────────────────────────────────────────────────
+// SPEED ROUND — floating bubble game
+// ─────────────────────────────────────────────────
+const SPEED_CIRCUMFERENCE = 2 * Math.PI * 22;
+let SPEED_SECS = 5;
+let speedBubbles = [];
+let speedBubbleFrame = null;
+
+function startSpeedRound() {
+  SPEED_SECS = studyOpts.speedSecs || 5;
+  const rounds = studyOpts.speedRounds || 1;
+  // Repeat cards for multiple rounds
+  let pool = shuffle([...sessionCards]);
+  for (let r = 1; r < rounds; r++) pool = pool.concat(shuffle([...sessionCards]));
+  speedCards = pool;
+  speedIdx = 0; speedKnow = 0; speedMiss = 0;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-speed').classList.add('active');
+  renderSpeedCard();
+}
+
+function renderSpeedCard() {
+  if (speedIdx >= speedCards.length) { finishSpeedRound(); return; }
+  speedAnswered = false;
+  speedSecsLeft = SPEED_SECS;
+  const card = speedCards[speedIdx];
+  document.getElementById('speed-term').textContent = card.front;
+  document.getElementById('speed-know-n').textContent = speedKnow;
+  document.getElementById('speed-miss-n').textContent = speedMiss;
+  const pct = (speedIdx / speedCards.length) * 100;
+  document.getElementById('speed-prog').style.width = pct + '%';
+  document.getElementById('speed-count').textContent = (speedIdx+1) + '/' + speedCards.length;
+
+  const bubbleCount = studyOpts.speedBubbles || 4;
+  const wrong = shuffle(sessionCards.filter(c => c.back !== card.back)).slice(0, bubbleCount - 1).map(c=>c.back);
+  const answers = shuffle([card.back, ...wrong]);
+  spawnBubbles(answers, card.back);
+
+  updateSpeedRing();
+  if (speedTimerInt) clearInterval(speedTimerInt);
+  speedTimerInt = setInterval(() => {
+    speedSecsLeft -= 0.1;
+    updateSpeedRing();
+    if (speedSecsLeft <= 0) { clearInterval(speedTimerInt); if (!speedAnswered) speedTimeout(); }
+  }, 100);
+}
+
+function spawnBubbles(answers, correct) {
+  const arena = document.getElementById('speed-arena');
+  arena.querySelectorAll('.speed-bubble').forEach(b => b.remove());
+  if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
+  speedBubbles = [];
+  const W = arena.offsetWidth || 600;
+  const H = arena.offsetHeight || 450;
+  const colors = [
+    {bg:'rgba(58,127,255,.18)',border:'rgba(58,127,255,.6)',text:'var(--accent2)'},
+    {bg:'rgba(155,89,182,.18)',border:'rgba(155,89,182,.6)',text:'var(--purple2)'},
+    {bg:'rgba(232,144,32,.18)',border:'rgba(232,144,32,.6)',text:'var(--amber2)'},
+    {bg:'rgba(26,188,156,.18)',border:'rgba(26,188,156,.6)',text:'var(--teal2)'},
+  ];
+  answers.forEach((ans, i) => {
+    const col = colors[i % colors.length];
+    const el = document.createElement('div');
+    el.className = 'speed-bubble';
+    el.textContent = ans;
+    el.dataset.correct = (ans === correct) ? '1' : '0';
+    Object.assign(el.style, {
+      position:'absolute', cursor:'pointer',
+      background:col.bg, border:`2px solid ${col.border}`,
+      color:col.text, borderRadius:'100px',
+      padding:'10px 20px', fontSize:'.85rem', fontWeight:'800',
+      fontFamily:'var(--font)', maxWidth:'180px', textAlign:'center',
+      lineHeight:'1.3', boxShadow:'0 4px 16px rgba(0,0,0,.3)',
+      userSelect:'none', zIndex:'5', transition:'transform .15s, background .2s, border-color .2s',
+    });
+    el.addEventListener('click', () => speedBubbleClick(el, ans === correct));
+    const x = 40 + Math.random() * (W - 220);
+    const y = 130 + Math.random() * (H - 220);
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    arena.appendChild(el);
+    speedBubbles.push({ el, x, y, vx:(Math.random()-.5)*1.6, vy:(Math.random()-.5)*1.6, w:0, h:0 });
+  });
+  requestAnimationFrame(() => {
+    speedBubbles.forEach(b => { b.w = b.el.offsetWidth; b.h = b.el.offsetHeight; });
+    animateBubbles();
+  });
+}
+
+function animateBubbles() {
+  const arena = document.getElementById('speed-arena');
+  if (!arena) return;
+  const W = arena.offsetWidth, H = arena.offsetHeight;
+  speedBubbles.forEach(b => {
+    b.x += b.vx; b.y += b.vy;
+    if (b.x < 0) { b.x = 0; b.vx *= -1; }
+    if (b.x + b.w > W) { b.x = W - b.w; b.vx *= -1; }
+    if (b.y < 115) { b.y = 115; b.vy *= -1; }
+    if (b.y + b.h > H) { b.y = H - b.h; b.vy *= -1; }
+    b.el.style.left = b.x + 'px';
+    b.el.style.top = b.y + 'px';
+  });
+  speedBubbleFrame = requestAnimationFrame(animateBubbles);
+}
+
+function speedBubbleClick(el, isCorrect) {
+  if (speedAnswered) return;
+  speedAnswered = true;
+  clearInterval(speedTimerInt);
+  if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
+  speedBubbles.forEach(b => {
+    if (b.el.dataset.correct === '1') {
+      Object.assign(b.el.style, {background:'var(--green-dim)',borderColor:'var(--green)',color:'var(--green2)',transform:'scale(1.12)'});
+    } else if (b.el === el && !isCorrect) {
+      Object.assign(b.el.style, {background:'var(--red-dim)',borderColor:'var(--red)',color:'var(--red2)'});
+    }
+  });
+  speedCards[speedIdx].mastery = isCorrect ? 'know' : 'review';
+  if (isCorrect) { speedKnow++; sndCorrect(); } else { speedMiss++; sndWrong(); }
+  speedIdx++;
+  setTimeout(renderSpeedCard, 850);
+}
+
+function speedTimeout() {
+  if (speedAnswered) return;
+  speedAnswered = true;
+  if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
+  speedBubbles.forEach(b => {
+    if (b.el.dataset.correct === '1') {
+      Object.assign(b.el.style, {background:'var(--green-dim)',borderColor:'var(--green)',color:'var(--green2)',transform:'scale(1.12)'});
+    }
+  });
+  speedCards[speedIdx].mastery = 'review';
+  speedMiss++; sndWrong();
+  speedIdx++;
+  setTimeout(renderSpeedCard, 900);
+}
+
+function updateSpeedRing() {
+  const pct = Math.max(0, speedSecsLeft / SPEED_SECS);
+  const offset = SPEED_CIRCUMFERENCE * (1 - pct);
+  const ring = document.getElementById('speed-ring');
+  const timerN = document.getElementById('speed-timer-n');
+  if (!ring || !timerN) return;
+  ring.style.strokeDashoffset = offset;
+  ring.style.stroke = pct > 0.5 ? 'var(--accent)' : pct > 0.25 ? 'var(--amber)' : 'var(--red)';
+  timerN.textContent = Math.ceil(speedSecsLeft);
+  timerN.style.color = pct > 0.5 ? 'var(--text)' : pct > 0.25 ? 'var(--amber2)' : 'var(--red2)';
+}
+
+function finishSpeedRound() {
+  clearInterval(speedTimerInt);
+  if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
+  document.getElementById('speed-arena').querySelectorAll('.speed-bubble').forEach(b => b.remove());
+  const s = getSet(currentSetId);
+  if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:speedKnow,total:speedCards.length,mode:'Speed Round'}); }
+  autoSave();
+  showResults(speedKnow, speedCards.length, 'Speed Round');
+}
+
+function exitSpeedRound() {
+  clearInterval(speedTimerInt);
+  if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
+  document.getElementById('speed-arena').querySelectorAll('.speed-bubble').forEach(b => b.remove());
+  exitStudy();
+}
+
+
 function retryStudy() { launchStudy(); }
 
 // ─────────────────────────────────────────────────
@@ -1808,22 +2300,23 @@ function launchConfetti() {
   const ctx = canvas.getContext('2d');
   const colors = ['#3a7fff','#4de888','#c17de0','#ffb347','#ff6060','#2eead4','#ff6ec7'];
   const pieces = Array.from({length:150}, () => ({
-    x:Math.random()*canvas.width, y:-20, r:Math.random()*7+3,
-    color:colors[Math.floor(Math.random()*colors.length)],
-    vx:(Math.random()-.5)*5, vy:Math.random()*4+2,
-    angle:Math.random()*360, va:(Math.random()-.5)*8, shape:Math.random()>.5?'rect':'circle'
+    x: Math.random()*canvas.width, y: -20,
+    r: Math.random()*7+3, color: colors[Math.floor(Math.random()*colors.length)],
+    vx: (Math.random()-.5)*5, vy: Math.random()*4+2,
+    angle: Math.random()*360, va: (Math.random()-.5)*8, shape: Math.random()>.5?'rect':'circle'
   }));
   let frame = 0;
   const anim = setInterval(() => {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     pieces.forEach(p => {
       ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle*Math.PI/180); ctx.fillStyle = p.color;
-      if (p.shape==='rect') ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      if (p.shape === 'rect') ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
       else { ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill(); }
       ctx.restore();
       p.x+=p.vx; p.y+=p.vy; p.angle+=p.va; p.vy+=0.06;
     });
-    if (++frame > 220) { clearInterval(anim); ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
+    frame++;
+    if (frame > 220) { clearInterval(anim); ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
   }, 16);
 }
 
@@ -1839,6 +2332,7 @@ function showTracking() {
     ['▶', sets.reduce((n,s)=>n+(s.plays||0),0), 'Sessions'],
     ['📊', avgScore+'%', 'Avg Score'],
   ].map(([icon,n,label])=>`<div class="track-stat"><div class="track-stat-icon">${icon}</div><div class="track-stat-n">${n}</div><div class="track-stat-label">${label}</div></div>`).join('');
+
   document.getElementById('track-sets-list').innerHTML = sets.map(s => {
     const cards = allCards(s);
     const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
@@ -1853,14 +2347,140 @@ function showTracking() {
       <div class="track-pct" style="color:${mastery>=80?'var(--green2)':mastery>=60?'var(--amber2)':'var(--text2)'}">${mastery}%</div>
     </div>`;
   }).join('') || '<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">No data yet</div><div class="empty-sub">Study some sets to see your progress here.</div></div>';
-  _baseShowView('tracking');
+  // directly activate the view without going through showView (avoids loop)
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-tracking').classList.add('active');
+}
+
+// ─────────────────────────────────────────────────
+// FOLDERS (placeholder)
+// ─────────────────────────────────────────────────
+let currentFolderId = null;
+
+function showFolders() {
+  renderFoldersGrid();
+  closeFolderOpen();
+  showView('folders');
+  sndClick();
+}
+
+function renderFoldersGrid() {
+  const grid = document.getElementById('folders-grid');
+  if (!folders.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">📁</div><div class="empty-title">No folders yet</div><div class="empty-sub">Create a folder to group your sets by class or subject.</div><button class="btn btn-primary" onclick="createFolder()">＋ Create Folder</button></div>`;
+    return;
+  }
+  const FOLDER_ICONS = ['📁','📂','🗂','📚','🎒','💼','🗃','📋'];
+  grid.innerHTML = folders.map(f => {
+    const setCount = (f.setIds||[]).length;
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all var(--transition);" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''" onclick="openFolder('${f.id}')">
+      <div style="font-size:2rem;margin-bottom:8px;">${f.icon||'📁'}</div>
+      <div style="font-size:.9rem;font-weight:800;margin-bottom:3px;">${esc(f.name)}</div>
+      <div style="font-size:.68rem;color:var(--text2);">${setCount} set${setCount!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function createFolder() {
+  const name = prompt('Folder name:');
+  if (!name || !name.trim()) return;
+  const icons = ['📁','📂','🗂','📚','🎒','💼','🗃','📋'];
+  folders.push({ id: Date.now(), name: name.trim(), icon: icons[Math.floor(Math.random()*icons.length)], setIds: [] });
+  autoSave();
+  renderFoldersGrid();
+  renderSidebar();
+  sndClick();
+}
+
+function openFolder(id) {
+  currentFolderId = id;
+  const f = folders.find(fl => fl.id == id);
+  if (!f) return;
+  document.getElementById('folder-open-title').textContent = (f.icon||'📁') + ' ' + f.name;
+  // Populate add-set dropdown with sets not already in this folder
+  const sel = document.getElementById('folder-add-select');
+  sel.innerHTML = '<option value="">— pick a set —</option>' +
+    sets.filter(s => !(f.setIds||[]).includes(s.id))
+      .map(s => `<option value="${s.id}">${esc(s.icon||'📖')} ${esc(s.name)}</option>`).join('');
+  renderFolderSets(f);
+  document.getElementById('folders-grid').style.display = 'none';
+  document.getElementById('folder-open').style.display = '';
+}
+
+function renderFolderSets(f) {
+  const el = document.getElementById('folder-sets-list');
+  const fSets = (f.setIds||[]).map(id => sets.find(s => s.id == id)).filter(Boolean);
+  if (!fSets.length) {
+    el.innerHTML = '<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No sets in this folder yet. Add one above!</div>';
+    return;
+  }
+  el.innerHTML = fSets.map(s => {
+    const cards = allCards(s);
+    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
+      <div style="flex:1;cursor:pointer;" onclick="openSet('${s.id}')">
+        <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
+        <div style="font-size:.65rem;color:var(--text2);">${cards.length} cards · ${mastery}% mastered</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openSet('${s.id}')">Open →</button>
+      <button class="btn btn-danger btn-sm" onclick="removeFromFolder('${s.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addSetToFolder() {
+  const sel = document.getElementById('folder-add-select');
+  const setId = parseInt(sel.value);
+  if (!setId) return;
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!f) return;
+  f.setIds = f.setIds || [];
+  if (!f.setIds.includes(setId)) f.setIds.push(setId);
+  autoSave();
+  openFolder(currentFolderId); // re-render
+  sndClick();
+}
+
+function removeFromFolder(setId) {
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!f) return;
+  f.setIds = (f.setIds||[]).filter(id => id != setId);
+  autoSave();
+  renderFolderSets(f);
+}
+
+function closeFolderOpen() {
+  currentFolderId = null;
+  document.getElementById('folders-grid').style.display = '';
+  document.getElementById('folder-open').style.display = 'none';
+}
+
+function renameFolderCurrent() {
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!f) return;
+  const name = prompt('Rename folder:', f.name);
+  if (!name || !name.trim()) return;
+  f.name = name.trim();
+  autoSave();
+  openFolder(currentFolderId);
+  renderFoldersGrid();
+}
+
+function deleteFolderCurrent() {
+  if (!confirm('Delete this folder? Sets inside won\'t be deleted.')) return;
+  folders = folders.filter(f => f.id != currentFolderId);
+  autoSave();
+  closeFolderOpen();
+  renderFoldersGrid();
+  renderSidebar();
 }
 
 // ─────────────────────────────────────────────────
 // CREATE / EDIT SET MODAL
 // ─────────────────────────────────────────────────
 function openCreateModal() {
-  if (!isLoggedIn) { const ok = confirm('Not signed in. Data will only be saved locally. Continue?'); if (!ok) return; }
+  if (!isLoggedIn) { const ok = confirm('You\'re not signed in. Data will only be saved locally. Continue?'); if (!ok) return; }
   editingId = null;
   document.getElementById('create-modal-title').textContent = '✨ New Study Set';
   document.getElementById('inp-name').value = '';
@@ -1871,36 +2491,59 @@ function openCreateModal() {
   fcPairs = [{front:'',back:''},{front:'',back:''},{front:'',back:''}];
   document.getElementById('import-ta').value = '';
   document.getElementById('import-preview').style.display = 'none';
-  switchModalTab('fc'); renderPairList(); openModal('create-modal');
+  switchModalTab('fc');
+  renderPairList();
+  openModal('create-modal');
 }
 
 function openEditModal() {
   const s = getSet(currentSetId); if (!s) return;
   editingId = s.id;
   document.getElementById('create-modal-title').textContent = '✏️ Edit Set';
-  document.getElementById('inp-name').value  = s.name;
+  document.getElementById('inp-name').value = s.name;
   document.getElementById('inp-class').value = s.class||'';
-  document.getElementById('inp-unit').value  = s.unit||'';
-  document.getElementById('inp-icon').value  = s.icon||'';
+  document.getElementById('inp-unit').value = s.unit||'';
+  document.getElementById('inp-icon').value = s.icon||'';
   document.getElementById('inp-notes').value = s.notes||'';
   fcPairs = (s.cards||[]).map(c=>({front:c.front,back:c.back}));
   if (!fcPairs.length) fcPairs = [{front:'',back:''}];
-  switchModalTab('fc'); renderPairList(); openModal('create-modal');
+  switchModalTab('fc');
+  renderPairList();
+  openModal('create-modal');
 }
 
 function saveSet() {
   const name = document.getElementById('inp-name').value.trim();
-  if (!name) { document.getElementById('inp-name').style.borderColor='var(--red)'; document.getElementById('inp-name').focus(); return; }
+  if (!name) { document.getElementById('inp-name').focus(); document.getElementById('inp-name').style.borderColor='var(--red)'; return; }
   document.getElementById('inp-name').style.borderColor = '';
-  const rawPairs = fcPairs.filter(p=>p.front.trim()||p.back.trim()).map(p=>({front:p.front.trim(),back:p.back.trim(),starred:false,mastery:'unseen'}));
+
+  // Collect flashcards from pairs
+  const rawPairs = fcPairs.filter(p => p.front.trim() || p.back.trim())
+    .map(p => ({front:p.front.trim(), back:p.back.trim(), starred:false, mastery:'unseen'}));
+
+  // Collect import
   const importRaw = document.getElementById('import-ta').value.trim();
   const importCards = importRaw ? parseImport(importRaw, importFmt).map(p=>({front:p.front,back:p.back,starred:false,mastery:'unseen'})) : [];
+
   const cards = [...rawPairs, ...importCards];
   if (!cards.length) { alert('Please add at least one card.'); return; }
-  const setData = {name, class:document.getElementById('inp-class').value.trim(), unit:document.getElementById('inp-unit').value.trim(), icon:document.getElementById('inp-icon').value.trim()||'📖', notes:document.getElementById('inp-notes').value.trim(), cards, history:[], plays:0};
+
+  const setData = {
+    name, class:document.getElementById('inp-class').value.trim(),
+    unit:document.getElementById('inp-unit').value.trim(),
+    icon:document.getElementById('inp-icon').value.trim()||'📖',
+    notes:document.getElementById('inp-notes').value.trim(),
+    cards, history:[], plays:0
+  };
+
   if (editingId) {
     const s = getSet(editingId);
-    if (s) { Object.assign(s, {name:setData.name,class:setData.class,unit:setData.unit,icon:setData.icon,notes:setData.notes,cards:setData.cards,updated:Date.now()}); }
+    if (s) {
+      s.name=setData.name; s.class=setData.class; s.unit=setData.unit;
+      s.icon=setData.icon; s.notes=setData.notes; s.cards=setData.cards;
+      // Preserve history + plays
+      s.updated = Date.now();
+    }
   } else {
     sets.push({...setData, id:Date.now(), created:Date.now(), updated:Date.now()});
     currentSetId = sets[sets.length-1].id;
@@ -1916,15 +2559,16 @@ function renderPairList() {
       <textarea placeholder="Term / Front" oninput="fcPairs[${i}].front=this.value">${esc(p.front)}</textarea>
       <textarea placeholder="Definition / Back" oninput="fcPairs[${i}].back=this.value">${esc(p.back)}</textarea>
       <button class="fc-pair-del" onclick="removePair(${i})" title="Remove">✕</button>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
-function addPair()       { fcPairs.push({front:'',back:''}); renderPairList(); sndClick(); }
-function removePair(i)   { if (fcPairs.length > 1) { fcPairs.splice(i,1); renderPairList(); } }
+function addPair() { fcPairs.push({front:'',back:''}); renderPairList(); sndClick(); }
+function removePair(i) { if (fcPairs.length > 1) { fcPairs.splice(i,1); renderPairList(); } }
 
 function switchModalTab(tab) {
-  document.getElementById('tab-fc').style.display = tab==='fc'?'':'none';
-  document.getElementById('tab-import').style.display = tab==='import'?'':'none';
+  document.getElementById('tab-fc').style.display = tab==='fc' ? '' : 'none';
+  document.getElementById('tab-import').style.display = tab==='import' ? '' : 'none';
   document.getElementById('mtab-fc').classList.toggle('active', tab==='fc');
   document.getElementById('mtab-import').classList.toggle('active', tab==='import');
 }
@@ -1937,12 +2581,16 @@ function setImportFmt(fmt, el) {
 }
 
 function parseImport(raw, fmt) {
-  return raw.split('\n').filter(l=>l.trim()).map(line => {
+  const lines = raw.split('\n').filter(l=>l.trim());
+  return lines.map(line => {
     let sep;
-    if (fmt==='auto') sep = line.includes('\t')?'\t':line.includes(';')?';':',';
-    else if (fmt==='tab') sep='\t'; else if (fmt==='semi') sep=';'; else sep=',';
-    const idx = line.indexOf(sep); if (idx<0) return null;
-    return {front:line.slice(0,idx).trim(), back:line.slice(idx+sep.length).trim()};
+    if (fmt==='auto') sep = line.includes('\t') ? '\t' : line.includes(';') ? ';' : ',';
+    else if (fmt==='tab') sep = '\t';
+    else if (fmt==='semi') sep = ';';
+    else sep = ',';
+    const idx = line.indexOf(sep);
+    if (idx < 0) return null;
+    return {front: line.slice(0,idx).trim(), back: line.slice(idx+sep.length).trim()};
   }).filter(Boolean).filter(p=>p.front||p.back);
 }
 
@@ -1954,36 +2602,106 @@ function previewImport() {
   prev.style.display = '';
   prev.innerHTML = `<div style="font-size:.62rem;font-weight:900;color:var(--text3);margin-bottom:6px;">${parsed.length} cards detected</div>`
     + parsed.slice(0,6).map(p=>`<div class="import-preview-item"><span class="ipf">${esc(p.front)}</span><span class="ipb">→ ${esc(p.back)}</span></div>`).join('')
-    + (parsed.length>6?`<div style="font-size:.62rem;color:var(--text3);padding-top:4px;">+${parsed.length-6} more…</div>`:'');
+    + (parsed.length>6 ? `<div style="font-size:.62rem;color:var(--text3);padding-top:4px;">+${parsed.length-6} more…</div>` : '');
 }
 
 // ─────────────────────────────────────────────────
 // EXPORT
 // ─────────────────────────────────────────────────
 function exportAllData() {
-  const blob = new Blob([JSON.stringify({sets,folders},null,2)],{type:'application/json'});
+  const blob = new Blob([JSON.stringify({sets,folders},null,2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'dqstudy-export.json'; a.click();
 }
 
 function clearAllData() {
   if (!confirm('Clear ALL study data? This cannot be undone.')) return;
-  sets=[]; folders=[]; currentSetId=null; autoSave(); renderSidebar(); goHome();
+  sets=[]; folders=[]; currentSetId=null;
+  autoSave(); renderSidebar(); goHome();
+}
+
+function togglePin() {
+  const s = getSet(currentSetId); if (!s) return;
+  s.pinned = !s.pinned;
+  const btn = document.getElementById('pin-btn');
+  if (btn) btn.textContent = s.pinned ? '📌 Pinned' : '📌 Pin';
+  autoSave(); renderSidebar(); sndClick();
+}
+
+function showAllSets() {
+  renderAllSetsGrid();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-allsets').classList.add('active');
+  sndClick();
+}
+
+function renderAllSetsGrid(filter='') {
+  const filtered = filter
+    ? sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || (s.class||'').toLowerCase().includes(filter.toLowerCase()))
+    : sets;
+  document.getElementById('allsets-count').textContent = filtered.length + ' set' + (filtered.length!==1?'s':'');
+  const grid = document.getElementById('allsets-grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">📭</div><div class="empty-title">${filter?'No results':'No sets yet'}</div><div class="empty-sub">${filter?'Try a different search.':'Create your first study set.'}</div>${!filter?'<button class="btn btn-primary" onclick="openCreateModal()">＋ New Set</button>':''}</div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(s => {
+    const cards = allCards(s);
+    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    const lastHist = (s.history||[]).slice(-1)[0];
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;"
+      onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.transform=''"
+      onclick="openSet('${s.id}')">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green));opacity:${Math.max(0.15,mastery/100)};"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:1.8rem;">${s.icon||'📖'}</div>
+        ${s.pinned?'<span style="font-size:.75rem;">📌</span>':''}
+      </div>
+      <div style="font-size:.95rem;font-weight:800;margin-bottom:3px;line-height:1.3;">${esc(s.name)}</div>
+      <div style="font-size:.65rem;color:var(--text3);margin-bottom:8px;">${s.class||''}${s.unit?' · '+s.unit:''}</div>
+      <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text2);margin-bottom:6px;">
+        <span>${cards.length} cards</span>
+        <span>${lastHist?Math.round(lastHist.score/lastHist.total*100)+'% last':'Not studied'}</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+        <div style="height:100%;width:${mastery}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .5s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAllSetsView() {
+  showAllSets();
 }
 
 // ─────────────────────────────────────────────────
 // UTILS
 // ─────────────────────────────────────────────────
-function getSet(id)   { return sets.find(s => s.id == id); }
-function allCards(s)  { return s.cards||[]; }
-function shuffle(a)   { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
-function esc(s)       { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const main = document.getElementById('main');
+  const navBtn = document.getElementById('sb-toggle-btn');
+  const sbBtn = document.getElementById('sb-collapse-btn');
+  sb.classList.toggle('collapsed');
+  main.classList.toggle('sb-collapsed');
+  const isCollapsed = sb.classList.contains('collapsed');
+  if (navBtn) navBtn.textContent = isCollapsed ? '▶' : '☰';
+  if (sbBtn) sbBtn.textContent = isCollapsed ? '▶' : '◀';
+}
+
+function getSet(id) { return sets.find(s => s.id == id); }
+function allCards(s) { return s.cards||[]; }
+function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// Close modals on overlay click
+// tracking is handled inside showView directly
+
+// Close modal on overlay click
 document.getElementById('create-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('create-modal'); });
-document.getElementById('folder-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('folder-modal'); });
+document.getElementById('study-opts-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('study-opts-modal'); });
 
 // ─────────────────────────────────────────────────
 // INIT
@@ -1991,10 +2709,190 @@ document.getElementById('folder-modal').addEventListener('click', function(e){ i
 loadSettings();
 renderThemeGrid();
 
-// If dq-auth.js is not present, go straight into the app immediately
-if (typeof DQAuth === 'undefined') {
-  continueWithout();
+// ─────────────────────────────────────────────────
+// ANIMATED BACKGROUND
+// ─────────────────────────────────────────────────
+let bgAnim = 'none';
+let bgAnimFrame = null;
+
+function setBgAnim(type, el) {
+  bgAnim = type;
+  document.querySelectorAll('#bg-anim-grid .theme-option').forEach(e => e.classList.remove('active'));
+  if (el) el.classList.add('active');
+  stopBgAnim();
+  if (type !== 'none') startBgAnim(type);
+  saveSettings();
 }
+
+function stopBgAnim() {
+  if (bgAnimFrame) { cancelAnimationFrame(bgAnimFrame); bgAnimFrame = null; }
+  const c = document.getElementById('bg-canvas');
+  c.style.display = 'none';
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+}
+
+function startBgAnim(type) {
+  const c = document.getElementById('bg-canvas');
+  c.style.display = '';
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+  const ctx = c.getContext('2d');
+
+  window.addEventListener('resize', () => {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  });
+
+  if (type === 'matrix') runMatrix(c, ctx);
+  else if (type === 'particles') runParticles(c, ctx);
+  else if (type === 'bubbles') runBubbles(c, ctx);
+  else if (type === 'stars') runStars(c, ctx);
+  else if (type === 'rain') runRain(c, ctx);
+}
+
+// MATRIX — falling green characters
+function runMatrix(c, ctx) {
+  const cols = Math.floor(c.width / 16);
+  const drops = Array(cols).fill(0).map(() => Math.random() * -c.height / 16);
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  function draw() {
+    ctx.fillStyle = 'rgba(9,12,18,0.08)';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.font = '14px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      const bright = Math.random() > 0.97;
+      ctx.fillStyle = bright ? '#ffffff' : '#2dcc6f';
+      ctx.fillText(ch, i * 16, drops[i] * 16);
+      if (drops[i] * 16 > c.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.5;
+    }
+    bgAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// PARTICLES — floating glowing dots
+function runParticles(c, ctx) {
+  const pts = Array.from({length: 80}, () => ({
+    x: Math.random() * c.width, y: Math.random() * c.height,
+    r: Math.random() * 2.5 + 0.5,
+    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+    hue: Math.random() * 60 + 180
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    pts.forEach(p => {
+      ctx.beginPath();
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+      g.addColorStop(0, `hsla(${p.hue},100%,70%,0.8)`);
+      g.addColorStop(1, `hsla(${p.hue},100%,70%,0)`);
+      ctx.fillStyle = g;
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = c.width;
+      if (p.x > c.width) p.x = 0;
+      if (p.y < 0) p.y = c.height;
+      if (p.y > c.height) p.y = 0;
+    });
+    // Draw connecting lines
+    pts.forEach((a, i) => {
+      pts.slice(i + 1).forEach(b => {
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(100,160,255,${(1 - d/120) * 0.15})`;
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      });
+    });
+    bgAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// BUBBLES
+function runBubbles(c, ctx) {
+  const bubs = Array.from({length: 25}, () => ({
+    x: Math.random() * c.width, y: c.height + Math.random() * 200,
+    r: Math.random() * 30 + 8,
+    vx: (Math.random() - 0.5) * 0.4, vy: -(Math.random() * 0.6 + 0.2),
+    hue: Math.random() * 80 + 160, alpha: Math.random() * 0.3 + 0.05
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    bubs.forEach(b => {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(${b.hue},80%,70%,${b.alpha * 2})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      const g = ctx.createRadialGradient(b.x - b.r*0.3, b.y - b.r*0.3, 0, b.x, b.y, b.r);
+      g.addColorStop(0, `hsla(${b.hue},80%,90%,${b.alpha})`);
+      g.addColorStop(1, `hsla(${b.hue},80%,60%,0)`);
+      ctx.fillStyle = g;
+      ctx.fill();
+      b.x += b.vx; b.y += b.vy;
+      if (b.y + b.r < 0) { b.y = c.height + b.r; b.x = Math.random() * c.width; }
+    });
+    bgAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// STARS — parallax starfield
+function runStars(c, ctx) {
+  const stars = Array.from({length: 160}, () => ({
+    x: Math.random() * c.width, y: Math.random() * c.height,
+    r: Math.random() * 1.5 + 0.2,
+    speed: Math.random() * 0.15 + 0.02,
+    twinkle: Math.random() * Math.PI * 2
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.twinkle += 0.03;
+      const alpha = 0.4 + Math.sin(s.twinkle) * 0.35;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,220,255,${alpha})`;
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > c.height) { s.y = 0; s.x = Math.random() * c.width; }
+    });
+    bgAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// RAIN — diagonal streaks
+function runRain(c, ctx) {
+  const drops = Array.from({length: 120}, () => ({
+    x: Math.random() * c.width, y: Math.random() * c.height,
+    len: Math.random() * 20 + 8,
+    speed: Math.random() * 4 + 2,
+    alpha: Math.random() * 0.15 + 0.04
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    drops.forEach(d => {
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x - d.len * 0.3, d.y + d.len);
+      ctx.strokeStyle = `rgba(100,180,255,${d.alpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      d.y += d.speed; d.x -= d.speed * 0.3;
+      if (d.y > c.height) { d.y = -d.len; d.x = Math.random() * c.width; }
+    });
+    bgAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
 </script>
 </body>
 </html>
