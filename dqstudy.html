@@ -1369,9 +1369,9 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 // ── GLOBAL STATE ──
 // Supabase config for DQcodes shared_sets table
-// Using var so it doesn't conflict if dq-auth.js also declares these
-var SUPABASE_URL = 'https://awpxwnfvbxtitmcxreep.supabase.co';
-var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4';
+// Named DQS_ to avoid any conflict with dq-auth.js globals
+const DQS_URL = 'https://awpxwnfvbxtitmcxreep.supabase.co';
+const DQS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4';
 
 let sets = [];       // all study sets
 let folders = [];    // folders
@@ -3602,8 +3602,8 @@ async function generateShortCode(s, access, expiry) {
   try {
     const uid = DQAuth.getUser().uid;
     // Check if this set already has a code in shared_sets
-    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=code`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=code`, {
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
     });
     const existing = await checkRes.json();
     const code = (existing && existing[0]?.code) ? existing[0].code : 'DQ-' + Math.random().toString(36).substr(2,4).toUpperCase();
@@ -3616,11 +3616,11 @@ async function generateShortCode(s, access, expiry) {
       data: serializeSet(s),
       expires_at: expiresAt
     };
-    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets`, {
+    await fetch(`${DQS_URL}/rest/v1/shared_sets`, {
       method: 'POST',
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': DQS_KEY,
+        'Authorization': 'Bearer ' + DQS_KEY,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
@@ -3634,9 +3634,9 @@ async function revokeShortCode(setId) {
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return;
   try {
     const uid = DQAuth.getUser().uid;
-    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}`, {
+    await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}`, {
       method: 'DELETE',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
     });
   } catch(e) {}
 }
@@ -3646,8 +3646,8 @@ async function resolveCode(raw) {
   const str = raw.trim();
   if (str.startsWith('DQ-')) {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?code=eq.${str}&select=*`, {
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${str}&select=*`, {
+        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
       });
       const rows = await res.json();
       if (!rows.length) return {error: 'Code not found — it may have been revoked or expired'};
@@ -3695,8 +3695,8 @@ async function renderCodesView() {
   if (isLoggedIn && typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
     try {
       const uid = DQAuth.getUser().uid;
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
+        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
       });
       const rows = await res.json();
       for (const row of rows) {
@@ -3817,11 +3817,11 @@ async function toggleCodeAccess(setId, code, currentAccess) {
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return;
   const newAccess = currentAccess === 'public' ? 'private' : 'public';
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?code=eq.${code}`, {
+    await fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${code}`, {
       method: 'PATCH',
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': DQS_KEY,
+        'Authorization': 'Bearer ' + DQS_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ access: newAccess })
@@ -3838,8 +3838,8 @@ async function openManageCode(setId) {
   try {
     if (typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
       const uid = DQAuth.getUser().uid;
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}&select=*`, {
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}&select=*`, {
+        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
       });
       const rows = await res.json();
       if (rows[0]) data = { access: rows[0].access, expiresAt: rows[0].expires_at ? new Date(rows[0].expires_at).getTime() : 0 };
@@ -3907,8 +3907,8 @@ async function refreshShortCode() {
   // Check for existing code first (via Supabase shared_sets)
   try {
     const uid = DQAuth.getUser().uid;
-    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=*`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=*`, {
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
     });
     const rows = await checkRes.json();
     const existing = rows[0] || null;
