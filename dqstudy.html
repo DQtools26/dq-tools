@@ -1325,6 +1325,9 @@ textarea.finp { resize:vertical; min-height:50px; }
 ═══════════════════════════════════════════════════ */
 
 // ── GLOBAL STATE ──
+const SUPABASE_URL = 'https://awpxwnfvbxtitmcxreep.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4';
+
 let sets = [];       // all study sets
 let folders = [];    // folders
 let currentSetId = null;
@@ -3533,30 +3536,44 @@ function decodeBase64ToSet(str) {
 async function generateShortCode(s, access, expiry) {
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return null;
   try {
-    // Reuse existing code or generate new one
-    const existingKey = 'dqshare_' + s.id;
-    const existing = await DQAuth.loadData(existingKey).catch(() => null);
-    const code = (existing && existing.code) ? existing.code : 'DQ-' + Math.random().toString(36).substr(2,4).toUpperCase();
-    const expiresAt = expiry > 0 ? Date.now() + expiry * 24*60*60*1000 : 0;
-    const payload = {
-      ...serializeSet(s),
-      code, access: access||shareAccess,
-      owner: DQAuth.getUser().uid,
-      setId: s.id,
-      expiresAt, createdAt: existing?.createdAt || Date.now()
+    const uid = DQAuth.getUser().uid;
+    // Check if this set already has a code in shared_sets
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=code`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    const existing = await checkRes.json();
+    const code = (existing && existing[0]?.code) ? existing[0].code : 'DQ-' + Math.random().toString(36).substr(2,4).toUpperCase();
+    const expiresAt = expiry > 0 ? new Date(Date.now() + expiry * 24*60*60*1000).toISOString() : null;
+    const row = {
+      code,
+      set_id: String(s.id),
+      owner_uid: uid,
+      access: access || 'public',
+      data: serializeSet(s),
+      expires_at: expiresAt
     };
-    await DQAuth.saveData(existingKey, payload);
-    await DQAuth.saveData('share_' + code, payload); // also store by code for lookup
+    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(row)
+    });
     return code;
   } catch(e) { return null; }
 }
 
 async function revokeShortCode(setId) {
-  if (typeof DQAuth === 'undefined') return;
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return;
   try {
-    const existing = await DQAuth.loadData('dqshare_' + setId).catch(() => null);
-    if (existing?.code) await DQAuth.deleteData('share_' + existing.code);
-    await DQAuth.deleteData('dqshare_' + setId);
+    const uid = DQAuth.getUser().uid;
+    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
   } catch(e) {}
 }
 
@@ -3564,15 +3581,19 @@ async function revokeShortCode(setId) {
 async function resolveCode(raw) {
   const str = raw.trim();
   if (str.startsWith('DQ-')) {
-    if (typeof DQAuth === 'undefined') return {error: 'Sign in to use short DQ-XXXX codes'};
     try {
-      const data = await DQAuth.loadData('share_' + str);
-      if (!data) return {error: 'Code not found — it may have been revoked or expired'};
-      if (data.expiresAt && data.expiresAt > 0 && Date.now() > data.expiresAt)
-        return {error: 'This code has expired'};
-      if (data.access === 'private' && DQAuth.getUser?.()?.uid !== data.owner)
-        return {error: 'This code is private — only the owner can access it'};
-      return {set: deserializeSet(data), meta: {code:str, access:data.access, owner:data.owner}};
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?code=eq.${str}&select=*`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      const rows = await res.json();
+      if (!rows.length) return {error: 'Code not found — it may have been revoked or expired'};
+      const row = rows[0];
+      if (row.access === 'private') {
+        const currentUid = (typeof DQAuth !== 'undefined') ? DQAuth?.getUser?.()?.uid : null;
+        if (currentUid !== row.owner_uid) return {error: 'This code is private — only the owner can access it'};
+      }
+      if (row.expires_at && new Date(row.expires_at) < new Date()) return {error: 'This code has expired'};
+      return {set: deserializeSet(row.data), meta: {code:str, access:row.access, owner:row.owner_uid}};
     } catch(e) { return {error: 'Could not fetch code — check your connection'}; }
   } else if (str.startsWith('DQS1:')) {
     const set = decodeBase64ToSet(str);
@@ -3598,14 +3619,21 @@ async function renderCodesView() {
   if (!isLoggedIn || typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) {
     myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px;">Sign in to share sets with short DQ-XXXX codes.</div>';
   } else {
-    // Find all shared sets by checking dqshare_{id} for each set
+    // Load shared sets from Supabase shared_sets table
     const sharedSets = [];
-    for (const s of sets) {
-      try {
-        const data = await DQAuth.loadData('dqshare_' + s.id);
-        if (data && data.code) sharedSets.push({s, data});
-      } catch(_) {}
-    }
+    try {
+      const uid = DQAuth.getUser().uid;
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      const rows = await res.json();
+      for (const row of rows) {
+        const s = sets.find(x => String(x.id) === String(row.set_id));
+        const data = { code: row.code, access: row.access, expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : 0 };
+        if (s) sharedSets.push({s, data});
+        else sharedSets.push({s: {id: row.set_id, name: row.data?.n || 'Deleted Set', icon: row.data?.ic || '📖'}, data});
+      }
+    } catch(_) {}
     if (!sharedSets.length) {
       myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px 0;">You haven\'t shared any sets yet. Click 🔗 Share on any set page to get started.</div>';
     } else {
@@ -3682,8 +3710,17 @@ async function revokeCode(setId) {
 
 async function openManageCode(setId) {
   const s = getSet(setId); if (!s) return;
-  const data = typeof DQAuth !== 'undefined' ? await DQAuth.loadData('dqshare_' + setId).catch(()=>null) : null;
-  const newAccess = data?.access === 'public' ? 'private' : 'public';
+  let data = null;
+  try {
+    if (typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
+      const uid = DQAuth.getUser().uid;
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}&select=*`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      const rows = await res.json();
+      if (rows[0]) data = { access: rows[0].access, expiresAt: rows[0].expires_at ? new Date(rows[0].expires_at).getTime() : 0 };
+    }
+  } catch(_) {}
   const newExpiry = prompt('Set expiry (days):\n0 = never\n7 = 7 days\n30 = 30 days\n\nCurrent: ' + (data?.expiresAt > 0 ? Math.ceil((data.expiresAt - Date.now())/(86400000)) + ' days left' : 'never'));
   if (newExpiry === null) return;
   const days = parseInt(newExpiry) || 0;
@@ -3742,18 +3779,23 @@ async function refreshShortCode() {
     document.getElementById('share-expiry-row').style.display = 'none';
     return;
   }
-  // Check for existing code first
+  // Check for existing code first (via Supabase shared_sets)
   try {
-    const existing = await DQAuth.loadData('dqshare_' + s.id).catch(() => null);
+    const uid = DQAuth.getUser().uid;
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=*`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    const rows = await checkRes.json();
+    const existing = rows[0] || null;
     if (existing && existing.code) {
       currentShareCode = existing.code;
       inp.value = existing.code;
-      const expired = existing.expiresAt > 0 && Date.now() > existing.expiresAt;
+      const expired = existing.expires_at && new Date(existing.expires_at) < new Date();
       statusEl.textContent = expired ? '⚠️ This code has expired — click New Code to regenerate' : '✓ Using existing code for this set';
       document.getElementById('share-existing-notice').style.display = '';
       document.getElementById('share-revoke-btn').style.display = '';
       // Set access toggle to match existing
-      shareAccess = existing.access || 'private';
+      shareAccess = existing.access || 'public';
       document.getElementById('share-public-btn').classList.toggle('on', shareAccess === 'public');
       document.getElementById('share-private-btn').classList.toggle('on', shareAccess === 'private');
     } else {
