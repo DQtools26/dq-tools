@@ -634,7 +634,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <div class="nav-spacer"></div>
   <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
   <button class="nav-icon-btn" title="Theme" onclick="showView('settings')">🎨</button>
-  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined'&&DQAuth.getUser?.())DQAuth._toggleDropdown();else if(typeof DQAuth!=='undefined')DQAuth.openModal();else{const t=setInterval(()=>{if(typeof DQAuth!=='undefined'){clearInterval(t);DQAuth.openModal();}},100);setTimeout(()=>clearInterval(t),5000);}})(event)">
+  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
     <div id="dq-auth-avatar">👤</div>
     <span id="dq-auth-label">Sign In</span>
   </button>
@@ -1536,22 +1536,25 @@ function bootApp() {
 // Always load local data in the background so it's ready
 const localTimestamp = loadLocal();
 
-// Always show landing first
-showLanding();
+// ─── AUTH + INIT ───────────────────────────────────
+// Mirror courseplanner pattern: wait for load, then listen for auth
+// This ensures dq-auth.js (defer) is fully ready before we touch DQAuth
 
-// Then try cloud auth
-window.addEventListener('dq:authready', async ({ detail: { user } }) => {
+let _authHandled = false;
+
+async function _handleAuthReady(user) {
+  if (_authHandled) return;
+  _authHandled = true;
+  showLanding();
+  renderSidebar();
   if (!user) {
-    // Not logged in — init sidebar/nav in background but stay on landing
-    renderSidebar();
     updateLandingCTA();
     return;
   }
   isLoggedIn = true;
-  updateLandingCTA(); // update to "Continue as Name"
+  updateLandingCTA();
   if (typeof DQAuth === 'undefined') return;
   try {
-    // Load settings from cloud and merge (cloud wins if newer)
     const cloudSettings = await DQAuth.loadData('dqstudy-settings');
     if (cloudSettings) {
       if (cloudSettings.theme) setTheme(cloudSettings.theme);
@@ -1568,7 +1571,6 @@ window.addEventListener('dq:authready', async ({ detail: { user } }) => {
         const el = document.querySelector(`#bg-anim-grid [data-bg="${cloudSettings.bgAnim}"]`);
         setBgAnim(cloudSettings.bgAnim, el);
       }
-      // Save merged settings back to localStorage
       saveSettings();
     }
     const cloud = await DQAuth.loadData('dqstudy');
@@ -1580,6 +1582,18 @@ window.addEventListener('dq:authready', async ({ detail: { user } }) => {
       DQAuth.saveData('dqstudy', {sets, folders, savedAt: localTimestamp});
     }
   } catch(_) {}
+}
+
+window.addEventListener('load', () => {
+  let started = false;
+  const start = (user) => { if (!started) { started = true; _handleAuthReady(user || null); } };
+
+  window.addEventListener('dq:authready', ({ detail: { user } }) => {
+    start(user);
+  });
+
+  // Fallback: if dq-auth.js never fires (e.g. offline), start anyway after 2s
+  setTimeout(() => start(null), 2000);
 });
 
 function showLanding() {
