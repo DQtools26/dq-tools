@@ -1368,7 +1368,10 @@ textarea.finp { resize:vertical; min-height:50px; }
 ═══════════════════════════════════════════════════ */
 
 // ── GLOBAL STATE ──
-// SUPABASE_URL and SUPABASE_ANON_KEY are already declared in dq-auth.js — do not redeclare here
+// Supabase config for DQcodes shared_sets table
+// Using var so it doesn't conflict if dq-auth.js also declares these
+var SUPABASE_URL = 'https://awpxwnfvbxtitmcxreep.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4';
 
 let sets = [];       // all study sets
 let folders = [];    // folders
@@ -1591,8 +1594,9 @@ window.addEventListener('load', () => {
     start(user);
   });
 
-  // Fallback: if dq-auth.js never fires (e.g. offline), start anyway after 2s
-  setTimeout(() => start(null), 2000);
+  // Fallback: if dq-auth.js never fires (offline/blocked), start after 500ms
+  // Short timeout so page doesn't feel slow — auth fires almost instantly when working
+  setTimeout(() => start(null), 500);
 });
 
 function showLanding() {
