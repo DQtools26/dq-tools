@@ -96,6 +96,46 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .nav-icon-btn { width:34px; height:34px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.9rem; transition:all var(--transition); }
 .nav-icon-btn:hover { border-color:var(--border2); color:var(--text); background:var(--surface2); }
 
+/* ─── Codes page ─── */
+.codes-filter-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-family: var(--font);
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.codes-filter-btn:hover { border-color: var(--border2); color: var(--text); }
+.codes-filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.code-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color var(--transition);
+}
+.code-card:hover { border-color: var(--border2); }
+.code-card-icon { font-size: 1.6rem; flex-shrink: 0; }
+.code-card-body { flex: 1; min-width: 0; }
+.code-card-name { font-size: .9rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.code-card-meta { display: flex; gap: 6px; margin-top: 5px; align-items: center; flex-wrap: wrap; }
+.code-card-code { font-family: var(--mono); font-size: .78rem; color: var(--accent2); background: var(--accent-dim, rgba(58,127,255,.12)); padding: 2px 8px; border-radius: 6px; cursor: pointer; transition: opacity .15s; }
+.code-card-code:hover { opacity: .7; }
+.code-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.code-badge-mine { background: rgba(45,204,111,.12); color: var(--green2); border: 1px solid rgba(45,204,111,.25); border-radius: 20px; font-size: .62rem; font-weight: 800; padding: 2px 8px; }
+.code-badge-saved { background: rgba(58,127,255,.12); color: var(--accent2); border: 1px solid rgba(58,127,255,.25); border-radius: 20px; font-size: .62rem; font-weight: 800; padding: 2px 8px; }
+.code-badge-expired { background: rgba(255,107,74,.12); color: var(--red2); border: 1px solid rgba(255,107,74,.25); border-radius: 20px; font-size: .62rem; font-weight: 800; padding: 2px 8px; }
+.code-by { font-size: .65rem; color: var(--text3); }
+
 /* DQ auth btn */
 #dq-auth-btn { display:flex;align-items:center;gap:6px; background:var(--surface);border:1px solid var(--border2); border-radius:100px;padding:4px 12px 4px 5px; font-family:var(--font);font-size:.68rem;font-weight:700; color:var(--text2);cursor:pointer;transition:all var(--transition); white-space:nowrap;flex-shrink:0; }
 #dq-auth-btn:hover { border-color:var(--accent); color:var(--text); }
@@ -594,7 +634,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <div class="nav-spacer"></div>
   <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
   <button class="nav-icon-btn" title="Theme" onclick="showView('settings')">🎨</button>
-  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+  <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined'&&DQAuth.getUser?.())DQAuth._toggleDropdown();else if(typeof DQAuth!=='undefined')DQAuth.openModal();else{const t=setInterval(()=>{if(typeof DQAuth!=='undefined'){clearInterval(t);DQAuth.openModal();}},100);setTimeout(()=>clearInterval(t),5000);}})(event)">
     <div id="dq-auth-avatar">👤</div>
     <span id="dq-auth-label">Sign In</span>
   </button>
@@ -837,35 +877,38 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ DQCODES VIEW ═══ -->
-    <div class="view" id="view-codes" style="padding:28px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-        <div style="font-size:1.5rem;font-weight:900;">🔗 DQcodes</div>
-        <button class="btn btn-primary btn-sm" onclick="showView('set');openShareModal()">＋ Share a Set</button>
-      </div>
-      <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Share your sets with anyone, or import a set someone shared with you.</div>
+    <div class="view" id="view-codes" style="padding:28px 28px 60px;">
 
-      <!-- Import a code -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;">
-        <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">📥 Import a DQcode</div>
-        <div style="font-size:.82rem;color:var(--text2);margin-bottom:12px;line-height:1.6;">Have a code from a friend? Paste it below to get a copy of their set.</div>
-        <div style="display:flex;gap:8px;">
-          <input class="finp" id="codes-import-inp" placeholder="Paste DQ-XXXX or DQS1:… code here" style="flex:1;">
-          <button class="btn btn-primary" onclick="importFromCodesView()">Import →</button>
-        </div>
-        <div id="codes-import-status" style="font-size:.72rem;margin-top:6px;"></div>
-        <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:.72rem;color:var(--text3);line-height:1.6;">
-          💡 <strong>How it works:</strong> Short codes (<code style="font-family:var(--mono);color:var(--accent2);">DQ-XXXX</code>) require sign-in and fetch the latest version. Long codes (<code style="font-family:var(--mono);color:var(--accent2);">DQS1:…</code>) are self-contained snapshots anyone can use.
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:1.6rem;font-weight:900;display:flex;align-items:center;gap:10px;">🔗 DQcodes</div>
+          <div style="color:var(--text2);font-size:.82rem;margin-top:3px;">Share sets with a short code. Anyone can import — no account needed.</div>
         </div>
       </div>
 
-      <!-- Your shared sets -->
-      <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">📤 Your Shared Sets</div>
-      <div id="codes-my-shared"></div>
+      <!-- Import bar — always visible at top -->
+      <div style="background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border2);border-radius:16px;padding:18px 20px;margin:18px 0 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:.68rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:7px;">📥 Got a code?</div>
+          <div style="display:flex;gap:8px;">
+            <input class="finp" id="codes-import-inp" placeholder="Paste DQ-XXXX or DQS1:… here" style="flex:1;font-family:var(--mono);font-size:.82rem;">
+            <button class="btn btn-primary" onclick="importFromCodesView()" style="white-space:nowrap;">Add to My Sets</button>
+          </div>
+          <div id="codes-import-status" style="font-size:.72rem;margin-top:6px;min-height:18px;"></div>
+        </div>
+      </div>
 
-      <!-- Saved codes from others -->
-      <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:20px;">📌 Saved Codes</div>
-      <div style="font-size:.75rem;color:var(--text2);margin-bottom:10px;">Sets you've imported from others. Click to open.</div>
-      <div id="codes-saved-sets"></div>
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+        <button class="codes-filter-btn active" data-filter="all" onclick="setCodesFilter('all',this)">All</button>
+        <button class="codes-filter-btn" data-filter="mine" onclick="setCodesFilter('mine',this)">Shared by Me</button>
+        <button class="codes-filter-btn" data-filter="saved" onclick="setCodesFilter('saved',this)">Saved from Others</button>
+      </div>
+
+      <!-- List -->
+      <div id="codes-list"></div>
+
     </div>
 
     <!-- ═══ TRACKING VIEW ═══ -->
@@ -2949,7 +2992,11 @@ let currentFolderId = null;
 function showFolders() {
   renderFoldersGrid();
   closeFolderOpen();
-  showView('folders');
+  // Activate view directly (don't call showView to avoid recursion)
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-folders');
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   sndClick();
 }
 
@@ -3604,6 +3651,15 @@ async function resolveCode(raw) {
 }
 
 // ── CODES VIEW ──
+let codesFilter = 'all';
+
+function setCodesFilter(filter, el) {
+  codesFilter = filter;
+  document.querySelectorAll('.codes-filter-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderCodesView();
+}
+
 function showCodesView() {
   renderCodesView();
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -3612,15 +3668,14 @@ function showCodesView() {
 }
 
 async function renderCodesView() {
-  // My shared sets
-  const myEl = document.getElementById('codes-my-shared');
-  myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px;">Loading…</div>';
+  const el = document.getElementById('codes-list');
+  el.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:16px 0;">Loading…</div>';
 
-  if (!isLoggedIn || typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) {
-    myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px;">Sign in to share sets with short DQ-XXXX codes.</div>';
-  } else {
-    // Load shared sets from Supabase shared_sets table
-    const sharedSets = [];
+  // Build combined list
+  const items = []; // {type:'mine'|'saved', s, data?, code?}
+
+  // Mine — from Supabase
+  if (isLoggedIn && typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
     try {
       const uid = DQAuth.getUser().uid;
       const res = await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
@@ -3629,82 +3684,134 @@ async function renderCodesView() {
       const rows = await res.json();
       for (const row of rows) {
         const s = sets.find(x => String(x.id) === String(row.set_id));
-        const data = { code: row.code, access: row.access, expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : 0 };
-        if (s) sharedSets.push({s, data});
-        else sharedSets.push({s: {id: row.set_id, name: row.data?.n || 'Deleted Set', icon: row.data?.ic || '📖'}, data});
+        const name = s?.name || row.data?.n || 'Deleted Set';
+        const icon = s?.icon || row.data?.ic || '📖';
+        const cardCount = s ? allCards(s).length : (row.data?.c?.length || 0);
+        const expired = row.expires_at && new Date(row.expires_at) < new Date();
+        items.push({ type: 'mine', setId: row.set_id, name, icon, cardCount, code: row.code, access: row.access, expired, expiresAt: row.expires_at, s });
       }
     } catch(_) {}
-    if (!sharedSets.length) {
-      myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px 0;">You haven\'t shared any sets yet. Click 🔗 Share on any set page to get started.</div>';
-    } else {
-      myEl.innerHTML = sharedSets.map(({s, data}) => {
-        const expired = data.expiresAt > 0 && Date.now() > data.expiresAt;
-        const expStr = data.expiresAt > 0 ? 'Expires ' + new Date(data.expiresAt).toLocaleDateString() : 'Never expires';
-        return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-          <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
-          <div style="flex:1;">
-            <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
-            <div style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">
-              <code style="font-family:var(--mono);font-size:.82rem;color:var(--accent2);background:var(--accent-dim);padding:2px 8px;border-radius:6px;">${data.code}</code>
-              <span class="chip ${data.access==='public'?'chip-green':'chip-amber'}">${data.access==='public'?'🌍 Public':'🔒 Private'}</span>
-              <span style="font-size:.62rem;color:var(--text3);">${expired?'⚠️ Expired':expStr}</span>
-            </div>
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn btn-ghost btn-sm" onclick="copyCode('${data.code}')">📋</button>
-            <button class="btn btn-ghost btn-sm" onclick="openManageCode('${s.id}')">⚙️</button>
-            <button class="btn btn-danger btn-sm" onclick="revokeCode('${s.id}')">✕</button>
-          </div>
-        </div>`;
-      }).join('');
+  }
+
+  // Saved — from local sets marked with fromCode
+  for (const s of sets.filter(x => x.fromCode)) {
+    const isMine = items.some(i => i.type === 'mine' && String(i.setId) === String(s.id));
+    if (!isMine) {
+      items.push({ type: 'saved', s, name: s.name, icon: s.icon || '📖', cardCount: allCards(s).length, code: s.fromCode !== 'DQS1' ? s.fromCode : null });
     }
   }
 
-  // Saved codes (sets imported from others — marked with fromCode)
-  const savedEl = document.getElementById('codes-saved-sets');
-  const saved = sets.filter(s => s.fromCode);
-  if (!saved.length) {
-    savedEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px 0;">No imported sets yet. Paste a DQcode above to import one.</div>';
-  } else {
-    savedEl.innerHTML = saved.map(s => `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openSet('${s.id}')">
-        <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
-        <div style="flex:1;">
-          <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
-          <div style="font-size:.65rem;color:var(--text3);margin-top:2px;">Imported · ${allCards(s).length} cards</div>
-        </div>
-        <span class="chip chip-blue">🔗 Shared</span>
-      </div>
-    `).join('');
+  // Filter
+  const filtered = items.filter(i => codesFilter === 'all' || (codesFilter === 'mine' && i.type === 'mine') || (codesFilter === 'saved' && i.type === 'saved'));
+
+  if (!filtered.length) {
+    let msg = '';
+    if (codesFilter === 'mine') msg = isLoggedIn ? 'You haven\'t shared any sets yet. Click 🔗 Share on any set page.' : 'Sign in to share sets and get a reusable DQ-XXXX code.';
+    else if (codesFilter === 'saved') msg = 'No imported sets yet. Paste a code in the box above.';
+    else msg = isLoggedIn ? 'No codes yet. Share a set to get started, or import one above.' : 'Paste a code above to import a set, or sign in to share your own.';
+    el.innerHTML = `<div style="padding:32px 0;text-align:center;color:var(--text3);font-size:.82rem;">${msg}</div>`;
+    return;
   }
+
+  el.innerHTML = filtered.map(item => {
+    if (item.type === 'mine') {
+      const expLabel = item.expired ? '<span class="code-badge-expired">⚠ Expired</span>' : (item.expiresAt ? '<span style="font-size:.62rem;color:var(--text3);">Expires ' + new Date(item.expiresAt).toLocaleDateString() + '</span>' : '');
+      const accessChip = item.access === 'public'
+        ? '<span class="chip chip-green" style="font-size:.6rem;">🌍 Public</span>'
+        : '<span class="chip chip-amber" style="font-size:.6rem;">🔒 Private</span>';
+      return `<div class="code-card">
+        <div class="code-card-icon">${item.icon}</div>
+        <div class="code-card-body">
+          <div class="code-card-name">${esc(item.name)}</div>
+          <div class="code-card-meta">
+            <span class="code-card-code" onclick="copyCodeToast('${item.code}')" title="Click to copy">${item.code}</span>
+            ${accessChip}
+            <span class="code-badge-mine">My Set</span>
+            <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
+            ${expLabel}
+          </div>
+        </div>
+        <div class="code-card-actions">
+          ${item.s ? `<button class="btn btn-ghost btn-sm" onclick="currentSetId='${item.setId}';openSet('${item.setId}')" title="Open set">↗</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="copyCodeToast('${item.code}')" title="Copy code">📋</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleCodeAccess('${item.setId}','${item.code}','${item.access}')" title="Toggle public/private">${item.access === 'public' ? '🌍' : '🔒'}</button>
+          <button class="btn btn-danger btn-sm" onclick="revokeCode('${item.setId}')" title="Revoke">✕</button>
+        </div>
+      </div>`;
+    } else {
+      const codeLabel = item.code ? `<span class="code-card-code" onclick="copyCodeToast('${item.code}')" title="Click to copy">${item.code}</span>` : '<span style="font-size:.62rem;color:var(--text3);">Snapshot code</span>';
+      return `<div class="code-card" style="cursor:pointer;" onclick="openSet('${item.s.id}')">
+        <div class="code-card-icon">${item.icon}</div>
+        <div class="code-card-body">
+          <div class="code-card-name">${esc(item.name)}</div>
+          <div class="code-card-meta">
+            ${codeLabel}
+            <span class="code-badge-saved">Saved from code</span>
+            <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
+          </div>
+        </div>
+        <div class="code-card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openSet('${item.s.id}')" title="Open">↗</button>
+        </div>
+      </div>`;
+    }
+  }).join('');
 }
 
 async function importFromCodesView() {
   const raw = document.getElementById('codes-import-inp').value.trim();
   const status = document.getElementById('codes-import-status');
   if (!raw) return;
-  status.textContent = 'Looking up…'; status.style.color = 'var(--text2)';
+  status.innerHTML = '<span style="color:var(--text2);">Looking up…</span>';
   const result = await resolveCode(raw);
-  if (result.error) { status.textContent = '⚠ ' + result.error; status.style.color = 'var(--red2)'; return; }
+  if (result.error) {
+    status.innerHTML = '<span style="color:var(--red2);">⚠ ' + result.error + '</span>';
+    return;
+  }
   const s = result.set;
   s.fromCode = raw.startsWith('DQ-') ? raw : 'DQS1';
   s.fromCodeMeta = result.meta || null;
   sets.push(s);
   autoSave(); renderSidebar();
-  status.textContent = '✓ Imported "' + s.name + '"! Opening…'; status.style.color = 'var(--green2)';
+  status.innerHTML = '<span style="color:var(--green2);">✓ Added <strong>' + esc(s.name) + '</strong> to your sets!</span>';
   document.getElementById('codes-import-inp').value = '';
-  setTimeout(() => { openSet(s.id); renderCodesView(); sndComplete(); }, 800);
+  renderCodesView();
+  sndComplete();
+  setTimeout(() => { status.innerHTML = ''; }, 4000);
 }
 
-function copyCode(code) {
-  navigator.clipboard.writeText(code).then(() => { if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Code copied!'); });
+function copyCodeToast(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Code copied: ' + code);
+  });
   sndClick();
 }
 
+function copyCode(code) { copyCodeToast(code); }
+
 async function revokeCode(setId) {
-  if (!confirm('Revoke this code? Anyone with the code will lose access.')) return;
+  if (!confirm('Revoke this code? Anyone with it will lose access.')) return;
   await revokeShortCode(setId);
   renderCodesView();
+  sndClick();
+}
+
+async function toggleCodeAccess(setId, code, currentAccess) {
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return;
+  const newAccess = currentAccess === 'public' ? 'private' : 'public';
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/shared_sets?code=eq.${code}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ access: newAccess })
+    });
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('Code is now ' + newAccess);
+    renderCodesView();
+  } catch(_) {}
   sndClick();
 }
 
@@ -3729,6 +3836,7 @@ async function openManageCode(setId) {
 }
 
 let shareCodeType = 'short'; // 'short' or 'long'
+
 
 function setShareCodeType(type, el) {
   shareCodeType = type;
