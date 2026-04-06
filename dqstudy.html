@@ -3598,9 +3598,10 @@ function decodeBase64ToSet(str) {
 // Generate a short code (stored in Supabase via DQAuth)
 // One code per set — key is dqshare_{setId}
 async function generateShortCode(s, access, expiry) {
-  if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return null;
+  const _u = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (!_u) return null;
   try {
-    const uid = DQAuth.getUser().uid;
+    const uid = _u.uid;
     // Check if this set already has a code in shared_sets
     const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=code`, {
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
@@ -3631,9 +3632,10 @@ async function generateShortCode(s, access, expiry) {
 }
 
 async function revokeShortCode(setId) {
-  if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return;
+  const _ru = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (!_ru) return;
   try {
-    const uid = DQAuth.getUser().uid;
+    const uid = _ru.uid;
     await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}`, {
       method: 'DELETE',
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
@@ -3692,7 +3694,9 @@ async function renderCodesView() {
   const items = []; // {type:'mine'|'saved', s, data?, code?}
 
   // Mine — from Supabase
-  if (isLoggedIn && typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
+  const _cu = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (_cu) { isLoggedIn = true; } // sync flag
+  if (_cu) {
     try {
       const uid = DQAuth.getUser().uid;
       const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
@@ -3896,7 +3900,8 @@ async function refreshShortCode() {
   inp.value = 'Loading…';
   statusEl.textContent = '';
   const s = getSet(currentSetId); if (!s) return;
-  if (!isLoggedIn || typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) {
+  const _authUser = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (!_authUser) {
     inp.value = encodeSetToBase64(s);
     currentShareCode = inp.value;
     statusEl.textContent = 'Sign in to get a short reusable DQ-XXXX code';
@@ -3904,9 +3909,10 @@ async function refreshShortCode() {
     document.getElementById('share-expiry-row').style.display = 'none';
     return;
   }
+  isLoggedIn = true; // sync flag in case it fell behind
   // Check for existing code first (via Supabase shared_sets)
   try {
-    const uid = DQAuth.getUser().uid;
+    const uid = _authUser.uid;
     const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=*`, {
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
     });
