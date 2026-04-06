@@ -1146,10 +1146,10 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div id="share-access-row" style="margin-bottom:14px;">
           <div class="flabel" style="margin-bottom:8px;">Who can use this code?</div>
           <div style="display:flex;gap:8px;">
-            <button class="start-opt" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Public — anyone</button>
-            <button class="start-opt on" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Private — only me</button>
+            <button class="start-opt on" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Public — anyone</button>
+            <button class="start-opt" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Private — only me</button>
           </div>
-          <div style="font-size:.65rem;color:var(--text3);margin-top:5px;" id="share-access-hint">Private: only you can import this code.</div>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:5px;" id="share-access-hint">Public: anyone with the code can import this set.</div>
         </div>
 
         <!-- Step 3: Expiry -->
@@ -3884,14 +3884,35 @@ function setShareCodeType(type, el) {
   }
 }
 
-function setShareAccess(type) {
+async function setShareAccess(type) {
   shareAccess = type;
   document.getElementById('share-public-btn').classList.toggle('on', type === 'public');
   document.getElementById('share-private-btn').classList.toggle('on', type === 'private');
   document.getElementById('share-access-hint').textContent = type === 'public'
     ? 'Public: anyone with the code can import this set.'
     : 'Private: only you can import this code.';
-  refreshShortCode();
+  // If we already have a code, patch it in Supabase immediately
+  if (currentShareCode && currentShareCode.startsWith('DQ-')) {
+    try {
+      await fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${currentShareCode}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': DQS_KEY,
+          'Authorization': 'Bearer ' + DQS_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access: type })
+      });
+      document.getElementById('share-status').textContent = type === 'public'
+        ? '🌍 Code is now public'
+        : '🔒 Code is now private';
+    } catch(e) {
+      document.getElementById('share-status').textContent = 'Could not update access';
+    }
+  } else {
+    // No code yet — generate one with the new access
+    refreshShortCode();
+  }
 }
 
 async function refreshShortCode() {
@@ -3982,7 +4003,7 @@ async function revokeCurrentCode() {
 // Open share modal
 async function openShareModal() {
   const s = getSet(currentSetId); if (!s) return;
-  shareAccess = 'private';
+  shareAccess = 'public';
   shareCodeType = 'short';
   currentShareCode = '';
 
@@ -4003,8 +4024,8 @@ async function openShareModal() {
   document.getElementById('share-existing-notice').style.display = 'none';
   document.getElementById('share-type-short').classList.add('active');
   document.getElementById('share-type-long').classList.remove('active');
-  document.getElementById('share-public-btn').classList.remove('on');
-  document.getElementById('share-private-btn').classList.add('on');
+  document.getElementById('share-public-btn').classList.add('on');
+  document.getElementById('share-private-btn').classList.remove('on');
   document.getElementById('share-revoke-btn').style.display = 'none';
 
   openModal('share-modal');
