@@ -587,6 +587,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <div class="nav-logo" onclick="goHome()">DQ<em>study</em></div>
   <div class="nav-links" id="nav-links" style="display:none">
     <button class="nav-link" onclick="goHome()">🏠 Home</button>
+    <button class="nav-link" onclick="showCodesView()">🔗 Codes</button>
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
     <button class="nav-link" onclick="showView('settings')">⚙️ Settings</button>
   </div>
@@ -615,6 +616,8 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div id="sb-foot">
       <button class="sb-foot-btn" onclick="showAllSets()"><span>📚</span> View All Sets</button>
       <button class="sb-foot-btn" onclick="showFolders()"><span>📁</span> Folders</button>
+      <button class="sb-foot-btn" onclick="showCodesView()"><span>🔗</span> DQcodes</button>
+      <button class="sb-foot-btn" onclick="openAIBuildModal()"><span>✨</span> Build Set with AI</button>
       <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress</button>
       <button class="sb-foot-btn" onclick="showView('settings')"><span>⚙️</span> Settings</button>
     </div>
@@ -757,16 +760,24 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="view" id="view-learn">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
-        <div class="study-title" id="learn-title">Learn</div>
+        <div class="study-title" id="learn-title">🧠 Learn</div>
         <div class="study-prog-track"><div class="study-prog-fill" id="learn-prog" style="width:0%"></div></div>
         <div class="study-count" id="learn-count-nav">0/0</div>
       </div>
       <div class="learn-body">
         <div class="learn-wrap">
+          <!-- Phase indicator -->
+          <div id="learn-phase-row" style="display:flex;gap:8px;margin-bottom:14px;align-items:center;">
+            <div id="learn-phase-pip-1" style="flex:1;height:4px;border-radius:2px;background:var(--border);transition:.3s;"></div>
+            <div id="learn-phase-pip-2" style="flex:1;height:4px;border-radius:2px;background:var(--border);transition:.3s;"></div>
+            <div id="learn-phase-pip-3" style="flex:1;height:4px;border-radius:2px;background:var(--border);transition:.3s;"></div>
+            <div id="learn-phase-label" style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);white-space:nowrap;margin-left:4px;"></div>
+          </div>
+          <!-- Status row -->
           <div class="learn-status-row">
-            <div class="learn-status-card learn-n-known"><div class="learn-status-n" id="learn-known-n">0</div><div class="learn-status-label">Known</div></div>
-            <div class="learn-status-card learn-n-left"><div class="learn-status-n" id="learn-left-n">0</div><div class="learn-status-label">Left</div></div>
-            <div class="learn-status-card learn-n-round"><div class="learn-status-n" id="learn-round-n">1</div><div class="learn-status-label">Round</div></div>
+            <div class="learn-status-card learn-n-known"><div class="learn-status-n" id="learn-known-n">0</div><div class="learn-status-label">Mastered</div></div>
+            <div class="learn-status-card learn-n-left"><div class="learn-status-n" id="learn-left-n">0</div><div class="learn-status-label">Learning</div></div>
+            <div class="learn-status-card learn-n-round"><div class="learn-status-n" id="learn-streak-n">0</div><div class="learn-status-label">🔥 Streak</div></div>
           </div>
           <div id="learn-card-area"></div>
         </div>
@@ -823,6 +834,38 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
         <!-- floating bubbles injected by JS here -->
       </div>
+    </div>
+
+    <!-- ═══ DQCODES VIEW ═══ -->
+    <div class="view" id="view-codes" style="padding:28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+        <div style="font-size:1.5rem;font-weight:900;">🔗 DQcodes</div>
+        <button class="btn btn-primary btn-sm" onclick="showView('set');openShareModal()">＋ Share a Set</button>
+      </div>
+      <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Share your sets with anyone, or import a set someone shared with you.</div>
+
+      <!-- Import a code -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;">
+        <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">📥 Import a DQcode</div>
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:12px;line-height:1.6;">Have a code from a friend? Paste it below to get a copy of their set.</div>
+        <div style="display:flex;gap:8px;">
+          <input class="finp" id="codes-import-inp" placeholder="Paste DQ-XXXX or DQS1:… code here" style="flex:1;">
+          <button class="btn btn-primary" onclick="importFromCodesView()">Import →</button>
+        </div>
+        <div id="codes-import-status" style="font-size:.72rem;margin-top:6px;"></div>
+        <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:.72rem;color:var(--text3);line-height:1.6;">
+          💡 <strong>How it works:</strong> Short codes (<code style="font-family:var(--mono);color:var(--accent2);">DQ-XXXX</code>) require sign-in and fetch the latest version. Long codes (<code style="font-family:var(--mono);color:var(--accent2);">DQS1:…</code>) are self-contained snapshots anyone can use.
+        </div>
+      </div>
+
+      <!-- Your shared sets -->
+      <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">📤 Your Shared Sets</div>
+      <div id="codes-my-shared"></div>
+
+      <!-- Saved codes from others -->
+      <div style="font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:20px;">📌 Saved Codes</div>
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:10px;">Sets you've imported from others. Click to open.</div>
+      <div id="codes-saved-sets"></div>
     </div>
 
     <!-- ═══ TRACKING VIEW ═══ -->
@@ -902,6 +945,19 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="font-size:.7rem;color:var(--text3);">Animated backgrounds appear behind all content. May affect performance on older devices.</div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">🤖 AI Assistant</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">Show AI Buttons</div>
+            <div class="settings-toggle-sub">Show "Ask AI" buttons throughout DQstudy</div>
+          </div>
+          <button class="toggle on" id="ai-toggle" onclick="toggleAISetting()"></button>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.72rem;color:var(--amber2);line-height:1.6;">
+          ⚠️ AI buttons open prompts you copy into an AI tool like Claude or ChatGPT in a <strong>new tab</strong>. DQstudy does not have built-in AI — it generates the prompt for you.
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">💾 Data</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
@@ -915,6 +971,39 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
   </main>
+</div>
+
+<!-- ═══ AI PROMPTER MODAL ═══ -->
+<div class="modal-overlay" id="ai-modal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-head">
+      <div class="modal-title">🤖 AI Prompt Generator</div>
+      <button class="modal-close" onclick="closeModal('ai-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.75rem;color:var(--amber2);line-height:1.5;margin-bottom:16px;">
+        ⚠️ This generates a prompt for you to paste into an AI tool like <strong>Claude</strong> or <strong>ChatGPT</strong>. You'll need to open that in a <strong>new tab</strong> — DQstudy doesn't have built-in AI.
+      </div>
+      <div class="field">
+        <label class="flabel">What do you want to do?</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;" id="ai-action-grid"></div>
+      </div>
+      <div class="field" id="ai-custom-field">
+        <label class="flabel">Or describe something custom</label>
+        <textarea class="finp" id="ai-custom-inp" style="min-height:60px;" placeholder="e.g. Turn these into a study guide, make harder questions, translate to Spanish…"></textarea>
+      </div>
+      <div class="field">
+        <label class="flabel">Generated Prompt</label>
+        <textarea class="finp" id="ai-prompt-out" style="min-height:140px;font-size:.78rem;font-family:var(--mono);" readonly></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-primary" onclick="copyAIPrompt()">📋 Copy Prompt</button>
+        <button class="btn btn-ghost" onclick="openAIInNewTab()">↗ Open Claude</button>
+        <button class="btn btn-ghost" onclick="openChatGPT()">↗ Open ChatGPT</button>
+      </div>
+      <div style="font-size:.68rem;color:var(--text3);margin-top:8px;">After the AI responds, you can paste the result back using 📥 Import DQcode or by editing the set.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ CREATE SET MODAL ═══ -->
@@ -958,6 +1047,243 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('create-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSet()">💾 Save Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SHARE MODAL ═══ -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="max-width:540px;">
+    <div class="modal-head">
+      <div class="modal-title">🔗 Share Set</div>
+      <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Set preview card -->
+      <div id="share-card-preview" style="background:linear-gradient(135deg,var(--surface),var(--surface2));border:2px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:18px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--green));"></div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div id="sc-icon" style="font-size:2rem;"></div>
+          <div style="flex:1;">
+            <div id="sc-name" style="font-size:1rem;font-weight:900;"></div>
+            <div id="sc-meta" style="font-size:.72rem;color:var(--text2);margin-top:2px;"></div>
+          </div>
+          <div style="font-size:.58rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);background:var(--accent-dim);padding:3px 8px;border-radius:100px;border:1px solid rgba(58,127,255,.3);">DQstudy</div>
+        </div>
+        <div id="sc-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="share-loading" style="text-align:center;padding:20px;color:var(--text3);font-size:.82rem;">⏳ Checking for existing code…</div>
+
+      <!-- Main share UI (shown after load) -->
+      <div id="share-main" style="display:none;">
+
+        <!-- Existing code notice -->
+        <div id="share-existing-notice" style="display:none;background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--green2);display:none;">
+          ✓ This set already has a code. Sharing it again uses the same code.
+        </div>
+
+        <!-- Step 1: Choose code type -->
+        <div style="margin-bottom:14px;">
+          <div class="flabel" style="margin-bottom:8px;">Code type</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="theme-option active" id="share-type-short" onclick="setShareCodeType('short',this)" style="text-align:left;padding:12px;">
+              <div style="font-size:.85rem;font-weight:800;margin-bottom:2px;">🔑 Short Code</div>
+              <div style="font-size:.65rem;color:var(--text2);">DQ-XXXX — easy to type, requires sign-in</div>
+            </div>
+            <div class="theme-option" id="share-type-long" onclick="setShareCodeType('long',this)" style="text-align:left;padding:12px;">
+              <div style="font-size:.85rem;font-weight:800;margin-bottom:2px;">📦 Long Code</div>
+              <div style="font-size:.65rem;color:var(--text2);">DQS1:… — self-contained, works without sign-in</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Access (short code only) -->
+        <div id="share-access-row" style="margin-bottom:14px;">
+          <div class="flabel" style="margin-bottom:8px;">Who can use this code?</div>
+          <div style="display:flex;gap:8px;">
+            <button class="start-opt" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Public — anyone</button>
+            <button class="start-opt on" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Private — only me</button>
+          </div>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:5px;" id="share-access-hint">Private: only you can import this code.</div>
+        </div>
+
+        <!-- Step 3: Expiry -->
+        <div id="share-expiry-row" style="margin-bottom:14px;">
+          <div class="flabel" style="margin-bottom:8px;">Expiry</div>
+          <select class="finp" id="share-expiry-sel" style="max-width:220px;">
+            <option value="0">Never expires</option>
+            <option value="7">7 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+          </select>
+        </div>
+
+        <!-- The code -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div class="flabel" style="margin:0;">Your DQcode</div>
+            <button class="btn btn-ghost btn-sm" id="share-newcode-btn" onclick="regenerateCode()" style="font-size:.65rem;padding:4px 10px;">🔄 New Code</button>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input class="finp" id="share-code-inp" readonly style="font-family:var(--mono);font-size:.85rem;font-weight:700;letter-spacing:.08em;flex:1;" placeholder="Generating…">
+            <button class="btn btn-primary btn-sm" onclick="copyShareCode()">📋 Copy</button>
+          </div>
+          <div id="share-status" style="font-size:.68rem;color:var(--text3);margin-top:5px;"></div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border);">
+          <button class="btn btn-ghost btn-sm" onclick="mailtoShare()">✉️ Email</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadSharePNG()">🖼 Save Image</button>
+          <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export File</button>
+          <button class="btn btn-danger btn-sm" id="share-revoke-btn" onclick="revokeCurrentCode()" style="display:none;">✕ Revoke Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EXPORT MODAL ═══ -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-head">
+      <div class="modal-title">📤 Export Set</div>
+      <button class="modal-close" onclick="closeModal('export-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="export-set-name" style="font-size:.9rem;font-weight:800;margin-bottom:16px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="theme-option" style="text-align:left;padding:14px;" onclick="doExport('csv')">
+          <div style="font-size:1.2rem;margin-bottom:6px;">📄</div>
+          <div style="font-size:.82rem;font-weight:800;">CSV</div>
+          <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">term, definition<br>Opens in Excel/Sheets</div>
+        </button>
+        <button class="theme-option" style="text-align:left;padding:14px;" onclick="doExport('tsv')">
+          <div style="font-size:1.2rem;margin-bottom:6px;">📋</div>
+          <div style="font-size:.82rem;font-weight:800;">Tab Separated</div>
+          <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">term[TAB]definition<br>Quizlet-compatible</div>
+        </button>
+        <button class="theme-option" style="text-align:left;padding:14px;" onclick="doExport('txt')">
+          <div style="font-size:1.2rem;margin-bottom:6px;">📝</div>
+          <div style="font-size:.82rem;font-weight:800;">Plain Text</div>
+          <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">term: definition<br>Human readable</div>
+        </button>
+        <button class="theme-option" style="text-align:left;padding:14px;" onclick="doExport('dqs')">
+          <div style="font-size:1.2rem;margin-bottom:6px;">🔑</div>
+          <div style="font-size:.82rem;font-weight:800;">DQcode</div>
+          <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">DQS1:… self-contained<br>Import back into DQstudy</div>
+        </button>
+      </div>
+      <div id="export-dqs-out" style="display:none;margin-top:14px;">
+        <div class="flabel" style="margin-bottom:6px;">DQcode — copy and share</div>
+        <textarea class="finp" id="export-dqs-code" style="min-height:80px;font-family:var(--mono);font-size:.7rem;" readonly></textarea>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="copyExportCode()">📋 Copy Code</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ IMPORT MODAL ═══ -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-head">
+      <div class="modal-title">📥 Import DQcode</div>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="flabel">Paste a DQcode or short code</label>
+        <textarea class="finp" id="import-code-inp" style="min-height:80px;font-family:var(--mono);font-size:.78rem;" placeholder="Paste DQ-XXXX or full DQcode here…"></textarea>
+      </div>
+      <div id="import-preview-area" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+        <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Preview</div>
+        <div id="import-preview-content"></div>
+      </div>
+      <div id="import-error" style="display:none;color:var(--red2);font-size:.78rem;margin-top:8px;"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancel</button>
+      <button class="btn btn-ghost" onclick="previewImportCode()">👁 Preview</button>
+      <button class="btn btn-primary" onclick="confirmImportCode()">📥 Import Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI BUILD-A-SET MODAL ═══ -->
+<div class="modal-overlay" id="ai-build-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-head">
+      <div class="modal-title">✨ Build a Set with AI</div>
+      <button class="modal-close" onclick="closeModal('ai-build-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="ai-build-body">
+      <!-- Step 1: Configure -->
+      <div id="ai-build-step1">
+        <div id="ai-build-greeting"></div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+          <div style="font-size:.95rem;font-weight:800;margin-bottom:4px;">👋 Hi! I'm DQstudy's AI assistant.</div>
+          <div style="font-size:.8rem;color:var(--text2);line-height:1.6;">Tell me what you want to study and I'll generate a prompt you can paste into any AI (Claude, ChatGPT, etc.). The AI will respond with cards in a format you paste back here — I'll import them automatically.</div>
+        </div>
+        <div class="field">
+          <label class="flabel">What are you studying? *</label>
+          <input class="finp" id="ai-build-topic" placeholder="e.g. Photosynthesis, Spanish vocab chapter 3, Civil War battles…">
+        </div>
+        <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="field">
+            <label class="flabel">Grade / Level</label>
+            <select class="finp" id="ai-build-level">
+              <option value="middle school">Middle School</option>
+              <option value="high school" selected>High School</option>
+              <option value="AP/college">AP / College</option>
+              <option value="any">Any level</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="flabel">Card Style</label>
+            <select class="finp" id="ai-build-style">
+              <option value="flashcards">Flashcards (term + definition)</option>
+              <option value="questions">Q&A (question + answer)</option>
+              <option value="fill">Fill in the blank</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="flabel">How many cards? <span id="ai-build-count-val" style="color:var(--accent2);font-weight:900;">20</span></label>
+          <input type="range" class="launcher-range" id="ai-build-count" min="5" max="50" value="20" oninput="document.getElementById('ai-build-count-val').textContent=this.value">
+        </div>
+        <div class="field">
+          <label class="flabel">Extra instructions (optional)</label>
+          <input class="finp" id="ai-build-extra" placeholder="e.g. Focus on dates, include examples, keep definitions short…">
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="generateAIBuildPrompt()">✨ Generate Prompt</button>
+      </div>
+
+      <!-- Step 2: Copy prompt -->
+      <div id="ai-build-step2" style="display:none;">
+        <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.8rem;color:var(--green2);line-height:1.6;">
+          ✓ Prompt ready! Copy it, paste into Claude or ChatGPT, then paste the AI's response in Step 3.
+        </div>
+        <div class="field">
+          <label class="flabel">Your Prompt — copy this</label>
+          <textarea class="finp" id="ai-build-prompt-out" style="min-height:160px;font-size:.75rem;font-family:var(--mono);" readonly></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button class="btn btn-primary" id="ai-build-copy-btn" onclick="copyAIBuildPrompt()">📋 Copy Prompt</button>
+          <button class="btn btn-ghost" onclick="window.open('https://claude.ai','_blank');copyAIBuildPrompt()">↗ Open Claude</button>
+          <button class="btn btn-ghost" onclick="window.open('https://chat.openai.com','_blank');copyAIBuildPrompt()">↗ Open ChatGPT</button>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;">
+          <div style="font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Step 3 — Paste the AI's response here</div>
+          <textarea class="finp" id="ai-build-paste-in" style="min-height:120px;font-size:.78rem;" placeholder="Paste the AI's response here…"></textarea>
+          <div id="ai-build-paste-status" style="font-size:.72rem;color:var(--text3);margin-top:4px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-ghost" onclick="document.getElementById('ai-build-step1').style.display='';document.getElementById('ai-build-step2').style.display='none';">← Back</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="importAIBuildResult()">📥 Import as New Set</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1009,16 +1335,28 @@ let fcPairs = [];
 let soundEnabled = true;
 let volume = 0.5;
 let currentTheme = 'dark';
+let aiEnabled = true; // on by default, first-time prompt handled separately
+let aiSeenPrompt = false;
+let aiContext = 'set';
+let bgAnim = 'none';
+let bgAnimFrame = null;
+let shareAccess = 'private';
+let currentShareCode = '';
 
 // ── STUDY SESSION STATE ──
 let sessionCards = [];
 let sessionMode = null;
+let studyOpts = {};
 let fcIdx = 0, fcKnown = new Set(), fcReview = new Set(), fcShuffle = false, fcDir = 'normal';
 let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false, quizTimerInt = null, quizSecs = 0, isTestMode = false;
-let matchSel = null, matchMatched = 0;
+let matchSel = null, matchMatched = 0, matchTotal = 0;
 let learnQueue = [], learnKnown = new Set(), learnRound = 1, learnIdx = 0;
+let learnDeck = [], learnMastered = 0, learnStreak = 0, learnCurrentIdx = 0;
 let speedCards = [], speedIdx = 0, speedKnow = 0, speedMiss = 0;
 let speedTimerInt = null, speedSecsLeft = 5, speedAnswered = false;
+let speedBubbles = [], speedBubbleFrame = null;
+let selectedMode = 'flashcards';
+let optShuffle = false, optStarred = false, optReview = false;
 
 // ─────────────────────────────────────────────────
 // SOUNDS
@@ -1102,12 +1440,15 @@ function loadSettings() {
         setBgAnim(bgAnim, el);
       }, 300);
     }
+    if (s.aiEnabled !== undefined) aiEnabled = s.aiEnabled;
+    aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
   const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
+  const at = document.getElementById('ai-toggle'); if (at) at.classList.toggle('on', aiEnabled);
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
@@ -1238,6 +1579,7 @@ function showView(id) {
   if (id === 'tracking') { showTracking(); return; }
   if (id === 'folders') { showFolders(); return; }
   if (id === 'allsets') { showAllSets(); return; }
+  if (id === 'codes') { showCodesView(); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const el = document.getElementById('view-' + id);
   if (el) { el.classList.add('active'); }
@@ -1311,7 +1653,9 @@ function renderHome() {
         <div class="recent-card-count">${cards.length} cards${lastHist?' · Last: '+Math.round(lastHist.score/lastHist.total*100)+'%':''}</div>
         <div class="recent-card-bar"><div class="recent-card-fill" style="width:${mastery}%"></div></div>
       </div>`;
-    }).join('') + `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>New Set</span></div>`;
+    }).join('') +
+    `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>New Set</span></div>` +
+    `<div class="home-add-card" onclick="openAIBuildModal()" style="border-color:rgba(155,89,182,.4);color:var(--purple2);"><span style="font-size:1.6rem;">✨</span><span>Build with AI</span></div>`;
   }
 }
 
@@ -1391,8 +1735,6 @@ const MODES = [
   {id:'learn',      icon:'🧠', name:'Learn',      desc:'Type-in answers'},
   {id:'speed',      icon:'⚡', name:'Speed Round', desc:'5 sec per card!'},
 ];
-let selectedMode = 'flashcards';
-let optShuffle = false, optStarred = false, optReview = false;
 
 function openSet(id) {
   currentSetId = id;
@@ -1425,6 +1767,9 @@ function renderSetPage(s) {
       ${s.notes ? `<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>` : ''}
     </div>
     <div class="set-header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openShareModal()">🔗 Share</button>
+      <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>
+      <button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">🤖 AI</button>
       <button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>
       <button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>
       <button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>
@@ -1441,6 +1786,9 @@ function renderSetPage(s) {
 
   renderStartBar();
   renderCardsGrid(s);
+  // Show/hide AI button based on setting
+  const aiBtn = document.getElementById('ai-set-btn');
+  if (aiBtn) aiBtn.style.display = aiEnabled ? '' : 'none';
 }
 
 function selectMode(id, el) {
@@ -1460,22 +1808,32 @@ function renderStartBar() {
   `;
 }
 
-// Study options per mode
-let studyOpts = {};
-
 function openStudyOpts() {
   const s = getSet(currentSetId);
   const total = s ? allCards(s).length : 0;
   const mode = selectedMode;
   studyOpts = {};
 
-  document.getElementById('study-opts-title').textContent = 
+  document.getElementById('study-opts-title').textContent =
     MODES.find(m=>m.id===mode)?.icon + ' ' + MODES.find(m=>m.id===mode)?.name + ' Options';
 
-  let body = '';
+  // Universal card count selector shown for all modes
+  const universalCards = `
+    <div class="field" style="padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border);">
+      <label class="flabel">How many cards to use</label>
+      <input type="range" class="launcher-range" id="opt-card-count" min="2" max="${total}" value="${total}"
+        oninput="document.getElementById('opt-card-count-val').textContent=this.value">
+      <div style="font-size:.82rem;color:var(--accent2);font-weight:700;margin-top:4px;">
+        <span id="opt-card-count-val">${total}</span> of ${total} cards
+        <span style="color:var(--text3);font-weight:500;font-size:.72rem;margin-left:6px;">(uses first N cards in current order)</span>
+      </div>
+    </div>
+  `;
+
+  let body = universalCards;
 
   if (mode === 'flashcards') {
-    body = `
+    body += `
       <div class="field"><label class="flabel">Direction</label>
         <select class="finp" id="opt-fc-dir">
           <option value="normal">Front → Back (Term → Definition)</option>
@@ -1494,9 +1852,10 @@ function openStudyOpts() {
       <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-top:8px;"><input type="checkbox" id="opt-fc-flip-mode"> Just flip through (no Know/Miss tracking)</label>
     `;
   } else if (mode === 'quiz' || mode === 'test') {
-    body = `
+    body += `
       <div class="field"><label class="flabel">Number of questions</label>
-        <input type="range" class="launcher-range" id="opt-q-count" min="5" max="${Math.min(50,total)}" value="${Math.min(20,total)}" oninput="document.getElementById('opt-q-count-val').textContent=this.value">
+        <input type="range" class="launcher-range" id="opt-q-count" min="2" max="${Math.min(50,total)}" value="${Math.min(20,total)}"
+          oninput="document.getElementById('opt-q-count-val').textContent=this.value">
         <div style="font-size:.82rem;color:var(--accent2);font-weight:700;margin-top:4px;"><span id="opt-q-count-val">${Math.min(20,total)}</span> questions</div>
       </div>
       <div class="field"><label class="flabel">Question types</label>
@@ -1517,7 +1876,7 @@ function openStudyOpts() {
       </div>` : ''}
     `;
   } else if (mode === 'matching') {
-    body = `
+    body += `
       <div class="field"><label class="flabel">Number of pairs</label>
         <select class="finp" id="opt-match-pairs">
           <option value="4">4 pairs</option>
@@ -1534,8 +1893,7 @@ function openStudyOpts() {
       </div>
     `;
   } else if (mode === 'speed') {
-    const total = sessionCards.length;
-    body = `
+    body += `
       <div class="field"><label class="flabel">Seconds per card</label>
         <select class="finp" id="opt-speed-secs">
           <option value="3">3 seconds (hard)</option>
@@ -1559,9 +1917,30 @@ function openStudyOpts() {
         </select>
       </div>
     `;
+  } else if (mode === 'learn') {
+    body += `
+      <div class="field"><label class="flabel">Mastery threshold</label>
+        <select class="finp" id="opt-learn-threshold">
+          <option value="1">Pass all 3 phases once (default)</option>
+          <option value="2">Pass each phase twice (thorough)</option>
+          <option value="3">Pass each phase 3 times (deep learning)</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Include phases</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-bottom:6px;"><input type="checkbox" id="opt-learn-p1" checked> 📖 Phase 1 — Study (show front + back)</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;margin-bottom:6px;"><input type="checkbox" id="opt-learn-p2" checked> 🎯 Phase 2 — Multiple choice</label>
+        <label class="launcher-check" style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><input type="checkbox" id="opt-learn-p3" checked> ✏️ Phase 3 — Type the answer</label>
+      </div>
+      <div class="field"><label class="flabel">Starting phase</label>
+        <select class="finp" id="opt-learn-startphase">
+          <option value="1">Phase 1 — Study first (best for new material)</option>
+          <option value="2">Phase 2 — Skip to multiple choice</option>
+          <option value="3">Phase 3 — Jump straight to typing</option>
+        </select>
+      </div>
+    `;
   } else {
-    // learn, no options yet
-    body = `<div style="font-size:.82rem;color:var(--text2);padding:8px 0;">No extra options for this mode. Hit Start to begin!</div>`;
+    body += `<div style="font-size:.82rem;color:var(--text2);padding:8px 0;">Hit Start to begin!</div>`;
   }
 
   document.getElementById('study-opts-body').innerHTML = body;
@@ -1569,8 +1948,13 @@ function openStudyOpts() {
 }
 
 function confirmLaunch() {
-  // Read options
   const mode = selectedMode;
+  const s = getSet(currentSetId);
+  const total = s ? allCards(s).length : 0;
+
+  // Universal — card count
+  studyOpts.cardCount = parseInt(document.getElementById('opt-card-count')?.value || total);
+
   if (mode === 'flashcards') {
     studyOpts.fcDir = document.getElementById('opt-fc-dir')?.value || 'normal';
     studyOpts.fcTimer = parseInt(document.getElementById('opt-fc-timer')?.value || '0');
@@ -1588,6 +1972,12 @@ function confirmLaunch() {
     studyOpts.speedSecs = parseInt(document.getElementById('opt-speed-secs')?.value || '5');
     studyOpts.speedBubbles = parseInt(document.getElementById('opt-speed-bubbles')?.value || '4');
     studyOpts.speedRounds = parseInt(document.getElementById('opt-speed-rounds')?.value || '1');
+  } else if (mode === 'learn') {
+    studyOpts.learnThreshold = parseInt(document.getElementById('opt-learn-threshold')?.value || '1');
+    studyOpts.learnPhase1 = document.getElementById('opt-learn-p1')?.checked !== false;
+    studyOpts.learnPhase2 = document.getElementById('opt-learn-p2')?.checked !== false;
+    studyOpts.learnPhase3 = document.getElementById('opt-learn-p3')?.checked !== false;
+    studyOpts.learnStartPhase = parseInt(document.getElementById('opt-learn-startphase')?.value || '1');
   }
   closeModal('study-opts-modal');
   launchStudy();
@@ -1624,7 +2014,7 @@ function cycleIcon() {
 
 function deleteSet() {
   if (!confirm('Delete this study set? This cannot be undone.')) return;
-  sets = sets.filter(s => s.id !== currentSetId);
+  sets = sets.filter(s => s.id != currentSetId); // loose != handles number/string mismatch
   currentSetId = null;
   autoSave(); renderSidebar(); goHome();
 }
@@ -1639,6 +2029,9 @@ function launchStudy() {
   if (optReview) cards = cards.filter(c => c.mastery === 'review');
   if (!cards.length) { alert('No cards match your filter!'); return; }
   if (optShuffle || selectedMode !== 'flashcards') cards = shuffle([...cards]);
+  // Apply card count limit
+  const limit = studyOpts.cardCount || cards.length;
+  cards = cards.slice(0, Math.min(limit, cards.length));
   s.plays = (s.plays||0) + 1;
   s.updated = Date.now();
   sessionCards = cards;
@@ -1942,7 +2335,6 @@ function finishQuiz() {
 // ─────────────────────────────────────────────────
 // MATCHING
 // ─────────────────────────────────────────────────
-let matchTotal = 0;
 function startMatching() {
   const pairCount = studyOpts.matchPairs || 6;
   const style = studyOpts.matchStyle || 'term-def';
@@ -2015,71 +2407,266 @@ function matchClick(el) {
 }
 
 // ─────────────────────────────────────────────────
-// LEARN
+// LEARN — 3-phase teaching mode
 // ─────────────────────────────────────────────────
+// Each card has a phase: 1=show&learn, 2=multiple choice, 3=type it
+// Card graduates when it passes its current phase
+// Mastered = passed all 3 phases
+// learnDeck: [{card, phase, streak}]
+
+const LEARN_ENCOURAGEMENTS = ['Nice! 🎉','Keep going! 💪','You got it! ✓','Nailed it! 🔥','Great job! ⭐','Crushing it! 🚀','Perfect! 💎','Yes! 🎯'];
+const LEARN_WRONG_MSGS = ["Not quite — let's review it again","Almost! Take another look","Don't worry, you'll get it!","Keep at it — repetition works!"];
+
 function startLearn() {
-  learnQueue = shuffle([...sessionCards]);
-  learnKnown = new Set(); learnRound = 1; learnIdx = 0;
-  document.getElementById('learn-title').textContent = getSet(currentSetId)?.name || 'Learn';
-  showView('learn');
-  renderLearnCard();
+  const useP1 = studyOpts.learnPhase1 !== false;
+  const useP2 = studyOpts.learnPhase2 !== false;
+  const useP3 = studyOpts.learnPhase3 !== false;
+  const startPhase = studyOpts.learnStartPhase || 1;
+  const threshold = studyOpts.learnThreshold || 1;
+
+  // Build phases array based on options
+  const phases = [];
+  if (useP1) phases.push(1);
+  if (useP2) phases.push(2);
+  if (useP3) phases.push(3);
+  if (!phases.length) phases.push(1,2,3); // fallback
+
+  // Start each card at the chosen starting phase (or first available)
+  const startP = phases.includes(startPhase) ? startPhase : phases[0];
+
+  learnDeck = sessionCards.map(card => ({
+    card, phase: startP, streak: 0, mastered: false,
+    passCount: 0, threshold, phases
+  }));
+  learnMastered = 0; learnStreak = 0; learnCurrentIdx = 0;
+  document.getElementById('learn-title').textContent = '🧠 ' + (getSet(currentSetId)?.name || 'Learn');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-learn').classList.add('active');
+  renderLearnPhase();
 }
 
-function renderLearnCard() {
-  const remaining = learnQueue.filter((_,i) => !learnKnown.has(i));
-  document.getElementById('learn-known-n').textContent = learnKnown.size;
-  document.getElementById('learn-left-n').textContent = remaining.length;
-  document.getElementById('learn-round-n').textContent = learnRound;
-  const pct = (learnKnown.size / learnQueue.length) * 100;
-  document.getElementById('learn-prog').style.width = pct+'%';
-  document.getElementById('learn-count-nav').textContent = learnKnown.size+'/'+learnQueue.length;
+function getLearnNext() {
+  // Find first unmastered card
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  if (!unmastered.length) return null;
+  return unmastered[learnCurrentIdx % unmastered.length];
+}
 
-  if (!remaining.length) {
-    const s = getSet(currentSetId);
-    if (s) { s.history=s.history||[]; s.history.push({date:Date.now(),score:learnQueue.length,total:learnQueue.length,mode:'Learn'}); autoSave(); }
-    showResults(learnQueue.length, learnQueue.length, 'Learn');
-    return;
-  }
-  // Pick first in remaining
-  learnIdx = learnQueue.indexOf(remaining[0]);
-  const card = learnQueue[learnIdx];
+function renderLearnPhase() {
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  learnMastered = learnDeck.filter(e => e.mastered).length;
+  const total = learnDeck.length;
+  const pct = (learnMastered / total) * 100;
 
+  document.getElementById('learn-prog').style.width = pct + '%';
+  document.getElementById('learn-count-nav').textContent = learnMastered + '/' + total + ' mastered';
+  document.getElementById('learn-known-n').textContent = learnMastered;
+  document.getElementById('learn-left-n').textContent = unmastered.length;
+  document.getElementById('learn-streak-n').textContent = learnStreak;
+
+  if (!unmastered.length) { finishLearn(); return; }
+
+  learnCurrentIdx = learnCurrentIdx % unmastered.length;
+  const entry = unmastered[learnCurrentIdx];
+  updateLearnPhaseIndicator(entry.phase);
+
+  if (entry.phase === 1) renderLearnPhase1(entry);
+  else if (entry.phase === 2) renderLearnPhase2(entry);
+  else renderLearnPhase3(entry);
+}
+
+function updateLearnPhaseIndicator(phase) {
+  const labels = ['', 'Study', 'Choose', 'Type'];
+  const colors = ['', 'var(--accent)', 'var(--purple)', 'var(--green)'];
+  [1,2,3].forEach(i => {
+    const pip = document.getElementById('learn-phase-pip-' + i);
+    if (pip) pip.style.background = i <= phase ? colors[phase] : 'var(--border)';
+  });
+  const lbl = document.getElementById('learn-phase-label');
+  if (lbl) { lbl.textContent = 'Phase ' + phase + ' — ' + labels[phase]; lbl.style.color = colors[phase]; }
+}
+
+// ── PHASE 1: Show & Learn ──
+function renderLearnPhase1(entry) {
+  const {card} = entry;
   document.getElementById('learn-card-area').innerHTML = `
-    <div class="learn-card anim-pop">
-      <div class="learn-prompt-tag">What is the definition of…</div>
-      <div class="learn-question">${esc(card.front)}</div>
-      <input class="learn-inp" id="learn-input" placeholder="Type your answer…" autocomplete="off" onkeydown="if(event.key==='Enter')submitLearn()">
-      <div class="learn-actions">
-        <button class="learn-submit" onclick="submitLearn()">Check →</button>
-        <button class="btn btn-ghost btn-sm" onclick="showLearnHint()">💡 Hint</button>
-        <button class="btn btn-ghost btn-sm" onclick="skipLearnCard()">Skip →</button>
-        <button class="btn btn-ghost btn-sm" onclick="markLearnKnown()">✓ I Know</button>
+    <div class="learn-card anim-pop" style="border-color:rgba(58,127,255,.3);">
+      <div class="learn-prompt-tag" style="color:var(--accent2);">📖 STUDY THIS</div>
+      <div class="learn-question" style="margin-bottom:10px;">${esc(card.front)}</div>
+      <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase;">Definition</div>
+      <div style="font-size:1.05rem;color:var(--text);line-height:1.6;font-weight:600;">${esc(card.back)}</div>
+      <div style="margin-top:18px;display:flex;gap:8px;">
+        <button class="learn-submit" style="flex:1;background:var(--accent);" onclick="learnPhase1Continue()">Got it, next →</button>
+        <button class="btn btn-ghost btn-sm" onclick="learnPhase1Again()">🔄 Show again</button>
       </div>
-      <div class="learn-hint-box" id="learn-hint">First letter: <strong>${esc(card.back[0]||'?')}</strong> (${card.back.length} characters)</div>
-      <div class="learn-feedback" id="learn-feedback"></div>
+      <div style="margin-top:10px;font-size:.7rem;color:var(--text3);text-align:center;">Read it, absorb it — no pressure yet</div>
     </div>
   `;
-  document.getElementById('learn-input').focus();
 }
 
-function submitLearn() {
-  const inp = document.getElementById('learn-input');
-  const fb = document.getElementById('learn-feedback');
-  const card = learnQueue[learnIdx];
+function learnPhase1Continue() {
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  const entry = unmastered[learnCurrentIdx % unmastered.length];
+  entry.passCount = (entry.passCount||0) + 1;
+  const nextPhase = entry.phases.find(p => p > entry.phase);
+  if (entry.passCount >= entry.threshold) {
+    entry.phase = nextPhase || entry.phase;
+    entry.passCount = 0;
+  }
+  learnCurrentIdx++;
+  sndClick();
+  renderLearnPhase();
+}
+
+function learnPhase1Again() {
+  learnCurrentIdx++;
+  sndClick();
+  renderLearnPhase();
+}
+
+// ── PHASE 2: Multiple Choice ──
+function renderLearnPhase2(entry) {
+  const {card} = entry;
+  const others = shuffle(sessionCards.filter(c => c.back !== card.back)).slice(0,3).map(c=>c.back);
+  const opts = shuffle([card.back, ...others]);
+  document.getElementById('learn-card-area').innerHTML = `
+    <div class="learn-card anim-pop" style="border-color:rgba(155,89,182,.3);">
+      <div class="learn-prompt-tag" style="color:var(--purple2);">🎯 CHOOSE THE CORRECT DEFINITION</div>
+      <div class="learn-question">${esc(card.front)}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;" id="learn-mc-opts">
+        ${opts.map((o,i) => `
+          <button class="quiz-opt" onclick="learnPhase2Answer(this,'${esc(o)}','${esc(card.back)}')">
+            <span class="quiz-opt-letter">${'ABCD'[i]}</span>${esc(o)}
+          </button>`).join('')}
+      </div>
+      <div id="learn-mc-feedback" style="margin-top:10px;"></div>
+    </div>
+  `;
+}
+
+function learnPhase2Answer(btn, chosen, correct) {
+  document.querySelectorAll('#learn-mc-opts .quiz-opt').forEach(b => b.disabled = true);
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    document.querySelectorAll('#learn-mc-opts .quiz-opt').forEach(b => {
+      if (b.textContent.trim().slice(1).trim() === correct) b.classList.add('correct');
+    });
+  }
+  const fb = document.getElementById('learn-mc-feedback');
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  const entry = unmastered[learnCurrentIdx % unmastered.length];
+
+  if (isCorrect) {
+    entry.passCount = (entry.passCount||0) + 1;
+    learnStreak++;
+    sndCorrect();
+    if (entry.passCount >= entry.threshold) {
+      const nextPhase = entry.phases.find(p => p > entry.phase);
+      entry.phase = nextPhase || entry.phase;
+      entry.passCount = 0;
+    }
+    fb.innerHTML = `<div style="padding:10px 14px;border-radius:10px;background:var(--green-dim);color:var(--green2);font-weight:800;border:1px solid rgba(45,204,111,.25);">
+      ${LEARN_ENCOURAGEMENTS[Math.floor(Math.random()*LEARN_ENCOURAGEMENTS.length)]} ${entry.passCount < entry.threshold ? 'One more time!' : 'On to the next phase!'}
+    </div>`;
+  } else {
+    entry.phase = entry.phases[0]; // Back to first phase
+    entry.passCount = 0;
+    learnStreak = 0;
+    sndWrong();
+    fb.innerHTML = `<div style="padding:10px 14px;border-radius:10px;background:var(--red-dim);color:var(--red2);font-weight:700;border:1px solid rgba(224,48,48,.25);">
+      ${LEARN_WRONG_MSGS[Math.floor(Math.random()*LEARN_WRONG_MSGS.length)]}
+    </div>`;
+  }
+  learnCurrentIdx++;
+  setTimeout(renderLearnPhase, isCorrect ? 1000 : 1600);
+}
+
+// ── PHASE 3: Type It ──
+function renderLearnPhase3(entry) {
+  const {card} = entry;
+  document.getElementById('learn-card-area').innerHTML = `
+    <div class="learn-card anim-pop" style="border-color:rgba(45,204,111,.3);">
+      <div class="learn-prompt-tag" style="color:var(--green2);">✏️ TYPE THE DEFINITION</div>
+      <div class="learn-question">${esc(card.front)}</div>
+      <div style="margin-top:4px;margin-bottom:14px;font-size:.7rem;color:var(--text3);">You've studied this — now prove it!</div>
+      <input class="learn-inp" id="learn-type-inp" placeholder="Type the definition…" autocomplete="off" onkeydown="if(event.key==='Enter')learnPhase3Check('${esc(card.back)}')">
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="learn-submit" onclick="learnPhase3Check('${esc(card.back)}')">Check →</button>
+        <button class="btn btn-ghost btn-sm" onclick="learnPhase3Hint('${esc(card.back)}')">💡 Hint</button>
+      </div>
+      <div id="learn-type-hint" style="display:none;margin-top:8px;padding:10px 14px;border-radius:10px;background:var(--amber-dim);color:var(--amber2);font-size:.8rem;border:1px solid rgba(232,144,32,.25);">
+        First letter: <strong>${esc(card.back[0]||'?')}</strong> — ${card.back.length} characters
+      </div>
+      <div id="learn-type-feedback" style="margin-top:10px;"></div>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('learn-type-inp')?.focus(), 50);
+}
+
+function learnPhase3Hint(correct) {
+  document.getElementById('learn-type-hint').style.display = '';
+}
+
+function learnPhase3Check(correct) {
+  const inp = document.getElementById('learn-type-inp');
+  if (!inp || !inp.value.trim()) return;
   const val = inp.value.trim();
-  if (!val) return;
-  const correct = val.toLowerCase() === card.back.toLowerCase();
-  fb.className = 'learn-feedback show ' + (correct ? 'correct' : 'wrong');
-  fb.innerHTML = correct ? `✓ Correct! <strong>${esc(card.back)}</strong>` : `✗ Incorrect. Answer: <strong>${esc(card.back)}</strong>`;
-  inp.classList.add(correct ? 'correct' : 'wrong');
+  const isCorrect = val.toLowerCase() === correct.toLowerCase();
   inp.disabled = true;
-  if (correct) { learnKnown.add(learnIdx); sndCorrect(); } else sndWrong();
-  setTimeout(renderLearnCard, correct ? 900 : 1600);
+  inp.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  const entry = unmastered[learnCurrentIdx % unmastered.length];
+  const fb = document.getElementById('learn-type-feedback');
+
+  if (isCorrect) {
+    entry.passCount = (entry.passCount||0) + 1;
+    learnStreak++;
+    if (entry.passCount >= entry.threshold) {
+      entry.mastered = true;
+      entry.card.mastery = 'know';
+      sndComplete();
+      fb.innerHTML = `<div style="padding:12px 16px;border-radius:12px;background:var(--green-dim);color:var(--green2);font-weight:900;border:1px solid rgba(45,204,111,.3);text-align:center;font-size:1rem;">
+        🎉 MASTERED! +1 to your collection!
+      </div>`;
+    } else {
+      sndCorrect();
+      fb.innerHTML = `<div style="padding:10px 14px;border-radius:10px;background:var(--green-dim);color:var(--green2);font-weight:800;border:1px solid rgba(45,204,111,.25);">
+        ✓ Correct! ${entry.threshold - entry.passCount} more time${entry.threshold - entry.passCount !== 1 ? 's' : ''} to master
+      </div>`;
+    }
+  } else {
+    entry.phase = entry.phases[0];
+    entry.passCount = 0;
+    learnStreak = 0;
+    sndWrong();
+    fb.innerHTML = `<div style="padding:10px 14px;border-radius:10px;background:var(--red-dim);color:var(--red2);font-weight:700;border:1px solid rgba(224,48,48,.25);">
+      ✗ Answer: <strong>${esc(correct)}</strong> — back to the start for this one
+    </div>`;
+  }
+  learnCurrentIdx++;
+  setTimeout(renderLearnPhase, isCorrect ? 1200 : 1800);
 }
 
-function showLearnHint() { document.getElementById('learn-hint').classList.add('show'); }
-function skipLearnCard() { renderLearnCard(); }
-function markLearnKnown() { learnKnown.add(learnIdx); renderLearnCard(); sndCorrect(); }
+function finishLearn() {
+  const s = getSet(currentSetId);
+  if (s) {
+    s.history = s.history||[];
+    s.history.push({date:Date.now(), score:learnMastered, total:learnDeck.length, mode:'Learn'});
+    autoSave();
+  }
+  showResults(learnMastered, learnDeck.length, 'Learn');
+}
+
+function showLearnHint() { document.getElementById('learn-hint')?.classList.add('show'); }
+function skipLearnCard() { learnCurrentIdx++; renderLearnPhase(); }
+function markLearnKnown() { 
+  const unmastered = learnDeck.filter(e => !e.mastered);
+  if (unmastered.length) { unmastered[learnCurrentIdx % unmastered.length].mastered = true; }
+  learnCurrentIdx++; renderLearnPhase(); sndCorrect();
+}
 
 // ─────────────────────────────────────────────────
 // RESULTS
@@ -2114,6 +2701,7 @@ function showResults(score, total, mode) {
     <button class="btn btn-primary" onclick="retryStudy()">🔁 Try Again</button>
     <button class="btn btn-ghost" onclick="openSet('${currentSetId}')">← Back to Set</button>
     <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+    <button class="btn btn-ghost ai-btn" onclick="openAIModal('results')" id="results-ai-btn" style="display:none">🤖 AI Help</button>
   `;
   showView('results');
   if (isGreat) { sndComplete(); launchConfetti(); } else { sndWrong(); }
@@ -2125,8 +2713,6 @@ function exitStudy() { openSet(currentSetId); }
 // ─────────────────────────────────────────────────
 const SPEED_CIRCUMFERENCE = 2 * Math.PI * 22;
 let SPEED_SECS = 5;
-let speedBubbles = [];
-let speedBubbleFrame = null;
 
 function startSpeedRound() {
   SPEED_SECS = studyOpts.speedSecs || 5;
@@ -2656,7 +3242,11 @@ function renderAllSetsGrid(filter='') {
       <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green));opacity:${Math.max(0.15,mastery/100)};"></div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:1.8rem;">${s.icon||'📖'}</div>
-        ${s.pinned?'<span style="font-size:.75rem;">📌</span>':''}
+        <div style="display:flex;gap:4px;" onclick="event.stopPropagation()">
+          ${s.pinned?'<span style="font-size:.75rem;padding-top:2px;">📌</span>':''}
+          <button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:.65rem;" onclick="event.stopPropagation();currentSetId='${s.id}';openExportModal()">📤</button>
+          <button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:.65rem;" onclick="event.stopPropagation();currentSetId='${s.id}';openShareModal()">🔗</button>
+        </div>
       </div>
       <div style="font-size:.95rem;font-weight:800;margin-bottom:3px;line-height:1.3;">${esc(s.name)}</div>
       <div style="font-size:.65rem;color:var(--text3);margin-bottom:8px;">${s.class||''}${s.unit?' · '+s.unit:''}</div>
@@ -2712,8 +3302,6 @@ renderThemeGrid();
 // ─────────────────────────────────────────────────
 // ANIMATED BACKGROUND
 // ─────────────────────────────────────────────────
-let bgAnim = 'none';
-let bgAnimFrame = null;
 
 function setBgAnim(type, el) {
   bgAnim = type;
@@ -2892,6 +3480,840 @@ function runRain(c, ctx) {
   }
   draw();
 }
+
+// ─────────────────────────────────────────────────
+// DQCODE — export, import, share
+// ─────────────────────────────────────────────────
+
+// Serialize a set to a compact object for encoding
+function serializeSet(s) {
+  return {
+    v: 1, // version
+    n: s.name,
+    cl: s.class||'',
+    u: s.unit||'',
+    ic: s.icon||'📖',
+    no: s.notes||'',
+    c: (s.cards||[]).map(c => [c.front, c.back]),
+    created: Date.now()
+  };
+}
+
+function deserializeSet(obj) {
+  if (!obj || obj.v !== 1) return null;
+  return {
+    id: Date.now() + Math.floor(Math.random()*1000),
+    name: obj.n || 'Imported Set',
+    class: obj.cl || '',
+    unit: obj.u || '',
+    icon: obj.ic || '📖',
+    notes: obj.no || '',
+    cards: (obj.c||[]).map(([front,back]) => ({front, back, starred:false, mastery:'unseen'})),
+    history: [], plays: 0, created: obj.created||Date.now(), updated: Date.now()
+  };
+}
+
+// Encode to base64 self-contained string
+function encodeSetToBase64(s) {
+  const data = JSON.stringify(serializeSet(s));
+  return 'DQS1:' + btoa(unescape(encodeURIComponent(data)));
+}
+
+// Decode from base64
+function decodeBase64ToSet(str) {
+  try {
+    const b64 = str.replace('DQS1:', '');
+    const json = decodeURIComponent(escape(atob(b64)));
+    return deserializeSet(JSON.parse(json));
+  } catch(e) { return null; }
+}
+
+// Generate a short code (stored in Supabase via DQAuth)
+// One code per set — key is dqshare_{setId}
+async function generateShortCode(s, access, expiry) {
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) return null;
+  try {
+    // Reuse existing code or generate new one
+    const existingKey = 'dqshare_' + s.id;
+    const existing = await DQAuth.loadData(existingKey).catch(() => null);
+    const code = (existing && existing.code) ? existing.code : 'DQ-' + Math.random().toString(36).substr(2,4).toUpperCase();
+    const expiresAt = expiry > 0 ? Date.now() + expiry * 24*60*60*1000 : 0;
+    const payload = {
+      ...serializeSet(s),
+      code, access: access||shareAccess,
+      owner: DQAuth.getUser().uid,
+      setId: s.id,
+      expiresAt, createdAt: existing?.createdAt || Date.now()
+    };
+    await DQAuth.saveData(existingKey, payload);
+    await DQAuth.saveData('share_' + code, payload); // also store by code for lookup
+    return code;
+  } catch(e) { return null; }
+}
+
+async function revokeShortCode(setId) {
+  if (typeof DQAuth === 'undefined') return;
+  try {
+    const existing = await DQAuth.loadData('dqshare_' + setId).catch(() => null);
+    if (existing?.code) await DQAuth.deleteData('share_' + existing.code);
+    await DQAuth.deleteData('dqshare_' + setId);
+  } catch(e) {}
+}
+
+// Resolve a code — short or long
+async function resolveCode(raw) {
+  const str = raw.trim();
+  if (str.startsWith('DQ-')) {
+    if (typeof DQAuth === 'undefined') return {error: 'Sign in to use short DQ-XXXX codes'};
+    try {
+      const data = await DQAuth.loadData('share_' + str);
+      if (!data) return {error: 'Code not found — it may have been revoked or expired'};
+      if (data.expiresAt && data.expiresAt > 0 && Date.now() > data.expiresAt)
+        return {error: 'This code has expired'};
+      if (data.access === 'private' && DQAuth.getUser?.()?.uid !== data.owner)
+        return {error: 'This code is private — only the owner can access it'};
+      return {set: deserializeSet(data), meta: {code:str, access:data.access, owner:data.owner}};
+    } catch(e) { return {error: 'Could not fetch code — check your connection'}; }
+  } else if (str.startsWith('DQS1:')) {
+    const set = decodeBase64ToSet(str);
+    if (!set) return {error: 'Invalid DQcode — make sure you copied the full code'};
+    return {set};
+  }
+  return {error: 'Not a valid DQcode. Should start with DQ- or DQS1:'};
+}
+
+// ── CODES VIEW ──
+function showCodesView() {
+  renderCodesView();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-codes').classList.add('active');
+  sndClick();
+}
+
+async function renderCodesView() {
+  // My shared sets
+  const myEl = document.getElementById('codes-my-shared');
+  myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px;">Loading…</div>';
+
+  if (!isLoggedIn || typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) {
+    myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px;">Sign in to share sets with short DQ-XXXX codes.</div>';
+  } else {
+    // Find all shared sets by checking dqshare_{id} for each set
+    const sharedSets = [];
+    for (const s of sets) {
+      try {
+        const data = await DQAuth.loadData('dqshare_' + s.id);
+        if (data && data.code) sharedSets.push({s, data});
+      } catch(_) {}
+    }
+    if (!sharedSets.length) {
+      myEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px 0;">You haven\'t shared any sets yet. Click 🔗 Share on any set page to get started.</div>';
+    } else {
+      myEl.innerHTML = sharedSets.map(({s, data}) => {
+        const expired = data.expiresAt > 0 && Date.now() > data.expiresAt;
+        const expStr = data.expiresAt > 0 ? 'Expires ' + new Date(data.expiresAt).toLocaleDateString() : 'Never expires';
+        return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+          <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
+          <div style="flex:1;">
+            <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
+            <div style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">
+              <code style="font-family:var(--mono);font-size:.82rem;color:var(--accent2);background:var(--accent-dim);padding:2px 8px;border-radius:6px;">${data.code}</code>
+              <span class="chip ${data.access==='public'?'chip-green':'chip-amber'}">${data.access==='public'?'🌍 Public':'🔒 Private'}</span>
+              <span style="font-size:.62rem;color:var(--text3);">${expired?'⚠️ Expired':expStr}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="copyCode('${data.code}')">📋</button>
+            <button class="btn btn-ghost btn-sm" onclick="openManageCode('${s.id}')">⚙️</button>
+            <button class="btn btn-danger btn-sm" onclick="revokeCode('${s.id}')">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Saved codes (sets imported from others — marked with fromCode)
+  const savedEl = document.getElementById('codes-saved-sets');
+  const saved = sets.filter(s => s.fromCode);
+  if (!saved.length) {
+    savedEl.innerHTML = '<div style="font-size:.78rem;color:var(--text3);padding:8px 0;">No imported sets yet. Paste a DQcode above to import one.</div>';
+  } else {
+    savedEl.innerHTML = saved.map(s => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openSet('${s.id}')">
+        <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
+        <div style="flex:1;">
+          <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:2px;">Imported · ${allCards(s).length} cards</div>
+        </div>
+        <span class="chip chip-blue">🔗 Shared</span>
+      </div>
+    `).join('');
+  }
+}
+
+async function importFromCodesView() {
+  const raw = document.getElementById('codes-import-inp').value.trim();
+  const status = document.getElementById('codes-import-status');
+  if (!raw) return;
+  status.textContent = 'Looking up…'; status.style.color = 'var(--text2)';
+  const result = await resolveCode(raw);
+  if (result.error) { status.textContent = '⚠ ' + result.error; status.style.color = 'var(--red2)'; return; }
+  const s = result.set;
+  s.fromCode = raw.startsWith('DQ-') ? raw : 'DQS1';
+  s.fromCodeMeta = result.meta || null;
+  sets.push(s);
+  autoSave(); renderSidebar();
+  status.textContent = '✓ Imported "' + s.name + '"! Opening…'; status.style.color = 'var(--green2)';
+  document.getElementById('codes-import-inp').value = '';
+  setTimeout(() => { openSet(s.id); renderCodesView(); sndComplete(); }, 800);
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => { if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Code copied!'); });
+  sndClick();
+}
+
+async function revokeCode(setId) {
+  if (!confirm('Revoke this code? Anyone with the code will lose access.')) return;
+  await revokeShortCode(setId);
+  renderCodesView();
+  sndClick();
+}
+
+async function openManageCode(setId) {
+  const s = getSet(setId); if (!s) return;
+  const data = typeof DQAuth !== 'undefined' ? await DQAuth.loadData('dqshare_' + setId).catch(()=>null) : null;
+  const newAccess = data?.access === 'public' ? 'private' : 'public';
+  const newExpiry = prompt('Set expiry (days):\n0 = never\n7 = 7 days\n30 = 30 days\n\nCurrent: ' + (data?.expiresAt > 0 ? Math.ceil((data.expiresAt - Date.now())/(86400000)) + ' days left' : 'never'));
+  if (newExpiry === null) return;
+  const days = parseInt(newExpiry) || 0;
+  await generateShortCode(s, data?.access || 'public', days);
+  renderCodesView();
+}
+
+let shareCodeType = 'short'; // 'short' or 'long'
+
+function setShareCodeType(type, el) {
+  shareCodeType = type;
+  document.querySelectorAll('#share-type-short,#share-type-long').forEach(e => e.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const accessRow = document.getElementById('share-access-row');
+  const expiryRow = document.getElementById('share-expiry-row');
+  const newCodeBtn = document.getElementById('share-newcode-btn');
+  if (type === 'long') {
+    accessRow.style.display = 'none';
+    expiryRow.style.display = 'none';
+    newCodeBtn.style.display = 'none';
+    const s = getSet(currentSetId); if (!s) return;
+    const code = encodeSetToBase64(s);
+    currentShareCode = code;
+    document.getElementById('share-code-inp').value = code;
+    document.getElementById('share-status').textContent = 'Self-contained — works without sign-in';
+    document.getElementById('share-revoke-btn').style.display = 'none';
+  } else {
+    accessRow.style.display = '';
+    expiryRow.style.display = '';
+    newCodeBtn.style.display = '';
+    refreshShortCode();
+  }
+}
+
+function setShareAccess(type) {
+  shareAccess = type;
+  document.getElementById('share-public-btn').classList.toggle('on', type === 'public');
+  document.getElementById('share-private-btn').classList.toggle('on', type === 'private');
+  document.getElementById('share-access-hint').textContent = type === 'public'
+    ? 'Public: anyone with the code can import this set.'
+    : 'Private: only you can import this code.';
+  refreshShortCode();
+}
+
+async function refreshShortCode() {
+  const inp = document.getElementById('share-code-inp');
+  const statusEl = document.getElementById('share-status');
+  inp.value = 'Loading…';
+  statusEl.textContent = '';
+  const s = getSet(currentSetId); if (!s) return;
+  if (!isLoggedIn || typeof DQAuth === 'undefined' || !DQAuth.getUser?.()) {
+    inp.value = encodeSetToBase64(s);
+    currentShareCode = inp.value;
+    statusEl.textContent = 'Sign in to get a short reusable DQ-XXXX code';
+    document.getElementById('share-access-row').style.display = 'none';
+    document.getElementById('share-expiry-row').style.display = 'none';
+    return;
+  }
+  // Check for existing code first
+  try {
+    const existing = await DQAuth.loadData('dqshare_' + s.id).catch(() => null);
+    if (existing && existing.code) {
+      currentShareCode = existing.code;
+      inp.value = existing.code;
+      const expired = existing.expiresAt > 0 && Date.now() > existing.expiresAt;
+      statusEl.textContent = expired ? '⚠️ This code has expired — click New Code to regenerate' : '✓ Using existing code for this set';
+      document.getElementById('share-existing-notice').style.display = '';
+      document.getElementById('share-revoke-btn').style.display = '';
+      // Set access toggle to match existing
+      shareAccess = existing.access || 'private';
+      document.getElementById('share-public-btn').classList.toggle('on', shareAccess === 'public');
+      document.getElementById('share-private-btn').classList.toggle('on', shareAccess === 'private');
+    } else {
+      // Generate new
+      const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
+      const code = await generateShortCode(s, shareAccess, days);
+      if (code) {
+        currentShareCode = code;
+        inp.value = code;
+        statusEl.textContent = '✓ New code created';
+        document.getElementById('share-revoke-btn').style.display = '';
+      } else {
+        inp.value = encodeSetToBase64(s);
+        currentShareCode = inp.value;
+        statusEl.textContent = 'Could not create short code — using long code instead';
+        document.getElementById('share-revoke-btn').style.display = 'none';
+      }
+    }
+  } catch(e) {
+    inp.value = encodeSetToBase64(s);
+    currentShareCode = inp.value;
+    statusEl.textContent = 'Falling back to long code';
+  }
+}
+
+async function regenerateCode() {
+  const s = getSet(currentSetId); if (!s) return;
+  if (!confirm('Generate a new code? The old code will stop working.')) return;
+  await revokeShortCode(s.id);
+  document.getElementById('share-existing-notice').style.display = 'none';
+  const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
+  const code = await generateShortCode(s, shareAccess, days);
+  if (code) {
+    currentShareCode = code;
+    document.getElementById('share-code-inp').value = code;
+    document.getElementById('share-status').textContent = '✓ New code generated';
+    document.getElementById('share-revoke-btn').style.display = '';
+  }
+  sndClick();
+}
+
+async function revokeCurrentCode() {
+  const s = getSet(currentSetId); if (!s) return;
+  if (!confirm('Revoke this code? Anyone with it will lose access.')) return;
+  await revokeShortCode(s.id);
+  document.getElementById('share-code-inp').value = '';
+  document.getElementById('share-status').textContent = 'Code revoked.';
+  document.getElementById('share-revoke-btn').style.display = 'none';
+  document.getElementById('share-existing-notice').style.display = 'none';
+  sndClick();
+}
+
+// Open share modal
+async function openShareModal() {
+  const s = getSet(currentSetId); if (!s) return;
+  shareAccess = 'private';
+  shareCodeType = 'short';
+  currentShareCode = '';
+
+  // Fill preview
+  document.getElementById('sc-icon').textContent = s.icon||'📖';
+  document.getElementById('sc-name').textContent = s.name;
+  const cards = allCards(s);
+  document.getElementById('sc-meta').textContent = cards.length + ' cards' + (s.class ? ' · ' + s.class : '') + (s.unit ? ' · ' + s.unit : '');
+  document.getElementById('sc-chips').innerHTML = [
+    s.class ? `<span class="chip chip-blue">${esc(s.class)}</span>` : '',
+    s.unit ? `<span class="chip chip-purple">${esc(s.unit)}</span>` : '',
+    `<span class="chip chip-green">${cards.length} cards</span>`,
+  ].filter(Boolean).join('');
+
+  // Reset UI
+  document.getElementById('share-loading').style.display = '';
+  document.getElementById('share-main').style.display = 'none';
+  document.getElementById('share-existing-notice').style.display = 'none';
+  document.getElementById('share-type-short').classList.add('active');
+  document.getElementById('share-type-long').classList.remove('active');
+  document.getElementById('share-public-btn').classList.remove('on');
+  document.getElementById('share-private-btn').classList.add('on');
+  document.getElementById('share-revoke-btn').style.display = 'none';
+
+  openModal('share-modal');
+  await refreshShortCode();
+  document.getElementById('share-loading').style.display = 'none';
+  document.getElementById('share-main').style.display = '';
+}
+
+function copyShareCode() {
+  const inp = document.getElementById('share-code-inp');
+  navigator.clipboard.writeText(inp.value).then(() => {
+    const btn = document.querySelector('#share-modal .btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy', 2000); }
+  });
+  sndClick();
+}
+
+function mailtoShare() {
+  const s = getSet(currentSetId); if (!s) return;
+  const subject = encodeURIComponent('DQstudy set: ' + s.name);
+  const body = encodeURIComponent(
+    'Hey! I\'m sharing a study set with you via DQstudy.\n\n' +
+    'Set: ' + s.name + '\n' +
+    'Cards: ' + allCards(s).length + '\n\n' +
+    'To import it:\n' +
+    '1. Go to DQstudy\n' +
+    '2. Click "Import DQcode" in the sidebar\n' +
+    '3. Paste this code:\n\n' +
+    currentShareCode + '\n\n' +
+    '— Sent from DQtools'
+  );
+  window.open('mailto:?subject=' + subject + '&body=' + body);
+  sndClick();
+}
+
+function openExportModal() {
+  const s = getSet(currentSetId); if (!s) return;
+  document.getElementById('export-set-name').textContent = (s.icon||'📖') + ' ' + s.name + ' — ' + allCards(s).length + ' cards';
+  document.getElementById('export-dqs-out').style.display = 'none';
+  document.querySelectorAll('#export-modal .theme-option').forEach(e => e.classList.remove('active'));
+  closeModal('share-modal');
+  openModal('export-modal');
+  sndClick();
+}
+
+function doExport(fmt) {
+  const s = getSet(currentSetId); if (!s) return;
+  const cards = allCards(s);
+  document.querySelectorAll('#export-modal .theme-option').forEach(e => e.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  if (fmt === 'dqs') {
+    const code = encodeSetToBase64(s);
+    document.getElementById('export-dqs-out').style.display = '';
+    document.getElementById('export-dqs-code').value = code;
+    return;
+  }
+  document.getElementById('export-dqs-out').style.display = 'none';
+
+  let content, ext, mime;
+  if (fmt === 'csv') {
+    content = 'Term,Definition\n' + cards.map(c => `"${(c.front||'').replace(/"/g,'""')}","${(c.back||'').replace(/"/g,'""')}"`).join('\n');
+    ext = 'csv'; mime = 'text/csv';
+  } else if (fmt === 'tsv') {
+    content = cards.map(c => `${c.front}\t${c.back}`).join('\n');
+    ext = 'tsv'; mime = 'text/tab-separated-values';
+  } else {
+    content = cards.map(c => `${c.front}: ${c.back}`).join('\n');
+    ext = 'txt'; mime = 'text/plain';
+  }
+  const blob = new Blob([content], {type: mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (s.name||'set').replace(/[^a-z0-9]/gi,'_') + '.' + ext;
+  a.click();
+  sndClick();
+}
+
+function copyExportCode() {
+  const code = document.getElementById('export-dqs-code').value;
+  navigator.clipboard.writeText(code).then(() => {
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ DQcode copied!');
+  });
+  sndClick();
+}
+
+function exportSetFile() { openExportModal(); }
+
+// Share card PNG
+function downloadSharePNG() {
+  const s = getSet(currentSetId); if (!s) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 800; canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0,0,800,420);
+  grad.addColorStop(0, '#090c12');
+  grad.addColorStop(1, '#0e1320');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,800,420);
+
+  // Top accent bar
+  const bar = ctx.createLinearGradient(0,0,800,0);
+  bar.addColorStop(0,'#3a7fff'); bar.addColorStop(1,'#2dcc6f');
+  ctx.fillStyle = bar; ctx.fillRect(0,0,800,6);
+
+  // Border
+  ctx.strokeStyle = '#2a4468'; ctx.lineWidth = 2;
+  ctx.strokeRect(1,1,798,418);
+
+  // Icon
+  ctx.font = '64px serif'; ctx.fillText(s.icon||'📖', 48, 110);
+
+  // Set name
+  ctx.fillStyle = '#e8eef8';
+  ctx.font = 'bold 38px Outfit, sans-serif';
+  ctx.fillText(s.name.length > 32 ? s.name.slice(0,32)+'…' : s.name, 48, 170);
+
+  // Meta
+  ctx.fillStyle = '#7a9abf';
+  ctx.font = '22px Outfit, sans-serif';
+  const meta = [allCards(s).length + ' cards', s.class, s.unit].filter(Boolean).join(' · ');
+  ctx.fillText(meta, 48, 210);
+
+  // Code
+  ctx.fillStyle = '#3d5878';
+  ctx.font = '16px Outfit, sans-serif';
+  ctx.fillText('DQcode:', 48, 290);
+  ctx.fillStyle = '#60a0ff';
+  ctx.font = 'bold 18px monospace';
+  const codeDisplay = currentShareCode.length > 60 ? currentShareCode.slice(0,60)+'…' : currentShareCode;
+  ctx.fillText(codeDisplay, 48, 316);
+
+  // DQstudy branding
+  ctx.fillStyle = '#4de888';
+  ctx.font = 'bold 18px Outfit, sans-serif';
+  ctx.fillText('DQstudy', 48, 386);
+  ctx.fillStyle = '#3d5878';
+  ctx.font = '16px Outfit, sans-serif';
+  ctx.fillText('part of DQtools', 130, 386);
+
+  // Download
+  const a = document.createElement('a');
+  a.download = (s.name||'set').replace(/[^a-z0-9]/gi,'_') + '_dqcode.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  sndClick();
+}
+
+// ── IMPORT ──
+async function previewImportCode() {
+  const raw = document.getElementById('import-code-inp').value.trim();
+  const errEl = document.getElementById('import-error');
+  const prevEl = document.getElementById('import-preview-area');
+  errEl.style.display = 'none'; prevEl.style.display = 'none';
+  if (!raw) return;
+  const result = await resolveCode(raw);
+  if (result.error) {
+    errEl.textContent = '⚠ ' + result.error; errEl.style.display = ''; return;
+  }
+  const s = result.set;
+  prevEl.style.display = '';
+  document.getElementById('import-preview-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <span style="font-size:1.4rem;">${s.icon||'📖'}</span>
+      <div>
+        <div style="font-weight:800;font-size:.9rem;">${esc(s.name)}</div>
+        <div style="font-size:.68rem;color:var(--text2);">${(s.cards||[]).length} cards${s.class?' · '+s.class:''}${s.unit?' · '+s.unit:''}</div>
+      </div>
+    </div>
+    <div style="font-size:.72rem;color:var(--text3);">${(s.cards||[]).slice(0,3).map(c=>`<div style="padding:3px 0;border-bottom:1px solid var(--border);">${esc(c.front)} → ${esc(c.back)}</div>`).join('')}${(s.cards||[]).length>3?`<div style="padding-top:4px;">+${(s.cards||[]).length-3} more…</div>`:''}</div>
+  `;
+  sndClick();
+}
+
+async function confirmImportCode() {
+  const raw = document.getElementById('import-code-inp').value.trim();
+  if (!raw) return;
+  const result = await resolveCode(raw);
+  if (result.error) {
+    document.getElementById('import-error').textContent = '⚠ ' + result.error;
+    document.getElementById('import-error').style.display = '';
+    return;
+  }
+  sets.push(result.set);
+  autoSave(); renderSidebar();
+  closeModal('import-modal');
+  openSet(result.set.id);
+  sndComplete();
+}
+
+
+// ─────────────────────────────────────────────────
+// AI PROMPTER
+// ─────────────────────────────────────────────────
+
+const AI_ACTIONS = {
+  set: [
+    { id:'more-cards',    icon:'➕', label:'Generate more cards',     desc:'Add similar flashcards to this set' },
+    { id:'harder',        icon:'🔥', label:'Make harder questions',   desc:'Turn cards into harder MC questions' },
+    { id:'simplify',      icon:'✂️', label:'Simplify definitions',    desc:'Make definitions shorter and clearer' },
+    { id:'mc-questions',  icon:'❓', label:'Cards → MC Questions',    desc:'Convert flashcards to multiple choice' },
+    { id:'study-guide',   icon:'📖', label:'Create study guide',      desc:'Turn the set into a written guide' },
+    { id:'mnemonics',     icon:'🧠', label:'Add memory tricks',       desc:'Add mnemonics to help remember each card' },
+    { id:'translate',     icon:'🌍', label:'Translate set',           desc:'Translate terms/definitions to another language' },
+    { id:'practice-test', icon:'📝', label:'Write a practice test',   desc:'Generate a full practice test from this set' },
+  ],
+  results: [
+    { id:'explain-wrong', icon:'💡', label:'Explain what I got wrong', desc:'Get explanations for missed questions' },
+    { id:'study-tips',    icon:'📚', label:'Study tips for this topic', desc:'Get targeted advice based on your score' },
+    { id:'more-practice', icon:'🔁', label:'More practice questions',  desc:'Generate extra questions on weak areas' },
+  ],
+  cards: [
+    { id:'more-cards',    icon:'➕', label:'Generate more cards',     desc:'Add similar flashcards' },
+    { id:'mc-questions',  icon:'❓', label:'Cards → MC Questions',    desc:'Convert to multiple choice format' },
+    { id:'study-guide',   icon:'📖', label:'Create study guide',      desc:'Turn cards into a written guide' },
+    { id:'explain',       icon:'💬', label:'Explain these concepts',  desc:'Get plain-language explanations' },
+  ]
+};
+
+function toggleAISetting() {
+  aiEnabled = !aiEnabled;
+  const t = document.getElementById('ai-toggle');
+  if (t) t.classList.toggle('on', aiEnabled);
+  updateAIButtonVisibility();
+  saveSettings();
+}
+
+function updateAIButtonVisibility() {
+  document.querySelectorAll('.ai-btn, [id$="-ai-btn"], #ai-set-btn').forEach(el => {
+    el.style.display = aiEnabled ? '' : 'none';
+  });
+}
+
+function openAIModal(context) {
+  if (!aiEnabled) return;
+  aiContext = context;
+  const actions = AI_ACTIONS[context] || AI_ACTIONS.set;
+
+  document.getElementById('ai-action-grid').innerHTML = actions.map(a => `
+    <div class="theme-option" style="text-align:left;padding:10px 12px;cursor:pointer;" onclick="selectAIAction('${a.id}',this)">
+      <div style="font-size:1.1rem;margin-bottom:4px;">${a.icon}</div>
+      <div style="font-size:.78rem;font-weight:800;">${a.label}</div>
+      <div style="font-size:.62rem;color:var(--text2);margin-top:2px;line-height:1.3;">${a.desc}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('ai-prompt-out').value = '';
+  document.getElementById('ai-custom-inp').value = '';
+  openModal('ai-modal');
+  sndClick();
+}
+
+function selectAIAction(id, el) {
+  document.querySelectorAll('#ai-action-grid .theme-option').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ai-prompt-out').value = buildAIPrompt(id);
+  sndClick();
+}
+
+function buildAIPrompt(actionId) {
+  const s = getSet(currentSetId);
+  if (!s) return '';
+  const cards = allCards(s);
+  const cardList = cards.slice(0,40).map((c,i) => `${i+1}. TERM: ${c.front} | DEFINITION: ${c.back}`).join('\n');
+  const setInfo = `Set: "${s.name}"${s.class?' | Class: '+s.class:''}${s.unit?' | Unit: '+s.unit:''}`;
+  const base = `I have a study set called "${s.name}" with ${cards.length} flashcards.\n\n${setInfo}\n\nCards:\n${cardList}\n\n`;
+
+  const prompts = {
+    'more-cards': base + `Please generate 10 more flashcard pairs in the same style and topic as this set. Format each one as:\nTERM: [term]\nDEFINITION: [definition]\n\nMake sure they're at the same difficulty level and cover related concepts not already in the set.`,
+
+    'harder': base + `Convert these flashcards into harder multiple choice questions. For each card, create a question with 4 options (1 correct, 3 plausible wrong answers). Format:\nQUESTION: [question]\nA) [option]\nB) [option]\nC) [option]\nD) [option]\nANSWER: [correct letter]`,
+
+    'simplify': base + `Rewrite each definition to be shorter, clearer, and easier to remember — like you're explaining to a student who's never seen this before. Keep the same terms but simplify the definitions. Return in the same TERM | DEFINITION format.`,
+
+    'mc-questions': base + `Convert these flashcards into multiple choice questions I can import back into DQstudy. For each card:\nQUESTION: [term as a question like "What is [term]?"]\nCORRECT: [definition]\nWRONG1: [plausible wrong answer]\nWRONG2: [plausible wrong answer]\nWRONG3: [plausible wrong answer]`,
+
+    'study-guide': base + `Turn these flashcards into a well-organized study guide. Group related concepts together, add brief explanations for context, and include any important connections between terms. Write it as clear readable paragraphs, not just a list.`,
+
+    'mnemonics': base + `For each flashcard, suggest a memory trick, acronym, rhyme, or vivid mental image to help remember the definition. Format:\nTERM: [term]\nMEMORY TRICK: [your suggestion]`,
+
+    'translate': base + `Translate this study set to Spanish (or tell me your target language and I'll redo it). Keep the same terms but translate the definitions. If the terms themselves are subject-specific (like scientific terms), keep those in English but translate the definitions. Return as TERM | DEFINITION.`,
+
+    'practice-test': base + `Write a full practice test using all these terms. Include:\n- 5 multiple choice questions\n- 3 true/false questions\n- 3 fill-in-the-blank questions\n- 2 short answer questions\nProvide an answer key at the end.`,
+
+    'explain-wrong': `I just took a quiz and I'm struggling with some of these concepts from the set "${s?.name||''}". Here are the flashcards:\n\n${cardList}\n\nPlease explain the most commonly confused concepts in plain language, give examples, and suggest how to remember each one better.`,
+
+    'study-tips': `I scored on a quiz covering this study set: "${s?.name||''}". Here are the topics:\n\n${cardList}\n\nPlease give me specific study tips and strategies for mastering this material. What are the best ways to remember these types of concepts?`,
+
+    'more-practice': base + `Generate 10 extra practice questions focused on the most difficult or confusing concepts from this set. Mix question types (multiple choice, fill-in-the-blank, short answer). Include answer key.`,
+
+    'explain': base + `Explain each of these concepts in plain, simple language like you're teaching a student. For each term, give:\n1. A simple explanation\n2. A real-world example\n3. Why it matters or how it connects to other concepts`,
+  };
+
+  return prompts[actionId] || base + `Please help me study this material.`;
+}
+
+// Handle custom prompt
+document.addEventListener('DOMContentLoaded', () => {
+  const customInp = document.getElementById('ai-custom-inp');
+  if (customInp) {
+    customInp.addEventListener('input', () => {
+      if (customInp.value.trim()) {
+        const s = getSet(currentSetId);
+        const cards = allCards(s||{});
+        const cardList = cards.slice(0,40).map((c,i) => `${i+1}. ${c.front} | ${c.back}`).join('\n');
+        document.getElementById('ai-prompt-out').value =
+          `I have a study set "${s?.name||''}" with ${cards.length} cards:\n\n${cardList}\n\n${customInp.value.trim()}`;
+        document.querySelectorAll('#ai-action-grid .theme-option').forEach(e => e.classList.remove('active'));
+      }
+    });
+  }
+});
+
+function copyAIPrompt() {
+  const out = document.getElementById('ai-prompt-out');
+  if (!out.value) return;
+  navigator.clipboard.writeText(out.value).then(() => {
+    const btn = document.querySelector('#ai-modal .btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Prompt', 2000); }
+  });
+  sndClick();
+}
+
+function openAIInNewTab() {
+  copyAIPrompt();
+  window.open('https://claude.ai', '_blank');
+}
+
+function openChatGPT() {
+  copyAIPrompt();
+  window.open('https://chat.openai.com', '_blank');
+}
+
+document.getElementById('ai-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-modal'); });
+
+
+
+// ─────────────────────────────────────────────────
+// AI BUILD-A-SET
+// ─────────────────────────────────────────────────
+
+function openAIBuildModal() {
+  const seen = localStorage.getItem('dqstudy-ai-seen');
+  document.getElementById('ai-build-step1').style.display = '';
+  document.getElementById('ai-build-step2').style.display = 'none';
+  document.getElementById('ai-build-topic').value = '';
+  document.getElementById('ai-build-extra').value = '';
+  document.getElementById('ai-build-paste-in').value = '';
+  document.getElementById('ai-build-paste-status').textContent = '';
+
+  // First-time tooltip
+  const greeting = document.getElementById('ai-build-greeting');
+  if (!seen && greeting) {
+    greeting.innerHTML = `<div style="background:linear-gradient(135deg,var(--purple-dim),var(--accent-dim));border:1px solid rgba(155,89,182,.3);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:1rem;font-weight:900;margin-bottom:6px;">✨ Welcome to AI Set Builder!</div>
+      <div style="font-size:.8rem;color:var(--text2);line-height:1.7;">DQstudy can generate flashcard sets for you using AI tools like Claude or ChatGPT. Here's how it works:<br>
+      <strong style="color:var(--text);">1.</strong> Describe your topic below<br>
+      <strong style="color:var(--text);">2.</strong> Copy the generated prompt<br>
+      <strong style="color:var(--text);">3.</strong> Paste it into Claude or ChatGPT<br>
+      <strong style="color:var(--text);">4.</strong> Copy the AI's response back here — we import it automatically!<br><br>
+      <span style="color:var(--amber2);">⚠️ DQstudy doesn't have built-in AI — you'll need a free Claude or ChatGPT account.</span></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="localStorage.setItem('dqstudy-ai-seen','1');this.closest('[style*=linear-gradient]').remove();">Got it, don't show again</button>
+    </div>`;
+  } else if (seen && greeting) {
+    greeting.innerHTML = '';
+  }
+  if (!seen) localStorage.setItem('dqstudy-ai-seen', '1');
+
+  openModal('ai-build-modal');
+  sndClick();
+}
+
+function generateAIBuildPrompt() {
+  const topic = document.getElementById('ai-build-topic').value.trim();
+  if (!topic) { document.getElementById('ai-build-topic').focus(); return; }
+  const level = document.getElementById('ai-build-level').value;
+  const style = document.getElementById('ai-build-style').value;
+  const count = document.getElementById('ai-build-count').value;
+  const extra = document.getElementById('ai-build-extra').value.trim();
+
+  // Use real examples so the AI doesn't copy placeholder text
+  const styleExamples = {
+    flashcards: [
+      'TERM: Photosynthesis',
+      'DEFINITION: The process by which plants convert sunlight, water, and CO2 into glucose and oxygen.',
+    ],
+    questions: [
+      'TERM: What is the powerhouse of the cell?',
+      'DEFINITION: The mitochondria — it produces ATP through cellular respiration.',
+    ],
+    fill: [
+      'TERM: The ___ is the process plants use to make food from sunlight.',
+      'DEFINITION: photosynthesis',
+    ]
+  };
+  const ex = styleExamples[style] || styleExamples.flashcards;
+
+  const lines = [
+    'Generate ' + count + ' study flashcards about: "' + topic + '"',
+    'Student level: ' + level,
+    extra ? 'Additional instructions: ' + extra : null,
+    '',
+    'RULES — follow exactly:',
+    '1. Output ONLY the cards. No intro, no explanation, no summary, nothing else.',
+    '2. Number every card with CARD 1, CARD 2, etc.',
+    '3. Every card must have exactly one TERM: line and one DEFINITION: line.',
+    '4. Do not use brackets like [example] — write the real content directly.',
+    '5. Start immediately with CARD 1. Stop after the last card.',
+    '',
+    'Example of correct format:',
+    '',
+    'CARD 1',
+    ex[0],
+    ex[1],
+    '',
+    'CARD 2',
+    ex[0].replace('1','2'),
+    ex[1],
+    '',
+    'Now generate all ' + count + ' cards about "' + topic + '" in that exact format:',
+  ].filter(l => l !== null);
+
+  document.getElementById('ai-build-prompt-out').value = lines.join('\n');
+  document.getElementById('ai-build-step1').style.display = 'none';
+  document.getElementById('ai-build-step2').style.display = '';
+  sndClick();
+}
+
+function copyAIBuildPrompt() {
+  const val = document.getElementById('ai-build-prompt-out').value;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('ai-build-copy-btn');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Prompt', 2000); }
+  });
+  sndClick();
+}
+
+function importAIBuildResult() {
+  const raw = document.getElementById('ai-build-paste-in').value.trim();
+  const status = document.getElementById('ai-build-paste-status');
+  if (!raw) { status.textContent = 'Paste the AI response first.'; status.style.color = 'var(--red2)'; return; }
+  const cards = [];
+  const blocks = raw.split(/CARD\s+\d+/i).filter(b => b.trim());
+  for (const block of blocks) {
+    const t = block.match(/TERM:\s*([\s\S]+?)(?=\nDEFINITION:)/i);
+    const d = block.match(/DEFINITION:\s*([\s\S]+?)(?=\nCARD\s+\d+|\s*$)/i);
+    if (t && d) {
+      const front = t[1].trim();
+      const back = d[1].trim();
+      // Skip if it's obviously placeholder text
+      if (front && back && !front.startsWith('[') && !back.startsWith('[')) {
+        cards.push({front, back, starred: false, mastery: 'unseen'});
+      }
+    }
+  }
+  // Fallback: tab or pipe lines
+  if (!cards.length) {
+    raw.split('\n').filter(l => l.trim() && !l.startsWith('[') && !l.startsWith('CARD')).forEach(line => {
+      const sep = line.includes('\t') ? '\t' : line.includes('|') ? '|' : null;
+      if (sep) {
+        const p = line.split(sep);
+        if (p.length >= 2 && p[0].trim() && p[1].trim()) {
+          cards.push({front: p[0].trim(), back: p[1].trim(), starred: false, mastery: 'unseen'});
+        }
+      }
+    });
+  }
+  if (!cards.length) {
+    status.textContent = '⚠ Could not read cards. Make sure you copied the full AI response including CARD 1, TERM:, DEFINITION: lines.';
+    status.style.color = 'var(--red2)'; return;
+  }
+  status.textContent = '✓ Found ' + cards.length + ' cards — importing…'; status.style.color = 'var(--green2)';
+  const topic = document.getElementById('ai-build-topic').value.trim() || 'AI Set';
+  const newSet = {id: Date.now(), name: topic, class: '', unit: '', icon: '✨', notes: 'Built with AI', cards, history: [], plays: 0, created: Date.now(), updated: Date.now()};
+  sets.push(newSet);
+  autoSave(); renderSidebar();
+  setTimeout(() => { closeModal('ai-build-modal'); openSet(newSet.id); sndComplete(); }, 600);
+}
+
+document.getElementById('ai-build-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-build-modal'); });
+document.getElementById('export-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('export-modal'); });
 
 </script>
 </body>
