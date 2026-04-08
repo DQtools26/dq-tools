@@ -1375,6 +1375,7 @@ const DQS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 
 let sets = [];       // all study sets
 let folders = [];    // folders
+let sharedWithMe = []; // sets shared with me via DQ- codes {code, name, icon, cachedData, cachedAt}
 let currentSetId = null;
 let isLoggedIn = false;
 let editingId = null;
@@ -1518,9 +1519,32 @@ function saveLocal() {
 
 async function autoSave() {
   saveLocal();
-  if (isLoggedIn && typeof DQAuth !== 'undefined') {
-    DQAuth.saveData('dqstudy', {sets, folders, savedAt: Date.now()});
+  const _u = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (_u) {
+    isLoggedIn = true;
+    DQAuth.saveData('dqstudy', {sets, folders, sharedWithMe, savedAt: Date.now()});
+    // Push updated set data to any shared_sets rows owned by this user
+    syncSharedSets(_u.uid);
   }
+}
+
+// When owner saves, push latest set data to shared_sets table for live sync
+async function syncSharedSets(uid) {
+  try {
+    const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=code,set_id`, {
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
+    });
+    const rows = await res.json();
+    for (const row of rows) {
+      const s = sets.find(x => String(x.id) === String(row.set_id));
+      if (!s) continue;
+      fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${row.code}`, {
+        method: 'PATCH',
+        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: serializeSet(s) })
+      });
+    }
+  } catch(_) {}
 }
 
 function bootApp() {
@@ -1579,9 +1603,10 @@ async function _handleAuthReady(user) {
     if (cloud && (cloud.savedAt||0) > localTimestamp) {
       sets = cloud.sets || sets;
       folders = cloud.folders || folders;
+      sharedWithMe = cloud.sharedWithMe || sharedWithMe;
       saveLocal();
     } else if (sets.length > 0) {
-      DQAuth.saveData('dqstudy', {sets, folders, savedAt: localTimestamp});
+      DQAuth.saveData('dqstudy', {sets, folders, sharedWithMe, savedAt: localTimestamp});
     }
   } catch(_) {}
 }
@@ -1762,7 +1787,20 @@ function renderSidebar(filter='') {
     }).join('');
   }
 
-  if (!pinned.length && !folders.length) {
+  // Shared with me
+  if (sharedWithMe.length) {
+    html += `<div class="sb-section-label">🔗 Shared with Me</div>`;
+    html += sharedWithMe.map(e => `
+      <div class="sb-set${currentSharedCode===e.code?' active':''}" onclick="openSharedSet('${e.code}')">
+        <div class="sb-set-icon">${e.icon||'📖'}</div>
+        <div class="sb-set-info">
+          <div class="sb-set-name">${esc(e.name)}</div>
+          <div class="sb-set-sub" style="color:var(--accent2);">🔗 Live</div>
+        </div>
+      </div>`).join('');
+  }
+
+  if (!pinned.length && !folders.length && !sharedWithMe.length) {
     html += '<div style="padding:16px 10px;font-size:.72rem;color:var(--text3);text-align:center;line-height:1.6;">Pin sets or create folders<br>to see them here.</div>';
   }
 
@@ -1770,11 +1808,12 @@ function renderSidebar(filter='') {
 }
 
 function sbSetItem(s) {
+  const isSnapshot = s.isSnapshot;
   return `<div class="sb-set${s.id===currentSetId?' active':''}" onclick="openSet('${s.id}')">
     <div class="sb-set-icon">${s.icon||'📖'}</div>
     <div class="sb-set-info">
       <div class="sb-set-name">${esc(s.name)}</div>
-      <div class="sb-set-sub">${allCards(s).length} cards${s.class?' · '+s.class:''}</div>
+      <div class="sb-set-sub">${isSnapshot ? '<span style="color:#c084fc;">📦 Snapshot</span>' : allCards(s).length + ' cards' + (s.class?' · '+s.class:'')}</div>
     </div>
     ${s.pinned ? '<span style="font-size:.7rem;opacity:.6;">📌</span>' : ''}
   </div>`;
@@ -1799,43 +1838,92 @@ const MODES = [
   {id:'speed',      icon:'⚡', name:'Speed Round', desc:'5 sec per card!'},
 ];
 
+// ── SHARED SET (read-only live access) ──────────────
+let currentSharedCode = null; // tracks if we're viewing a shared set
+
+async function openSharedSet(code) {
+  currentSharedCode = code;
+  const entry = sharedWithMe.find(x => x.code === code);
+  if (!entry) return;
+
+  // Use cached data immediately so page shows fast
+  if (entry.cachedData) {
+    renderSetPage(entry.cachedData, true);
+    showView('set');
+  }
+
+  // Fetch latest from Supabase in background
+  try {
+    const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${code}&select=data,access`, {
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
+    });
+    const rows = await res.json();
+    if (!rows.length) {
+      // Code revoked
+      showView('home');
+      if (typeof DQAuth !== 'undefined') DQAuth.toast?.('⚠ This shared set is no longer available');
+      sharedWithMe = sharedWithMe.filter(x => x.code !== code);
+      autoSave(); renderSidebar();
+      return;
+    }
+    const latest = deserializeSet(rows[0].data);
+    if (!latest) return;
+    // Update cache
+    entry.cachedData = latest;
+    entry.name = latest.name;
+    entry.icon = latest.icon || '📖';
+    entry.cachedAt = Date.now();
+    autoSave();
+    renderSetPage(latest, true);
+    showView('set');
+  } catch(_) {
+    // Offline — already showing cached version, that's fine
+  }
+  sndClick();
+}
+
 function openSet(id) {
+  currentSharedCode = null;
   currentSetId = id;
   const s = getSet(id);
   if (!s) return;
   renderSidebar();
-  renderSetPage(s);
+  renderSetPage(s, false);
   showView('set');
   sndClick();
 }
 
-function renderSetPage(s) {
+function renderSetPage(s, readOnly) {
   const cards = allCards(s);
   const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
   const lastHist = (s.history||[]).slice(-1)[0];
+  const isSnapshot = !readOnly && s.isSnapshot;
 
   document.getElementById('set-header').innerHTML = `
-    <div class="set-big-icon" onclick="cycleIcon()">${s.icon||'📖'}</div>
+    <div class="set-big-icon">${s.icon||'📖'}</div>
     <div class="set-header-info">
       <div class="set-title">${esc(s.name)}</div>
       <div class="set-chips">
+        ${readOnly ? '<span class="chip" style="background:rgba(58,127,255,.15);color:var(--accent2);border-color:var(--accent);">🔗 Shared Set</span>' : ''}
+        ${isSnapshot ? '<span class="chip" style="background:rgba(161,100,255,.15);color:#c084fc;border-color:rgba(161,100,255,.4);">📦 Snapshot</span>' : ''}
         ${s.class ? `<span class="chip chip-blue">${esc(s.class)}</span>` : ''}
         ${s.unit ? `<span class="chip chip-purple">${esc(s.unit)}</span>` : ''}
         <span class="chip chip-green">${cards.length} cards</span>
-        <span class="chip chip-amber">${s.plays||0} plays</span>
+        ${!readOnly ? `<span class="chip chip-amber">${s.plays||0} plays</span>` : ''}
         ${mastery >= 80 ? '<span class="chip chip-green">🏆 Mastered</span>' : ''}
         ${lastHist ? `<span class="chip chip-blue">Last: ${Math.round(lastHist.score/lastHist.total*100)}%</span>` : ''}
-        <span class="chip" style="color:var(--text3);border-color:var(--border);background:transparent;font-family:var(--mono);">ID #${String(s.id).slice(-6)}</span>
       </div>
       ${s.notes ? `<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>` : ''}
+      ${readOnly ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Read-only · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="openSharedSet('${currentSharedCode}')">🔄 Refresh</button> · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySharedSet()">📋 Copy to My Sets</button></div>` : ''}
+      ${isSnapshot ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Snapshot import · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySnapshotSet('${s.id}')">📋 Make It Mine</button> to edit</div>` : ''}
     </div>
     <div class="set-header-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openShareModal()">🔗 Share</button>
-      <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>
-      <button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">🤖 AI</button>
-      <button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>
-      <button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openShareModal()">🔗 Share</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">🤖 AI</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
+      ${readOnly ? `<button class="btn btn-ghost btn-sm" onclick="copySharedSet()">📋 Copy</button>` : `<button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>`}
+      ${readOnly ? `<button class="btn btn-danger btn-sm" onclick="removeSharedSet('${currentSharedCode}')">✕ Remove</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>`}
     </div>
   `;
 
@@ -1872,7 +1960,7 @@ function renderStartBar() {
 }
 
 function openStudyOpts() {
-  const s = getSet(currentSetId);
+  const s = getCurrentSet();
   const total = s ? allCards(s).length : 0;
   const mode = selectedMode;
   studyOpts = {};
@@ -2075,6 +2163,43 @@ function cycleIcon() {
   autoSave(); renderSidebar(); renderSetPage(s);
 }
 
+// Copy a live shared set into your own sets[]
+function copySharedSet() {
+  const entry = sharedWithMe.find(x => x.code === currentSharedCode);
+  if (!entry || !entry.cachedData) return;
+  const copy = JSON.parse(JSON.stringify(entry.cachedData));
+  copy.id = Date.now() + Math.floor(Math.random()*1000);
+  copy.name = copy.name + ' (copy)';
+  copy.isSnapshot = false;
+  copy.fromCode = null;
+  sets.push(copy);
+  autoSave(); renderSidebar();
+  if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Copied to your sets!');
+  openSet(copy.id);
+  sndComplete();
+}
+
+// Make a snapshot set fully yours (enable editing)
+function copySnapshotSet(id) {
+  const s = getSet(id);
+  if (!s) return;
+  s.isSnapshot = false;
+  s.fromCode = null;
+  autoSave();
+  renderSetPage(s, false);
+  if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Now your set — editing unlocked!');
+}
+
+// Remove a shared-with-me entry
+function removeSharedSet(code) {
+  if (!confirm('Remove this shared set from your library?')) return;
+  sharedWithMe = sharedWithMe.filter(x => x.code !== code);
+  autoSave(); renderSidebar();
+  currentSharedCode = null;
+  showView('home');
+  sndClick();
+}
+
 function deleteSet() {
   if (!confirm('Delete this study set? This cannot be undone.')) return;
   sets = sets.filter(s => s.id != currentSetId); // loose != handles number/string mismatch
@@ -2086,7 +2211,7 @@ function deleteSet() {
 // LAUNCH STUDY
 // ─────────────────────────────────────────────────
 function launchStudy() {
-  const s = getSet(currentSetId); if (!s) return;
+  const s = getCurrentSet(); if (!s) return;
   let cards = allCards(s);
   if (optStarred) cards = cards.filter(c => c.starred);
   if (optReview) cards = cards.filter(c => c.mastery === 'review');
@@ -2095,8 +2220,7 @@ function launchStudy() {
   // Apply card count limit
   const limit = studyOpts.cardCount || cards.length;
   cards = cards.slice(0, Math.min(limit, cards.length));
-  s.plays = (s.plays||0) + 1;
-  s.updated = Date.now();
+  if (!currentSharedCode) { s.plays = (s.plays||0) + 1; s.updated = Date.now(); }
   sessionCards = cards;
   sessionMode = selectedMode;
   autoSave();
@@ -2187,7 +2311,7 @@ function fcNext() {
   if (fcIdx < sessionCards.length - 1) { fcIdx++; renderFCCard(); }
   else {
     const s = getSet(currentSetId);
-    if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:fcKnown.size,total:sessionCards.length,mode:'Flashcards'}); autoSave(); }
+    if (s && !currentSharedCode) { s.history = s.history||[]; s.history.push({date:Date.now(),score:fcKnown.size,total:sessionCards.length,mode:'Flashcards'}); autoSave(); }
     showResults(fcKnown.size, sessionCards.length, 'Flashcards');
   }
 }
@@ -2388,8 +2512,7 @@ function finishQuiz() {
   if (quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
   const s = getSet(currentSetId);
   if (s) {
-    s.history = s.history||[];
-    s.history.push({date:Date.now(), score:quizScore, total:quizQs.length, mode:isTestMode?'Test':'Quiz', time:quizSecs});
+    if (!currentSharedCode) { s.history = s.history||[]; s.history.push({date:Date.now(), score:quizScore, total:quizQs.length, mode:isTestMode?'Test':'Quiz', time:quizSecs}); }
     autoSave();
   }
   showResults(quizScore, quizQs.length, isTestMode ? 'Test' : 'Quiz');
@@ -2455,7 +2578,7 @@ function matchClick(el) {
     if (matchMatched === matchTotal) {
       setTimeout(() => {
         const s = getSet(currentSetId);
-        if (s) { s.history=s.history||[]; s.history.push({date:Date.now(),score:matchTotal,total:matchTotal,mode:'Matching'}); autoSave(); }
+        if (s && !currentSharedCode) { s.history=s.history||[]; s.history.push({date:Date.now(),score:matchTotal,total:matchTotal,mode:'Matching'}); autoSave(); }
         showResults(matchTotal, matchTotal, 'Matching');
       }, 500);
     }
@@ -2716,8 +2839,7 @@ function learnPhase3Check(correct) {
 function finishLearn() {
   const s = getSet(currentSetId);
   if (s) {
-    s.history = s.history||[];
-    s.history.push({date:Date.now(), score:learnMastered, total:learnDeck.length, mode:'Learn'});
+    if (!currentSharedCode) { s.history = s.history||[]; s.history.push({date:Date.now(), score:learnMastered, total:learnDeck.length, mode:'Learn'}); }
     autoSave();
   }
   showResults(learnMastered, learnDeck.length, 'Learn');
@@ -2924,7 +3046,7 @@ function finishSpeedRound() {
   if (speedBubbleFrame) { cancelAnimationFrame(speedBubbleFrame); speedBubbleFrame = null; }
   document.getElementById('speed-arena').querySelectorAll('.speed-bubble').forEach(b => b.remove());
   const s = getSet(currentSetId);
-  if (s) { s.history = s.history||[]; s.history.push({date:Date.now(),score:speedKnow,total:speedCards.length,mode:'Speed Round'}); }
+  if (s && !currentSharedCode) { s.history = s.history||[]; s.history.push({date:Date.now(),score:speedKnow,total:speedCards.length,mode:'Speed Round'}); }
   autoSave();
   showResults(speedKnow, speedCards.length, 'Speed Round');
 }
@@ -3348,6 +3470,13 @@ function toggleSidebar() {
 }
 
 function getSet(id) { return sets.find(s => s.id == id); }
+function getCurrentSet() {
+  if (currentSharedCode) {
+    const entry = sharedWithMe.find(x => x.code === currentSharedCode);
+    return entry?.cachedData || null;
+  }
+  return getSet(currentSetId);
+}
 function allCards(s) { return s.cards||[]; }
 function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -3714,12 +3843,15 @@ async function renderCodesView() {
     } catch(_) {}
   }
 
-  // Saved — from local sets marked with fromCode
-  for (const s of sets.filter(x => x.fromCode)) {
-    const isMine = items.some(i => i.type === 'mine' && String(i.setId) === String(s.id));
-    if (!isMine) {
-      items.push({ type: 'saved', s, name: s.name, icon: s.icon || '📖', cardCount: allCards(s).length, code: s.fromCode !== 'DQS1' ? s.fromCode : null });
-    }
+  // Shared with me (live DQ- codes)
+  for (const e of sharedWithMe) {
+    const cardCount = e.cachedData ? allCards(e.cachedData) : 0;
+    items.push({ type: 'saved', subtype: 'live', name: e.name, icon: e.icon || '📖', cardCount: typeof cardCount === 'number' ? cardCount : cardCount.length, code: e.code, entry: e });
+  }
+
+  // Snapshots — sets with isSnapshot flag
+  for (const s of sets.filter(x => x.isSnapshot)) {
+    items.push({ type: 'saved', subtype: 'snapshot', s, name: s.name, icon: s.icon || '📖', cardCount: allCards(s).length, code: null });
   }
 
   // Filter
@@ -3759,16 +3891,31 @@ async function renderCodesView() {
           <button class="btn btn-danger btn-sm" onclick="revokeCode('${item.setId}')" title="Revoke">✕</button>
         </div>
       </div>`;
+    } else if (item.subtype === 'live') {
+      return `<div class="code-card" style="cursor:pointer;" onclick="openSharedSet('${item.code}')">
+        <div class="code-card-icon">${item.icon}</div>
+        <div class="code-card-body">
+          <div class="code-card-name">${esc(item.name)}</div>
+          <div class="code-card-meta">
+            <span class="code-card-code" onclick="event.stopPropagation();copyCodeToast('${item.code}')" title="Copy code">${item.code}</span>
+            <span class="code-badge-saved">🔗 Live</span>
+            <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
+          </div>
+        </div>
+        <div class="code-card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openSharedSet('${item.code}')" title="Open">↗</button>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removeSharedSet('${item.code}')" title="Remove">✕</button>
+        </div>
+      </div>`;
     } else {
-      const codeLabel = item.code ? `<span class="code-card-code" onclick="copyCodeToast('${item.code}')" title="Click to copy">${item.code}</span>` : '<span style="font-size:.62rem;color:var(--text3);">Snapshot code</span>';
+      // Snapshot
       return `<div class="code-card" style="cursor:pointer;" onclick="openSet('${item.s.id}')">
         <div class="code-card-icon">${item.icon}</div>
         <div class="code-card-body">
           <div class="code-card-name">${esc(item.name)}</div>
           <div class="code-card-meta">
-            ${codeLabel}
-            <span class="code-badge-saved">Saved from code</span>
-            <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
+            <span style="font-size:.62rem;color:#c084fc;background:rgba(161,100,255,.12);border:1px solid rgba(161,100,255,.3);border-radius:6px;padding:2px 7px;">📦 Snapshot</span>
+            <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards · yours to edit</span>
           </div>
         </div>
         <div class="code-card-actions">
@@ -3790,11 +3937,25 @@ async function importFromCodesView() {
     return;
   }
   const s = result.set;
-  s.fromCode = raw.startsWith('DQ-') ? raw : 'DQS1';
-  s.fromCodeMeta = result.meta || null;
-  sets.push(s);
-  autoSave(); renderSidebar();
-  status.innerHTML = '<span style="color:var(--green2);">✓ Added <strong>' + esc(s.name) + '</strong> to your sets!</span>';
+  if (raw.startsWith('DQ-')) {
+    // Live shared set — add to sharedWithMe, not sets[]
+    const already = sharedWithMe.find(x => x.code === raw);
+    if (already) {
+      status.innerHTML = '<span style="color:var(--amber);">Already in your library!</span>';
+      setTimeout(() => { status.innerHTML = ''; }, 3000);
+      return;
+    }
+    sharedWithMe.push({ code: raw, name: s.name, icon: s.icon||'📖', cachedData: s, cachedAt: Date.now() });
+    autoSave(); renderSidebar();
+    status.innerHTML = '<span style="color:var(--green2);">✓ Added <strong>' + esc(s.name) + '</strong> — opens as live shared set</span>';
+  } else {
+    // Snapshot — add as your own set, marked as snapshot
+    s.fromCode = 'DQS1';
+    s.isSnapshot = true;
+    sets.push(s);
+    autoSave(); renderSidebar();
+    status.innerHTML = '<span style="color:var(--green2);">✓ Snapshot of <strong>' + esc(s.name) + '</strong> saved to your sets</span>';
+  }
   document.getElementById('codes-import-inp').value = '';
   renderCodesView();
   sndComplete();
