@@ -754,7 +754,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       <button class="sb-foot-btn" onclick="showAllSets()"><span>📚</span> View All Sets</button>
       <button class="sb-foot-btn" onclick="showFolders()"><span>📁</span> Folders</button>
       <button class="sb-foot-btn" onclick="showCodesView()"><span>🔗</span> DQcodes</button>
-      <button class="sb-foot-btn" onclick="openAIBuildModal()"><span>✨</span> Build Set with AI</button>
+      <button class="sb-foot-btn" id="sb-ai-btn" onclick="openAIBuildModal()"><span>✨</span> Build Set with AI</button>
       <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress</button>
       <button class="sb-foot-btn" onclick="showView('settings')"><span>⚙️</span> Settings</button>
     </div>
@@ -1560,6 +1560,13 @@ function renderThemeGrid() {
 // ─────────────────────────────────────────────────
 // SETTINGS PERSISTENCE
 // ─────────────────────────────────────────────────
+function applyAIVisibility() {
+  const show = aiEnabled;
+  document.querySelectorAll('.ai-btn, [id$="-ai-btn"], #ai-set-btn, #sb-ai-btn').forEach(el => {
+    el.style.display = show ? '' : 'none';
+  });
+}
+
 function loadSettings() {
   try {
     const s = JSON.parse(localStorage.getItem('dqstudy-settings') || '{}');
@@ -1641,7 +1648,8 @@ function bootApp() {
   _get('nav-links') && (_get('nav-links').style.display = '');
   _get('sb-toggle-btn') && (_get('sb-toggle-btn').style.display = '');
   renderSidebar();
-  goHome();
+  // Short pause so landing is visible, then go home
+  setTimeout(() => { goHome(); updateLandingCTA(); }, 900);
 }
 
 // Always load local data in the background so it's ready
@@ -1656,10 +1664,11 @@ let _authHandled = false;
 async function _handleAuthReady(user) {
   if (_authHandled) return;
   _authHandled = true;
+  // Always show landing first — gives a moment for data to load
+  showLanding();
+  updateLandingCTA();
   if (!user) {
-    showLanding();
     renderSidebar();
-    updateLandingCTA();
     return;
   }
   isLoggedIn = true;
@@ -1801,7 +1810,7 @@ function renderHome(tab) {
           <div class="home-greeting-sub">${sets.length ? 'Pick up where you left off, or start something new.' : 'Welcome to DQstudy. Create your first set to get started.'}</div>
           <div class="home-quick" style="margin-top:16px;">
             <button class="home-quick-btn primary" onclick="openCreateModal()">＋ New Set</button>
-            <button class="home-quick-btn" onclick="openAIBuildModal()">✨ AI Build</button>
+            ${aiEnabled ? `<button class="home-quick-btn" onclick="openAIBuildModal()">✨ AI Build</button>` : ''}
             <button class="home-quick-btn" onclick="showAllSets()">📚 All Sets</button>
             <button class="home-quick-btn" onclick="showCodesView()">🔗 Codes</button>
             <button class="home-quick-btn" onclick="showView('tracking')">📊 Progress</button>
@@ -1855,11 +1864,11 @@ function renderHome(tab) {
       <div class="home-action-title">New Set</div>
       <div class="home-action-sub">Build from scratch with cards</div>
     </div>
-    <div class="home-action-card ai" onclick="openAIBuildModal()">
+    ${aiEnabled ? `<div class="home-action-card ai" onclick="openAIBuildModal()">
       <div class="home-action-icon">✨</div>
       <div class="home-action-title">AI Build</div>
       <div class="home-action-sub">Describe a topic, get cards instantly</div>
-    </div>
+    </div>` : ''}
     <div class="home-action-card" onclick="showCodesView()">
       <div class="home-action-icon">🔗</div>
       <div class="home-action-title">Import Code</div>
@@ -4656,7 +4665,7 @@ function toggleAISetting() {
 }
 
 function updateAIButtonVisibility() {
-  document.querySelectorAll('.ai-btn, [id$="-ai-btn"], #ai-set-btn').forEach(el => {
+  document.querySelectorAll('.ai-btn, [id$="-ai-btn"], #ai-set-btn, #sb-ai-btn').forEach(el => {
     el.style.display = aiEnabled ? '' : 'none';
   });
 }
