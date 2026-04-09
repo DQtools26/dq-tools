@@ -136,6 +136,102 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .code-badge-expired { background: rgba(255,107,74,.12); color: var(--red2); border: 1px solid rgba(255,107,74,.25); border-radius: 20px; font-size: .62rem; font-weight: 800; padding: 2px 8px; }
 .code-by { font-size: .65rem; color: var(--text3); }
 
+/* ═══ HOME REDESIGN ═══ */
+#view-home { padding: 0; overflow-y: auto; min-height: calc(100vh - 55px); position: relative; }
+
+/* Hero section — same vibe as landing */
+.home-hero-section {
+  position: relative; overflow: hidden;
+  padding: 48px 32px 40px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.home-hero-blobs { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.home-hero-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .13; }
+.hhb1 { width: 500px; height: 500px; background: var(--accent); top: -180px; right: -100px; animation: blobFloat 12s ease-in-out infinite; }
+.hhb2 { width: 350px; height: 350px; background: var(--green); bottom: -120px; left: -60px; animation: blobFloat 9s ease-in-out infinite reverse; }
+.hhb3 { width: 250px; height: 250px; background: var(--purple); top: 40%; left: 40%; animation: blobFloat 7s ease-in-out infinite 1s; }
+.home-hero-inner { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.home-greeting-text { font-size: clamp(1.6rem,3.5vw,2.4rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.1; margin-bottom: 6px; }
+.home-greeting-text .hl { background: linear-gradient(135deg,var(--accent2),var(--green2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.home-greeting-sub { font-size: .85rem; color: var(--text2); margin-bottom: 20px; }
+.home-quick { display: flex; gap: 8px; flex-wrap: wrap; }
+.home-quick-btn { display: flex; align-items: center; gap: 7px; padding: 9px 16px; background: rgba(255,255,255,.05); border: 1px solid var(--border2); border-radius: 12px; font-family: var(--font); font-size: .8rem; font-weight: 700; color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap; backdrop-filter: blur(8px); }
+.home-quick-btn:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
+.home-quick-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 16px rgba(58,127,255,.3); }
+.home-quick-btn.primary:hover { opacity: .9; transform: translateY(-1px); }
+.home-hero-stats { display: flex; gap: 10px; flex-shrink: 0; }
+.home-stat { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; text-align: center; min-width: 80px; backdrop-filter: blur(8px); }
+.home-stat-n { font-size: 1.6rem; font-weight: 900; color: var(--text); line-height: 1; }
+.home-stat-label { font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-top: 4px; }
+
+/* Body section */
+.home-body { max-width: 960px; margin: 0 auto; padding: 28px 24px 80px; }
+
+/* Section headers */
+.home-sec { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.home-sec-title { font-size: .65rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); }
+.home-sec-link { font-size: .75rem; font-weight: 700; color: var(--accent2); cursor: pointer; background: none; border: none; font-family: var(--font); }
+.home-sec-link:hover { text-decoration: underline; }
+
+/* Pinned chips */
+.home-pinned-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 28px; }
+.home-pinned-row::-webkit-scrollbar { height: 3px; }
+.home-pinned-chip { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--surface); border: 1px solid rgba(255,179,71,.25); border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0; }
+.home-pinned-chip:hover { border-color: rgba(255,179,71,.6); transform: translateY(-1px); background: var(--surface2); }
+.home-pinned-chip-name { font-size: .8rem; font-weight: 700; }
+.home-pinned-chip-count { font-size: .62rem; color: var(--text3); }
+
+/* Tabs */
+.home-set-tabs { display: flex; gap: 5px; margin-bottom: 14px; }
+.home-tab { padding: 5px 13px; border-radius: 20px; font-size: .73rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--text3); cursor: pointer; transition: all .15s; font-family: var(--font); }
+.home-tab:hover { color: var(--text); border-color: var(--border2); }
+.home-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Set cards */
+.home-sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.home-set-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; cursor: pointer; transition: all .18s; position: relative; overflow: hidden; }
+.home-set-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--green)); opacity: .3; transition: opacity .18s; }
+.home-set-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.home-set-card:hover::before { opacity: .7; }
+.home-set-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+.home-set-card-name { font-size: .9rem; font-weight: 800; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-set-card-meta { font-size: .65rem; color: var(--text3); margin-bottom: 10px; }
+.home-set-card-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.home-set-card-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green2)); border-radius: 2px; transition: width .5s; }
+.home-set-card-badge { position: absolute; top: 12px; right: 12px; font-size: .58rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; }
+.home-set-card.shared::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.home-add-card { background: transparent; border: 1.5px dashed var(--border2); border-radius: 16px; padding: 18px; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px; color: var(--text3); font-size: .82rem; font-weight: 700; }
+.home-add-card:hover { border-color: var(--accent); color: var(--accent2); background: rgba(58,127,255,.04); transform: translateY(-1px); }
+
+/* Continue studying banner */
+.home-continue { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all .18s; position: relative; overflow: hidden; }
+.home-continue::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--green2)); }
+.home-continue:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.home-continue-icon { font-size: 2.2rem; flex-shrink: 0; }
+.home-continue-label { font-size: .6rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 3px; }
+.home-continue-title { font-size: .95rem; font-weight: 800; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+.home-continue-sub { font-size: .7rem; color: var(--text2); }
+.home-continue-arrow { font-size: .78rem; font-weight: 800; color: var(--accent2); background: rgba(58,127,255,.12); border: 1px solid rgba(58,127,255,.25); padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
+
+/* Action cards grid */
+.home-actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 8px; }
+.home-action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; cursor: pointer; transition: all .18s; }
+.home-action-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+.home-action-card.accent { border-color: rgba(58,127,255,.3); background: rgba(58,127,255,.06); }
+.home-action-card.accent:hover { border-color: var(--accent); background: rgba(58,127,255,.1); }
+.home-action-card.ai { border-color: rgba(161,100,255,.3); background: rgba(161,100,255,.06); }
+.home-action-card.ai:hover { border-color: #a855f7; background: rgba(161,100,255,.1); }
+.home-action-icon { font-size: 1.6rem; margin-bottom: 10px; }
+.home-action-title { font-size: .9rem; font-weight: 800; margin-bottom: 4px; }
+.home-action-sub { font-size: .68rem; color: var(--text2); line-height: 1.4; }
+
+/* Empty state */
+.home-empty { text-align: center; padding: 48px 20px; color: var(--text3); }
+.home-empty-icon { font-size: 2.8rem; margin-bottom: 12px; }
+.home-empty-title { font-size: .95rem; font-weight: 800; margin-bottom: 6px; color: var(--text2); }
+.home-empty-sub { font-size: .8rem; line-height: 1.6; margin-bottom: 18px; }
+
 /* DQ auth btn */
 #dq-auth-btn { display:flex;align-items:center;gap:6px; background:var(--surface);border:1px solid var(--border2); border-radius:100px;padding:4px 12px 4px 5px; font-family:var(--font);font-size:.68rem;font-weight:700; color:var(--text2);cursor:pointer;transition:all var(--transition); white-space:nowrap;flex-shrink:0; }
 #dq-auth-btn:hover { border-color:var(--accent); color:var(--text); }
@@ -623,17 +719,18 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 <!-- ═══════ TOPNAV ═══════ -->
 <nav id="topnav">
-  <button class="nav-icon-btn" id="sb-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar" style="display:none">☰</button>
+  <button class="nav-icon-btn" id="sb-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar" style="display:none;">☰</button>
   <div class="nav-logo" onclick="goHome()">DQ<em>study</em></div>
   <div class="nav-links" id="nav-links" style="display:none">
-    <button class="nav-link" onclick="goHome()">🏠 Home</button>
+    <button class="nav-link" onclick="goHome()">Home</button>
+    <button class="nav-link" onclick="showAllSets()">My Sets</button>
     <button class="nav-link" onclick="showCodesView()">🔗 Codes</button>
+    <button class="nav-link" onclick="showFolders()">📁 Folders</button>
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
-    <button class="nav-link" onclick="showView('settings')">⚙️ Settings</button>
   </div>
   <div class="nav-spacer"></div>
   <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
-  <button class="nav-icon-btn" title="Theme" onclick="showView('settings')">🎨</button>
+  <button class="nav-icon-btn" title="Settings" onclick="showView('settings')">⚙️</button>
   <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
     <div id="dq-auth-avatar">👤</div>
     <span id="dq-auth-label">Sign In</span>
@@ -676,7 +773,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="landing-content">
         <div class="landing-badge">✨ Part of DQ Tools</div>
         <div class="landing-title">Study Smarter.<br><span class="hl">Remember More.</span></div>
-        <p class="landing-sub">Flashcards, quizzes, matching, and more — all synced to your DQ Account so your progress follows you everywhere.</p>
+        <p class="landing-sub">Flashcards, quizzes, speed rounds, and AI-powered set building — all synced to your DQ Account so your progress follows you everywhere.</p>
         <div class="landing-cta" id="landing-cta">
           <!-- filled by updateLandingCTA() -->
         </div>
@@ -692,20 +789,8 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ HOME ═══ -->
-    <div class="view" id="view-home" style="padding:28px;position:relative;overflow:hidden;">
-      <div class="landing-bg" style="opacity:.35;">
-        <div class="landing-bg-blob blob1"></div>
-        <div class="landing-bg-blob blob2"></div>
-        <div class="landing-bg-blob blob3"></div>
-      </div>
-      <div style="position:relative;z-index:1;">
-        <div class="home-greeting" id="home-greeting">Welcome back! 👋</div>
-        <div class="home-sub" id="home-sub">Pick up where you left off, or start something new.</div>
-        <div class="home-stats" id="home-stats"></div>
-        <div class="streak-row" id="streak-row"></div>
-        <div class="home-section-title">Recent Sets <a onclick="renderAllSetsView()">View all →</a></div>
-        <div class="recent-grid" id="recent-grid"></div>
-      </div>
+    <div class="view" id="view-home">
+      <!-- rendered by renderHome() -->
     </div>
 
     <!-- ═══ SET PAGE ═══ -->
@@ -1548,13 +1633,13 @@ async function syncSharedSets(uid) {
 }
 
 function bootApp() {
-  document.getElementById('topnav').style.display = '';
-  document.getElementById('app').style.paddingTop = '';
-  document.getElementById('sidebar').classList.remove('hidden');
-  document.getElementById('sidebar').classList.remove('collapsed');
-  document.getElementById('main').classList.remove('sb-collapsed');
-  document.getElementById('nav-links').style.display = '';
-  document.getElementById('sb-toggle-btn').style.display = '';
+  const _get = id => document.getElementById(id);
+  _get('app') && (_get('app').style.paddingTop = '');
+  _get('sidebar') && _get('sidebar').classList.remove('hidden');
+  _get('sidebar') && _get('sidebar').classList.remove('collapsed');
+  _get('main') && _get('main').classList.remove('sb-collapsed');
+  _get('nav-links') && (_get('nav-links').style.display = '');
+  _get('sb-toggle-btn') && (_get('sb-toggle-btn').style.display = '');
   renderSidebar();
   goHome();
 }
@@ -1571,14 +1656,13 @@ let _authHandled = false;
 async function _handleAuthReady(user) {
   if (_authHandled) return;
   _authHandled = true;
-  showLanding();
-  renderSidebar();
   if (!user) {
+    showLanding();
+    renderSidebar();
     updateLandingCTA();
     return;
   }
   isLoggedIn = true;
-  updateLandingCTA();
   if (typeof DQAuth === 'undefined') return;
   try {
     const cloudSettings = await DQAuth.loadData('dqstudy-settings');
@@ -1609,6 +1693,7 @@ async function _handleAuthReady(user) {
       DQAuth.saveData('dqstudy', {sets, folders, sharedWithMe, savedAt: localTimestamp});
     }
   } catch(_) {}
+  bootApp();
 }
 
 window.addEventListener('load', () => {
@@ -1625,13 +1710,11 @@ window.addEventListener('load', () => {
 });
 
 function showLanding() {
-  document.getElementById('topnav').style.display = '';
-  document.getElementById('app').style.paddingTop = '';
-  document.getElementById('sidebar').classList.remove('hidden');
-  document.getElementById('sidebar').classList.add('collapsed');
-  document.getElementById('main').classList.add('sb-collapsed');
-  document.getElementById('nav-links').style.display = 'none';
-  document.getElementById('sb-toggle-btn').style.display = '';
+  const _get = id => document.getElementById(id);
+  _get('sidebar') && _get('sidebar').classList.remove('hidden');
+  _get('sidebar') && _get('sidebar').classList.add('collapsed');
+  _get('main') && _get('main').classList.add('sb-collapsed');
+  _get('nav-links') && (_get('nav-links').style.display = 'none');
   showView('landing');
   updateLandingCTA();
 }
@@ -1685,66 +1768,190 @@ function goHome() {
 // ─────────────────────────────────────────────────
 // HOME
 // ─────────────────────────────────────────────────
-function renderHome() {
+function renderHome(tab) {
   const user = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
   const profile = (typeof DQAuth !== 'undefined') ? DQAuth.getProfile?.() : null;
-  const name = profile?.displayName || user?.displayName || 'there';
+  const name = profile?.displayName || user?.displayName || null;
   const hrs = new Date().getHours();
   const greet = hrs < 12 ? 'Good morning' : hrs < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('home-greeting').textContent = `${greet}, ${name}! 👋`;
+  const activeTab = tab || homeTab || 'mine';
+  homeTab = activeTab;
 
   const totalCards = sets.reduce((n,s) => n + allCards(s).length, 0);
   const totalPlays = sets.reduce((n,s) => n + (s.plays||0), 0);
   const allHist = sets.flatMap(s => s.history||[]);
-  const avgScore = allHist.length ? Math.round(allHist.reduce((n,h) => n + (h.score/h.total*100), 0) / allHist.length) : 0;
-  const knownCards = sets.reduce((n,s) => n + (s.cards||[]).filter(c=>c.mastery==='know').length, 0);
+  const avgScore = allHist.length ? Math.round(allHist.reduce((n,h) => n+(h.score/h.total*100),0)/allHist.length) : null;
+  const pinned = sets.filter(s => s.pinned);
 
-  document.getElementById('home-stats').innerHTML = [
-    ['📚', sets.length, 'Study Sets', 'sets'],
-    ['📇', totalCards, 'Total Cards', ''],
-    ['▶', totalPlays, 'Sessions', ''],
-    ['🧠', knownCards, 'Cards Mastered', ''],
-  ].map(([icon,n,label]) => `
-    <div class="stat-card">
-      <div class="stat-icon">${icon}</div>
-      <div class="stat-n">${n}</div>
-      <div class="stat-label">${label}</div>
-    </div>
-  `).join('');
+  // Find most recently studied set for "continue" banner
+  const recentlyStudied = sets.filter(s => s.history && s.history.length > 0)
+    .sort((a,b) => (b.history.slice(-1)[0]?.date||0) - (a.history.slice(-1)[0]?.date||0))[0];
 
-  // Streak + avg score row
-  document.getElementById('streak-row').innerHTML = `
-    <div class="streak-card" style="border-color:${avgScore>=80?'rgba(45,204,111,.3)':avgScore>=60?'rgba(232,144,32,.3)':'var(--border)'}">
-      <div class="streak-icon">${avgScore>=80?'🏆':avgScore>=60?'📈':'📊'}</div>
-      <div class="streak-info"><div class="streak-n" style="color:${avgScore>=80?'var(--green2)':avgScore>=60?'var(--amber2)':'var(--text2)'}">${allHist.length?avgScore+'%':'—'}</div><div class="streak-label">Average Quiz Score</div></div>
-    </div>
-    <div class="streak-card">
-      <div class="streak-icon">⚡</div>
-      <div class="streak-info"><div class="streak-n" style="color:var(--accent2)">${totalPlays}</div><div class="streak-label">Total Study Sessions</div></div>
-    </div>
-  `;
+  // Hero section
+  const heroHtml = `
+    <div class="home-hero-section">
+      <div class="home-hero-blobs">
+        <div class="home-hero-blob hhb1"></div>
+        <div class="home-hero-blob hhb2"></div>
+        <div class="home-hero-blob hhb3"></div>
+      </div>
+      <div class="home-hero-inner">
+        <div style="flex:1;min-width:240px;">
+          <div class="home-greeting-text">${name ? `${greet}, <span class="hl">${esc(name)}</span>! 👋` : `${greet}! 👋`}</div>
+          <div class="home-greeting-sub">${sets.length ? 'Pick up where you left off, or start something new.' : 'Welcome to DQstudy. Create your first set to get started.'}</div>
+          <div class="home-quick" style="margin-top:16px;">
+            <button class="home-quick-btn primary" onclick="openCreateModal()">＋ New Set</button>
+            <button class="home-quick-btn" onclick="openAIBuildModal()">✨ AI Build</button>
+            <button class="home-quick-btn" onclick="showAllSets()">📚 All Sets</button>
+            <button class="home-quick-btn" onclick="showCodesView()">🔗 Codes</button>
+            <button class="home-quick-btn" onclick="showView('tracking')">📊 Progress</button>
+          </div>
+        </div>
+        <div class="home-hero-stats">
+          <div class="home-stat"><div class="home-stat-n">${sets.length}</div><div class="home-stat-label">Sets</div></div>
+          <div class="home-stat"><div class="home-stat-n">${totalCards}</div><div class="home-stat-label">Cards</div></div>
+          <div class="home-stat"><div class="home-stat-n">${totalPlays}</div><div class="home-stat-label">Sessions</div></div>
+          <div class="home-stat"><div class="home-stat-n" style="color:${avgScore===null?'var(--text3)':avgScore>=80?'var(--green2)':avgScore>=60?'var(--amber2)':'var(--red2)'}">${avgScore !== null ? avgScore+'%' : '—'}</div><div class="home-stat-label">Avg Score</div></div>
+        </div>
+      </div>
+    </div>`;
 
-  // Recent sets grid
-  const recent = sets.slice().sort((a,b) => (b.updated||b.created||0) - (a.updated||a.created||0)).slice(0,5);
-  const grid = document.getElementById('recent-grid');
-  if (!sets.length) {
-    grid.innerHTML = `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>Create your first set</span></div>`;
-  } else {
-    grid.innerHTML = recent.map(s => {
-      const cards = allCards(s);
-      const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length / cards.length * 100) : 0;
-      const lastHist = (s.history||[]).slice(-1)[0];
-      return `<div class="recent-card" onclick="openSet('${s.id}')">
-        <div class="recent-card-icon">${s.icon||'📖'}</div>
-        <div class="recent-card-name">${esc(s.name)}</div>
-        <div class="recent-card-meta">${s.class||''} ${s.unit?'· '+s.unit:''}</div>
-        <div class="recent-card-count">${cards.length} cards${lastHist?' · Last: '+Math.round(lastHist.score/lastHist.total*100)+'%':''}</div>
-        <div class="recent-card-bar"><div class="recent-card-fill" style="width:${mastery}%"></div></div>
+  // Continue banner
+  const continueBanner = recentlyStudied ? (() => {
+    const lastH = recentlyStudied.history.slice(-1)[0];
+    const pct = Math.round(lastH.score/lastH.total*100);
+    const cards = allCards(recentlyStudied);
+    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    return `<div class="home-continue" onclick="openSet('${recentlyStudied.id}')">
+      <div class="home-continue-icon">${recentlyStudied.icon||'📖'}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="home-continue-label">Continue where you left off</div>
+        <div class="home-continue-title">${esc(recentlyStudied.name)}</div>
+        <div class="home-continue-sub">${cards.length} cards · Last score: ${pct}% · ${mastery}% mastered</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:.62rem;font-weight:800;color:${pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)'};letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;">${pct>=80?'Strong':'Keep going'}</div>
+        <div class="home-continue-arrow">▶ Study</div>
+      </div>
+    </div>`;
+  })() : '';
+
+  // Pinned row
+  const pinnedHtml = pinned.length ? `
+    <div class="home-sec" style="margin-top:0;margin-bottom:10px;"><span class="home-sec-title">📌 Pinned</span></div>
+    <div class="home-pinned-row">
+      ${pinned.map(s => `<div class="home-pinned-chip" onclick="openSet('${s.id}')">
+        <span style="font-size:14px;">${s.icon||'📖'}</span>
+        <span class="home-pinned-chip-name">${esc(s.name)}</span>
+        <span class="home-pinned-chip-count">${allCards(s).length}c</span>
+      </div>`).join('')}
+    </div>` : '';
+
+  // Action cards — tell users what to do
+  const noSets = sets.filter(s=>!s.isSnapshot).length === 0;
+  const actionCards = `<div class="home-actions-grid">
+    <div class="home-action-card accent" onclick="openCreateModal()">
+      <div class="home-action-icon">＋</div>
+      <div class="home-action-title">New Set</div>
+      <div class="home-action-sub">Build from scratch with cards</div>
+    </div>
+    <div class="home-action-card ai" onclick="openAIBuildModal()">
+      <div class="home-action-icon">✨</div>
+      <div class="home-action-title">AI Build</div>
+      <div class="home-action-sub">Describe a topic, get cards instantly</div>
+    </div>
+    <div class="home-action-card" onclick="showCodesView()">
+      <div class="home-action-icon">🔗</div>
+      <div class="home-action-title">Import Code</div>
+      <div class="home-action-sub">Get a set shared by someone else</div>
+    </div>
+    <div class="home-action-card" onclick="showView('tracking')">
+      <div class="home-action-icon">📊</div>
+      <div class="home-action-title">My Progress</div>
+      <div class="home-action-sub">Mastery, history, and stats</div>
+    </div>
+  </div>`;
+
+  // Sets section
+  const myMine = sets.filter(s => !s.isSnapshot).sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
+  const myCount = myMine.length;
+  const sharedCount = sharedWithMe.length;
+  const snapCount = sets.filter(s=>s.isSnapshot).length;
+
+  const tabsHtml = (myCount + sharedCount + snapCount) > 0 ? `<div class="home-set-tabs">
+    <button class="home-tab${activeTab==='mine'?' active':''}" onclick="renderHome('mine')">My Sets${myCount?` (${myCount})`:''}</button>
+    ${sharedCount ? `<button class="home-tab${activeTab==='shared'?' active':''}" onclick="renderHome('shared')">Shared (${sharedCount})</button>` : ''}
+    ${snapCount ? `<button class="home-tab${activeTab==='snapshots'?' active':''}" onclick="renderHome('snapshots')">Snapshots (${snapCount})</button>` : ''}
+  </div>` : '';
+
+  let gridHtml = '';
+  if (activeTab === 'mine') {
+    if (!myMine.length) {
+      gridHtml = `<div class="home-empty">
+        <div class="home-empty-icon">📚</div>
+        <div class="home-empty-title">No sets yet — create one above</div>
+        <div class="home-empty-sub">Start with AI to get a full set in seconds, or build your own card by card.</div>
       </div>`;
-    }).join('') +
-    `<div class="home-add-card" onclick="openCreateModal()"><span style="font-size:1.6rem;">＋</span><span>New Set</span></div>` +
-    `<div class="home-add-card" onclick="openAIBuildModal()" style="border-color:rgba(155,89,182,.4);color:var(--purple2);"><span style="font-size:1.6rem;">✨</span><span>Build with AI</span></div>`;
+    } else {
+      gridHtml = `<div class="home-sets-grid">
+        ${myMine.map(s => homeSetCard(s, false)).join('')}
+      </div>`;
+    }
+  } else if (activeTab === 'shared') {
+    gridHtml = sharedWithMe.length ? `<div class="home-sets-grid">
+      ${sharedWithMe.map(e => {
+        const cnt = e.cachedData ? allCards(e.cachedData).length : '?';
+        return `<div class="home-set-card shared" onclick="openSharedSet('${e.code}')">
+          <div class="home-set-card-badge" style="background:rgba(58,127,255,.15);color:var(--accent2);">🔗 Live</div>
+          <div class="home-set-card-icon">${e.icon||'📖'}</div>
+          <div class="home-set-card-name">${esc(e.name)}</div>
+          <div class="home-set-card-meta">${cnt} cards · live access</div>
+          <div class="home-set-card-bar"><div class="home-set-card-fill" style="width:0%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+  } else if (activeTab === 'snapshots') {
+    const snaps = sets.filter(s => s.isSnapshot);
+    gridHtml = snaps.length ? `<div class="home-sets-grid">${snaps.map(s => homeSetCard(s, true)).join('')}</div>` : '';
   }
+
+    const el = document.getElementById('view-home');
+  const hasSets = myMine.length > 0;
+  el.innerHTML = heroHtml + `<div class="home-body">
+    ${continueBanner}
+    ${pinnedHtml}
+
+    <div class="home-sec" style="margin-top:${(continueBanner||pinnedHtml)?'8px':'0'};">
+      <span class="home-sec-title">What do you want to do?</span>
+    </div>
+    ${actionCards}
+
+    ${hasSets || sharedWithMe.length ? `
+    <div class="home-sec" style="margin-top:28px;">
+      <span class="home-sec-title">Your Sets</span>
+      <button class="home-sec-link" onclick="showAllSets()">View all →</button>
+    </div>
+    ${tabsHtml}
+    ${gridHtml}` : ''}
+  </div>`;
+}
+
+let homeTab = 'mine';
+
+function homeSetCard(s, isSnapshot) {
+  const cards = allCards(s);
+  const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+  const lastHist = (s.history||[]).slice(-1)[0];
+  const badge = isSnapshot
+    ? `<div class="home-set-card-badge" style="background:rgba(161,100,255,.15);color:#c084fc;">📦</div>`
+    : s.pinned ? `<div class="home-set-card-badge" style="background:rgba(255,179,71,.15);color:var(--amber2);">📌</div>` : '';
+  return `<div class="home-set-card${s.pinned?' pinned-card':''}" onclick="openSet('${s.id}')">
+    ${badge}
+    <div class="home-set-card-icon">${s.icon||'📖'}</div>
+    <div class="home-set-card-name">${esc(s.name)}</div>
+    <div class="home-set-card-meta">${cards.length} cards${lastHist?' · '+Math.round(lastHist.score/lastHist.total*100)+'%':''}</div>
+    <div class="home-set-card-bar"><div class="home-set-card-fill" style="width:${mastery}%"></div></div>
+  </div>`;
 }
 
 // ─────────────────────────────────────────────────
@@ -3411,30 +3618,33 @@ function showAllSets() {
 }
 
 function renderAllSetsGrid(filter='') {
-  const filtered = filter
-    ? sets.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || (s.class||'').toLowerCase().includes(filter.toLowerCase()))
-    : sets;
-  document.getElementById('allsets-count').textContent = filtered.length + ' set' + (filtered.length!==1?'s':'');
+  const q = filter.toLowerCase();
+  const mySets = sets.filter(s => !q || s.name.toLowerCase().includes(q) || (s.class||'').toLowerCase().includes(q));
+  const sharedFiltered = sharedWithMe.filter(e => !q || e.name.toLowerCase().includes(q));
+  const total = mySets.length + sharedFiltered.length;
+  document.getElementById('allsets-count').textContent = total + ' set' + (total!==1?'s':'');
   const grid = document.getElementById('allsets-grid');
-  if (!filtered.length) {
+  if (!total) {
     grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">📭</div><div class="empty-title">${filter?'No results':'No sets yet'}</div><div class="empty-sub">${filter?'Try a different search.':'Create your first study set.'}</div>${!filter?'<button class="btn btn-primary" onclick="openCreateModal()">＋ New Set</button>':''}</div>`;
     return;
   }
-  grid.innerHTML = filtered.map(s => {
+
+  const myHtml = mySets.map(s => {
     const cards = allCards(s);
     const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
     const lastHist = (s.history||[]).slice(-1)[0];
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;"
+    const isSnap = s.isSnapshot;
+    return `<div style="background:var(--surface);border:1px solid ${isSnap?'rgba(161,100,255,.25)':'var(--border)'};border-radius:16px;padding:18px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;"
       onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'"
-      onmouseout="this.style.borderColor='var(--border)';this.style.transform=''"
+      onmouseout="this.style.borderColor='${isSnap?'rgba(161,100,255,.25)':'var(--border)'}';this.style.transform=''"
       onclick="openSet('${s.id}')">
-      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green));opacity:${Math.max(0.15,mastery/100)};"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${isSnap?'linear-gradient(90deg,#a855f7,#c084fc)':'linear-gradient(90deg,var(--accent),var(--green))'};opacity:${Math.max(0.2,mastery/100)};"></div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:1.8rem;">${s.icon||'📖'}</div>
         <div style="display:flex;gap:4px;" onclick="event.stopPropagation()">
-          ${s.pinned?'<span style="font-size:.75rem;padding-top:2px;">📌</span>':''}
-          <button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:.65rem;" onclick="event.stopPropagation();currentSetId='${s.id}';openExportModal()">📤</button>
-          <button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:.65rem;" onclick="event.stopPropagation();currentSetId='${s.id}';openShareModal()">🔗</button>
+          ${isSnap?'<span style="font-size:.6rem;padding:2px 6px;background:rgba(161,100,255,.15);color:#c084fc;border-radius:6px;font-weight:800;">📦 Snap</span>':''}
+          ${s.pinned&&!isSnap?'<span style="font-size:.75rem;padding-top:2px;">📌</span>':''}
+          ${!isSnap?`<button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:.65rem;" onclick="event.stopPropagation();currentSetId='${s.id}';openShareModal()">🔗</button>`:''}
         </div>
       </div>
       <div style="font-size:.95rem;font-weight:800;margin-bottom:3px;line-height:1.3;">${esc(s.name)}</div>
@@ -3444,10 +3654,40 @@ function renderAllSetsGrid(filter='') {
         <span>${lastHist?Math.round(lastHist.score/lastHist.total*100)+'% last':'Not studied'}</span>
       </div>
       <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
-        <div style="height:100%;width:${mastery}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .5s;"></div>
+        <div style="height:100%;width:${mastery}%;background:${isSnap?'#a855f7':'linear-gradient(90deg,var(--accent),var(--green))'};border-radius:2px;transition:width .5s;"></div>
       </div>
     </div>`;
   }).join('');
+
+  const sharedHtml = sharedFiltered.map(e => {
+    const cached = e.cachedData;
+    const cardCount = cached ? allCards(cached).length : '?';
+    return `<div style="background:var(--surface);border:1px solid rgba(58,127,255,.25);border-radius:16px;padding:18px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;"
+      onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.borderColor='rgba(58,127,255,.25)';this.style.transform=''"
+      onclick="openSharedSet('${e.code}')">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);opacity:.4;"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:1.8rem;">${e.icon||'📖'}</div>
+        <span style="font-size:.6rem;padding:2px 6px;background:rgba(58,127,255,.15);color:var(--accent2);border-radius:6px;font-weight:800;">🔗 Live</span>
+      </div>
+      <div style="font-size:.95rem;font-weight:800;margin-bottom:3px;line-height:1.3;">${esc(e.name)}</div>
+      <div style="font-size:.65rem;color:var(--accent2);margin-bottom:8px;">Shared with you</div>
+      <div style="font-size:.68rem;color:var(--text2);">${cardCount} cards</div>
+    </div>`;
+  }).join('');
+
+  // Section labels if both types exist
+  let html = '';
+  if (myHtml && sharedHtml) {
+    html = `<div style="grid-column:1/-1;font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">My Sets (${mySets.length})</div>`
+      + myHtml
+      + `<div style="grid-column:1/-1;font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:8px;margin-bottom:4px;">Shared with Me (${sharedFiltered.length})</div>`
+      + sharedHtml;
+  } else {
+    html = myHtml + sharedHtml;
+  }
+  grid.innerHTML = html;
 }
 
 function renderAllSetsView() {
