@@ -411,6 +411,33 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .home-empty-title { font-size:.88rem; font-weight:800; margin-bottom:6px; color:var(--text2); }
 .home-empty-sub { font-size:.75rem; line-height:1.5; }
 
+/* Focus card — main CTA */
+.home-focus-card { display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:0; position:relative; overflow:hidden; transition:all var(--transition); }
+.home-focus-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.home-focus-new::before { background:linear-gradient(90deg,var(--accent),var(--purple)); }
+.home-focus-continue { cursor:pointer; }
+.home-focus-continue::before { background:linear-gradient(90deg,var(--accent),var(--green)); }
+.home-focus-continue:hover { border-color:var(--border2); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.home-focus-start { cursor:pointer; }
+.home-focus-start::before { background:linear-gradient(90deg,var(--teal),var(--green)); }
+.home-focus-start:hover { border-color:var(--border2); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.home-focus-emoji { font-size:2.2rem; flex-shrink:0; }
+.home-focus-body { flex:1; min-width:0; }
+.home-focus-label { font-size:.6rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--accent2); margin-bottom:3px; }
+.home-focus-title { font-size:1rem; font-weight:900; line-height:1.2; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.home-focus-sub { font-size:.75rem; color:var(--text2); line-height:1.5; }
+.home-focus-meta { display:flex; gap:6px; align-items:center; margin-top:6px; font-size:.7rem; color:var(--text2); flex-wrap:wrap; }
+.home-focus-arrow { font-size:.78rem; font-weight:800; color:var(--accent2); background:var(--accent-dim); padding:8px 14px; border-radius:10px; border:1px solid rgba(58,127,255,.3); white-space:nowrap; flex-shrink:0; }
+
+/* Nudge cards — secondary actions */
+.home-nudge-card { display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 14px; cursor:pointer; transition:all var(--transition); }
+.home-nudge-card:hover { border-color:var(--border2); background:var(--surface2); transform:translateX(2px); }
+.home-nudge-icon { font-size:1.2rem; flex-shrink:0; width:28px; text-align:center; }
+.home-nudge-body { flex:1; min-width:0; }
+.home-nudge-title { font-size:.75rem; font-weight:800; }
+.home-nudge-sub { font-size:.68rem; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.home-nudge-arrow { font-size:.75rem; color:var(--text3); flex-shrink:0; }
+
 /* Legacy compat */
 .streak-row { display:flex; gap:10px; margin-bottom:24px; }
 .streak-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; align-items:center; gap:14px; }
@@ -796,7 +823,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <div class="nav-links" id="nav-links" style="display:none">
     <button class="nav-link" onclick="goHome()">Home</button>
     <button class="nav-link" onclick="showAllSets()">My Sets</button>
-    <button class="nav-link" onclick="showCodesView()">🔗 Codes</button>
+    <button class="nav-link sharing-btn" id="codes-nav-link" onclick="showCodesView()">🔗 Codes</button>
     <button class="nav-link" onclick="showFolders()">📁 Folders</button>
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
   </div>
@@ -825,7 +852,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div id="sb-foot">
       <button class="sb-foot-btn" onclick="showAllSets()"><span>📚</span> View All Sets</button>
       <button class="sb-foot-btn" onclick="showFolders()"><span>📁</span> Folders</button>
-      <button class="sb-foot-btn" onclick="showCodesView()"><span>🔗</span> DQcodes</button>
+      <button class="sb-foot-btn sharing-btn" onclick="showCodesView()"><span>🔗</span> DQcodes</button>
       <button class="sb-foot-btn" id="sb-ai-btn" onclick="openAIBuildModal()"><span>✨</span> Build Set with AI</button>
       <button class="sb-foot-btn" onclick="showView('tracking')"><span>📊</span> Progress</button>
       <button class="sb-foot-btn" onclick="showView('settings')"><span>⚙️</span> Settings</button>
@@ -1145,6 +1172,16 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="font-size:.7rem;color:var(--text3);">Animated backgrounds appear behind all content. May affect performance on older devices.</div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">🔗 Sharing & Codes</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">Enable Sharing Features</div>
+            <div class="settings-toggle-sub">Show Share buttons, Codes page, and import options</div>
+          </div>
+          <button class="toggle on" id="sharing-toggle" onclick="toggleSharingSetting()"></button>
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">🤖 AI Assistant</div>
         <div class="settings-toggle-row">
           <div>
@@ -1165,12 +1202,33 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">ℹ️ About</div>
-        <div style="font-size:.78rem;color:var(--text2);line-height:1.7;">DQstudy — Part of the DQ Tools suite. Built for students. Data saved locally and synced to your DQ Account when signed in.</div>
+        <div class="settings-section-title">ℹ️ About & Version</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:1.1rem;font-weight:900;">DQstudy</div>
+          <div style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;">v1.0.0</div>
+        </div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.7;margin-bottom:14px;">Part of the DQ Tools suite. Built for students. Data saved locally and synced to your DQ Account when signed in.</div>
+        <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">📋 Changelog</div>
+        <div style="font-size:.72rem;color:var(--text2);line-height:1.8;">
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--accent2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folders now support shared sets, Created by on shared sets, import count tracking, URL code import</div>
+        </div>
       </div>
     </div>
 
   </main>
+</div>
+
+<!-- ═══ ICON PICKER MODAL ═══ -->
+<div class="modal-overlay" id="icon-picker-modal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-head">
+      <div class="modal-title">🎨 Choose Icon</div>
+      <button class="modal-close" onclick="closeModal('icon-picker-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="icon-picker-grid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ AI PROMPTER MODAL ═══ -->
@@ -1253,102 +1311,108 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 <!-- ═══ SHARE MODAL ═══ -->
 <div class="modal-overlay" id="share-modal">
-  <div class="modal" style="max-width:540px;">
+  <div class="modal" style="max-width:520px;">
     <div class="modal-head">
       <div class="modal-title">🔗 Share Set</div>
       <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
     </div>
-    <div class="modal-body">
-      <!-- Set preview card -->
-      <div id="share-card-preview" style="background:linear-gradient(135deg,var(--surface),var(--surface2));border:2px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:18px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--green));"></div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div id="sc-icon" style="font-size:2rem;"></div>
-          <div style="flex:1;">
-            <div id="sc-name" style="font-size:1rem;font-weight:900;"></div>
-            <div id="sc-meta" style="font-size:.72rem;color:var(--text2);margin-top:2px;"></div>
-          </div>
-          <div style="font-size:.58rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);background:var(--accent-dim);padding:3px 8px;border-radius:100px;border:1px solid rgba(58,127,255,.3);">DQstudy</div>
+    <div class="modal-body" style="padding-top:0;">
+
+      <!-- Set preview strip -->
+      <div style="background:linear-gradient(135deg,var(--surface),var(--surface2));border-bottom:1px solid var(--border2);padding:14px 20px;margin:0 -20px 20px;display:flex;align-items:center;gap:12px;">
+        <div id="sc-icon" style="font-size:1.8rem;"></div>
+        <div style="flex:1;min-width:0;">
+          <div id="sc-name" style="font-size:.95rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="sc-meta" style="font-size:.68rem;color:var(--text2);margin-top:1px;"></div>
         </div>
-        <div id="sc-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+        <div style="font-size:.55rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);background:var(--accent-dim);padding:3px 8px;border-radius:100px;border:1px solid rgba(58,127,255,.3);flex-shrink:0;">DQstudy</div>
       </div>
 
       <!-- Loading state -->
-      <div id="share-loading" style="text-align:center;padding:20px;color:var(--text3);font-size:.82rem;">⏳ Checking for existing code…</div>
+      <div id="share-loading" style="text-align:center;padding:24px;color:var(--text3);font-size:.82rem;">⏳ Loading…</div>
 
-      <!-- Main share UI (shown after load) -->
+      <!-- Main share UI -->
       <div id="share-main" style="display:none;">
 
-        <!-- Existing code notice -->
-        <div id="share-existing-notice" style="display:none;background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--green2);display:none;">
-          ✓ This set already has a code. Sharing it again uses the same code.
+        <!-- TAB SWITCHER: Link vs Code vs Snapshot -->
+        <div style="display:flex;gap:6px;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;">
+          <button id="stab-link" onclick="switchShareTab('link')" style="flex:1;padding:8px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .15s;">🔗 Share Link</button>
+          <button id="stab-code" onclick="switchShareTab('code')" style="flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;">🔑 Code Only</button>
+          <button id="stab-snap" onclick="switchShareTab('snap')" style="flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;">📦 Snapshot</button>
         </div>
 
-        <!-- Step 1: Choose code type -->
-        <div style="margin-bottom:14px;">
-          <div class="flabel" style="margin-bottom:8px;">Code type</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="theme-option active" id="share-type-short" onclick="setShareCodeType('short',this)" style="text-align:left;padding:12px;">
-              <div style="font-size:.85rem;font-weight:800;margin-bottom:2px;">🔑 Short Code</div>
-              <div style="font-size:.65rem;color:var(--text2);">DQ-XXXX — easy to type, requires sign-in</div>
-            </div>
-            <div class="theme-option" id="share-type-long" onclick="setShareCodeType('long',this)" style="text-align:left;padding:12px;">
-              <div style="font-size:.85rem;font-weight:800;margin-bottom:2px;">📦 Long Code</div>
-              <div style="font-size:.65rem;color:var(--text2);">DQS1:… — self-contained, works without sign-in</div>
+        <!-- LINK TAB (default) -->
+        <div id="share-tab-link">
+          <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:var(--green2);line-height:1.6;">
+            ✅ <strong>Share a link</strong> — anyone who clicks it goes straight to the set. They can study it right away or save it to their account.
+          </div>
+          <!-- Access -->
+          <div style="margin-bottom:12px;">
+            <div class="flabel" style="margin-bottom:7px;">Who can access?</div>
+            <div style="display:flex;gap:8px;">
+              <button class="start-opt on" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Anyone with link</button>
+              <button class="start-opt" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Only me</button>
             </div>
           </div>
-        </div>
-
-        <!-- Step 2: Access (short code only) -->
-        <div id="share-access-row" style="margin-bottom:14px;">
-          <div class="flabel" style="margin-bottom:8px;">Who can use this code?</div>
-          <div style="display:flex;gap:8px;">
-            <button class="start-opt on" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Public — anyone</button>
-            <button class="start-opt" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Private — only me</button>
+          <!-- Expiry -->
+          <div style="margin-bottom:12px;">
+            <div class="flabel" style="margin-bottom:7px;">Link expires</div>
+            <select class="finp" id="share-expiry-sel" style="max-width:200px;">
+              <option value="0">Never</option>
+              <option value="7">In 7 days</option>
+              <option value="30">In 30 days</option>
+              <option value="90">In 90 days</option>
+            </select>
           </div>
-          <div style="font-size:.65rem;color:var(--text3);margin-top:5px;" id="share-access-hint">Public: anyone with the code can import this set.</div>
-        </div>
-
-        <!-- Step 3: Expiry -->
-        <div id="share-expiry-row" style="margin-bottom:14px;">
-          <div class="flabel" style="margin-bottom:8px;">Expiry</div>
-          <select class="finp" id="share-expiry-sel" style="max-width:220px;">
-            <option value="0">Never expires</option>
-            <option value="7">7 days</option>
-            <option value="30">30 days</option>
-            <option value="90">90 days</option>
-          </select>
-        </div>
-
-        <!-- Step 3b: Display name -->
-        <div id="share-name-row" style="margin-bottom:14px;">
-          <div class="flabel" style="margin-bottom:8px;">Show your name to importers?</div>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <!-- Name toggle -->
+          <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;">
             <button class="toggle on" id="share-anon-toggle" onclick="toggleShareAnon(this)"></button>
-            <span style="font-size:.78rem;color:var(--text2);" id="share-anon-label">Show my name</span>
+            <span style="font-size:.75rem;color:var(--text2);" id="share-anon-label">Show my name to recipients</span>
+          </div>
+          <!-- The link -->
+          <div class="flabel" style="margin-bottom:7px;">Shareable link</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px;">
+            <input class="finp" id="share-link-inp" readonly style="font-size:.75rem;flex:1;color:var(--accent2);" placeholder="Generating link…">
+            <button class="btn btn-primary btn-sm" onclick="copyShareLink()">📋 Copy Link</button>
+          </div>
+          <div style="font-size:.65rem;color:var(--text3);margin-bottom:14px;">Also works as a code — paste <strong id="share-code-inline"></strong> in the Codes page to import.</div>
+          <!-- Hidden code input kept for JS compat -->
+          <input type="hidden" id="share-code-inp">
+          <div id="share-status" style="font-size:.68rem;color:var(--text3);margin-bottom:8px;"></div>
+          <!-- Actions row -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border);">
+            <button class="btn btn-ghost btn-sm" onclick="mailtoShare()">✉️ Email</button>
+            <button class="btn btn-ghost btn-sm" id="share-newcode-btn" onclick="regenerateCode()">🔄 New Code</button>
+            <button class="btn btn-danger btn-sm" id="share-revoke-btn" onclick="revokeCurrentCode()" style="display:none;">✕ Revoke</button>
           </div>
         </div>
 
-        <!-- The code -->
-        <div style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div class="flabel" style="margin:0;">Your DQcode</div>
-            <button class="btn btn-ghost btn-sm" id="share-newcode-btn" onclick="regenerateCode()" style="font-size:.65rem;padding:4px 10px;">🔄 New Code</button>
+        <!-- CODE TAB -->
+        <div id="share-tab-code" style="display:none;">
+          <div style="background:var(--accent-dim);border:1px solid rgba(58,127,255,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:var(--accent2);line-height:1.6;">
+            🔑 <strong>Short code</strong> — recipient types this in the Codes page to import the set. Requires both people to be signed in.
           </div>
+          <div class="flabel" style="margin-bottom:7px;">Your DQ Code</div>
           <div style="display:flex;gap:8px;">
-            <input class="finp" id="share-code-inp" readonly style="font-family:var(--mono);font-size:.85rem;font-weight:700;letter-spacing:.08em;flex:1;" placeholder="Generating…">
-            <button class="btn btn-primary btn-sm" onclick="copyShareCode()">📋 Copy</button>
+            <input class="finp" id="share-code-only-inp" readonly style="font-family:var(--mono);font-size:1.1rem;font-weight:800;letter-spacing:.1em;flex:1;text-align:center;" placeholder="DQ-????">
+            <button class="btn btn-primary btn-sm" onclick="copyShareCodeOnly()">📋 Copy</button>
           </div>
-          <div id="share-status" style="font-size:.68rem;color:var(--text3);margin-top:5px;"></div>
+          <div style="font-size:.68rem;color:var(--text3);margin-top:8px;">Tell them: go to DQstudy → Codes → paste this code → Import.</div>
         </div>
 
-        <!-- Actions -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border);">
-          <button class="btn btn-ghost btn-sm" onclick="mailtoShare()">✉️ Email</button>
-          <button class="btn btn-ghost btn-sm" onclick="downloadSharePNG()">🖼 Save Image</button>
-          <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export File</button>
-          <button class="btn btn-danger btn-sm" id="share-revoke-btn" onclick="revokeCurrentCode()" style="display:none;">✕ Revoke Code</button>
+        <!-- SNAPSHOT TAB -->
+        <div id="share-tab-snap" style="display:none;">
+          <div style="background:rgba(161,100,255,.1);border:1px solid rgba(161,100,255,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:#c084fc;line-height:1.6;">
+            📦 <strong>Snapshot code</strong> — a self-contained copy of this set. Works without sign-in. Anyone can import it anywhere, but it won't update if you edit the set.
+          </div>
+          <div class="flabel" style="margin-bottom:7px;">Snapshot code (DQS1:…)</div>
+          <textarea class="finp" id="share-snap-out" readonly style="min-height:70px;font-family:var(--mono);font-size:.65rem;resize:none;" placeholder="Generating…"></textarea>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="copySnapCode()">📋 Copy Snapshot Code</button>
+          <div style="margin-top:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.68rem;color:var(--text2);line-height:1.6;">
+            💡 <strong>Tip:</strong> Snapshot codes are too long for a URL. For a shareable link, use the <strong>🔗 Share Link</strong> tab — it requires both people to have an account. Snapshot codes can be pasted directly in the Codes page by anyone, no account needed.
+          </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -1551,6 +1615,7 @@ let soundEnabled = true;
 let volume = 0.5;
 let currentTheme = 'dark';
 let aiEnabled = true; // on by default, first-time prompt handled separately
+let sharingEnabled = true; // show/hide all sharing & codes features
 let aiSeenPrompt = false;
 let aiContext = 'set';
 let bgAnim = 'none';
@@ -1663,14 +1728,17 @@ function loadSettings() {
       }, 300);
     }
     if (s.aiEnabled !== undefined) aiEnabled = s.aiEnabled;
+    if (s.sharingEnabled !== undefined) sharingEnabled = s.sharingEnabled;
     aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
   const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
   const at = document.getElementById('ai-toggle'); if (at) at.classList.toggle('on', aiEnabled);
+  const st = document.getElementById('sharing-toggle'); if (st) st.classList.toggle('on', sharingEnabled);
+  applySharingVisibility();
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
@@ -1730,8 +1798,58 @@ function bootApp() {
   _get('sb-toggle-btn') && (_get('sb-toggle-btn').style.display = '');
   renderSidebar();
   _appState = 'app';
-  goHome();
-  updateLandingCTA();
+  applySharingVisibility();
+  applyAIVisibility();
+  // Check for ?code= URL param — auto-import shared set
+  const _urlCode = new URLSearchParams(window.location.search).get('code');
+  // Note: DQS1 codes are too long for URLs in practice — only DQ-XXXX codes work as links
+  if (_urlCode) {
+    goHome();
+    updateLandingCTA();
+    handleURLCode(_urlCode);
+  } else {
+    goHome();
+    updateLandingCTA();
+  }
+}
+
+async function handleURLCode(code) {
+  // Show a banner at top of home while loading
+  const banner = document.createElement('div');
+  banner.id = 'url-code-banner';
+  banner.style.cssText = 'position:fixed;top:55px;left:0;right:0;z-index:500;background:var(--accent);color:#fff;padding:12px 20px;text-align:center;font-size:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;';
+  const _displayCode = code.startsWith('DQS1:') ? 'DQS1 snapshot' : esc(code);
+  banner.innerHTML = `<span>🔗 Loading shared set <strong>${_displayCode}</strong>…</span>`;
+  document.body.appendChild(banner);
+  const result = await resolveCode(code);
+  banner.remove();
+  // Clean URL so refreshing doesn't re-trigger
+  window.history.replaceState({}, '', window.location.pathname);
+  if (result.error) {
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('⚠ ' + result.error);
+    return;
+  }
+  const s = result.set;
+  if (code.startsWith('DQ-')) {
+    const already = sharedWithMe.find(x => x.code === code);
+    if (already) {
+      openSharedSet(code);
+      return;
+    }
+    const ownerName = result.meta?.ownerName || null;
+    sharedWithMe.push({ code, name: s.name, icon: s.icon||'📖', cachedData: s, cachedAt: Date.now(), ownerName });
+    fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${code}`, {
+      method: 'PATCH',
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ import_count: (result.meta?.importCount||0) + 1 })
+    }).catch(()=>{});
+    autoSave(); renderSidebar();
+    openSharedSet(code);
+  } else {
+    s.isSnapshot = true; s.fromCode = 'DQS1';
+    sets.push(s); autoSave(); renderSidebar();
+    openSet(s.id);
+  }
 }
 
 // Always load local data synchronously — it's ready before anything else
@@ -1952,17 +2070,24 @@ function renderHome(tab) {
   const activeTab = tab || homeTab || 'mine';
   homeTab = activeTab;
 
+  const myMine = sets.filter(s => !s.isSnapshot).sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
   const totalCards = sets.reduce((n,s) => n + allCards(s).length, 0);
   const totalPlays = sets.reduce((n,s) => n + (s.plays||0), 0);
   const allHist = sets.flatMap(s => s.history||[]);
   const avgScore = allHist.length ? Math.round(allHist.reduce((n,h) => n+(h.score/h.total*100),0)/allHist.length) : null;
   const pinned = sets.filter(s => s.pinned);
+  const hasAnySets = myMine.length > 0 || sharedWithMe.length > 0;
 
-  // Find most recently studied set for "continue" banner
+  // Most recently studied
   const recentlyStudied = sets.filter(s => s.history && s.history.length > 0)
     .sort((a,b) => (b.history.slice(-1)[0]?.date||0) - (a.history.slice(-1)[0]?.date||0))[0];
 
-  // Hero section
+  // Weakest set (most room to improve)
+  const weakest = myMine.filter(s => s.history && s.history.length > 0)
+    .map(s => { const cards = allCards(s); const m = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0; return {s, m}; })
+    .sort((a,b) => a.m - b.m)[0];
+
+  // ── HERO ──
   const heroHtml = `
     <div class="home-hero-section">
       <div class="home-hero-blobs">
@@ -1973,17 +2098,17 @@ function renderHome(tab) {
       <div class="home-hero-inner">
         <div style="flex:1;min-width:240px;">
           <div class="home-greeting-text">${name ? `${greet}, <span class="hl">${esc(name)}</span>! 👋` : `${greet}! 👋`}</div>
-          <div class="home-greeting-sub">${sets.length ? 'Pick up where you left off, or start something new.' : 'Welcome to DQstudy. Create your first set to get started.'}</div>
+          <div class="home-greeting-sub">${hasAnySets ? 'What are you studying today?' : 'Welcome to DQstudy — your personal study toolkit.'}</div>
           <div class="home-quick" style="margin-top:16px;">
             <button class="home-quick-btn primary" onclick="openCreateModal()">＋ New Set</button>
             ${aiEnabled ? `<button class="home-quick-btn" onclick="openAIBuildModal()">✨ AI Build</button>` : ''}
             <button class="home-quick-btn" onclick="showAllSets()">📚 All Sets</button>
-            <button class="home-quick-btn" onclick="showCodesView()">🔗 Codes</button>
+            ${sharingEnabled ? `<button class="home-quick-btn sharing-btn" onclick="showCodesView()">🔗 Codes</button>` : ''}
             <button class="home-quick-btn" onclick="showView('tracking')">📊 Progress</button>
           </div>
         </div>
         <div class="home-hero-stats">
-          <div class="home-stat"><div class="home-stat-n">${sets.length}</div><div class="home-stat-label">Sets</div></div>
+          <div class="home-stat"><div class="home-stat-n">${myMine.length}</div><div class="home-stat-label">Sets</div></div>
           <div class="home-stat"><div class="home-stat-n">${totalCards}</div><div class="home-stat-label">Cards</div></div>
           <div class="home-stat"><div class="home-stat-n">${totalPlays}</div><div class="home-stat-label">Sessions</div></div>
           <div class="home-stat"><div class="home-stat-n" style="color:${avgScore===null?'var(--text3)':avgScore>=80?'var(--green2)':avgScore>=60?'var(--amber2)':'var(--red2)'}">${avgScore !== null ? avgScore+'%' : '—'}</div><div class="home-stat-label">Avg Score</div></div>
@@ -1991,64 +2116,156 @@ function renderHome(tab) {
       </div>
     </div>`;
 
-  // Continue banner
-  const continueBanner = recentlyStudied ? (() => {
+  // ── FOCUS CARD — the main CTA, changes based on state ──
+  let focusCard = '';
+  if (!hasAnySets) {
+    // New user — get them to create their first set
+    focusCard = `
+      <div class="home-focus-card home-focus-new">
+        <div class="home-focus-emoji">🚀</div>
+        <div class="home-focus-body">
+          <div class="home-focus-label">Get started</div>
+          <div class="home-focus-title">Create your first flashcard set</div>
+          <div class="home-focus-sub">Add a topic, build cards, and start studying in minutes.</div>
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openCreateModal()">＋ Create a Set</button>
+            ${aiEnabled ? `<button class="btn btn-ghost" onclick="openAIBuildModal()">✨ Build with AI</button>` : ''}
+            ${sharingEnabled ? `<button class="btn btn-ghost sharing-btn" onclick="showCodesView()">🔗 Import a Code</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  } else if (recentlyStudied) {
+    // Returning user — continue studying
     const lastH = recentlyStudied.history.slice(-1)[0];
     const pct = Math.round(lastH.score/lastH.total*100);
     const cards = allCards(recentlyStudied);
     const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
-    return `<div class="home-continue" onclick="openSet('${recentlyStudied.id}')">
-      <div class="home-continue-icon">${recentlyStudied.icon||'📖'}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="home-continue-label">Continue where you left off</div>
-        <div class="home-continue-title">${esc(recentlyStudied.name)}</div>
-        <div class="home-continue-sub">${cards.length} cards · Last score: ${pct}% · ${mastery}% mastered</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:.62rem;font-weight:800;color:${pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)'};letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;">${pct>=80?'Strong':'Keep going'}</div>
-        <div class="home-continue-arrow">▶ Study</div>
-      </div>
-    </div>`;
-  })() : '';
+    const scoreColor = pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)';
+    const msg = pct >= 80 ? 'Great score last time! Keep the streak going.' : pct >= 60 ? 'Getting there — keep pushing.' : 'Needs more practice — you\'ve got this.';
+    focusCard = `
+      <div class="home-focus-card home-focus-continue" onclick="openSet('${recentlyStudied.id}')">
+        <div class="home-focus-emoji">${recentlyStudied.icon||'📖'}</div>
+        <div class="home-focus-body">
+          <div class="home-focus-label">Continue studying</div>
+          <div class="home-focus-title">${esc(recentlyStudied.name)}</div>
+          <div class="home-focus-sub">${msg}</div>
+          <div class="home-focus-meta">
+            <span style="color:${scoreColor};font-weight:800;">${pct}% last score</span>
+            <span>·</span>
+            <span>${mastery}% mastered</span>
+            <span>·</span>
+            <span>${cards.length} cards</span>
+          </div>
+        </div>
+        <div class="home-focus-arrow">▶ Study Now</div>
+      </div>`;
+  } else {
+    // Has sets but never studied — nudge them to start
+    const first = myMine[0];
+    const cards = allCards(first);
+    focusCard = `
+      <div class="home-focus-card home-focus-start" onclick="openSet('${first.id}')">
+        <div class="home-focus-emoji">${first.icon||'📖'}</div>
+        <div class="home-focus-body">
+          <div class="home-focus-label">Ready to study?</div>
+          <div class="home-focus-title">${esc(first.name)}</div>
+          <div class="home-focus-sub">You have ${cards.length} cards ready — start your first study session.</div>
+        </div>
+        <div class="home-focus-arrow">▶ Start</div>
+      </div>`;
+  }
 
-  // Pinned row
-  const pinnedHtml = pinned.length ? `
-    <div class="home-sec" style="margin-top:0;margin-bottom:10px;"><span class="home-sec-title">📌 Pinned</span></div>
-    <div class="home-pinned-row">
-      ${pinned.map(s => `<div class="home-pinned-chip" onclick="openSet('${s.id}')">
-        <span style="font-size:14px;">${s.icon||'📖'}</span>
-        <span class="home-pinned-chip-name">${esc(s.name)}</span>
-        <span class="home-pinned-chip-count">${allCards(s).length}c</span>
-      </div>`).join('')}
+  // ── NUDGE CARDS — secondary purpose-driven actions ──
+  const nudgeCards = [];
+
+  // Weakest set nudge
+  if (weakest && weakest.m < 80 && weakest.s !== recentlyStudied) {
+    nudgeCards.push(`
+      <div class="home-nudge-card" onclick="openSet('${weakest.s.id}')">
+        <div class="home-nudge-icon">📍</div>
+        <div class="home-nudge-body">
+          <div class="home-nudge-title">Needs attention</div>
+          <div class="home-nudge-sub">${esc(weakest.s.name)} — ${weakest.m}% mastered</div>
+        </div>
+        <div class="home-nudge-arrow">→</div>
+      </div>`);
+  }
+
+  // Pinned sets nudge
+  if (pinned.length) {
+    pinned.slice(0,2).forEach(s => {
+      nudgeCards.push(`
+        <div class="home-nudge-card" onclick="openSet('${s.id}')">
+          <div class="home-nudge-icon">${s.icon||'📌'}</div>
+          <div class="home-nudge-body">
+            <div class="home-nudge-title">Pinned</div>
+            <div class="home-nudge-sub">${esc(s.name)}</div>
+          </div>
+          <div class="home-nudge-arrow">→</div>
+        </div>`);
+    });
+  }
+
+  // If no sets — nudge to import a code
+  if (!hasAnySets && sharingEnabled) {
+    nudgeCards.push(`
+      <div class="home-nudge-card sharing-btn" onclick="showCodesView()">
+        <div class="home-nudge-icon">🔗</div>
+        <div class="home-nudge-body">
+          <div class="home-nudge-title">Got a code?</div>
+          <div class="home-nudge-sub">Import a set from a classmate</div>
+        </div>
+        <div class="home-nudge-arrow">→</div>
+      </div>`);
+  }
+
+  // Progress nudge if has history
+  if (allHist.length > 0) {
+    nudgeCards.push(`
+      <div class="home-nudge-card" onclick="showView('tracking')">
+        <div class="home-nudge-icon">📊</div>
+        <div class="home-nudge-body">
+          <div class="home-nudge-title">View Progress</div>
+          <div class="home-nudge-sub">Avg score: ${avgScore}% across ${allHist.length} session${allHist.length===1?'':'s'}</div>
+        </div>
+        <div class="home-nudge-arrow">→</div>
+      </div>`);
+  }
+
+  const nudgesHtml = nudgeCards.length ? `
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+      ${nudgeCards.join('')}
     </div>` : '';
 
-  // Action cards — tell users what to do
-  const noSets = sets.filter(s=>!s.isSnapshot).length === 0;
-  const actionCards = `<div class="home-actions-grid">
-    <div class="home-action-card accent" onclick="openCreateModal()">
-      <div class="home-action-icon">＋</div>
-      <div class="home-action-title">New Set</div>
-      <div class="home-action-sub">Build from scratch with cards</div>
+  // ── ACTION GRID (bottom of left col) ──
+  const actionGrid = `
+    <div class="home-sec" style="margin-top:20px;">
+      <span class="home-sec-title">More actions</span>
     </div>
-    ${aiEnabled ? `<div class="home-action-card ai" onclick="openAIBuildModal()">
-      <div class="home-action-icon">✨</div>
-      <div class="home-action-title">AI Build</div>
-      <div class="home-action-sub">Describe a topic, get cards instantly</div>
-    </div>` : ''}
-    <div class="home-action-card" onclick="showCodesView()">
-      <div class="home-action-icon">🔗</div>
-      <div class="home-action-title">Import Code</div>
-      <div class="home-action-sub">Get a set shared by someone else</div>
-    </div>
-    <div class="home-action-card" onclick="showView('tracking')">
-      <div class="home-action-icon">📊</div>
-      <div class="home-action-title">My Progress</div>
-      <div class="home-action-sub">Mastery, history, and stats</div>
-    </div>
-  </div>`;
+    <div class="home-actions-grid">
+      <div class="home-action-card accent" onclick="openCreateModal()">
+        <div class="home-action-icon">＋</div>
+        <div class="home-action-title">New Set</div>
+        <div class="home-action-sub">Build cards from scratch</div>
+      </div>
+      ${aiEnabled ? `<div class="home-action-card ai" onclick="openAIBuildModal()">
+        <div class="home-action-icon">✨</div>
+        <div class="home-action-title">AI Build</div>
+        <div class="home-action-sub">Describe a topic, get cards</div>
+      </div>` : ''}
+      ${sharingEnabled ? `<div class="home-action-card sharing-btn" onclick="showCodesView()">
+        <div class="home-action-icon">🔗</div>
+        <div class="home-action-title">Import Code</div>
+        <div class="home-action-sub">Get a classmate's set</div>
+      </div>` : ''}
+      <div class="home-action-card" onclick="showView('tracking')">
+        <div class="home-action-icon">📊</div>
+        <div class="home-action-title">My Progress</div>
+        <div class="home-action-sub">Mastery, scores, history</div>
+      </div>
+    </div>`;
 
-  // Sets section
-  const myMine = sets.filter(s => !s.isSnapshot).sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
+  // ── SETS LIST (right col) ──
   const myCount = myMine.length;
   const sharedCount = sharedWithMe.length;
   const snapCount = sets.filter(s=>s.isSnapshot).length;
@@ -2061,55 +2278,43 @@ function renderHome(tab) {
 
   let gridHtml = '';
   if (activeTab === 'mine') {
-    if (!myMine.length) {
-      gridHtml = `<div class="home-empty">
-        <div class="home-empty-icon">📚</div>
-        <div class="home-empty-title">No sets yet — create one above</div>
-        <div class="home-empty-sub">Start with AI to get a full set in seconds, or build your own card by card.</div>
-      </div>`;
-    } else {
-      gridHtml = `<div class="home-sets-grid">
-        ${myMine.map(s => homeSetCard(s, false)).join('')}
-      </div>`;
-    }
+    gridHtml = myMine.length ? `<div class="home-sets-grid">${myMine.map(s => homeSetCard(s, false)).join('')}</div>`
+      : `<div class="home-empty"><div class="home-empty-icon">📚</div><div class="home-empty-title">No sets yet</div><div class="home-empty-sub">Use the actions on the left to create or import one.</div></div>`;
   } else if (activeTab === 'shared') {
     gridHtml = sharedWithMe.length ? `<div class="home-sets-grid">
       ${sharedWithMe.map(e => {
         const cnt = e.cachedData ? allCards(e.cachedData).length : '?';
+        const byLine = e.ownerName ? ` · by ${esc(e.ownerName)}` : '';
         return `<div class="home-set-card shared" onclick="openSharedSet('${e.code}')">
           <div class="home-set-card-badge" style="background:rgba(58,127,255,.15);color:var(--accent2);">🔗 Live</div>
           <div class="home-set-card-icon">${e.icon||'📖'}</div>
           <div class="home-set-card-name">${esc(e.name)}</div>
-          <div class="home-set-card-meta">${cnt} cards · live access</div>
+          <div class="home-set-card-meta">${cnt} cards${byLine}</div>
           <div class="home-set-card-bar"><div class="home-set-card-fill" style="width:0%"></div></div>
         </div>`;
       }).join('')}
     </div>` : '';
-  } else if (activeTab === 'snapshots') {
+  } else {
     const snaps = sets.filter(s => s.isSnapshot);
     gridHtml = snaps.length ? `<div class="home-sets-grid">${snaps.map(s => homeSetCard(s, true)).join('')}</div>` : '';
   }
 
-    const el = document.getElementById('view-home');
-  const hasSets = myMine.length > 0 || sharedWithMe.length > 0;
+  const el = document.getElementById('view-home');
   el.innerHTML = heroHtml + `<div class="home-body">
     <div class="home-left">
-      ${continueBanner}
-      ${pinnedHtml}
-      <div class="home-sec" style="margin-top:0;">
-        <span class="home-sec-title">What do you want to do?</span>
-      </div>
-      ${actionCards}
+      ${focusCard}
+      ${nudgesHtml}
+      ${actionGrid}
     </div>
     <div class="home-right">
       <div class="home-sec" style="margin-top:0;">
         <span class="home-sec-title">Your Sets</span>
-        ${hasSets ? `<button class="home-sec-link" onclick="showAllSets()">View all →</button>` : ''}
+        ${hasAnySets ? `<button class="home-sec-link" onclick="showAllSets()">View all →</button>` : ''}
       </div>
-      ${hasSets ? tabsHtml + gridHtml : `<div class="home-empty">
+      ${hasAnySets ? tabsHtml + gridHtml : `<div class="home-empty">
         <div class="home-empty-icon">📚</div>
         <div class="home-empty-title">No sets yet</div>
-        <div class="home-empty-sub">Create your first set using the options on the left.</div>
+        <div class="home-empty-sub">Create your first set to get started.</div>
       </div>`}
     </div>
   </div>`;
@@ -2287,7 +2492,7 @@ function renderSetPage(s, readOnly) {
   const isSnapshot = !readOnly && s.isSnapshot;
 
   document.getElementById('set-header').innerHTML = `
-    <div class="set-big-icon">${s.icon||'📖'}</div>
+    <div class="set-big-icon" onclick="openIconPicker()" title="Click to change icon">${s.icon||'📖'}</div>
     <div class="set-header-info">
       <div class="set-title">${esc(s.name)}</div>
       <div class="set-chips">
@@ -2305,7 +2510,7 @@ function renderSetPage(s, readOnly) {
       ${isSnapshot ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Snapshot import · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySnapshotSet('${s.id}')">📋 Make It Mine</button> to edit</div>` : ''}
     </div>
     <div class="set-header-actions">
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openShareModal()">🔗 Share</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm sharing-btn" onclick="openShareModal()">🔗 Share</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">🤖 AI</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
@@ -2548,6 +2753,27 @@ function cycleIcon() {
   const s = getSet(currentSetId); if (!s) return;
   s.icon = icons[(icons.indexOf(s.icon)+1) % icons.length];
   autoSave(); renderSidebar(); renderSetPage(s);
+}
+
+function openIconPicker() {
+  const s = getSet(currentSetId); if (!s) return;
+  const icons = [
+    '📖','📚','🧠','⚡','🔬','🧪','📐','🎯','💡','🌊','🔭','🧬','📝','🎓','💻','🦠','🌍','🏔','🎵','⚽',
+    '🏆','🎨','🎭','🎬','🧩','🃏','🎲','🎮','🚀','✈️','🚂','🏄','🧗','🤿','🎸','🥁','🎹','🎺','🎻','🪗',
+    '🍎','🍕','☕','🧁','🌮','🍜','🌸','🌺','🍀','🌻','💎','🔮','⚗️','🧲','🔑','🗝️','🛡️','⚔️','🏹','🪄',
+    '🦁','🐯','🦊','🐺','🦅','🦋','🐬','🦈','🦖','🐲','🌈','⭐','🌙','☀️','❄️','🔥','💧','🌪️','⚡','🌍'
+  ];
+  const grid = document.getElementById('icon-picker-grid');
+  grid.innerHTML = icons.map(ic => `<button onclick="setIcon('${ic}')" style="font-size:1.4rem;background:${s.icon===ic?'var(--accent-dim)':'var(--surface)'};border:1px solid ${s.icon===ic?'var(--accent)':'var(--border)'};border-radius:8px;padding:6px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='${s.icon===ic?'var(--accent-dim)':'var(--surface)'}'">${ic}</button>`).join('');
+  openModal('icon-picker-modal');
+}
+
+function setIcon(ic) {
+  const s = getSet(currentSetId); if (!s) return;
+  s.icon = ic;
+  autoSave(); renderSidebar(); renderSetPage(s);
+  closeModal('icon-picker-modal');
+  sndClick();
 }
 
 // Copy a live shared set into your own sets[]
@@ -4513,10 +4739,7 @@ async function setShareAccess(type) {
   shareAccess = type;
   document.getElementById('share-public-btn').classList.toggle('on', type === 'public');
   document.getElementById('share-private-btn').classList.toggle('on', type === 'private');
-  document.getElementById('share-access-hint').textContent = type === 'public'
-    ? 'Public: anyone with the code can import this set.'
-    : 'Private: only you can import this code.';
-  // If we already have a code, patch it in Supabase immediately
+  // If we already have a short code, patch it in Supabase immediately
   if (currentShareCode && currentShareCode.startsWith('DQ-')) {
     try {
       await fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${currentShareCode}`, {
@@ -4528,14 +4751,13 @@ async function setShareAccess(type) {
         },
         body: JSON.stringify({ access: type })
       });
-      document.getElementById('share-status').textContent = type === 'public'
-        ? '🌍 Code is now public'
-        : '🔒 Code is now private';
+      const statusEl = document.getElementById('share-status');
+      if (statusEl) statusEl.textContent = type === 'public' ? '🌍 Now public' : '🔒 Now private';
     } catch(e) {
-      document.getElementById('share-status').textContent = 'Could not update access';
+      const statusEl = document.getElementById('share-status');
+      if (statusEl) statusEl.textContent = 'Could not update access';
     }
   } else {
-    // No code yet — generate one with the new access
     refreshShortCode();
   }
 }
@@ -4548,11 +4770,9 @@ async function refreshShortCode() {
   const s = getSet(currentSetId); if (!s) return;
   const _authUser = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
   if (!_authUser) {
-    inp.value = encodeSetToBase64(s);
-    currentShareCode = inp.value;
-    statusEl.textContent = 'Sign in to get a short reusable DQ-XXXX code';
-    document.getElementById('share-access-row').style.display = 'none';
-    document.getElementById('share-expiry-row').style.display = 'none';
+    if (statusEl) statusEl.textContent = 'Sign in to get a shareable link. Use the Snapshot tab to share without an account.';
+    // Switch to snapshot tab for guests
+    switchShareTab('snap');
     return;
   }
   isLoggedIn = true; // sync flag in case it fell behind
@@ -4565,36 +4785,26 @@ async function refreshShortCode() {
     const rows = await checkRes.json();
     const existing = rows[0] || null;
     if (existing && existing.code) {
-      currentShareCode = existing.code;
-      inp.value = existing.code;
-      const expired = existing.expires_at && new Date(existing.expires_at) < new Date();
-      statusEl.textContent = expired ? '⚠️ This code has expired — click New Code to regenerate' : '✓ Using existing code for this set';
-      document.getElementById('share-existing-notice').style.display = '';
-      document.getElementById('share-revoke-btn').style.display = '';
-      // Set access toggle to match existing
       shareAccess = existing.access || 'public';
       document.getElementById('share-public-btn').classList.toggle('on', shareAccess === 'public');
       document.getElementById('share-private-btn').classList.toggle('on', shareAccess === 'private');
+      const expired = existing.expires_at && new Date(existing.expires_at) < new Date();
+      if (statusEl) statusEl.textContent = expired ? '⚠️ Expired — click New Code to regenerate' : '';
+      _updateShareFields(existing.code);
     } else {
       // Generate new
       const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
       const code = await generateShortCode(s, shareAccess, days);
       if (code) {
-        currentShareCode = code;
-        inp.value = code;
-        statusEl.textContent = '✓ New code created';
-        document.getElementById('share-revoke-btn').style.display = '';
+        if (statusEl) statusEl.textContent = '';
+        _updateShareFields(code);
       } else {
-        inp.value = encodeSetToBase64(s);
-        currentShareCode = inp.value;
-        statusEl.textContent = 'Could not create short code — using long code instead';
-        document.getElementById('share-revoke-btn').style.display = 'none';
+        // Not signed in or error — show snapshot fallback on snap tab
+        if (statusEl) statusEl.textContent = 'Sign in to get a short code. Snapshot available below.';
       }
     }
   } catch(e) {
-    inp.value = encodeSetToBase64(s);
-    currentShareCode = inp.value;
-    statusEl.textContent = 'Falling back to long code';
+    if (statusEl) statusEl.textContent = 'Could not connect — check your internet.';
   }
 }
 
@@ -4606,10 +4816,9 @@ async function regenerateCode() {
   const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
   const code = await generateShortCode(s, shareAccess, days);
   if (code) {
-    currentShareCode = code;
-    document.getElementById('share-code-inp').value = code;
-    document.getElementById('share-status').textContent = '✓ New code generated';
-    document.getElementById('share-revoke-btn').style.display = '';
+    _updateShareFields(code);
+    const statusEl = document.getElementById('share-status');
+    if (statusEl) statusEl.textContent = '✓ New code generated';
   }
   sndClick();
 }
@@ -4618,10 +4827,17 @@ async function revokeCurrentCode() {
   const s = getSet(currentSetId); if (!s) return;
   if (!confirm('Revoke this code? Anyone with it will lose access.')) return;
   await revokeShortCode(s.id);
-  document.getElementById('share-code-inp').value = '';
-  document.getElementById('share-status').textContent = 'Code revoked.';
-  document.getElementById('share-revoke-btn').style.display = 'none';
-  document.getElementById('share-existing-notice').style.display = 'none';
+  const hiddenInp = document.getElementById('share-code-inp');
+  if (hiddenInp) hiddenInp.value = '';
+  const linkInp = document.getElementById('share-link-inp');
+  if (linkInp) linkInp.value = '';
+  const codeOnlyInp = document.getElementById('share-code-only-inp');
+  if (codeOnlyInp) codeOnlyInp.value = '';
+  const statusEl = document.getElementById('share-status');
+  if (statusEl) statusEl.textContent = 'Code revoked.';
+  const rBtn = document.getElementById('share-revoke-btn');
+  if (rBtn) rBtn.style.display = 'none';
+  currentShareCode = '';
   sndClick();
 }
 
@@ -4646,26 +4862,87 @@ async function openShareModal() {
   // Reset UI
   document.getElementById('share-loading').style.display = '';
   document.getElementById('share-main').style.display = 'none';
-  document.getElementById('share-existing-notice').style.display = 'none';
-  document.getElementById('share-type-short').classList.add('active');
-  document.getElementById('share-type-long').classList.remove('active');
   document.getElementById('share-public-btn').classList.add('on');
   document.getElementById('share-private-btn').classList.remove('on');
-  document.getElementById('share-revoke-btn').style.display = 'none';
+  const rBtn = document.getElementById('share-revoke-btn');
+  if (rBtn) rBtn.style.display = 'none';
 
   openModal('share-modal');
   await refreshShortCode();
   document.getElementById('share-loading').style.display = 'none';
   document.getElementById('share-main').style.display = '';
+  switchShareTab('link'); // default to link tab
 }
 
-function copyShareCode() {
-  const inp = document.getElementById('share-code-inp');
+// ── Share modal tab switcher ──
+function switchShareTab(tab) {
+  ['link','code','snap'].forEach(t => {
+    document.getElementById('share-tab-'+t).style.display = t===tab ? '' : 'none';
+    const btn = document.getElementById('stab-'+t);
+    btn.style.background = t===tab ? 'var(--accent)' : 'transparent';
+    btn.style.color = t===tab ? '#fff' : 'var(--text2)';
+    btn.style.fontWeight = t===tab ? '800' : '700';
+  });
+  // Populate snapshot tab on demand
+  if (tab === 'snap') {
+    const s = getSet(currentSetId); if (!s) return;
+    document.getElementById('share-snap-out').value = encodeSetToBase64(s);
+  }
+}
+
+function copyShareLink() {
+  const inp = document.getElementById('share-link-inp');
+  if (!inp.value || inp.value === 'Generating link…') return;
   navigator.clipboard.writeText(inp.value).then(() => {
-    const btn = document.querySelector('#share-modal .btn-primary');
+    const btn = document.querySelector('#share-tab-link .btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Link', 2000); }
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Link copied!');
+  });
+  sndClick();
+}
+
+function copyShareCodeOnly() {
+  const inp = document.getElementById('share-code-only-inp');
+  navigator.clipboard.writeText(inp.value).then(() => {
+    const btn = document.querySelector('#share-tab-code .btn-primary');
     if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy', 2000); }
   });
   sndClick();
+}
+
+function copySnapCode() {
+  const ta = document.getElementById('share-snap-out');
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.querySelector('#share-tab-snap .btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Snapshot Code', 2000); }
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('✓ Snapshot code copied!');
+  });
+  sndClick();
+}
+
+function copyShareCode() {
+  // Legacy — copy whichever code is active
+  copyShareLink();
+}
+
+// Update link/code fields when code is generated
+function _updateShareFields(code) {
+  if (!code) return;
+  currentShareCode = code;
+  // hidden compat field
+  const hiddenInp = document.getElementById('share-code-inp');
+  if (hiddenInp) hiddenInp.value = code;
+  // link tab
+  const linkInp = document.getElementById('share-link-inp');
+  if (linkInp) linkInp.value = 'https://dqtools26.github.io/dq-tools/dqstudy.html?code=' + code;
+  const codeInline = document.getElementById('share-code-inline');
+  if (codeInline) codeInline.textContent = code;
+  // code tab
+  const codeOnlyInp = document.getElementById('share-code-only-inp');
+  if (codeOnlyInp) codeOnlyInp.value = code;
+  // show revoke btn
+  const revokeBtn = document.getElementById('share-revoke-btn');
+  if (revokeBtn) revokeBtn.style.display = '';
 }
 
 function mailtoShare() {
@@ -4870,6 +5147,26 @@ const AI_ACTIONS = {
     { id:'explain',       icon:'💬', label:'Explain these concepts',  desc:'Get plain-language explanations' },
   ]
 };
+
+function applySharingVisibility() {
+  const show = sharingEnabled;
+  // Hide/show all sharing-related elements by class
+  document.querySelectorAll('.sharing-btn').forEach(el => el.style.display = show ? '' : 'none');
+  // Sidebar DQcodes button
+  const sbCodes = document.querySelector('.sb-foot-btn[onclick*="showCodesView"]');
+  if (sbCodes) sbCodes.style.display = show ? '' : 'none';
+  // Re-render home if visible so action cards update too
+  const homeView = document.getElementById('view-home');
+  if (homeView && homeView.classList.contains('active')) renderHome();
+}
+
+function toggleSharingSetting() {
+  sharingEnabled = !sharingEnabled;
+  const t = document.getElementById('sharing-toggle'); if (t) t.classList.toggle('on', sharingEnabled);
+  applySharingVisibility();
+  saveSettings();
+  if (document.getElementById('view-home').classList.contains('active')) renderHome();
+}
 
 function toggleAISetting() {
   aiEnabled = !aiEnabled;
