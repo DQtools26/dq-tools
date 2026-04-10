@@ -1648,29 +1648,69 @@ function bootApp() {
   _get('nav-links') && (_get('nav-links').style.display = '');
   _get('sb-toggle-btn') && (_get('sb-toggle-btn').style.display = '');
   renderSidebar();
-  // Short pause so landing is visible, then go home
-  setTimeout(() => { goHome(); updateLandingCTA(); }, 900);
+  _appState = 'app';
+  goHome();
+  updateLandingCTA();
 }
 
-// Always load local data in the background so it's ready
+// Always load local data synchronously — it's ready before anything else
 const localTimestamp = loadLocal();
 
 // ─── AUTH + INIT ───────────────────────────────────
-// Mirror courseplanner pattern: wait for load, then listen for auth
-// This ensures dq-auth.js (defer) is fully ready before we touch DQAuth
+// State machine: 'waiting' → 'landing' → 'booting' → 'app'
+// This prevents double-boots, race conditions, and stuck landing screens.
 
-let _authHandled = false;
+let _appState = 'waiting'; // 'waiting' | 'landing' | 'booting' | 'app'
+let _fallbackTimer = null;
 
+// Called once on initial auth check (page load)
 async function _handleAuthReady(user) {
-  if (_authHandled) return;
-  _authHandled = true;
-  // Always show landing first — gives a moment for data to load
+  // If we already made it to the app, ignore stale callbacks
+  if (_appState === 'booting' || _appState === 'app') return;
+  _appState = 'landing';
+
+  // Always show landing
   showLanding();
-  updateLandingCTA();
+
   if (!user) {
+    // Not logged in — stay on landing, wait for user action
     renderSidebar();
     return;
   }
+
+  // Logged in — load cloud data in background, then auto-proceed to app
+  await _loadCloudData(user);
+  bootApp();
+}
+
+// Called when user signs IN during the session (via DQAuth modal)
+async function _handleSignIn(user) {
+  if (!user) return;
+  // If already in the app (guest who just signed in), reload cloud data + refresh
+  if (_appState === 'app') {
+    isLoggedIn = true;
+    await _loadCloudData(user);
+    renderSidebar();
+    renderHome();
+    return;
+  }
+  // On landing — proceed to boot
+  await _loadCloudData(user);
+  _doBootApp();
+}
+
+// Called when user signs OUT during the session
+function _handleSignOut() {
+  isLoggedIn = false;
+  sets = []; folders = []; sharedWithMe = [];
+  loadLocal(); // restore local-only data
+  _appState = 'landing';
+  showLanding();
+  renderSidebar();
+}
+
+// Load cloud settings + data for a logged-in user
+async function _loadCloudData(user) {
   isLoggedIn = true;
   if (typeof DQAuth === 'undefined') return;
   try {
@@ -1702,21 +1742,50 @@ async function _handleAuthReady(user) {
       DQAuth.saveData('dqstudy', {sets, folders, sharedWithMe, savedAt: localTimestamp});
     }
   } catch(_) {}
+}
+
+// Activate the full app UI (sidebar, nav, home screen)
+function _doBootApp() {
+  if (_appState === 'booting' || _appState === 'app') return;
+  _appState = 'booting';
   bootApp();
 }
 
-window.addEventListener('load', () => {
-  let started = false;
-  const start = (user) => { if (!started) { started = true; _handleAuthReady(user || null); } };
+// Listen for auth events at the top level — NOT inside window.load.
+// dq-auth.js is defer, so it runs right after HTML parses, potentially
+// before or simultaneous with the load event. Registering inside load
+// risks missing the event entirely.
 
-  window.addEventListener('dq:authready', ({ detail: { user } }) => {
-    start(user);
-  });
+let _initialAuthReceived = false;
 
-  // Fallback: if dq-auth.js never fires (offline/blocked), start after 500ms
-  // Short timeout so page doesn't feel slow — auth fires almost instantly when working
-  setTimeout(() => start(null), 500);
+function _onAuthReady(user) {
+  if (_fallbackTimer) { clearTimeout(_fallbackTimer); _fallbackTimer = null; }
+  if (!_initialAuthReceived) {
+    _initialAuthReceived = true;
+    _handleAuthReady(user || null);
+  }
+}
+
+window.addEventListener('dq:authready', ({ detail: { user } }) => {
+  _onAuthReady(user || null);
 });
+
+// dq:authchange fires when the user signs in or out during the session
+window.addEventListener('dq:authchange', ({ detail: { user } }) => {
+  if (user) {
+    _handleSignIn(user);
+  } else {
+    _handleSignOut();
+  }
+});
+
+// Fallback: fires if dq-auth.js never dispatches authready (offline/blocked).
+_fallbackTimer = setTimeout(() => {
+  if (!_initialAuthReceived) {
+    _initialAuthReceived = true;
+    _handleAuthReady(null);
+  }
+}, 3000);
 
 function showLanding() {
   const _get = id => document.getElementById(id);
@@ -1737,7 +1806,7 @@ function updateLandingCTA() {
   const safeName = (name||'Me').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (user) {
     cta.innerHTML = `
-      <button class="btn btn-primary btn-lg" onclick="bootApp()">▶ Continue as ${safeName}</button>
+      <button class="btn btn-primary btn-lg" onclick="_handleSignIn(DQAuth.getUser?.())">▶ Continue as ${safeName}</button>
       <button class="btn btn-ghost btn-lg" onclick="if(typeof DQAuth!=='undefined'){DQAuth.signOut();location.reload();}">Sign Out</button>
     `;
   } else {
@@ -1749,8 +1818,32 @@ function updateLandingCTA() {
 }
 
 function continueWithout() {
+  _appState = 'landing'; // allow bootApp to proceed
   bootApp();
 }
+
+// Poll for auth state — runs while on landing OR still waiting for authready.
+// Safety net for: missed events, slow Firebase, older dq-auth.js versions.
+let _landingPollUser = null;
+setInterval(() => {
+  if (_appState !== 'landing' && _appState !== 'waiting') return;
+  if (typeof DQAuth === 'undefined') return;
+  const user = DQAuth.getUser?.() || null;
+  const uid = user?.uid || null;
+  if (uid && uid !== _landingPollUser) {
+    _landingPollUser = uid;
+    // If authready never fired, trigger the full boot flow
+    if (!_initialAuthReceived) {
+      _onAuthReady(user);
+    } else {
+      _handleSignIn(user);
+    }
+  } else if (!uid && _landingPollUser) {
+    _landingPollUser = null;
+    updateLandingCTA();
+    renderSidebar();
+  }
+}, 500);
 
 // ─────────────────────────────────────────────────
 // ROUTING
