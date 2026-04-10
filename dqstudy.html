@@ -137,7 +137,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .code-by { font-size: .65rem; color: var(--text3); }
 
 /* ═══ HOME REDESIGN ═══ */
-#view-home { padding: 0; overflow-y: auto; min-height: calc(100vh - 55px); position: relative; }
+/* #view-home base is defined in HOME section below */
 
 /* Hero section — same vibe as landing */
 .home-hero-section {
@@ -287,7 +287,9 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* ═══════════════ VIEWS (all hidden by default) ═══════════════ */
 .view { display:none; }
-.view.active { display:flex; flex-direction:column; }
+.view.active { display:block; }
+#view-landing.active { display:flex; flex-direction:column; }
+#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active { display:flex; flex-direction:column; }
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
@@ -317,29 +319,99 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .landing-feat-sub { font-size:.72rem; color:var(--text2); line-height:1.5; }
 
 /* ═══════════════ HOME (logged in) ═══════════════ */
-#view-home { padding:28px; min-height:calc(100vh - 55px); }
-.home-greeting { font-size:1.6rem; font-weight:900; letter-spacing:-.03em; margin-bottom:4px; }
-.home-sub { color:var(--text2); font-size:.88rem; margin-bottom:24px; }
-.home-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
-.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); }
-.stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
-.stat-n { font-size:2rem; font-weight:900; line-height:1; }
-.stat-label { font-size:.68rem; color:var(--text2); margin-top:3px; font-weight:600; }
-.stat-icon { font-size:1.2rem; margin-bottom:6px; }
-.home-section-title { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-.home-section-title a { color:var(--accent2); font-size:.6rem; margin-left:auto; cursor:pointer; font-weight:700; }
-.recent-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-bottom:24px; }
-.recent-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); position:relative; overflow:hidden; }
-.recent-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--green)); }
-.recent-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
-.recent-card-icon { font-size:1.6rem; margin-bottom:8px; }
-.recent-card-name { font-size:.88rem; font-weight:800; margin-bottom:3px; line-height:1.3; }
-.recent-card-meta { font-size:.65rem; color:var(--text3); }
-.recent-card-count { font-size:.62rem; font-weight:800; color:var(--text2); margin-top:4px; }
-.recent-card-bar { height:3px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; }
-.recent-card-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:2px; transition:width .6s ease; }
-.home-add-card { background:var(--surface); border:2px dashed var(--border2); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:120px; color:var(--text3); font-size:.82rem; gap:6px; font-weight:700; }
-.home-add-card:hover { border-color:var(--accent); color:var(--accent2); background:var(--accent-dim); }
+#view-home { min-height:calc(100vh - 55px); overflow-y:auto; }
+
+/* Hero */
+.home-hero-section { position:relative; overflow:hidden; padding:32px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
+.home-hero-blobs { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.home-hero-blob { position:absolute; border-radius:50%; filter:blur(70px); opacity:.1; }
+.hhb1 { width:360px; height:360px; background:var(--accent); top:-120px; right:-80px; animation:blobFloat 12s ease-in-out infinite; }
+.hhb2 { width:280px; height:280px; background:var(--green); bottom:-100px; left:5%; animation:blobFloat 15s ease-in-out infinite reverse; }
+.hhb3 { width:200px; height:200px; background:var(--purple); top:30%; left:40%; animation:blobFloat 10s ease-in-out infinite 3s; }
+.home-hero-inner { position:relative; z-index:1; display:flex; align-items:center; gap:24px; flex-wrap:wrap; max-width:1100px; }
+.home-greeting-text { font-size:1.7rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:5px; }
+.home-greeting-text .hl { background:linear-gradient(135deg,var(--accent2),var(--green2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.home-greeting-sub { font-size:.82rem; color:var(--text2); margin-bottom:16px; }
+.home-quick { display:flex; gap:8px; flex-wrap:wrap; }
+.home-quick-btn { padding:8px 16px; border-radius:10px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-family:inherit; font-size:.78rem; font-weight:700; cursor:pointer; transition:all var(--transition); white-space:nowrap; }
+.home-quick-btn:hover { border-color:var(--accent); color:var(--accent2); background:var(--accent-dim); }
+.home-quick-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.home-quick-btn.primary:hover { filter:brightness(1.15); }
+.home-hero-stats { display:flex; gap:16px; margin-left:auto; flex-shrink:0; }
+.home-stat { text-align:center; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 18px; min-width:64px; }
+.home-stat-n { font-size:1.6rem; font-weight:900; line-height:1; }
+.home-stat-label { font-size:.62rem; color:var(--text2); font-weight:700; margin-top:3px; text-transform:uppercase; letter-spacing:.06em; }
+
+/* Body — 2-col layout */
+.home-body { display:grid; grid-template-columns:1fr 320px; gap:0; max-width:1100px; margin:0 auto; padding:24px 32px; }
+@media(max-width:900px) { .home-body { grid-template-columns:1fr; padding:16px; } .home-hero-stats { display:none; } .home-hero-section { padding:20px 16px; } }
+
+/* Left col */
+.home-left { padding-right:24px; min-width:0; }
+@media(max-width:900px) { .home-left { padding-right:0; } }
+
+/* Right col */
+.home-right { border-left:1px solid var(--border); padding-left:24px; min-width:0; }
+@media(max-width:900px) { .home-right { border-left:none; padding-left:0; border-top:1px solid var(--border); padding-top:20px; margin-top:8px; } }
+
+/* Section headers */
+.home-sec { display:flex; align-items:center; gap:8px; margin-bottom:12px; margin-top:24px; }
+.home-sec:first-child { margin-top:0; }
+.home-sec-title { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); }
+.home-sec-link { margin-left:auto; font-size:.68rem; font-weight:700; color:var(--accent2); background:none; border:none; cursor:pointer; font-family:inherit; padding:0; }
+.home-sec-link:hover { text-decoration:underline; }
+
+/* Continue banner */
+.home-continue { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:all var(--transition); margin-bottom:20px; position:relative; overflow:hidden; }
+.home-continue::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--green)); }
+.home-continue:hover { border-color:var(--border2); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.home-continue-icon { font-size:1.8rem; flex-shrink:0; }
+.home-continue-label { font-size:.62rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:2px; }
+.home-continue-title { font-size:.9rem; font-weight:800; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.home-continue-sub { font-size:.68rem; color:var(--text2); }
+.home-continue-arrow { font-size:.78rem; font-weight:800; color:var(--accent2); background:var(--accent-dim); padding:5px 12px; border-radius:8px; border:1px solid rgba(58,127,255,.3); white-space:nowrap; }
+
+/* Pinned row */
+.home-pinned-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.home-pinned-chip { display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--border); border-radius:100px; padding:6px 12px; cursor:pointer; transition:all var(--transition); font-size:.78rem; font-weight:700; }
+.home-pinned-chip:hover { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
+.home-pinned-chip-name { max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.home-pinned-chip-count { font-size:.6rem; color:var(--text3); font-weight:800; }
+
+/* Action cards */
+.home-actions-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:0; }
+.home-action-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; transition:all var(--transition); }
+.home-action-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.home-action-card.accent { border-color:rgba(58,127,255,.35); background:var(--accent-dim); }
+.home-action-card.accent:hover { border-color:var(--accent); }
+.home-action-card.ai { border-color:rgba(155,89,182,.35); background:var(--purple-dim); }
+.home-action-card.ai:hover { border-color:var(--purple); }
+.home-action-icon { font-size:1.4rem; margin-bottom:6px; }
+.home-action-title { font-size:.88rem; font-weight:800; margin-bottom:2px; }
+.home-action-sub { font-size:.68rem; color:var(--text2); line-height:1.4; }
+
+/* Sets grid — right column */
+.home-set-tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.home-tab { padding:5px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text2); font-family:inherit; font-size:.72rem; font-weight:700; cursor:pointer; transition:all var(--transition); }
+.home-tab:hover { border-color:var(--border2); color:var(--text); }
+.home-tab.active { background:var(--accent-dim); border-color:rgba(58,127,255,.4); color:var(--accent2); }
+.home-sets-grid { display:flex; flex-direction:column; gap:8px; }
+.home-set-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; cursor:pointer; transition:all var(--transition); position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; }
+.home-set-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--accent),var(--green)); border-radius:3px 0 0 3px; }
+.home-set-card:hover { border-color:var(--border2); transform:translateX(2px); box-shadow:var(--shadow-sm); }
+.home-set-card.shared::before { background:linear-gradient(180deg,var(--accent2),var(--teal)); }
+.home-set-card-badge { position:absolute; top:8px; right:8px; font-size:.55rem; font-weight:800; padding:2px 6px; border-radius:6px; letter-spacing:.05em; }
+.home-set-card-icon { font-size:1.4rem; flex-shrink:0; margin-left:6px; }
+.home-set-card-name { font-size:.83rem; font-weight:800; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
+.home-set-card-meta { font-size:.62rem; color:var(--text3); white-space:nowrap; flex-shrink:0; }
+.home-set-card-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; width:40px; flex-shrink:0; }
+.home-set-card-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:2px; }
+.home-empty { text-align:center; padding:32px 16px; color:var(--text3); }
+.home-empty-icon { font-size:2.5rem; margin-bottom:10px; }
+.home-empty-title { font-size:.88rem; font-weight:800; margin-bottom:6px; color:var(--text2); }
+.home-empty-sub { font-size:.75rem; line-height:1.5; }
+
+/* Legacy compat */
 .streak-row { display:flex; gap:10px; margin-bottom:24px; }
 .streak-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; align-items:center; gap:14px; }
 .streak-icon { font-size:2rem; }
@@ -764,7 +836,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   <main id="main">
 
     <!-- ═══ LANDING (pre-login) ═══ -->
-    <div class="view" id="view-landing">
+    <div class="view active" id="view-landing">
       <div class="landing-bg">
         <div class="landing-bg-blob blob1"></div>
         <div class="landing-bg-blob blob2"></div>
@@ -1248,6 +1320,15 @@ textarea.finp { resize:vertical; min-height:50px; }
           </select>
         </div>
 
+        <!-- Step 3b: Display name -->
+        <div id="share-name-row" style="margin-bottom:14px;">
+          <div class="flabel" style="margin-bottom:8px;">Show your name to importers?</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="toggle on" id="share-anon-toggle" onclick="toggleShareAnon(this)"></button>
+            <span style="font-size:.78rem;color:var(--text2);" id="share-anon-label">Show my name</span>
+          </div>
+        </div>
+
         <!-- The code -->
         <div style="margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -1483,7 +1564,7 @@ let sessionMode = null;
 let studyOpts = {};
 let fcIdx = 0, fcKnown = new Set(), fcReview = new Set(), fcShuffle = false, fcDir = 'normal';
 let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false, quizTimerInt = null, quizSecs = 0, isTestMode = false;
-let matchSel = null, matchMatched = 0, matchTotal = 0;
+let matchSel = null, matchMatched = 0, matchTotal = 0, matchWrong = 0;
 let learnQueue = [], learnKnown = new Set(), learnRound = 1, learnIdx = 0;
 let learnDeck = [], learnMastered = 0, learnStreak = 0, learnCurrentIdx = 0;
 let speedCards = [], speedIdx = 0, speedKnow = 0, speedMiss = 0;
@@ -1665,38 +1746,29 @@ let _fallbackTimer = null;
 
 // Called once on initial auth check (page load)
 async function _handleAuthReady(user) {
-  // If we already made it to the app, ignore stale callbacks
   if (_appState === 'booting' || _appState === 'app') return;
   _appState = 'landing';
 
-  // Always show landing
+  // Always show landing — user must click a button to proceed
   showLanding();
+  renderSidebar();
 
-  if (!user) {
-    // Not logged in — stay on landing, wait for user action
-    renderSidebar();
-    return;
+  // If logged in, load cloud data silently in the background
+  // so it's ready when they click the button — but don't auto-navigate
+  if (user) {
+    _loadCloudData(user); // intentionally not awaited
   }
-
-  // Logged in — load cloud data in background, then auto-proceed to app
-  await _loadCloudData(user);
-  bootApp();
 }
 
-// Called when user signs IN during the session (via DQAuth modal)
+// Called when a guest signs IN while already using the app
 async function _handleSignIn(user) {
   if (!user) return;
-  // If already in the app (guest who just signed in), reload cloud data + refresh
   if (_appState === 'app') {
     isLoggedIn = true;
     await _loadCloudData(user);
     renderSidebar();
     renderHome();
-    return;
   }
-  // On landing — proceed to boot
-  await _loadCloudData(user);
-  _doBootApp();
 }
 
 // Called when user signs OUT during the session
@@ -1806,7 +1878,7 @@ function updateLandingCTA() {
   const safeName = (name||'Me').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (user) {
     cta.innerHTML = `
-      <button class="btn btn-primary btn-lg" onclick="_handleSignIn(DQAuth.getUser?.())">▶ Continue as ${safeName}</button>
+      <button class="btn btn-primary btn-lg" onclick="bootApp()">▶ Continue as ${safeName}</button>
       <button class="btn btn-ghost btn-lg" onclick="if(typeof DQAuth!=='undefined'){DQAuth.signOut();location.reload();}">Sign Out</button>
     `;
   } else {
@@ -1822,26 +1894,27 @@ function continueWithout() {
   bootApp();
 }
 
-// Poll for auth state — runs while on landing OR still waiting for authready.
-// Safety net for: missed events, slow Firebase, older dq-auth.js versions.
+// Poll while on landing — keeps CTA buttons up to date as auth state resolves.
+// Does NOT auto-navigate. User must always click a button.
 let _landingPollUser = null;
 setInterval(() => {
   if (_appState !== 'landing' && _appState !== 'waiting') return;
   if (typeof DQAuth === 'undefined') return;
   const user = DQAuth.getUser?.() || null;
   const uid = user?.uid || null;
-  if (uid && uid !== _landingPollUser) {
+
+  // Show landing if authready hasn't fired yet but DQAuth is already available
+  if (_appState === 'waiting' && !_initialAuthReceived) {
+    _onAuthReady(user || null);
+    return;
+  }
+
+  // Update CTA if auth state changed (e.g. signed in via modal)
+  if (uid !== _landingPollUser) {
     _landingPollUser = uid;
-    // If authready never fired, trigger the full boot flow
-    if (!_initialAuthReceived) {
-      _onAuthReady(user);
-    } else {
-      _handleSignIn(user);
-    }
-  } else if (!uid && _landingPollUser) {
-    _landingPollUser = null;
     updateLandingCTA();
-    renderSidebar();
+    // If newly logged in, pre-load cloud data silently
+    if (uid && user) _loadCloudData(user);
   }
 }, 500);
 
@@ -2018,23 +2091,27 @@ function renderHome(tab) {
   }
 
     const el = document.getElementById('view-home');
-  const hasSets = myMine.length > 0;
+  const hasSets = myMine.length > 0 || sharedWithMe.length > 0;
   el.innerHTML = heroHtml + `<div class="home-body">
-    ${continueBanner}
-    ${pinnedHtml}
-
-    <div class="home-sec" style="margin-top:${(continueBanner||pinnedHtml)?'8px':'0'};">
-      <span class="home-sec-title">What do you want to do?</span>
+    <div class="home-left">
+      ${continueBanner}
+      ${pinnedHtml}
+      <div class="home-sec" style="margin-top:0;">
+        <span class="home-sec-title">What do you want to do?</span>
+      </div>
+      ${actionCards}
     </div>
-    ${actionCards}
-
-    ${hasSets || sharedWithMe.length ? `
-    <div class="home-sec" style="margin-top:28px;">
-      <span class="home-sec-title">Your Sets</span>
-      <button class="home-sec-link" onclick="showAllSets()">View all →</button>
+    <div class="home-right">
+      <div class="home-sec" style="margin-top:0;">
+        <span class="home-sec-title">Your Sets</span>
+        ${hasSets ? `<button class="home-sec-link" onclick="showAllSets()">View all →</button>` : ''}
+      </div>
+      ${hasSets ? tabsHtml + gridHtml : `<div class="home-empty">
+        <div class="home-empty-icon">📚</div>
+        <div class="home-empty-title">No sets yet</div>
+        <div class="home-empty-sub">Create your first set using the options on the left.</div>
+      </div>`}
     </div>
-    ${tabsHtml}
-    ${gridHtml}` : ''}
   </div>`;
 }
 
@@ -2157,6 +2234,7 @@ async function openSharedSet(code) {
 
   // Use cached data immediately so page shows fast
   if (entry.cachedData) {
+    entry.cachedData._ownerName = entry.ownerName || null;
     renderSetPage(entry.cachedData, true);
     showView('set');
   }
@@ -2223,7 +2301,7 @@ function renderSetPage(s, readOnly) {
         ${lastHist ? `<span class="chip chip-blue">Last: ${Math.round(lastHist.score/lastHist.total*100)}%</span>` : ''}
       </div>
       ${s.notes ? `<div style="font-size:.75rem;color:var(--text2);margin-top:4px;">${esc(s.notes)}</div>` : ''}
-      ${readOnly ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Read-only · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="openSharedSet('${currentSharedCode}')">🔄 Refresh</button> · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySharedSet()">📋 Copy to My Sets</button></div>` : ''}
+      ${readOnly ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Read-only · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="openSharedSet('${currentSharedCode}')">🔄 Refresh</button> · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySharedSet()">📋 Copy to My Sets</button>${s._ownerName ? ` · <span style="color:var(--text2)">Created by <strong>${esc(s._ownerName)}</strong></span>` : ''}</div>` : ''}
       ${isSnapshot ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Snapshot import · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySnapshotSet('${s.id}')">📋 Make It Mine</button> to edit</div>` : ''}
     </div>
     <div class="set-header-actions">
@@ -2834,7 +2912,7 @@ function startMatching() {
   const pairCount = studyOpts.matchPairs || 6;
   const style = studyOpts.matchStyle || 'term-def';
   const pairs = shuffle([...sessionCards]).slice(0, Math.min(pairCount, sessionCards.length));
-  matchTotal = pairs.length;
+  matchTotal = pairs.length; matchWrong = 0;
   matchMatched = 0; matchSel = null;
   // style: term-def = left is front, right is back. def-term = reversed
   const lefts  = shuffle(pairs.map(p => style === 'def-term' ? ({text:p.back,  id:p.front+'__'+p.back}) : ({text:p.front, id:p.front+'__'+p.back})));
@@ -2887,8 +2965,8 @@ function matchClick(el) {
     if (matchMatched === matchTotal) {
       setTimeout(() => {
         const s = getSet(currentSetId);
-        if (s && !currentSharedCode) { s.history=s.history||[]; s.history.push({date:Date.now(),score:matchTotal,total:matchTotal,mode:'Matching'}); autoSave(); }
-        showResults(matchTotal, matchTotal, 'Matching');
+        if (s && !currentSharedCode) { s.history=s.history||[]; s.history.push({date:Date.now(),score:matchTotal-matchWrong,total:matchTotal,mode:'Matching'}); autoSave(); }
+        showResults(matchTotal - matchWrong, matchTotal, 'Matching');
       }, 500);
     }
   } else {
@@ -2897,6 +2975,7 @@ function matchClick(el) {
     const wrongA = matchSel;
     setTimeout(() => { el.classList.remove('wrong-flash'); wrongA.classList.remove('wrong-flash','sel-a'); }, 400);
     matchSel = null;
+    matchWrong++;
     sndWrong();
   }
 }
@@ -3483,9 +3562,12 @@ function openFolder(id) {
   document.getElementById('folder-open-title').textContent = (f.icon||'📁') + ' ' + f.name;
   // Populate add-set dropdown with sets not already in this folder
   const sel = document.getElementById('folder-add-select');
-  sel.innerHTML = '<option value="">— pick a set —</option>' +
-    sets.filter(s => !(f.setIds||[]).includes(s.id))
-      .map(s => `<option value="${s.id}">${esc(s.icon||'📖')} ${esc(s.name)}</option>`).join('');
+  const alreadyIn = f.setIds||[];
+  const ownedOpts = sets.filter(s => !alreadyIn.includes(s.id))
+    .map(s => `<option value="owned:${s.id}">${esc(s.icon||'📖')} ${esc(s.name)}</option>`).join('');
+  const sharedOpts = sharedWithMe.filter(e => !alreadyIn.includes('shared:'+e.code))
+    .map(e => `<option value="shared:${e.code}">${esc(e.icon||'🔗')} ${esc(e.name)} (shared)</option>`).join('');
+  sel.innerHTML = '<option value="">— pick a set —</option>' + ownedOpts + sharedOpts;
   renderFolderSets(f);
   document.getElementById('folders-grid').style.display = 'none';
   document.getElementById('folder-open').style.display = '';
@@ -3493,36 +3575,55 @@ function openFolder(id) {
 
 function renderFolderSets(f) {
   const el = document.getElementById('folder-sets-list');
-  const fSets = (f.setIds||[]).map(id => sets.find(s => s.id == id)).filter(Boolean);
-  if (!fSets.length) {
+  if (!(f.setIds||[]).length) {
     el.innerHTML = '<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No sets in this folder yet. Add one above!</div>';
     return;
   }
-  el.innerHTML = fSets.map(s => {
+  const items = (f.setIds||[]).map(id => {
+    const strId = String(id);
+    // Check owned sets first
+    const owned = sets.find(s => String(s.id) == strId);
+    if (owned) return { s: owned, isShared: false, removeId: owned.id };
+    // Check shared sets (stored as DQ-XXXX code)
+    const shared = sharedWithMe.find(e => e.code === strId);
+    if (shared && shared.cachedData) return { s: shared.cachedData, isShared: true, code: shared.code, removeId: strId };
+    return null;
+  }).filter(Boolean);
+  if (!items.length) {
+    el.innerHTML = '<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No sets in this folder yet. Add one above!</div>';
+    return;
+  }
+  el.innerHTML = items.map(({ s, isShared, code, removeId }) => {
     const cards = allCards(s);
     const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    const openFn = isShared ? `openSharedSet('${code}')` : `openSet('${s.id}')`;
+    const badge = isShared ? `<span style="font-size:.6rem;background:var(--accent-dim);color:var(--accent2);border-radius:6px;padding:1px 6px;font-weight:800;">🔗 SHARED</span>` : '';
     return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;">
       <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
-      <div style="flex:1;cursor:pointer;" onclick="openSet('${s.id}')">
-        <div style="font-size:.88rem;font-weight:800;">${esc(s.name)}</div>
+      <div style="flex:1;cursor:pointer;" onclick="${openFn}">
+        <div style="font-size:.88rem;font-weight:800;">${esc(s.name)} ${badge}</div>
         <div style="font-size:.65rem;color:var(--text2);">${cards.length} cards · ${mastery}% mastered</div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="openSet('${s.id}')">Open →</button>
-      <button class="btn btn-danger btn-sm" onclick="removeFromFolder('${s.id}')">✕</button>
+      <button class="btn btn-ghost btn-sm" onclick="${openFn}">Open →</button>
+      <button class="btn btn-danger btn-sm" onclick="removeFromFolder('${removeId}')">✕</button>
     </div>`;
   }).join('');
 }
 
 function addSetToFolder() {
   const sel = document.getElementById('folder-add-select');
-  const setId = parseInt(sel.value);
-  if (!setId) return;
+  const val = sel.value;
+  if (!val) return;
   const f = folders.find(fl => fl.id == currentFolderId);
   if (!f) return;
   f.setIds = f.setIds || [];
-  if (!f.setIds.includes(setId)) f.setIds.push(setId);
+  // val is either "owned:123456" or "shared:DQ-XXXX"
+  const entryId = val.startsWith('owned:') ? parseInt(val.replace('owned:','')) : val.replace('owned:','');
+  const storeId = val.startsWith('shared:') ? val.replace('owned:','') : parseInt(val.replace('owned:',''));
+  const finalId = val.startsWith('shared:') ? val.slice(7) : parseInt(val.slice(6));
+  if (!f.setIds.some(x => String(x) === String(finalId))) f.setIds.push(finalId);
   autoSave();
-  openFolder(currentFolderId); // re-render
+  openFolder(currentFolderId);
   sndClick();
 }
 
@@ -4080,13 +4181,17 @@ async function generateShortCode(s, access, expiry) {
     const existing = await checkRes.json();
     const code = (existing && existing[0]?.code) ? existing[0].code : 'DQ-' + Math.random().toString(36).substr(2,4).toUpperCase();
     const expiresAt = expiry > 0 ? new Date(Date.now() + expiry * 24*60*60*1000).toISOString() : null;
+    const _profile = (typeof DQAuth !== 'undefined') ? DQAuth.getProfile?.() : null;
+    const _dispName = shareAnon ? 'Anonymous' : (_profile?.displayName || _u.displayName || _u.email?.split('@')[0] || 'Anonymous');
     const row = {
       code,
       set_id: String(s.id),
       owner_uid: uid,
+      owner_name: _dispName,
       access: access || 'public',
       data: serializeSet(s),
-      expires_at: expiresAt
+      expires_at: expiresAt,
+      import_count: existing?.[0]?.import_count || 0
     };
     await fetch(`${DQS_URL}/rest/v1/shared_sets`, {
       method: 'POST',
@@ -4130,7 +4235,7 @@ async function resolveCode(raw) {
         if (currentUid !== row.owner_uid) return {error: 'This code is private — only the owner can access it'};
       }
       if (row.expires_at && new Date(row.expires_at) < new Date()) return {error: 'This code has expired'};
-      return {set: deserializeSet(row.data), meta: {code:str, access:row.access, owner:row.owner_uid}};
+      return {set: deserializeSet(row.data), meta: {code:str, access:row.access, owner:row.owner_uid, ownerName: row.owner_name || null, importCount: row.import_count || 0}};
     } catch(e) { return {error: 'Could not fetch code — check your connection'}; }
   } else if (str.startsWith('DQS1:')) {
     const set = decodeBase64ToSet(str);
@@ -4180,7 +4285,7 @@ async function renderCodesView() {
         const icon = s?.icon || row.data?.ic || '📖';
         const cardCount = s ? allCards(s).length : (row.data?.c?.length || 0);
         const expired = row.expires_at && new Date(row.expires_at) < new Date();
-        items.push({ type: 'mine', setId: row.set_id, name, icon, cardCount, code: row.code, access: row.access, expired, expiresAt: row.expires_at, s });
+        items.push({ type: 'mine', setId: row.set_id, name, icon, cardCount, code: row.code, access: row.access, expired, expiresAt: row.expires_at, s, importCount: row.import_count || 0 });
       }
     } catch(_) {}
   }
@@ -4224,6 +4329,7 @@ async function renderCodesView() {
             <span class="code-badge-mine">My Set</span>
             <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
             ${expLabel}
+            ${item.importCount > 0 ? `<span style="font-size:.62rem;color:var(--text3);">📥 ${item.importCount} import${item.importCount===1?'':'s'}</span>` : ''}
           </div>
         </div>
         <div class="code-card-actions">
@@ -4242,6 +4348,7 @@ async function renderCodesView() {
             <span class="code-card-code" onclick="event.stopPropagation();copyCodeToast('${item.code}')" title="Copy code">${item.code}</span>
             <span class="code-badge-saved">🔗 Live</span>
             <span style="font-size:.62rem;color:var(--text3);">${item.cardCount} cards</span>
+            ${item.entry?.ownerName ? `<span style="font-size:.62rem;color:var(--text2);">by ${esc(item.entry.ownerName)}</span>` : ''}
           </div>
         </div>
         <div class="code-card-actions">
@@ -4287,9 +4394,17 @@ async function importFromCodesView() {
       setTimeout(() => { status.innerHTML = ''; }, 3000);
       return;
     }
-    sharedWithMe.push({ code: raw, name: s.name, icon: s.icon||'📖', cachedData: s, cachedAt: Date.now() });
+    const _ownerName = result.meta?.ownerName || null;
+    sharedWithMe.push({ code: raw, name: s.name, icon: s.icon||'📖', cachedData: s, cachedAt: Date.now(), ownerName: _ownerName });
+    // Increment import_count on the Supabase row
+    fetch(`${DQS_URL}/rest/v1/shared_sets?code=eq.${raw}`, {
+      method: 'PATCH',
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ import_count: (result.meta?.importCount || 0) + 1 })
+    }).catch(()=>{});
     autoSave(); renderSidebar();
-    status.innerHTML = '<span style="color:var(--green2);">✓ Added <strong>' + esc(s.name) + '</strong> — opens as live shared set</span>';
+    const _byLine = _ownerName ? ` by <strong>${esc(_ownerName)}</strong>` : '';
+    status.innerHTML = '<span style="color:var(--green2);">✓ Added <strong>' + esc(s.name) + '</strong>' + _byLine + ' — opens as live shared set</span>';
   } else {
     // Snapshot — add as your own set, marked as snapshot
     s.fromCode = 'DQS1';
@@ -4360,6 +4475,13 @@ async function openManageCode(setId) {
 }
 
 let shareCodeType = 'short'; // 'short' or 'long'
+let shareAnon = false; // if true, store 'Anonymous' as owner_name
+
+function toggleShareAnon(btn) {
+  shareAnon = !shareAnon;
+  btn.classList.toggle('on', !shareAnon);
+  document.getElementById('share-anon-label').textContent = shareAnon ? 'Anonymous' : 'Show my name';
+}
 
 
 function setShareCodeType(type, el) {
