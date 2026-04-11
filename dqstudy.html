@@ -4853,11 +4853,7 @@ async function openShareModal() {
   document.getElementById('sc-name').textContent = s.name;
   const cards = allCards(s);
   document.getElementById('sc-meta').textContent = cards.length + ' cards' + (s.class ? ' · ' + s.class : '') + (s.unit ? ' · ' + s.unit : '');
-  document.getElementById('sc-chips').innerHTML = [
-    s.class ? `<span class="chip chip-blue">${esc(s.class)}</span>` : '',
-    s.unit ? `<span class="chip chip-purple">${esc(s.unit)}</span>` : '',
-    `<span class="chip chip-green">${cards.length} cards</span>`,
-  ].filter(Boolean).join('');
+  // sc-chips removed (not in simplified modal header)
 
   // Reset UI
   document.getElementById('share-loading').style.display = '';
