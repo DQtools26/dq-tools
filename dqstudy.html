@@ -446,6 +446,12 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .streak-n { font-size:1.5rem; font-weight:900; }
 .streak-label { font-size:.68rem; color:var(--text2); font-weight:600; }
 
+/* Share action buttons */
+.share-action-btn { display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 4px;cursor:pointer;transition:all var(--transition);font-family:inherit; }
+.share-action-btn:hover { border-color:var(--border2);background:var(--surface2);transform:translateY(-1px); }
+.share-action-icon { font-size:1.3rem;line-height:1; }
+.share-action-label { font-size:.6rem;font-weight:700;color:var(--text2);text-align:center; }
+
 /* ═══════════════ SET PAGE ═══════════════ */
 #view-set { padding:24px; }
 .set-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
@@ -1311,7 +1317,7 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 <!-- ═══ SHARE MODAL ═══ -->
 <div class="modal-overlay" id="share-modal">
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:500px;">
     <div class="modal-head">
       <div class="modal-title">🔗 Share Set</div>
       <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
@@ -1328,88 +1334,114 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="font-size:.55rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);background:var(--accent-dim);padding:3px 8px;border-radius:100px;border:1px solid rgba(58,127,255,.3);flex-shrink:0;">DQstudy</div>
       </div>
 
-      <!-- Loading state -->
+      <!-- Loading -->
       <div id="share-loading" style="text-align:center;padding:24px;color:var(--text3);font-size:.82rem;">⏳ Loading…</div>
 
       <!-- Main share UI -->
       <div id="share-main" style="display:none;">
 
-        <!-- TAB SWITCHER: Link vs Code vs Snapshot -->
-        <div style="display:flex;gap:6px;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;">
-          <button id="stab-link" onclick="switchShareTab('link')" style="flex:1;padding:8px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .15s;">🔗 Share Link</button>
-          <button id="stab-code" onclick="switchShareTab('code')" style="flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;">🔑 Code Only</button>
-          <button id="stab-snap" onclick="switchShareTab('snap')" style="flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;">📦 Snapshot</button>
+        <!-- TAB SWITCHER -->
+        <div style="display:flex;gap:5px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;">
+          <button id="stab-link" onclick="switchShareTab('link')" style="flex:1;padding:7px 4px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;transition:all .15s;">🔗 Link</button>
+          <button id="stab-snap" onclick="switchShareTab('snap')" style="flex:1;padding:7px 4px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;">📦 Snapshot</button>
+          <button id="stab-card" onclick="switchShareTab('card')" style="flex:1;padding:7px 4px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;">🖼 Card</button>
         </div>
 
-        <!-- LINK TAB (default) -->
+        <!-- LINK TAB -->
         <div id="share-tab-link">
-          <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:var(--green2);line-height:1.6;">
-            ✅ <strong>Share a link</strong> — anyone who clicks it goes straight to the set. They can study it right away or save it to their account.
+          <!-- Link box — always shown, even for guests -->
+          <div class="flabel" style="margin-bottom:7px;">Shareable link</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <input class="finp" id="share-link-inp" readonly style="font-size:.73rem;flex:1;color:var(--accent2);" placeholder="Generating…">
+            <button class="btn btn-primary btn-sm" onclick="copyShareLink()">📋 Copy</button>
           </div>
-          <!-- Access -->
-          <div style="margin-bottom:12px;">
-            <div class="flabel" style="margin-bottom:7px;">Who can access?</div>
-            <div style="display:flex;gap:8px;">
-              <button class="start-opt on" id="share-public-btn" onclick="setShareAccess('public')" style="padding:7px 14px;font-size:.75rem;">🌍 Anyone with link</button>
-              <button class="start-opt" id="share-private-btn" onclick="setShareAccess('private')" style="padding:7px 14px;font-size:.75rem;">🔒 Only me</button>
+          <!-- Guest notice -->
+          <div id="share-guest-notice" style="display:none;padding:9px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.72rem;color:var(--amber2);line-height:1.6;margin-bottom:12px;">
+            ⚠️ <strong>Sign in</strong> to get a live shareable link that updates when you edit. Without an account, use the <strong>📦 Snapshot</strong> tab instead — no sign-in needed.
+          </div>
+          <!-- Signed-in options -->
+          <div id="share-auth-options" style="display:none;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <button class="start-opt on" id="share-public-btn" onclick="setShareAccess('public')" style="padding:6px 12px;font-size:.72rem;">🌍 Anyone</button>
+              <button class="start-opt" id="share-private-btn" onclick="setShareAccess('private')" style="padding:6px 12px;font-size:.72rem;">🔒 Only me</button>
+              <select class="finp" id="share-expiry-sel" style="flex:1;font-size:.72rem;padding:6px 8px;">
+                <option value="0">Never expires</option>
+                <option value="7">7 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <button class="toggle on" id="share-anon-toggle" onclick="toggleShareAnon(this)" style="flex-shrink:0;"></button>
+              <span style="font-size:.72rem;color:var(--text2);" id="share-anon-label">Show my name</span>
+              <span style="font-size:.65rem;color:var(--text3);margin-left:auto;" id="share-code-inline-wrap">Code: <strong id="share-code-inline"></strong></span>
             </div>
           </div>
-          <!-- Expiry -->
-          <div style="margin-bottom:12px;">
-            <div class="flabel" style="margin-bottom:7px;">Link expires</div>
-            <select class="finp" id="share-expiry-sel" style="max-width:200px;">
-              <option value="0">Never</option>
-              <option value="7">In 7 days</option>
-              <option value="30">In 30 days</option>
-              <option value="90">In 90 days</option>
-            </select>
-          </div>
-          <!-- Name toggle -->
-          <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;">
-            <button class="toggle on" id="share-anon-toggle" onclick="toggleShareAnon(this)"></button>
-            <span style="font-size:.75rem;color:var(--text2);" id="share-anon-label">Show my name to recipients</span>
-          </div>
-          <!-- The link -->
-          <div class="flabel" style="margin-bottom:7px;">Shareable link</div>
-          <div style="display:flex;gap:8px;margin-bottom:6px;">
-            <input class="finp" id="share-link-inp" readonly style="font-size:.75rem;flex:1;color:var(--accent2);" placeholder="Generating link…">
-            <button class="btn btn-primary btn-sm" onclick="copyShareLink()">📋 Copy Link</button>
-          </div>
-          <div style="font-size:.65rem;color:var(--text3);margin-bottom:14px;">Also works as a code — paste <strong id="share-code-inline"></strong> in the Codes page to import.</div>
-          <!-- Hidden code input kept for JS compat -->
+          <!-- Hidden compat -->
           <input type="hidden" id="share-code-inp">
-          <div id="share-status" style="font-size:.68rem;color:var(--text3);margin-bottom:8px;"></div>
-          <!-- Actions row -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border);">
-            <button class="btn btn-ghost btn-sm" onclick="mailtoShare()">✉️ Email</button>
-            <button class="btn btn-ghost btn-sm" id="share-newcode-btn" onclick="regenerateCode()">🔄 New Code</button>
-            <button class="btn btn-danger btn-sm" id="share-revoke-btn" onclick="revokeCurrentCode()" style="display:none;">✕ Revoke</button>
+          <div id="share-status" style="font-size:.67rem;color:var(--text3);margin-bottom:8px;min-height:16px;"></div>
+          <!-- Share action buttons -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding-top:12px;border-top:1px solid var(--border);">
+            <button class="share-action-btn" onclick="copyShareLink()" title="Copy link">
+              <span class="share-action-icon">📋</span><span class="share-action-label">Copy</span>
+            </button>
+            <button class="share-action-btn" onclick="mailtoShare()" title="Email">
+              <span class="share-action-icon">✉️</span><span class="share-action-label">Email</span>
+            </button>
+            <button class="share-action-btn" onclick="whatsappShare()" title="WhatsApp">
+              <span class="share-action-icon">💬</span><span class="share-action-label">WhatsApp</span>
+            </button>
+            <button class="share-action-btn" onclick="nativeShare()" title="More" id="share-native-btn">
+              <span class="share-action-icon">⬆️</span><span class="share-action-label">More</span>
+            </button>
           </div>
-        </div>
-
-        <!-- CODE TAB -->
-        <div id="share-tab-code" style="display:none;">
-          <div style="background:var(--accent-dim);border:1px solid rgba(58,127,255,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:var(--accent2);line-height:1.6;">
-            🔑 <strong>Short code</strong> — recipient types this in the Codes page to import the set. Requires both people to be signed in.
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-ghost btn-sm" id="share-newcode-btn" onclick="regenerateCode()" style="font-size:.68rem;">🔄 New Code</button>
+            <button class="btn btn-danger btn-sm" id="share-revoke-btn" onclick="revokeCurrentCode()" style="display:none;font-size:.68rem;">✕ Revoke</button>
           </div>
-          <div class="flabel" style="margin-bottom:7px;">Your DQ Code</div>
-          <div style="display:flex;gap:8px;">
-            <input class="finp" id="share-code-only-inp" readonly style="font-family:var(--mono);font-size:1.1rem;font-weight:800;letter-spacing:.1em;flex:1;text-align:center;" placeholder="DQ-????">
-            <button class="btn btn-primary btn-sm" onclick="copyShareCodeOnly()">📋 Copy</button>
-          </div>
-          <div style="font-size:.68rem;color:var(--text3);margin-top:8px;">Tell them: go to DQstudy → Codes → paste this code → Import.</div>
         </div>
 
         <!-- SNAPSHOT TAB -->
         <div id="share-tab-snap" style="display:none;">
-          <div style="background:rgba(161,100,255,.1);border:1px solid rgba(161,100,255,.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.75rem;color:#c084fc;line-height:1.6;">
-            📦 <strong>Snapshot code</strong> — a self-contained copy of this set. Works without sign-in. Anyone can import it anywhere, but it won't update if you edit the set.
+          <div style="background:rgba(161,100,255,.1);border:1px solid rgba(161,100,255,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.75rem;color:#c084fc;line-height:1.6;">
+            📦 <strong>No account needed.</strong> Share this code with anyone — they paste it in the Codes page to import. It's a snapshot, so it won't update when you edit.
           </div>
-          <div class="flabel" style="margin-bottom:7px;">Snapshot code (DQS1:…)</div>
-          <textarea class="finp" id="share-snap-out" readonly style="min-height:70px;font-family:var(--mono);font-size:.65rem;resize:none;" placeholder="Generating…"></textarea>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="copySnapCode()">📋 Copy Snapshot Code</button>
-          <div style="margin-top:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.68rem;color:var(--text2);line-height:1.6;">
-            💡 <strong>Tip:</strong> Snapshot codes are too long for a URL. For a shareable link, use the <strong>🔗 Share Link</strong> tab — it requires both people to have an account. Snapshot codes can be pasted directly in the Codes page by anyone, no account needed.
+          <div class="flabel" style="margin-bottom:7px;">Snapshot code</div>
+          <textarea class="finp" id="share-snap-out" readonly style="min-height:68px;font-family:var(--mono);font-size:.62rem;resize:none;" placeholder="Generating…"></textarea>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px;">
+            <button class="share-action-btn" onclick="copySnapCode()">
+              <span class="share-action-icon">📋</span><span class="share-action-label">Copy</span>
+            </button>
+            <button class="share-action-btn" onclick="mailtoSnapShare()">
+              <span class="share-action-icon">✉️</span><span class="share-action-label">Email</span>
+            </button>
+            <button class="share-action-btn" onclick="whatsappSnapShare()">
+              <span class="share-action-icon">💬</span><span class="share-action-label">WhatsApp</span>
+            </button>
+            <button class="share-action-btn" onclick="nativeSnapShare()">
+              <span class="share-action-icon">⬆️</span><span class="share-action-label">More</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD TAB -->
+        <div id="share-tab-card" style="display:none;">
+          <div style="font-size:.75rem;color:var(--text2);margin-bottom:12px;line-height:1.5;">Download a shareable image card — perfect for posting or sending to classmates.</div>
+          <!-- Preview canvas -->
+          <canvas id="share-card-canvas" style="width:100%;border-radius:12px;border:1px solid var(--border);display:block;margin-bottom:12px;"></canvas>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;">
+            <button class="share-action-btn" onclick="downloadSharePNG()">
+              <span class="share-action-icon">💾</span><span class="share-action-label">Save</span>
+            </button>
+            <button class="share-action-btn" onclick="mailtoShare()">
+              <span class="share-action-icon">✉️</span><span class="share-action-label">Email</span>
+            </button>
+            <button class="share-action-btn" onclick="whatsappShare()">
+              <span class="share-action-icon">💬</span><span class="share-action-label">WhatsApp</span>
+            </button>
+            <button class="share-action-btn" onclick="nativeShare()">
+              <span class="share-action-icon">⬆️</span><span class="share-action-label">More</span>
+            </button>
           </div>
         </div>
 
@@ -4770,11 +4802,20 @@ async function refreshShortCode() {
   const s = getSet(currentSetId); if (!s) return;
   const _authUser = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
   if (!_authUser) {
-    if (statusEl) statusEl.textContent = 'Sign in to get a shareable link. Use the Snapshot tab to share without an account.';
-    // Switch to snapshot tab for guests
-    switchShareTab('snap');
+    // Guest — show placeholder link and guest notice, no redirect
+    const linkInp = document.getElementById('share-link-inp');
+    if (linkInp) linkInp.value = 'Sign in for a shareable link';
+    const guestNotice = document.getElementById('share-guest-notice');
+    if (guestNotice) guestNotice.style.display = '';
+    const authOpts = document.getElementById('share-auth-options');
+    if (authOpts) authOpts.style.display = 'none';
     return;
   }
+  // Signed in — show auth options
+  const guestNotice = document.getElementById('share-guest-notice');
+  if (guestNotice) guestNotice.style.display = 'none';
+  const authOpts = document.getElementById('share-auth-options');
+  if (authOpts) authOpts.style.display = '';
   isLoggedIn = true; // sync flag in case it fell behind
   // Check for existing code first (via Supabase shared_sets)
   try {
@@ -4858,31 +4899,40 @@ async function openShareModal() {
   // Reset UI
   document.getElementById('share-loading').style.display = '';
   document.getElementById('share-main').style.display = 'none';
-  document.getElementById('share-public-btn').classList.add('on');
-  document.getElementById('share-private-btn').classList.remove('on');
+  const pubBtn = document.getElementById('share-public-btn');
+  const privBtn = document.getElementById('share-private-btn');
+  if (pubBtn) pubBtn.classList.add('on');
+  if (privBtn) privBtn.classList.remove('on');
   const rBtn = document.getElementById('share-revoke-btn');
   if (rBtn) rBtn.style.display = 'none';
+  const guestNotice = document.getElementById('share-guest-notice');
+  if (guestNotice) guestNotice.style.display = 'none';
 
   openModal('share-modal');
   await refreshShortCode();
   document.getElementById('share-loading').style.display = 'none';
   document.getElementById('share-main').style.display = '';
-  switchShareTab('link'); // default to link tab
+  switchShareTab('link');
 }
 
 // ── Share modal tab switcher ──
 function switchShareTab(tab) {
-  ['link','code','snap'].forEach(t => {
-    document.getElementById('share-tab-'+t).style.display = t===tab ? '' : 'none';
+  ['link','snap','card'].forEach(t => {
+    const tabEl = document.getElementById('share-tab-'+t);
+    if (tabEl) tabEl.style.display = t===tab ? '' : 'none';
     const btn = document.getElementById('stab-'+t);
-    btn.style.background = t===tab ? 'var(--accent)' : 'transparent';
-    btn.style.color = t===tab ? '#fff' : 'var(--text2)';
-    btn.style.fontWeight = t===tab ? '800' : '700';
+    if (btn) {
+      btn.style.background = t===tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t===tab ? '#fff' : 'var(--text2)';
+      btn.style.fontWeight = t===tab ? '800' : '700';
+    }
   });
-  // Populate snapshot tab on demand
+  const s = getSet(currentSetId); if (!s) return;
   if (tab === 'snap') {
-    const s = getSet(currentSetId); if (!s) return;
     document.getElementById('share-snap-out').value = encodeSetToBase64(s);
+  }
+  if (tab === 'card') {
+    renderShareCard(s);
   }
 }
 
@@ -4941,19 +4991,181 @@ function _updateShareFields(code) {
   if (revokeBtn) revokeBtn.style.display = '';
 }
 
-function mailtoShare() {
+// ── WhatsApp share ──
+function whatsappShare() {
+  const link = document.getElementById('share-link-inp')?.value || '';
+  const s = getSet(currentSetId);
+  const text = s ? `Check out this study set: ${s.name} — ${link}` : link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  sndClick();
+}
+
+function whatsappSnapShare() {
   const s = getSet(currentSetId); if (!s) return;
+  const code = document.getElementById('share-snap-out')?.value || '';
+  const text = `Study set: ${s.name}\n\nImport on DQstudy (dqtools26.github.io/dq-tools/dqstudy.html):\nPaste this code in the Codes page:\n${code.slice(0,200)}…`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  sndClick();
+}
+
+// ── Native share (mobile share sheet) ──
+async function nativeShare() {
+  const s = getSet(currentSetId); if (!s) return;
+  const link = document.getElementById('share-link-inp')?.value || '';
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: s.name + ' — DQstudy', text: 'Study set: ' + s.name, url: link });
+    } catch(e) { /* user cancelled */ }
+  } else {
+    // Fallback — copy link
+    copyShareLink();
+    if (typeof DQAuth !== 'undefined') DQAuth.toast?.('Link copied! Paste it anywhere to share.');
+  }
+  sndClick();
+}
+
+async function nativeSnapShare() {
+  const s = getSet(currentSetId); if (!s) return;
+  const code = document.getElementById('share-snap-out')?.value || '';
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: s.name + ' — DQstudy', text: 'Import this study set on DQstudy:\n' + code.slice(0,300) });
+    } catch(e) {}
+  } else {
+    copySnapCode();
+  }
+  sndClick();
+}
+
+function mailtoSnapShare() {
+  const s = getSet(currentSetId); if (!s) return;
+  const code = document.getElementById('share-snap-out')?.value || '';
   const subject = encodeURIComponent('DQstudy set: ' + s.name);
   const body = encodeURIComponent(
-    'Hey! I\'m sharing a study set with you via DQstudy.\n\n' +
-    'Set: ' + s.name + '\n' +
-    'Cards: ' + allCards(s).length + '\n\n' +
-    'To import it:\n' +
-    '1. Go to DQstudy\n' +
-    '2. Click "Import DQcode" in the sidebar\n' +
+    'Study set: ' + s.name + ' (' + allCards(s).length + ' cards)\n\n' +
+    'Import it on DQstudy (no account needed):\n' +
+    '1. Go to dqtools26.github.io/dq-tools/dqstudy.html\n' +
+    '2. Click Codes in the menu\n' +
     '3. Paste this code:\n\n' +
-    currentShareCode + '\n\n' +
-    '— Sent from DQtools'
+    code.slice(0, 500) + (code.length > 500 ? '…(truncated — copy full code from app)' : '') +
+    '\n\n— Sent from DQtools'
+  );
+  window.open('mailto:?subject=' + subject + '&body=' + body);
+  sndClick();
+}
+
+// ── Render business card on canvas ──
+function renderShareCard(s) {
+  const canvas = document.getElementById('share-card-canvas');
+  if (!canvas || !s) return;
+  const W = 800, H = 460;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#090c12'); bg.addColorStop(1,'#111827');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+  // Subtle grid pattern
+  ctx.strokeStyle = 'rgba(58,127,255,0.04)';
+  ctx.lineWidth = 1;
+  for (let x=0;x<W;x+=32) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for (let y=0;y<H;y+=32) { ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+
+  // Glow blobs
+  const g1 = ctx.createRadialGradient(W*0.8,0,0,W*0.8,0,300);
+  g1.addColorStop(0,'rgba(58,127,255,0.18)'); g1.addColorStop(1,'transparent');
+  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+  const g2 = ctx.createRadialGradient(0,H,0,0,H,200);
+  g2.addColorStop(0,'rgba(45,204,111,0.12)'); g2.addColorStop(1,'transparent');
+  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+
+  // Top accent bar
+  const bar = ctx.createLinearGradient(0,0,W,0);
+  bar.addColorStop(0,'#3a7fff'); bar.addColorStop(0.5,'#2dcc6f'); bar.addColorStop(1,'#9b59b6');
+  ctx.fillStyle = bar; ctx.fillRect(0,0,W,4);
+
+  // Border
+  ctx.strokeStyle = 'rgba(42,68,104,0.8)'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(0.75,0.75,W-1.5,H-1.5);
+
+  // Icon
+  ctx.font = '72px serif'; ctx.fillText(s.icon||'📖', 44, 110);
+
+  // Set name
+  ctx.fillStyle = '#e8eef8';
+  ctx.font = 'bold 36px system-ui, sans-serif';
+  const name = s.name.length > 34 ? s.name.slice(0,34)+'…' : s.name;
+  ctx.fillText(name, 44, 164);
+
+  // Class / unit chips
+  ctx.fillStyle = '#7a9abf';
+  ctx.font = '20px system-ui, sans-serif';
+  const meta = [allCards(s).length + ' cards', s.class, s.unit].filter(Boolean).join('  ·  ');
+  ctx.fillText(meta, 44, 200);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(42,68,104,0.6)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(44,220); ctx.lineTo(W-44,220); ctx.stroke();
+
+  // Preview cards (first 3)
+  const cards = allCards(s).slice(0,3);
+  cards.forEach((card, i) => {
+    const y = 240 + i * 60;
+    // Card bg
+    ctx.fillStyle = 'rgba(18,26,40,0.8)';
+    roundRect(ctx, 44, y, W-88, 48, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(42,68,104,0.5)'; ctx.lineWidth = 1;
+    roundRect(ctx, 44, y, W-88, 48, 8);
+    ctx.stroke();
+    // Term
+    ctx.fillStyle = '#e8eef8';
+    ctx.font = 'bold 15px system-ui, sans-serif';
+    const front = (card.front||'').length > 38 ? card.front.slice(0,38)+'…' : card.front||'';
+    ctx.fillText(front, 58, y+18);
+    // Definition
+    ctx.fillStyle = '#7a9abf';
+    ctx.font = '13px system-ui, sans-serif';
+    const back = (card.back||'').length > 60 ? card.back.slice(0,60)+'…' : card.back||'';
+    ctx.fillText(back, 58, y+36);
+  });
+
+  // URL / code at bottom
+  const codeStr = currentShareCode && currentShareCode.startsWith('DQ-')
+    ? 'dqtools26.github.io/dq-tools/dqstudy.html?code=' + currentShareCode
+    : 'dqtools26.github.io/dq-tools/dqstudy.html';
+  ctx.fillStyle = 'rgba(58,127,255,0.7)';
+  ctx.font = '13px monospace, sans-serif';
+  ctx.fillText(codeStr, 44, H-22);
+
+  // Branding right
+  ctx.fillStyle = '#4de888';
+  ctx.font = 'bold 16px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('DQstudy', W-44, H-22);
+  ctx.textAlign = 'left';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+function mailtoShare() {
+  const s = getSet(currentSetId); if (!s) return;
+  const link = currentShareCode && currentShareCode.startsWith('DQ-')
+    ? 'https://dqtools26.github.io/dq-tools/dqstudy.html?code=' + currentShareCode
+    : 'https://dqtools26.github.io/dq-tools/dqstudy.html';
+  const subject = encodeURIComponent('Study set: ' + s.name);
+  const body = encodeURIComponent(
+    s.name + ' — ' + allCards(s).length + ' cards\n\nClick to study instantly:\n' + link + '\n\n— Sent from DQstudy'
   );
   window.open('mailto:?subject=' + subject + '&body=' + body);
   sndClick();
@@ -5015,59 +5227,25 @@ function exportSetFile() { openExportModal(); }
 // Share card PNG
 function downloadSharePNG() {
   const s = getSet(currentSetId); if (!s) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = 800; canvas.height = 420;
-  const ctx = canvas.getContext('2d');
-
-  // Background
-  const grad = ctx.createLinearGradient(0,0,800,420);
-  grad.addColorStop(0, '#090c12');
-  grad.addColorStop(1, '#0e1320');
-  ctx.fillStyle = grad; ctx.fillRect(0,0,800,420);
-
-  // Top accent bar
-  const bar = ctx.createLinearGradient(0,0,800,0);
-  bar.addColorStop(0,'#3a7fff'); bar.addColorStop(1,'#2dcc6f');
-  ctx.fillStyle = bar; ctx.fillRect(0,0,800,6);
-
-  // Border
-  ctx.strokeStyle = '#2a4468'; ctx.lineWidth = 2;
-  ctx.strokeRect(1,1,798,418);
-
-  // Icon
-  ctx.font = '64px serif'; ctx.fillText(s.icon||'📖', 48, 110);
-
-  // Set name
-  ctx.fillStyle = '#e8eef8';
-  ctx.font = 'bold 38px Outfit, sans-serif';
-  ctx.fillText(s.name.length > 32 ? s.name.slice(0,32)+'…' : s.name, 48, 170);
-
-  // Meta
-  ctx.fillStyle = '#7a9abf';
-  ctx.font = '22px Outfit, sans-serif';
-  const meta = [allCards(s).length + ' cards', s.class, s.unit].filter(Boolean).join(' · ');
-  ctx.fillText(meta, 48, 210);
-
-  // Code
-  ctx.fillStyle = '#3d5878';
-  ctx.font = '16px Outfit, sans-serif';
-  ctx.fillText('DQcode:', 48, 290);
-  ctx.fillStyle = '#60a0ff';
-  ctx.font = 'bold 18px monospace';
-  const codeDisplay = currentShareCode.length > 60 ? currentShareCode.slice(0,60)+'…' : currentShareCode;
-  ctx.fillText(codeDisplay, 48, 316);
-
-  // DQstudy branding
-  ctx.fillStyle = '#4de888';
-  ctx.font = 'bold 18px Outfit, sans-serif';
-  ctx.fillText('DQstudy', 48, 386);
-  ctx.fillStyle = '#3d5878';
-  ctx.font = '16px Outfit, sans-serif';
-  ctx.fillText('part of DQtools', 130, 386);
-
-  // Download
+  // Render to the preview canvas first, then download from it
+  const canvas = document.getElementById('share-card-canvas');
+  if (!canvas) {
+    // Fallback: create offscreen canvas
+    const off = document.createElement('canvas');
+    off.width = 800; off.height = 460;
+    document.body.appendChild(off);
+    off.id = 'share-card-canvas';
+    renderShareCard(s);
+    const a = document.createElement('a');
+    a.download = (s.name||'set').replace(/[^a-z0-9]/gi,'_') + '_dqstudy.png';
+    a.href = off.toDataURL('image/png');
+    a.click();
+    off.remove();
+    return;
+  }
+  renderShareCard(s);
   const a = document.createElement('a');
-  a.download = (s.name||'set').replace(/[^a-z0-9]/gi,'_') + '_dqcode.png';
+  a.download = (s.name||'set').replace(/[^a-z0-9]/gi,'_') + '_dqstudy.png';
   a.href = canvas.toDataURL('image/png');
   a.click();
   sndClick();
