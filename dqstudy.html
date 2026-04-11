@@ -289,7 +289,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .view { display:none; }
 .view.active { display:block; }
 #view-landing.active { display:flex; flex-direction:column; }
-#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active { display:flex; flex-direction:column; }
+#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active { display:flex; flex-direction:column; }
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
@@ -469,7 +469,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .set-header-actions { display:flex; gap:8px; align-items:flex-start; }
 
 /* Study mode picker */
-.mode-picker { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:20px; }
+.mode-picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; margin-bottom:20px; }
 .mode-btn {
   background:var(--surface); border:2px solid var(--border); border-radius:14px;
   padding:14px 8px; cursor:pointer; transition:all var(--transition); text-align:center; position:relative; overflow:hidden;
@@ -501,6 +501,30 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .dot-know { background:var(--green); }
 .dot-review { background:var(--red); }
 .dot-unseen { background:var(--border2); }
+
+/* Elimination grid tiles */
+.elim-tile { background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:12px 10px; text-align:center; cursor:pointer; transition:all .18s; font-size:.8rem; font-weight:700; line-height:1.3; min-height:72px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.elim-tile:hover { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.elim-tile.eliminated { opacity:0; transform:scale(0.6); pointer-events:none; transition:all .35s cubic-bezier(.4,0,.2,1); }
+.elim-tile.wrong-flash { border-color:var(--red); background:var(--red-dim); animation:shake .3s ease; }
+.elim-tile.correct-flash { border-color:var(--green); background:var(--green-dim); }
+
+/* Fill in blank sentence styling */
+.fillin-blank { display:inline-block; border-bottom:3px solid var(--accent); min-width:80px; text-align:center; color:var(--accent2); font-weight:900; padding:0 4px; }
+.fillin-blank.revealed { color:var(--green2); border-bottom-color:var(--green); }
+.fillin-blank.wrong { color:var(--red2); border-bottom-color:var(--red); }
+
+/* Blitz / Streak answer buttons */
+.blitz-btn { background:var(--surface); border:2px solid var(--border); border-radius:14px; padding:16px 12px; font-family:inherit; font-size:.88rem; font-weight:700; color:var(--text); cursor:pointer; transition:all .12s; text-align:center; line-height:1.3; }
+.blitz-btn:hover { border-color:var(--border2); background:var(--surface2); transform:translateY(-1px); }
+.blitz-btn.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.blitz-btn.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); animation:shake .3s ease; }
+.blitz-btn:disabled { cursor:default; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.streak-btn { background:var(--surface); border:2px solid rgba(224,48,48,.2); border-radius:14px; padding:16px 12px; font-family:inherit; font-size:.88rem; font-weight:700; color:var(--text); cursor:pointer; transition:all .12s; text-align:center; line-height:1.3; }
+.streak-btn:hover { border-color:rgba(224,48,48,.5); background:var(--red-dim); }
+.streak-btn.correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.streak-btn.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); animation:shake .3s ease; }
 
 /* ═══════════════ STUDY VIEWS ═══════════════ */
 #view-flashcard, #view-quiz, #view-results, #view-learn, #view-matching { min-height:calc(100vh - 55px); }
@@ -1220,6 +1244,132 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
     </div>
+
+
+      <!-- ═══ BLITZ MODE ═══ -->
+      <div class="view" id="view-blitz">
+        <div class="study-nav">
+          <button class="study-back" onclick="exitBlitz()">← Back</button>
+          <div class="study-title">💥 Blitz</div>
+          <div id="blitz-timer-ring-wrap" style="position:relative;width:48px;height:48px;flex-shrink:0;">
+            <svg width="48" height="48" style="transform:rotate(-90deg);">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="4"/>
+              <circle id="blitz-ring" cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="4"
+                stroke-dasharray="125.7" stroke-dashoffset="0" style="transition:stroke-dashoffset .1s linear,stroke .3s;"/>
+            </svg>
+            <div id="blitz-secs" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;font-family:var(--mono);"></div>
+          </div>
+          <div id="blitz-score-display" style="font-size:.88rem;font-weight:900;font-family:var(--mono);color:var(--green2);">0</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
+          <div id="blitz-term" style="background:var(--surface);border:2px solid var(--border2);border-radius:20px;padding:28px 32px;text-align:center;font-size:1.3rem;font-weight:800;width:100%;min-height:100px;display:flex;align-items:center;justify-content:center;line-height:1.4;"></div>
+          <div id="blitz-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;"></div>
+          <div id="blitz-feedback" style="height:24px;font-size:.85rem;font-weight:800;"></div>
+        </div>
+        <div style="padding:12px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:24px;">
+          <div style="text-align:center;"><div id="blitz-correct-n" style="font-size:1.4rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Correct</div></div>
+          <div style="text-align:center;"><div id="blitz-wrong-n" style="font-size:1.4rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Wrong</div></div>
+          <div style="text-align:center;"><div id="blitz-cpm" style="font-size:1.4rem;font-weight:900;color:var(--accent2);">—</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Cards/min</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ STREAK MODE ═══ -->
+      <div class="view" id="view-streak">
+        <div class="study-nav" style="background:rgba(224,48,48,.06);border-bottom-color:rgba(224,48,48,.2);">
+          <button class="study-back" onclick="exitStreak()">← Back</button>
+          <div class="study-title" style="color:var(--red2);">🎯 Streak</div>
+          <div style="flex:1;"></div>
+          <div style="text-align:right;">
+            <div style="font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">STREAK</div>
+            <div id="streak-count" style="font-size:1.5rem;font-weight:900;font-family:var(--mono);line-height:1;color:var(--red2);">0</div>
+          </div>
+          <div style="text-align:right;margin-left:16px;">
+            <div style="font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">BEST</div>
+            <div id="streak-best-display" style="font-size:1.5rem;font-weight:900;font-family:var(--mono);line-height:1;color:var(--text2);">0</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
+          <div id="streak-term" style="background:var(--surface);border:2px solid rgba(224,48,48,.3);border-radius:20px;padding:28px 32px;text-align:center;font-size:1.3rem;font-weight:800;width:100%;min-height:100px;display:flex;align-items:center;justify-content:center;line-height:1.4;"></div>
+          <div id="streak-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;"></div>
+        </div>
+        <!-- Game over screen -->
+        <div id="streak-gameover" style="display:none;position:absolute;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
+          <div id="streak-go-emoji" style="font-size:4rem;margin-bottom:16px;">💥</div>
+          <div style="font-size:.75rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:var(--red2);margin-bottom:8px;">GAME OVER</div>
+          <div id="streak-go-n" style="font-size:4rem;font-weight:900;line-height:1;margin-bottom:4px;"></div>
+          <div style="font-size:.9rem;color:var(--text2);margin-bottom:4px;">card streak</div>
+          <div id="streak-go-best" style="font-size:.78rem;color:var(--text3);margin-bottom:6px;"></div>
+          <div id="streak-go-wrong" style="font-size:.78rem;color:var(--text2);background:var(--red-dim);border:1px solid rgba(224,48,48,.2);border-radius:8px;padding:8px 16px;margin-bottom:24px;"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button class="btn btn-primary" onclick="startStreak()">🔄 Try Again</button>
+            <button class="btn btn-ghost" onclick="exitStreak()">🏠 Home</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══ ELIMINATION MODE ═══ -->
+      <div class="view" id="view-elimination">
+        <div class="study-nav">
+          <button class="study-back" onclick="exitElimination()">← Back</button>
+          <div class="study-title">🗑 Elimination</div>
+          <div class="study-prog-track"><div class="study-prog-fill" id="elim-prog" style="width:0%"></div></div>
+          <div class="study-count" id="elim-count">0 left</div>
+        </div>
+        <!-- Card grid -->
+        <div id="elim-grid" style="flex:1;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;overflow-y:auto;align-content:start;"></div>
+        <!-- Answer overlay (shown when a card is selected) -->
+        <div id="elim-overlay" style="display:none;position:absolute;inset:0;background:rgba(9,12,18,.85);backdrop-filter:blur(4px);z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+          <div style="background:var(--surface);border:2px solid var(--border2);border-radius:20px;padding:28px;max-width:500px;width:100%;text-align:center;">
+            <div id="elim-q-label" style="font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;"></div>
+            <div id="elim-question" style="font-size:1.2rem;font-weight:800;margin-bottom:20px;line-height:1.4;"></div>
+            <div id="elim-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:16px;" onclick="closeElimOverlay()">✕ Cancel</button>
+          </div>
+        </div>
+        <!-- Completion screen -->
+        <div id="elim-complete" style="display:none;position:absolute;inset:0;background:var(--bg);z-index:50;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
+          <div style="font-size:3.5rem;margin-bottom:12px;">🏆</div>
+          <div style="font-size:1.6rem;font-weight:900;margin-bottom:8px;">Board Cleared!</div>
+          <div id="elim-complete-stats" style="font-size:.88rem;color:var(--text2);margin-bottom:24px;line-height:1.8;"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button class="btn btn-primary" onclick="startElimination()">🔄 Play Again</button>
+            <button class="btn btn-ghost" onclick="exitElimination()">🏠 Home</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FILL IN THE BLANK MODE ═══ -->
+      <div class="view" id="view-fillin">
+        <div class="study-nav">
+          <button class="study-back" onclick="exitFillin()">← Back</button>
+          <div class="study-title">🧩 Fill in the Blank</div>
+          <div class="study-prog-track"><div class="study-prog-fill" id="fillin-prog" style="width:0%"></div></div>
+          <div class="study-count" id="fillin-count">0/0</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
+          <div style="width:100%;">
+            <div style="font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;" id="fillin-label">Fill in the blank</div>
+            <div id="fillin-sentence" style="background:var(--surface);border:2px solid var(--border2);border-radius:16px;padding:24px;font-size:1.05rem;font-weight:600;line-height:1.8;min-height:80px;"></div>
+          </div>
+          <div style="width:100%;display:flex;gap:10px;align-items:center;">
+            <input class="finp" id="fillin-input" placeholder="Type the missing word…" style="font-size:1rem;font-weight:700;flex:1;" onkeydown="if(event.key==='Enter')submitFillin()">
+            <button class="btn btn-primary" onclick="submitFillin()">Check →</button>
+          </div>
+          <div id="fillin-hint-row" style="width:100%;display:flex;gap:8px;align-items:center;min-height:28px;">
+            <div id="fillin-feedback" style="font-size:.85rem;font-weight:700;flex:1;"></div>
+            <button id="fillin-hint-btn" class="btn btn-ghost btn-sm" onclick="showFillinHint()" style="font-size:.68rem;">💡 Hint</button>
+          </div>
+          <div style="width:100%;display:flex;gap:8px;justify-content:center;" id="fillin-next-row" style="display:none;">
+            <button class="btn btn-primary" id="fillin-next-btn" onclick="nextFillin()" style="display:none;">Next →</button>
+          </div>
+        </div>
+        <div style="padding:10px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:24px;">
+          <div style="text-align:center;"><div id="fillin-correct-n" style="font-size:1.3rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Correct</div></div>
+          <div style="text-align:center;"><div id="fillin-wrong-n" style="font-size:1.3rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Wrong</div></div>
+          <div style="text-align:center;"><div id="fillin-skipped-n" style="font-size:1.3rem;font-weight:900;color:var(--text3);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Skipped</div></div>
+        </div>
+      </div>
 
   </main>
 </div>
@@ -2459,6 +2609,10 @@ const MODES = [
   {id:'matching',   icon:'🔗', name:'Matching',   desc:'Match terms to defs'},
   {id:'learn',      icon:'🧠', name:'Learn',      desc:'Type-in answers'},
   {id:'speed',      icon:'⚡', name:'Speed Round', desc:'5 sec per card!'},
+  {id:'blitz',      icon:'💥', name:'Blitz',        desc:'60 sec, answer as many as you can'},
+  {id:'streak',     icon:'🎯', name:'Streak',       desc:'One wrong ends your run'},
+  {id:'elimination', icon:'🗑', name:'Elimination',  desc:'Clear the board one by one'},
+  {id:'fillin',      icon:'🧩', name:'Fill in Blank', desc:'Type the missing word'},
 ];
 
 // ── SHARED SET (read-only live access) ──────────────
@@ -2692,6 +2846,67 @@ function openStudyOpts() {
         </select>
       </div>
     `;
+  } else if (mode === 'elimination') {
+    body += `
+      <div class="field"><label class="flabel">Answer format</label>
+        <select class="finp" id="opt-elim-fmt">
+          <option value="mc">Multiple Choice</option>
+          <option value="written">Written</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Direction</label>
+        <select class="finp" id="opt-elim-dir">
+          <option value="normal">Term → Definition</option>
+          <option value="reverse">Definition → Term</option>
+        </select>
+      </div>`;
+  } else if (mode === 'fillin') {
+    body += `
+      <div class="field"><label class="flabel">Direction</label>
+        <select class="finp" id="opt-fillin-dir">
+          <option value="normal">See term, fill definition</option>
+          <option value="reverse">See definition, fill term</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Typo tolerance</label>
+        <select class="finp" id="opt-fillin-tolerance">
+          <option value="0">Exact match</option>
+          <option value="1" selected>1 character off (default)</option>
+          <option value="2">2 characters off</option>
+        </select>
+      </div>`;
+  } else if (mode === 'blitz') {
+    body += `
+      <div class="field"><label class="flabel">Timer</label>
+        <select class="finp" id="opt-blitz-secs">
+          <option value="30">30 seconds</option>
+          <option value="60" selected>60 seconds</option>
+          <option value="90">90 seconds</option>
+          <option value="120">2 minutes</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Direction</label>
+        <select class="finp" id="opt-blitz-dir">
+          <option value="normal">Term → Definition</option>
+          <option value="reverse">Definition → Term</option>
+        </select>
+      </div>`;
+  } else if (mode === 'streak') {
+    body += `
+      <div class="field"><label class="flabel">Direction</label>
+        <select class="finp" id="opt-streak-dir">
+          <option value="normal">Term → Definition</option>
+          <option value="reverse">Definition → Term</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Timer per card</label>
+        <select class="finp" id="opt-streak-timer">
+          <option value="0" selected>No timer</option>
+          <option value="10">10 seconds</option>
+          <option value="15">15 seconds</option>
+          <option value="30">30 seconds</option>
+        </select>
+      </div>`;
   } else if (mode === 'learn') {
     body += `
       <div class="field"><label class="flabel">Mastery threshold</label>
@@ -2747,6 +2962,18 @@ function confirmLaunch() {
     studyOpts.speedSecs = parseInt(document.getElementById('opt-speed-secs')?.value || '5');
     studyOpts.speedBubbles = parseInt(document.getElementById('opt-speed-bubbles')?.value || '4');
     studyOpts.speedRounds = parseInt(document.getElementById('opt-speed-rounds')?.value || '1');
+  } else if (mode === 'elimination') {
+    studyOpts.elimFmt = document.getElementById('opt-elim-fmt')?.value || 'mc';
+    studyOpts.elimDir = document.getElementById('opt-elim-dir')?.value || 'normal';
+  } else if (mode === 'fillin') {
+    studyOpts.fillinDir = document.getElementById('opt-fillin-dir')?.value || 'normal';
+    studyOpts.fillinTolerance = parseInt(document.getElementById('opt-fillin-tolerance')?.value || '1');
+  } else if (mode === 'blitz') {
+    studyOpts.blitzSecs = parseInt(document.getElementById('opt-blitz-secs')?.value || '60');
+    studyOpts.blitzDir = document.getElementById('opt-blitz-dir')?.value || 'normal';
+  } else if (mode === 'streak') {
+    studyOpts.streakDir = document.getElementById('opt-streak-dir')?.value || 'normal';
+    studyOpts.streakTimer = parseInt(document.getElementById('opt-streak-timer')?.value || '0');
   } else if (mode === 'learn') {
     studyOpts.learnThreshold = parseInt(document.getElementById('opt-learn-threshold')?.value || '1');
     studyOpts.learnPhase1 = document.getElementById('opt-learn-p1')?.checked !== false;
@@ -2876,6 +3103,10 @@ function launchStudy() {
   else if (selectedMode === 'matching') startMatching();
   else if (selectedMode === 'learn') startLearn();
   else if (selectedMode === 'speed') startSpeedRound();
+  else if (selectedMode === 'blitz') startBlitz();
+  else if (selectedMode === 'streak') startStreak();
+  else if (selectedMode === 'elimination') startElimination();
+  else if (selectedMode === 'fillin') startFillin();
 }
 
 // ─────────────────────────────────────────────────
@@ -3498,6 +3729,593 @@ function markLearnKnown() {
   if (unmastered.length) { unmastered[learnCurrentIdx % unmastered.length].mastered = true; }
   learnCurrentIdx++; renderLearnPhase(); sndCorrect();
 }
+
+
+// ─────────────────────────────────────────────────
+// BLITZ MODE — 60 seconds, answer as many as possible
+// ─────────────────────────────────────────────────
+let blitzCards = [], blitzIdx = 0, blitzCorrect = 0, blitzWrong = 0;
+let blitzTimerInt = null, blitzSecsLeft = 60, blitzStartTime = 0;
+let blitzAnswered = false, blitzTotalSecs = 60;
+const BLITZ_CIRC = 2 * Math.PI * 20; // r=20
+
+function startBlitz() {
+  blitzTotalSecs = studyOpts.blitzSecs || 60;
+  blitzCards = shuffle([...sessionCards]);
+  // Cycle cards if we run out
+  while (blitzCards.length < 40) blitzCards = blitzCards.concat(shuffle([...sessionCards]));
+  blitzIdx = 0; blitzCorrect = 0; blitzWrong = 0;
+  blitzSecsLeft = blitzTotalSecs; blitzStartTime = Date.now();
+  blitzAnswered = false;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-blitz').classList.add('active');
+  renderBlitzCard();
+  startBlitzTimer();
+}
+
+function startBlitzTimer() {
+  if (blitzTimerInt) clearInterval(blitzTimerInt);
+  blitzTimerInt = setInterval(() => {
+    blitzSecsLeft -= 0.1;
+    updateBlitzRing();
+    if (blitzSecsLeft <= 0) {
+      clearInterval(blitzTimerInt); blitzTimerInt = null;
+      finishBlitz();
+    }
+  }, 100);
+}
+
+function updateBlitzRing() {
+  const pct = Math.max(0, blitzSecsLeft / blitzTotalSecs);
+  const offset = BLITZ_CIRC * (1 - pct);
+  const ring = document.getElementById('blitz-ring');
+  const secs = document.getElementById('blitz-secs');
+  if (!ring) return;
+  ring.style.strokeDashoffset = offset;
+  // Color: green → amber → red
+  ring.style.stroke = pct > 0.4 ? 'var(--green)' : pct > 0.2 ? 'var(--amber)' : 'var(--red)';
+  if (secs) secs.textContent = Math.ceil(blitzSecsLeft);
+  // Pulse ring when low
+  if (blitzSecsLeft <= 5) ring.style.opacity = Math.sin(Date.now()/150) * 0.4 + 0.6;
+  else ring.style.opacity = 1;
+}
+
+function renderBlitzCard() {
+  if (blitzIdx >= blitzCards.length) {
+    // Ran out of cards — reshuffle and continue
+    blitzCards = blitzCards.concat(shuffle([...sessionCards]));
+  }
+  blitzAnswered = false;
+  const card = blitzCards[blitzIdx];
+  const dir = studyOpts.blitzDir || 'normal';
+  const term = dir === 'reverse' ? card.back : card.front;
+  const answer = dir === 'reverse' ? card.front : card.back;
+
+  document.getElementById('blitz-term').textContent = term;
+  document.getElementById('blitz-score-display').textContent = blitzCorrect;
+  document.getElementById('blitz-correct-n').textContent = blitzCorrect;
+  document.getElementById('blitz-wrong-n').textContent = blitzWrong;
+  document.getElementById('blitz-feedback').textContent = '';
+
+  // Update cards/min
+  const elapsed = (Date.now() - blitzStartTime) / 60000;
+  const total = blitzCorrect + blitzWrong;
+  const cpm = elapsed > 0.05 ? Math.round(total / elapsed) : '—';
+  document.getElementById('blitz-cpm').textContent = cpm;
+
+  // Build MC choices
+  const wrongPool = sessionCards.filter(c => {
+    const w = dir === 'reverse' ? c.front : c.back;
+    return w !== answer;
+  });
+  const wrongs = shuffle(wrongPool).slice(0, 3).map(c => dir === 'reverse' ? c.front : c.back);
+  const choices = shuffle([answer, ...wrongs]);
+
+  const grid = document.getElementById('blitz-choices');
+  grid.innerHTML = choices.map(ch => `
+    <button class="blitz-btn" onclick="blitzAnswer(this,'${esc(ch)}','${esc(answer)}')">${esc(ch)}</button>
+  `).join('');
+}
+
+function blitzAnswer(btn, chosen, correct) {
+  if (blitzAnswered) return;
+  blitzAnswered = true;
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  // Disable all buttons briefly
+  document.querySelectorAll('#blitz-choices .blitz-btn').forEach(b => b.disabled = true);
+  if (isCorrect) {
+    blitzCorrect++;
+    sndCorrect();
+    document.getElementById('blitz-feedback').style.color = 'var(--green2)';
+    document.getElementById('blitz-feedback').textContent = '✓ Correct!';
+  } else {
+    blitzWrong++;
+    sndWrong();
+    document.getElementById('blitz-feedback').style.color = 'var(--red2)';
+    document.getElementById('blitz-feedback').textContent = '✗ ' + correct;
+    // Highlight correct answer
+    document.querySelectorAll('#blitz-choices .blitz-btn').forEach(b => {
+      if (b.textContent.trim() === correct) b.classList.add('correct');
+    });
+  }
+  blitzIdx++;
+  // Quick pause then next card
+  setTimeout(renderBlitzCard, isCorrect ? 400 : 800);
+}
+
+function finishBlitz() {
+  if (blitzTimerInt) { clearInterval(blitzTimerInt); blitzTimerInt = null; }
+  const elapsed = Math.round((Date.now() - blitzStartTime) / 1000);
+  const total = blitzCorrect + blitzWrong;
+  const cpm = elapsed > 0 ? Math.round(total / (elapsed / 60)) : 0;
+  const pct = total > 0 ? Math.round(blitzCorrect / total * 100) : 0;
+
+  // Save to history
+  const s = getCurrentSet();
+  if (s && !currentSharedCode) {
+    s.history = s.history || [];
+    s.history.push({ date: Date.now(), score: blitzCorrect, total, mode: 'Blitz', time: elapsed });
+    autoSave();
+  }
+  sndComplete();
+  // Custom results for Blitz
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-results');
+  el.classList.add('active');
+  el.innerHTML = `
+    <div style="max-width:520px;margin:0 auto;padding:40px 24px;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">💥</div>
+      <div style="font-size:1.6rem;font-weight:900;margin-bottom:4px;">Blitz Complete!</div>
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:28px;">${blitzTotalSecs} second run</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2.2rem;font-weight:900;color:var(--green2);">${blitzCorrect}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Correct</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2.2rem;font-weight:900;color:var(--accent2);">${cpm}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Cards/min</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2.2rem;font-weight:900;color:${pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)'};">${pct}%</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Accuracy</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startBlitz()">🔄 Play Again</button>
+        <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+      </div>
+    </div>`;
+  if (blitzCorrect === total && total > 0) confetti();
+}
+
+function exitBlitz() {
+  if (blitzTimerInt) { clearInterval(blitzTimerInt); blitzTimerInt = null; }
+  goHome();
+}
+
+// ─────────────────────────────────────────────────
+// STREAK MODE — one wrong answer ends your run
+// ─────────────────────────────────────────────────
+let streakCards = [], streakIdx = 0, streakCount = 0, streakBest = 0;
+let streakAnswered = false, streakStartTime = 0;
+let streakTimerInt = null, streakSecsLeft = 0;
+
+function startStreak() {
+  streakCards = shuffle([...sessionCards]);
+  streakIdx = 0; streakCount = 0; streakAnswered = false;
+  streakStartTime = Date.now();
+  streakSecsLeft = studyOpts.streakTimer || 0;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-streak').classList.add('active');
+  document.getElementById('streak-gameover').style.display = 'none';
+
+  // Load personal best from set history
+  const s = getCurrentSet();
+  if (s) {
+    const bests = (s.history||[]).filter(h => h.mode === 'Streak').map(h => h.score);
+    streakBest = bests.length ? Math.max(...bests) : 0;
+  }
+  document.getElementById('streak-best-display').textContent = streakBest;
+  renderStreakCard();
+}
+
+function renderStreakCard() {
+  if (streakIdx >= streakCards.length) {
+    // Ran out — reshuffle remaining
+    streakCards = streakCards.concat(shuffle([...sessionCards]));
+  }
+  streakAnswered = false;
+
+  const card = streakCards[streakIdx];
+  const dir = studyOpts.streakDir || 'normal';
+  const term = dir === 'reverse' ? card.back : card.front;
+  const answer = dir === 'reverse' ? card.front : card.back;
+
+  document.getElementById('streak-count').textContent = streakCount;
+  document.getElementById('streak-best-display').textContent = Math.max(streakBest, streakCount);
+  document.getElementById('streak-term').textContent = term;
+
+  // Build 4 MC choices
+  const wrongPool = sessionCards.filter(c => {
+    const w = dir === 'reverse' ? c.front : c.back;
+    return w !== answer;
+  });
+  const wrongs = shuffle(wrongPool).slice(0, 3).map(c => dir === 'reverse' ? c.front : c.back);
+  const choices = shuffle([answer, ...wrongs]);
+
+  const grid = document.getElementById('streak-choices');
+  grid.innerHTML = choices.map(ch => `
+    <button class="streak-btn" onclick="streakAnswer(this,'${esc(ch)}','${esc(answer)}')">${esc(ch)}</button>
+  `).join('');
+
+  // Per-card timer if enabled
+  if (streakTimerInt) clearInterval(streakTimerInt);
+  if (studyOpts.streakTimer > 0) {
+    streakSecsLeft = studyOpts.streakTimer;
+    streakTimerInt = setInterval(() => {
+      streakSecsLeft -= 0.1;
+      if (streakSecsLeft <= 0) {
+        clearInterval(streakTimerInt);
+        // Time up = wrong
+        streakGameOver(answer, true);
+      }
+    }, 100);
+  }
+}
+
+function streakAnswer(btn, chosen, correct) {
+  if (streakAnswered) return;
+  streakAnswered = true;
+  if (streakTimerInt) { clearInterval(streakTimerInt); streakTimerInt = null; }
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  document.querySelectorAll('#streak-choices .streak-btn').forEach(b => b.disabled = true);
+  if (isCorrect) {
+    streakCount++;
+    document.getElementById('streak-count').textContent = streakCount;
+    sndCorrect();
+    streakIdx++;
+    setTimeout(renderStreakCard, 350);
+  } else {
+    sndWrong();
+    // Show correct answer
+    document.querySelectorAll('#streak-choices .streak-btn').forEach(b => {
+      if (b.textContent.trim() === correct) b.classList.add('correct');
+    });
+    setTimeout(() => streakGameOver(correct, false), 800);
+  }
+}
+
+function streakGameOver(correctAnswer, timedOut) {
+  const isNewBest = streakCount > streakBest;
+  if (isNewBest) streakBest = streakCount;
+
+  // Save to history
+  const s = getCurrentSet();
+  if (s && !currentSharedCode) {
+    s.history = s.history || [];
+    s.history.push({ date: Date.now(), score: streakCount, total: streakIdx, mode: 'Streak' });
+    autoSave();
+  }
+
+  const goEl = document.getElementById('streak-gameover');
+  document.getElementById('streak-go-n').textContent = streakCount;
+  document.getElementById('streak-go-emoji').textContent = streakCount === 0 ? '😬' : streakCount < 5 ? '😅' : streakCount < 15 ? '🔥' : '🏆';
+  document.getElementById('streak-go-best').textContent = isNewBest
+    ? '🎉 New personal best!'
+    : `Personal best: ${streakBest}`;
+  document.getElementById('streak-go-wrong').textContent = timedOut
+    ? '⏱ Time ran out!'
+    : `Correct answer: ${correctAnswer}`;
+  goEl.style.display = 'flex';
+  sndWrong();
+  if (isNewBest && streakCount >= 5) confetti();
+}
+
+function exitStreak() {
+  if (streakTimerInt) { clearInterval(streakTimerInt); streakTimerInt = null; }
+  goHome();
+}
+
+
+// ─────────────────────────────────────────────────
+// ELIMINATION MODE — answer cards, watch the board clear
+// ─────────────────────────────────────────────────
+let elimCards = [], elimRemaining = [], elimCorrect = 0, elimWrong = 0;
+let elimSelectedIdx = null;
+
+function startElimination() {
+  elimCards = shuffle([...sessionCards]);
+  elimRemaining = elimCards.map((c, i) => i); // indices of remaining cards
+  elimCorrect = 0; elimWrong = 0; elimSelectedIdx = null;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-elimination').classList.add('active');
+  document.getElementById('elim-overlay').style.display = 'none';
+  document.getElementById('elim-complete').style.display = 'none';
+  renderElimGrid();
+}
+
+function renderElimGrid() {
+  const grid = document.getElementById('elim-grid');
+  const dir = studyOpts.elimDir || 'normal';
+  const total = elimCards.length;
+  const left = elimRemaining.length;
+
+  document.getElementById('elim-count').textContent = left + ' left';
+  const pct = ((total - left) / total) * 100;
+  document.getElementById('elim-prog').style.width = pct + '%';
+
+  grid.innerHTML = elimCards.map((card, i) => {
+    const isGone = !elimRemaining.includes(i);
+    const label = dir === 'reverse' ? card.back : card.front;
+    return `<div class="elim-tile${isGone ? ' eliminated' : ''}" id="elim-tile-${i}" onclick="openElimCard(${i})">${esc(label)}</div>`;
+  }).join('');
+}
+
+function openElimCard(idx) {
+  if (!elimRemaining.includes(idx)) return;
+  elimSelectedIdx = idx;
+  const card = elimCards[idx];
+  const dir = studyOpts.elimDir || 'normal';
+  const question = dir === 'reverse' ? card.back : card.front;
+  const answer = dir === 'reverse' ? card.front : card.back;
+  const fmt = studyOpts.elimFmt || 'mc';
+
+  document.getElementById('elim-q-label').textContent = dir === 'reverse' ? 'What is the term?' : 'What is the definition?';
+  document.getElementById('elim-question').textContent = question;
+
+  if (fmt === 'mc') {
+    const wrongPool = elimCards.filter((c,i) => i !== idx);
+    const wrongs = shuffle(wrongPool).slice(0,3).map(c => dir === 'reverse' ? c.front : c.back);
+    const choices = shuffle([answer, ...wrongs]);
+    document.getElementById('elim-choices').innerHTML = choices.map(ch =>
+      `<button class="blitz-btn" onclick="submitElimAnswer('${esc(ch)}','${esc(answer)}',${idx})">${esc(ch)}</button>`
+    ).join('');
+  } else {
+    // Written
+    document.getElementById('elim-choices').innerHTML = `
+      <div style="grid-column:1/-1;display:flex;gap:8px;">
+        <input class="finp" id="elim-written-inp" placeholder="Type the answer…" style="flex:1;font-size:.9rem;" onkeydown="if(event.key==='Enter')submitElimWritten(${idx},'${esc(answer)}')">
+        <button class="btn btn-primary" onclick="submitElimWritten(${idx},'${esc(answer)}')">Check</button>
+      </div>`;
+    setTimeout(() => document.getElementById('elim-written-inp')?.focus(), 50);
+  }
+
+  document.getElementById('elim-overlay').style.display = 'flex';
+  sndClick();
+}
+
+function submitElimAnswer(chosen, correct, idx) {
+  const isCorrect = chosen.trim().toLowerCase() === correct.trim().toLowerCase();
+  document.querySelectorAll('#elim-choices .blitz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.trim() === correct) b.classList.add('correct');
+  });
+  const clickedBtn = [...document.querySelectorAll('#elim-choices .blitz-btn')]
+    .find(b => b.textContent.trim() === chosen);
+  if (!isCorrect && clickedBtn) clickedBtn.classList.add('wrong');
+
+  if (isCorrect) {
+    elimCorrect++;
+    sndCorrect();
+    setTimeout(() => eliminateCard(idx), 500);
+  } else {
+    elimWrong++;
+    sndWrong();
+    const tile = document.getElementById('elim-tile-' + idx);
+    if (tile) { tile.classList.add('wrong-flash'); setTimeout(() => tile.classList.remove('wrong-flash'), 400); }
+    setTimeout(() => closeElimOverlay(), 900);
+  }
+}
+
+function submitElimWritten(idx, correct) {
+  const inp = document.getElementById('elim-written-inp');
+  if (!inp) return;
+  const typed = inp.value.trim().toLowerCase();
+  const isCorrect = levenshtein(typed, correct.trim().toLowerCase()) <= (studyOpts.fillinTolerance || 1);
+  submitElimAnswer(isCorrect ? correct : typed, correct, idx);
+}
+
+function eliminateCard(idx) {
+  closeElimOverlay();
+  const tile = document.getElementById('elim-tile-' + idx);
+  if (tile) tile.classList.add('eliminated');
+  elimRemaining = elimRemaining.filter(i => i !== idx);
+  setTimeout(() => {
+    renderElimGrid();
+    if (elimRemaining.length === 0) setTimeout(finishElimination, 400);
+  }, 380);
+}
+
+function closeElimOverlay() {
+  document.getElementById('elim-overlay').style.display = 'none';
+  elimSelectedIdx = null;
+}
+
+function finishElimination() {
+  const total = elimCards.length;
+  const pct = total > 0 ? Math.round(elimCorrect / (elimCorrect + elimWrong) * 100) : 0;
+  const s = getCurrentSet();
+  if (s && !currentSharedCode) {
+    s.history = s.history || [];
+    s.history.push({ date: Date.now(), score: elimCorrect, total: elimCorrect + elimWrong, mode: 'Elimination' });
+    autoSave();
+  }
+  document.getElementById('elim-complete-stats').innerHTML =
+    `${elimCorrect} of ${total} cards eliminated on first try<br>` +
+    `${elimWrong} wrong attempt${elimWrong===1?'':'s'}<br>` +
+    `<strong style="color:${pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)'}">${pct}% accuracy</strong>`;
+  document.getElementById('elim-complete').style.display = 'flex';
+  sndComplete();
+  if (pct >= 80) confetti();
+}
+
+function exitElimination() {
+  document.getElementById('elim-overlay').style.display = 'none';
+  document.getElementById('elim-complete').style.display = 'none';
+  goHome();
+}
+
+// ─────────────────────────────────────────────────
+// FILL IN THE BLANK MODE
+// ─────────────────────────────────────────────────
+let fillinCards = [], fillinIdx = 0, fillinCorrect = 0, fillinWrong = 0, fillinSkipped = 0;
+let fillinCurrentBlank = '', fillinAnswered = false, fillinHintUsed = false;
+
+// Common words to skip when choosing what to blank
+const FILLIN_SKIP = new Set(['the','a','an','is','are','was','were','of','in','at','to','and','or','but','it','its','this','that','these','those','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','can','not','no','so','if','as','by','on','for','with','from','into','onto','than','then','when','where','which','who','what','how','very','also','just','more','most','other','some','any','all','each','both','about','after','before','between','during','through','up','down','out','over','under','off','again','further','once','here','there','own','same','too','only','because','such','well','even','new','old','first','last','long','great','little','good','high','low','big','small']);
+
+function pickBlankWord(text) {
+  // Split into words, find best candidates
+  const words = text.split(/\s+/);
+  const candidates = words.map((w, i) => {
+    const clean = w.replace(/[^a-zA-Z0-9'-]/g, '').toLowerCase();
+    const score = clean.length >= 4 && !FILLIN_SKIP.has(clean) ? clean.length : 0;
+    return { i, w, clean, score };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+
+  if (!candidates.length) return null;
+  // Pick the highest scoring word (longest non-common word)
+  return candidates[0];
+}
+
+function makeFillinSentence(text, blankWord, revealed = false, wrong = false) {
+  const regex = new RegExp('\\b' + blankWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+  const cls = revealed ? 'fillin-blank revealed' : wrong ? 'fillin-blank wrong' : 'fillin-blank';
+  const display = revealed || wrong ? blankWord : '___';
+  return text.replace(regex, `<span class="${cls}">${display}</span>`);
+}
+
+// Levenshtein distance for typo tolerance
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => i===0?j:j===0?i:0));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function startFillin() {
+  fillinCards = shuffle([...sessionCards]);
+  fillinIdx = 0; fillinCorrect = 0; fillinWrong = 0; fillinSkipped = 0;
+  fillinAnswered = false; fillinHintUsed = false;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-fillin').classList.add('active');
+  renderFillinCard();
+}
+
+function renderFillinCard() {
+  if (fillinIdx >= fillinCards.length) { finishFillin(); return; }
+  fillinAnswered = false; fillinHintUsed = false;
+
+  const card = fillinCards[fillinIdx];
+  const dir = studyOpts.fillinDir || 'normal';
+  // normal: see term, blank the definition
+  // reverse: see definition, blank the term
+  const shown = dir === 'reverse' ? card.back : card.front;
+  const blanked = dir === 'reverse' ? card.front : card.back;
+
+  const pct = (fillinIdx / fillinCards.length) * 100;
+  document.getElementById('fillin-prog').style.width = pct + '%';
+  document.getElementById('fillin-count').textContent = (fillinIdx+1) + '/' + fillinCards.length;
+  document.getElementById('fillin-correct-n').textContent = fillinCorrect;
+  document.getElementById('fillin-wrong-n').textContent = fillinWrong;
+  document.getElementById('fillin-skipped-n').textContent = fillinSkipped;
+
+  const picked = pickBlankWord(blanked);
+  if (!picked) {
+    // Can't find a blankable word — show as written question instead
+    fillinCurrentBlank = blanked;
+    document.getElementById('fillin-label').textContent = dir === 'reverse' ? 'What is the term for this definition?' : 'What is the definition of: ' + shown;
+    document.getElementById('fillin-sentence').innerHTML = '<span style="color:var(--text3);font-style:italic;">Type the full answer below</span>';
+  } else {
+    fillinCurrentBlank = picked.clean;
+    const labelText = dir === 'reverse' ? 'Term: ' + shown : 'Definition of: ' + shown;
+    document.getElementById('fillin-label').textContent = labelText;
+    document.getElementById('fillin-sentence').innerHTML = makeFillinSentence(blanked, picked.w);
+  }
+
+  const inp = document.getElementById('fillin-input');
+  inp.value = ''; inp.disabled = false;
+  inp.style.borderColor = '';
+  document.getElementById('fillin-feedback').textContent = '';
+  document.getElementById('fillin-feedback').style.color = '';
+  document.getElementById('fillin-next-btn').style.display = 'none';
+  document.getElementById('fillin-hint-btn').style.display = '';
+  setTimeout(() => inp.focus(), 50);
+}
+
+function submitFillin() {
+  if (fillinAnswered) { nextFillin(); return; }
+  const inp = document.getElementById('fillin-input');
+  const typed = inp.value.trim().toLowerCase();
+  if (!typed) return;
+
+  const tolerance = studyOpts.fillinTolerance !== undefined ? studyOpts.fillinTolerance : 1;
+  const dist = levenshtein(typed, fillinCurrentBlank.toLowerCase());
+  const isCorrect = dist <= tolerance;
+
+  fillinAnswered = true;
+  inp.disabled = true;
+  document.getElementById('fillin-hint-btn').style.display = 'none';
+  document.getElementById('fillin-next-btn').style.display = '';
+
+  const card = fillinCards[fillinIdx];
+  const dir = studyOpts.fillinDir || 'normal';
+  const blanked = dir === 'reverse' ? card.front : card.back;
+
+  if (isCorrect) {
+    fillinCorrect++;
+    inp.style.borderColor = 'var(--green)';
+    document.getElementById('fillin-feedback').style.color = 'var(--green2)';
+    document.getElementById('fillin-feedback').textContent = dist === 0 ? '✓ Correct!' : '✓ Close enough! (' + fillinCurrentBlank + ')';
+    document.getElementById('fillin-sentence').innerHTML = makeFillinSentence(blanked, fillinCurrentBlank, true, false);
+    sndCorrect();
+  } else {
+    fillinWrong++;
+    inp.style.borderColor = 'var(--red)';
+    document.getElementById('fillin-feedback').style.color = 'var(--red2)';
+    document.getElementById('fillin-feedback').textContent = '✗ Answer: ' + fillinCurrentBlank;
+    document.getElementById('fillin-sentence').innerHTML = makeFillinSentence(blanked, fillinCurrentBlank, false, true);
+    sndWrong();
+  }
+}
+
+function showFillinHint() {
+  if (fillinAnswered || fillinHintUsed) return;
+  fillinHintUsed = true;
+  // Reveal first letter + length
+  const hint = fillinCurrentBlank[0] + '_'.repeat(Math.max(0, fillinCurrentBlank.length - 1));
+  document.getElementById('fillin-feedback').style.color = 'var(--amber2)';
+  document.getElementById('fillin-feedback').textContent = '💡 Hint: ' + hint + ' (' + fillinCurrentBlank.length + ' letters)';
+  document.getElementById('fillin-hint-btn').style.display = 'none';
+  sndClick();
+}
+
+function nextFillin() {
+  fillinIdx++;
+  renderFillinCard();
+}
+
+function finishFillin() {
+  const total = fillinCards.length;
+  const pct = total > 0 ? Math.round(fillinCorrect / total * 100) : 0;
+  const s = getCurrentSet();
+  if (s && !currentSharedCode) {
+    s.history = s.history || [];
+    s.history.push({ date: Date.now(), score: fillinCorrect, total, mode: 'Fill in Blank' });
+    autoSave();
+  }
+  showResults(fillinCorrect, total, 'Fill in Blank');
+}
+
+function exitFillin() { goHome(); }
+
 
 // ─────────────────────────────────────────────────
 // RESULTS
