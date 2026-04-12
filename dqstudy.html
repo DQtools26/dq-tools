@@ -289,7 +289,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .view { display:none; }
 .view.active { display:block; }
 #view-landing.active { display:flex; flex-direction:column; }
-#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active { display:flex; flex-direction:column; }
+#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active { display:flex; flex-direction:column; }
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
@@ -501,6 +501,12 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .dot-know { background:var(--green); }
 .dot-review { background:var(--red); }
 .dot-unseen { background:var(--border2); }
+
+/* Smart Review rating buttons */
+.smart-rate-btn { border:2px solid; border-radius:12px; padding:10px 6px; cursor:pointer; font-family:inherit; text-align:center; transition:all var(--transition); }
+.smart-rate-btn:hover { transform:translateY(-2px); box-shadow:var(--shadow-sm); filter:brightness(1.1); }
+.smart-rate-label { font-size:.75rem; font-weight:800; margin-top:4px; }
+.smart-rate-sub { font-size:.6rem; opacity:.7; margin-top:2px; }
 
 /* Elimination grid tiles */
 .elim-tile { background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:12px 10px; text-align:center; cursor:pointer; transition:all .18s; font-size:.8rem; font-weight:700; line-height:1.3; min-height:72px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
@@ -925,6 +931,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <!-- ═══ SET PAGE ═══ -->
     <div class="view" id="view-set" style="padding:24px;">
       <div class="set-header" id="set-header"></div>
+      <div id="sr-due-badge"></div>
       <div class="mode-picker" id="mode-picker"></div>
       <div class="start-bar" id="start-bar"></div>
       <div class="home-section-title" id="cards-section-head">Cards <span id="cards-count-label" style="color:var(--text2);font-weight:600;font-size:.7rem;text-transform:none;letter-spacing:0;margin-left:4px;"></span></div>
@@ -1410,6 +1417,63 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="padding:10px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:28px;">
           <div style="text-align:center;"><div id="spell-correct-n" style="font-size:1.3rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Correct</div></div>
           <div style="text-align:center;"><div id="spell-wrong-n" style="font-size:1.3rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Wrong</div></div>
+        </div>
+      </div>
+
+
+      <!-- ═══ SMART REVIEW MODE ═══ -->
+      <div class="view" id="view-smart">
+        <div class="study-nav" style="background:rgba(155,89,182,.06);border-bottom-color:rgba(155,89,182,.2);">
+          <button class="study-back" onclick="exitSmartReview()">← Back</button>
+          <div class="study-title" style="color:var(--purple2);">📍 Smart Review</div>
+          <div class="study-prog-track"><div class="study-prog-fill" id="smart-prog" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--accent));"></div></div>
+          <div class="study-count" id="smart-count">0/0</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
+          <!-- Card -->
+          <div id="smart-card" style="width:100%;background:var(--surface);border:2px solid rgba(155,89,182,.3);border-radius:20px;padding:32px;text-align:center;font-size:1.2rem;font-weight:800;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;" onclick="flipSmartCard()">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent));"></div>
+            <div id="smart-card-label" style="font-size:.6rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--purple2);margin-bottom:4px;">TERM</div>
+            <div id="smart-card-front" style="line-height:1.4;"></div>
+            <div id="smart-card-back" style="display:none;padding-top:12px;border-top:1px solid var(--border);font-size:1rem;color:var(--text2);font-weight:600;line-height:1.5;"></div>
+            <div id="smart-flip-hint" style="font-size:.65rem;color:var(--text3);margin-top:8px;">tap to reveal →</div>
+          </div>
+
+          <!-- Rating buttons (hidden until flipped) -->
+          <div id="smart-rating-row" style="display:none;width:100%;display:none;">
+            <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:10px;">How well did you know this?</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+              <button class="smart-rate-btn" data-rating="0" onclick="rateSmartCard(0)" style="border-color:var(--red);background:var(--red-dim);color:var(--red2);">
+                <div style="font-size:1.1rem;">😵</div>
+                <div class="smart-rate-label">Again</div>
+                <div class="smart-rate-sub">1 day</div>
+              </button>
+              <button class="smart-rate-btn" data-rating="1" onclick="rateSmartCard(1)" style="border-color:var(--amber);background:var(--amber-dim);color:var(--amber2);">
+                <div style="font-size:1.1rem;">😓</div>
+                <div class="smart-rate-label">Hard</div>
+                <div class="smart-rate-sub">3 days</div>
+              </button>
+              <button class="smart-rate-btn" data-rating="3" onclick="rateSmartCard(3)" style="border-color:var(--teal);background:var(--teal-dim);color:var(--teal2);">
+                <div style="font-size:1.1rem;">🙂</div>
+                <div class="smart-rate-label">Good</div>
+                <div class="smart-rate-sub">7 days</div>
+              </button>
+              <button class="smart-rate-btn" data-rating="5" onclick="rateSmartCard(5)" style="border-color:var(--green);background:var(--green-dim);color:var(--green2);">
+                <div style="font-size:1.1rem;">😎</div>
+                <div class="smart-rate-label">Easy</div>
+                <div class="smart-rate-sub">14 days</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div id="smart-card-stats" style="display:none;font-size:.68rem;color:var(--text3);text-align:center;line-height:1.8;"></div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div style="padding:10px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:28px;">
+          <div style="text-align:center;"><div id="smart-done-n" style="font-size:1.3rem;font-weight:900;color:var(--purple2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Reviewed</div></div>
+          <div style="text-align:center;"><div id="smart-due-n" style="font-size:1.3rem;font-weight:900;color:var(--text2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Remaining</div></div>
         </div>
       </div>
 
@@ -2645,17 +2709,18 @@ function toggleSbFolder(id, el) {
 // SET PAGE
 // ─────────────────────────────────────────────────
 const MODES = [
-  {id:'flashcards', icon:'📇', name:'Flashcards', desc:'Flip through cards'},
-  {id:'quiz',       icon:'❓', name:'Quiz',       desc:'Multiple choice + T/F'},
-  {id:'test',       icon:'⏱', name:'Test',       desc:'Timed quiz mode'},
-  {id:'matching',   icon:'🔗', name:'Matching',   desc:'Match terms to defs'},
-  {id:'learn',      icon:'🧠', name:'Learn',      desc:'Type-in answers'},
-  {id:'speed',      icon:'⚡', name:'Speed Round', desc:'5 sec per card!'},
-  {id:'blitz',      icon:'💥', name:'Blitz',        desc:'60 sec, answer as many as you can'},
-  {id:'streak',     icon:'🎯', name:'Streak',       desc:'One wrong ends your run'},
-  {id:'elimination', icon:'🗑', name:'Elimination',  desc:'Clear the board one by one'},
-  {id:'fillin',      icon:'🧩', name:'Fill in Blank', desc:'Type the missing word'},
-  {id:'spelling',    icon:'🔤', name:'Spelling',      desc:'Hear it, spell it'},
+  {id:'flashcards',  icon:'📇', name:'Flashcards',    desc:'Flip cards, mark what you know'},
+  {id:'quiz',        icon:'❓', name:'Multiple Choice', desc:'4 options, pick the right one'},
+  {id:'test',        icon:'⏱', name:'Timed Test',      desc:'Quiz with a countdown clock'},
+  {id:'matching',    icon:'🔗', name:'Matching',        desc:'Click to pair terms & definitions'},
+  {id:'learn',       icon:'🧠', name:'Write It',        desc:'Study → pick → type. Until you know it.'},
+  {id:'speed',       icon:'⚡', name:'Speed Round',     desc:'Tap the right bubble before time runs out'},
+  {id:'blitz',       icon:'💥', name:'Blitz',           desc:'60 sec — answer as many as you can'},
+  {id:'streak',      icon:'🎯', name:'Streak',          desc:'One wrong answer ends your run'},
+  {id:'elimination', icon:'🗑', name:'Elimination',     desc:'Answer cards to clear them from the board'},
+  {id:'fillin',      icon:'🧩', name:'Fill in Blank',   desc:'Definition shown, type the missing word'},
+  {id:'spelling',    icon:'🔤', name:'Spelling',        desc:'Hear the term, type how its spelled'},
+  {id:'smart',       icon:'📍', name:'Smart Review',    desc:'Cards you struggle with, spaced for memory'},
 ];
 
 // ── SHARED SET (read-only live access) ──────────────
@@ -2748,6 +2813,17 @@ function renderSetPage(s, readOnly) {
     </div>
   `;
 
+  // Smart Review due badge
+  const _srBadge = document.getElementById('sr-due-badge');
+  if (_srBadge) {
+    if (!readOnly) {
+      _srBadge.innerHTML = getSmartBadge(s);
+      _srBadge.style.display = '';
+    } else {
+      _srBadge.style.display = 'none';
+    }
+  }
+
   document.getElementById('mode-picker').innerHTML = MODES.map(m => `
     <div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
       <span class="mode-btn-icon">${m.icon}</span>
@@ -2788,6 +2864,7 @@ function openStudyOpts() {
 
   document.getElementById('study-opts-title').textContent =
     MODES.find(m=>m.id===mode)?.icon + ' ' + MODES.find(m=>m.id===mode)?.name + ' Options';
+  if (mode === 'smart') smartSet = getCurrentSet(); // pre-set for badge count in opts
 
   // Universal card count selector shown for all modes
   const universalCards = `
@@ -2918,6 +2995,13 @@ function openStudyOpts() {
           <option value="2">2 characters off</option>
         </select>
       </div>`;
+  } else if (mode === 'smart') {
+    const _sDue = smartSet ? getSmartDueCount(smartSet) : 0;
+    body += `
+      <div style="padding:10px 12px;background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.25);border-radius:8px;font-size:.75rem;color:var(--purple2);margin-bottom:12px;line-height:1.6;">
+        📍 <strong>Smart Review</strong> shows cards based on when you last reviewed them and how well you know them. Rate each card after flipping to set its next review date.
+        ${_sDue > 0 ? `<br><strong>${_sDue} card${_sDue===1?'':'s'} due right now.</strong>` : ''}
+      </div>`;
   } else if (mode === 'spelling') {
     body += `
       <div style="padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(58,127,255,.2);border-radius:8px;font-size:.75rem;color:var(--accent2);margin-bottom:12px;line-height:1.6;">
@@ -3043,6 +3127,8 @@ function confirmLaunch() {
   } else if (mode === 'fillin') {
     studyOpts.fillinDir = document.getElementById('opt-fillin-dir')?.value || 'normal';
     studyOpts.fillinTolerance = parseInt(document.getElementById('opt-fillin-tolerance')?.value || '1');
+  } else if (mode === 'smart') {
+    // No extra opts — card count already handled universally
   } else if (mode === 'spelling') {
     studyOpts.spellDir = document.getElementById('opt-spell-dir')?.value || 'term';
     studyOpts.spellRate = parseFloat(document.getElementById('opt-spell-rate')?.value || '1');
@@ -3188,6 +3274,7 @@ function launchStudy() {
   else if (selectedMode === 'elimination') startElimination();
   else if (selectedMode === 'fillin') startFillin();
   else if (selectedMode === 'spelling') startSpelling();
+  else if (selectedMode === 'smart') startSmartReview();
 }
 
 // ─────────────────────────────────────────────────
@@ -3377,7 +3464,7 @@ function renderQuizQ() {
         <div class="quiz-q-text">${esc(q.q)}</div>
       </div>
       <div class="quiz-options">${q.opts.map((o,i)=>`
-        <button class="quiz-opt" onclick="answerMC(this,'${esc(o)}','${esc(q.correct)}')">
+        <button class="quiz-opt" data-chosen="${esc(o)}" data-answer="${esc(q.correct)}" onclick="answerMC(this,this.dataset.chosen,this.dataset.answer)">
           <span class="quiz-opt-letter">${'ABCD'[i]}</span>${esc(o)}
         </button>`).join('')}
       </div>
@@ -3894,7 +3981,7 @@ function renderBlitzCard() {
 
   const grid = document.getElementById('blitz-choices');
   grid.innerHTML = choices.map(ch => `
-    <button class="blitz-btn" onclick="blitzAnswer(this,'${esc(ch)}','${esc(answer)}')">${esc(ch)}</button>
+    <button class="blitz-btn" data-chosen="${esc(ch)}" data-answer="${esc(answer)}" onclick="blitzAnswer(this,this.dataset.chosen,this.dataset.answer)">${esc(ch)}</button>
   `).join('');
 }
 
@@ -4029,7 +4116,7 @@ function renderStreakCard() {
 
   const grid = document.getElementById('streak-choices');
   grid.innerHTML = choices.map(ch => `
-    <button class="streak-btn" onclick="streakAnswer(this,'${esc(ch)}','${esc(answer)}')">${esc(ch)}</button>
+    <button class="streak-btn" data-chosen="${esc(ch)}" data-answer="${esc(answer)}" onclick="streakAnswer(this,this.dataset.chosen,this.dataset.answer)">${esc(ch)}</button>
   `).join('');
 
   // Per-card timer if enabled
@@ -4154,7 +4241,7 @@ function openElimCard(idx) {
     const wrongs = shuffle(wrongPool).slice(0,3).map(c => dir === 'reverse' ? c.front : c.back);
     const choices = shuffle([answer, ...wrongs]);
     document.getElementById('elim-choices').innerHTML = choices.map(ch =>
-      `<button class="blitz-btn" onclick="submitElimAnswer('${esc(ch)}','${esc(answer)}',${idx})">${esc(ch)}</button>`
+      `<button class="blitz-btn" data-chosen="${esc(ch)}" data-answer="${esc(answer)}" data-idx="${idx}" onclick="submitElimAnswer(this.dataset.chosen,this.dataset.answer,this.dataset.idx)">${esc(ch)}</button>`
     ).join('');
   } else {
     // Written
@@ -4171,6 +4258,7 @@ function openElimCard(idx) {
 }
 
 function submitElimAnswer(chosen, correct, idx) {
+  idx = parseInt(idx);
   const isCorrect = chosen.trim().toLowerCase() === correct.trim().toLowerCase();
   document.querySelectorAll('#elim-choices .blitz-btn').forEach(b => {
     b.disabled = true;
@@ -4658,6 +4746,257 @@ function finishSpelling() {
 function exitSpelling() {
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
   goHome();
+}
+
+
+
+// ─────────────────────────────────────────────────
+// SMART REVIEW — spaced repetition mode
+// ─────────────────────────────────────────────────
+
+// SM-2 interval days by rating
+const SR_INTERVALS = { 0: 1, 1: 3, 3: 7, 5: 14 };
+
+// Ensure a card has SR fields, initializing from existing mastery if needed
+function ensureCardSR(card) {
+  if (!card.srInterval) card.srInterval = 1;
+  if (!card.srNextReview) {
+    // Initialize based on existing mastery — known cards due in 7 days, unseen due now
+    const offset = card.mastery === 'know' ? 7 : card.mastery === 'review' ? 1 : 0;
+    card.srNextReview = Date.now() - (7 - offset) * 86400000; // already due if unseen/review
+  }
+  if (!card.srTimesCorrect) card.srTimesCorrect = 0;
+  if (!card.srTimesWrong) card.srTimesWrong = 0;
+  if (!card.srLastSeen) card.srLastSeen = 0;
+  return card;
+}
+
+// Get cards due for review in a set
+function getSmartCards(s) {
+  const now = Date.now();
+  const cards = allCards(s).map(c => ensureCardSR(c));
+  // Due = nextReview is in the past, or never reviewed
+  const due = cards.filter(c => c.srNextReview <= now);
+  // Sort: most overdue first, then by wrong rate
+  due.sort((a, b) => {
+    const aDays = (now - a.srNextReview) / 86400000;
+    const bDays = (now - b.srNextReview) / 86400000;
+    return bDays - aDays;
+  });
+  return due;
+}
+
+// Get count of due cards for the set page badge
+function getSmartDueCount(s) {
+  const now = Date.now();
+  return allCards(s).filter(c => {
+    ensureCardSR(c);
+    return c.srNextReview <= now;
+  }).length;
+}
+
+// Smart Review state
+let smartCards = [], smartIdx = 0, smartDone = 0, smartFlipped = false;
+let smartSet = null;
+
+function startSmartReview() {
+  smartSet = getCurrentSet();
+  if (!smartSet) return;
+
+  // Build card queue
+  let queue = getSmartCards(smartSet);
+
+  // If no cards due, offer to review all anyway
+  if (!queue.length) {
+    if (confirm('No cards are due for review right now! Review all ' + allCards(smartSet).length + ' cards anyway?')) {
+      queue = allCards(smartSet).map(c => ensureCardSR(c));
+      queue.sort((a, b) => {
+        const aRate = (a.srTimesCorrect + a.srTimesWrong) > 0
+          ? a.srTimesWrong / (a.srTimesCorrect + a.srTimesWrong) : 1;
+        const bRate = (b.srTimesCorrect + b.srTimesWrong) > 0
+          ? b.srTimesWrong / (b.srTimesCorrect + b.srTimesWrong) : 1;
+        return bRate - aRate; // hardest first
+      });
+    } else {
+      return;
+    }
+  }
+
+  // Apply card count limit from study opts
+  const limit = studyOpts.cardCount || queue.length;
+  smartCards = queue.slice(0, limit);
+  smartIdx = 0; smartDone = 0; smartFlipped = false;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-smart').classList.add('active');
+  renderSmartCard();
+}
+
+function renderSmartCard() {
+  if (smartIdx >= smartCards.length) { finishSmartReview(); return; }
+  smartFlipped = false;
+
+  const card = smartCards[smartIdx];
+  const total = smartCards.length;
+  const pct = (smartIdx / total) * 100;
+
+  document.getElementById('smart-prog').style.width = pct + '%';
+  document.getElementById('smart-count').textContent = (smartIdx + 1) + '/' + total;
+  document.getElementById('smart-done-n').textContent = smartDone;
+  document.getElementById('smart-due-n').textContent = total - smartIdx;
+
+  // Card front
+  document.getElementById('smart-card-label').textContent = 'TERM';
+  document.getElementById('smart-card-front').textContent = card.front;
+  document.getElementById('smart-card-back').style.display = 'none';
+  document.getElementById('smart-card-back').textContent = card.back;
+  document.getElementById('smart-flip-hint').style.display = '';
+  document.getElementById('smart-rating-row').style.display = 'none';
+
+  // Card stats
+  const total_attempts = (card.srTimesCorrect || 0) + (card.srTimesWrong || 0);
+  const accuracy = total_attempts > 0
+    ? Math.round((card.srTimesCorrect || 0) / total_attempts * 100) + '%'
+    : 'New';
+  const nextDue = card.srNextReview
+    ? (() => {
+        const days = Math.round((card.srNextReview - Date.now()) / 86400000);
+        if (days < 0) return Math.abs(days) + 'd overdue';
+        if (days === 0) return 'due today';
+        return 'due in ' + days + 'd';
+      })()
+    : 'new card';
+  const statsEl = document.getElementById('smart-card-stats');
+  statsEl.style.display = 'none';
+  statsEl.innerHTML = `Seen ${total_attempts}x · Accuracy: ${accuracy} · ${nextDue}`;
+
+  // Reset card style
+  const cardEl = document.getElementById('smart-card');
+  cardEl.style.borderColor = 'rgba(155,89,182,.3)';
+}
+
+function flipSmartCard() {
+  if (smartFlipped) return;
+  smartFlipped = true;
+
+  document.getElementById('smart-card-back').style.display = '';
+  document.getElementById('smart-flip-hint').style.display = 'none';
+  document.getElementById('smart-rating-row').style.display = '';
+  document.getElementById('smart-card-stats').style.display = '';
+  document.getElementById('smart-card-label').textContent = 'TERM → DEFINITION';
+  sndClick();
+}
+
+function rateSmartCard(rating) {
+  if (!smartFlipped) return;
+  const card = smartCards[smartIdx];
+
+  // Update SR fields
+  const now = Date.now();
+  const intervalDays = SR_INTERVALS[rating] || 1;
+  card.srInterval = intervalDays;
+  card.srNextReview = now + intervalDays * 86400000;
+  card.srLastSeen = now;
+
+  if (rating >= 3) {
+    card.srTimesCorrect = (card.srTimesCorrect || 0) + 1;
+    // Update legacy mastery too
+    if (rating === 5) card.mastery = 'know';
+    else if (card.mastery === 'unseen') card.mastery = 'review';
+  } else {
+    card.srTimesWrong = (card.srTimesWrong || 0) + 1;
+    card.mastery = 'review';
+  }
+
+  // Flash card border color
+  const colors = { 0: 'var(--red)', 1: 'var(--amber)', 3: 'var(--teal)', 5: 'var(--green)' };
+  const cardEl = document.getElementById('smart-card');
+  cardEl.style.borderColor = colors[rating] || 'var(--border2)';
+
+  smartDone++;
+  autoSave();
+  sndClick();
+
+  setTimeout(() => {
+    smartIdx++;
+    renderSmartCard();
+  }, 300);
+}
+
+function finishSmartReview() {
+  const s = smartSet;
+  if (s && !currentSharedCode) {
+    s.history = s.history || [];
+    s.history.push({ date: Date.now(), score: smartDone, total: smartCards.length, mode: 'Smart Review' });
+    autoSave();
+  }
+
+  // Custom results screen for smart review
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-results');
+  el.classList.add('active');
+
+  const nextDueCards = s ? allCards(s).filter(c => {
+    const tomorrow = Date.now() + 86400000;
+    return c.srNextReview && c.srNextReview <= tomorrow;
+  }).length : 0;
+
+  el.innerHTML = `
+    <div style="max-width:520px;margin:0 auto;padding:40px 24px;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">📍</div>
+      <div style="font-size:1.6rem;font-weight:900;margin-bottom:4px;">Review Complete</div>
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:28px;">Your intervals have been updated</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2rem;font-weight:900;color:var(--purple2);">${smartDone}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Reviewed</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2rem;font-weight:900;color:var(--amber2);">${nextDueCards}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Due Tomorrow</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2rem;font-weight:900;color:var(--green2);">${s ? allCards(s).filter(c=>c.mastery==='know').length : 0}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Mastered</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--text2);line-height:1.7;">
+        ${buildSmartSummary()}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startSmartReview()">📍 Review Again</button>
+        <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+      </div>
+    </div>`;
+  sndComplete();
+}
+
+function buildSmartSummary() {
+  const counts = { 0: 0, 1: 0, 3: 0, 5: 0 };
+  // We don't track per-card ratings during session, so summarize from card data
+  const s = smartSet; if (!s) return '';
+  const rated = smartCards;
+  // Show next review dates
+  const byInterval = {};
+  rated.forEach(card => {
+    const days = card.srInterval || 1;
+    byInterval[days] = (byInterval[days] || 0) + 1;
+  });
+  return Object.entries(byInterval)
+    .sort((a,b) => a[0]-b[0])
+    .map(([days, count]) => `${count} card${count===1?'':'s'} → review in ${days} day${days==1?'':'s'}`)
+    .join('<br>') || 'All cards reviewed';
+}
+
+function exitSmartReview() { goHome(); }
+
+// ── Update set page to show Smart Review due count ──
+function getSmartBadge(s) {
+  const due = getSmartDueCount(s);
+  if (due === 0) return '';
+  return `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.3);border-radius:8px;padding:5px 10px;font-size:.72rem;font-weight:800;color:var(--purple2);cursor:pointer;margin-bottom:12px;" onclick="selectedMode='smart';openStudyOpts()">
+    📍 ${due} card${due===1?'':'s'} due for review
+  </div>`;
 }
 
 
