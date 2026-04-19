@@ -289,7 +289,55 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .view { display:none; }
 .view.active { display:block; }
 #view-landing.active { display:flex; flex-direction:column; }
-#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active { display:flex; flex-direction:column; }
+#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active, #view-gravity.active { display:flex; flex-direction:column; }
+
+/* ═══ GRAVITY MODE ═══ */
+.gravity-term {
+  position: absolute;
+  background: var(--surface);
+  border: 2px solid rgba(99,179,237,.4);
+  border-radius: 14px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  cursor: default;
+  transition: border-color .15s, box-shadow .15s;
+  user-select: none;
+}
+.gravity-term.targeted {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99,179,237,.25), 0 4px 16px rgba(0,0,0,.3);
+}
+.gravity-term.correct-flash {
+  border-color: var(--green);
+  background: var(--green-dim);
+  color: var(--green2);
+}
+.gravity-term.wrong-flash {
+  border-color: var(--red);
+  background: var(--red-dim);
+  color: var(--red2);
+}
+.gravity-combo-burst {
+  position: absolute;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--amber2);
+  pointer-events: none;
+  animation: gravityBurst .7s ease-out forwards;
+  z-index: 10;
+}
+@keyframes gravityBurst {
+  0%   { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(-40px) scale(1.3); }
+}
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
@@ -502,12 +550,6 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .dot-review { background:var(--red); }
 .dot-unseen { background:var(--border2); }
 
-/* Smart Review rating buttons */
-.smart-rate-btn { border:2px solid; border-radius:12px; padding:10px 6px; cursor:pointer; font-family:inherit; text-align:center; transition:all var(--transition); }
-.smart-rate-btn:hover { transform:translateY(-2px); box-shadow:var(--shadow-sm); filter:brightness(1.1); }
-.smart-rate-label { font-size:.75rem; font-weight:800; margin-top:4px; }
-.smart-rate-sub { font-size:.6rem; opacity:.7; margin-top:2px; }
-
 /* Elimination grid tiles */
 .elim-tile { background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:12px 10px; text-align:center; cursor:pointer; transition:all .18s; font-size:.8rem; font-weight:700; line-height:1.3; min-height:72px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
 .elim-tile:hover { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
@@ -519,6 +561,25 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .fillin-blank { display:inline-block; border-bottom:3px solid var(--accent); min-width:80px; text-align:center; color:var(--accent2); font-weight:900; padding:0 4px; }
 .fillin-blank.revealed { color:var(--green2); border-bottom-color:var(--green); }
 .fillin-blank.wrong { color:var(--red2); border-bottom-color:var(--red); }
+
+/* Card font size variable */
+:root { --card-font-size: .88rem; }
+.card-front-text { font-size: var(--card-font-size); }
+.card-back-text  { font-size: calc(var(--card-font-size) * 0.95); }
+
+/* Compact mode */
+body.compact .recent-grid,
+body.compact .home-sets-grid { gap:6px; }
+body.compact .home-body { padding:16px 24px; gap:0; }
+body.compact .home-sec { margin-top:14px; margin-bottom:6px; }
+body.compact .home-focus-card { padding:12px 14px; }
+body.compact .settings-section { padding:12px 14px; margin-bottom:8px; }
+body.compact #view-set { padding:14px; }
+
+/* Font size picker buttons */
+.settings-fontsize-btn { padding:7px 14px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text2); font-family:inherit; font-weight:700; cursor:pointer; transition:all var(--transition); }
+.settings-fontsize-btn:hover { border-color:var(--border2); color:var(--text); }
+.settings-fontsize-btn.active { background:var(--accent-dim); border-color:rgba(58,127,255,.4); color:var(--accent2); }
 
 /* Blitz / Streak answer buttons */
 .blitz-btn { background:var(--surface); border:2px solid var(--border); border-radius:14px; padding:16px 12px; font-family:inherit; font-size:.88rem; font-weight:700; color:var(--text); cursor:pointer; transition:all .12s; text-align:center; line-height:1.3; }
@@ -1209,6 +1270,27 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="font-size:.7rem;color:var(--text3);">Animated backgrounds appear behind all content. May affect performance on older devices.</div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">🔤 Card Text Size</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="settings-fontsize-btn" data-size="small" onclick="setCardFontSize('small')" style="font-size:.78rem;">Small</button>
+          <button class="settings-fontsize-btn active" data-size="medium" onclick="setCardFontSize('medium')" style="font-size:.88rem;">Medium</button>
+          <button class="settings-fontsize-btn" data-size="large" onclick="setCardFontSize('large')" style="font-size:1rem;">Large</button>
+          <button class="settings-fontsize-btn" data-size="xlarge" onclick="setCardFontSize('xlarge')" style="font-size:1.1rem;">X-Large</button>
+        </div>
+        <div style="font-size:.7rem;color:var(--text3);margin-top:8px;">Affects text size on flashcards and card tiles.</div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">🏠 Home Appearance</div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Animated blobs on home</div><div class="settings-toggle-sub">Glowing background orbs in the hero section</div></div>
+          <button class="toggle on" id="home-blobs-toggle" onclick="toggleHomeBlobs()"></button>
+        </div>
+        <div class="settings-toggle-row" style="margin-top:10px;">
+          <div><div class="settings-toggle-label">Compact mode</div><div class="settings-toggle-sub">Tighter spacing throughout the app</div></div>
+          <button class="toggle" id="compact-toggle" onclick="toggleCompact()"></button>
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">🔗 Sharing & Codes</div>
         <div class="settings-toggle-row">
           <div>
@@ -1421,6 +1503,10 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
 
 
+
+
+
+
       <!-- ═══ SMART REVIEW MODE ═══ -->
       <div class="view" id="view-smart">
         <div class="study-nav" style="background:rgba(155,89,182,.06);border-bottom-color:rgba(155,89,182,.2);">
@@ -1429,51 +1515,78 @@ textarea.finp { resize:vertical; min-height:50px; }
           <div class="study-prog-track"><div class="study-prog-fill" id="smart-prog" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--accent));"></div></div>
           <div class="study-count" id="smart-count">0/0</div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
-          <!-- Card -->
-          <div id="smart-card" style="width:100%;background:var(--surface);border:2px solid rgba(155,89,182,.3);border-radius:20px;padding:32px;text-align:center;font-size:1.2rem;font-weight:800;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;" onclick="flipSmartCard()">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent));"></div>
-            <div id="smart-card-label" style="font-size:.6rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--purple2);margin-bottom:4px;">TERM</div>
-            <div id="smart-card-front" style="line-height:1.4;"></div>
-            <div id="smart-card-back" style="display:none;padding-top:12px;border-top:1px solid var(--border);font-size:1rem;color:var(--text2);font-weight:600;line-height:1.5;"></div>
-            <div id="smart-flip-hint" style="font-size:.65rem;color:var(--text3);margin-top:8px;">tap to reveal →</div>
-          </div>
 
-          <!-- Rating buttons (hidden until flipped) -->
-          <div id="smart-rating-row" style="display:none;width:100%;display:none;">
-            <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:10px;">How well did you know this?</div>
+        <!-- PHASE 1: Flip the card -->
+        <div id="smart-phase-flip" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px;max-width:640px;margin:0 auto;width:100%;">
+          <div style="font-size:.68rem;color:var(--text3);width:100%;display:flex;justify-content:space-between;">
+            <span id="smart-card-stats"></span>
+            <span id="smart-streak-info" style="color:var(--amber2);font-weight:800;"></span>
+          </div>
+          <div id="smart-card" onclick="flipSmartCard()" style="width:100%;background:var(--surface);border:2px solid rgba(155,89,182,.3);border-radius:20px;padding:32px 28px;text-align:center;cursor:pointer;transition:border-color .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent));"></div>
+            <div id="smart-front" style="font-size:1.3rem;font-weight:800;line-height:1.4;"></div>
+            <div id="smart-back" style="font-size:1rem;color:var(--text2);font-weight:600;line-height:1.5;padding-top:14px;border-top:1px solid var(--border);width:100%;display:none;"></div>
+            <div id="smart-flip-hint" style="font-size:.68rem;color:var(--text3);">tap to reveal →</div>
+          </div>
+          <!-- Difficulty rating (optional, shown after flip) -->
+          <div id="smart-difficulty-row" style="display:none;width:100%;">
+            <div style="font-size:.62rem;color:var(--text3);text-align:center;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">How hard was that?</div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-              <button class="smart-rate-btn" data-rating="0" onclick="rateSmartCard(0)" style="border-color:var(--red);background:var(--red-dim);color:var(--red2);">
-                <div style="font-size:1.1rem;">😵</div>
-                <div class="smart-rate-label">Again</div>
-                <div class="smart-rate-sub">1 day</div>
-              </button>
-              <button class="smart-rate-btn" data-rating="1" onclick="rateSmartCard(1)" style="border-color:var(--amber);background:var(--amber-dim);color:var(--amber2);">
-                <div style="font-size:1.1rem;">😓</div>
-                <div class="smart-rate-label">Hard</div>
-                <div class="smart-rate-sub">3 days</div>
-              </button>
-              <button class="smart-rate-btn" data-rating="3" onclick="rateSmartCard(3)" style="border-color:var(--teal);background:var(--teal-dim);color:var(--teal2);">
-                <div style="font-size:1.1rem;">🙂</div>
-                <div class="smart-rate-label">Good</div>
-                <div class="smart-rate-sub">7 days</div>
-              </button>
-              <button class="smart-rate-btn" data-rating="5" onclick="rateSmartCard(5)" style="border-color:var(--green);background:var(--green-dim);color:var(--green2);">
-                <div style="font-size:1.1rem;">😎</div>
-                <div class="smart-rate-label">Easy</div>
-                <div class="smart-rate-sub">14 days</div>
-              </button>
+              <button onclick="smartRateDifficulty(0)" style="padding:10px 4px;border-radius:10px;border:2px solid var(--red);background:var(--red-dim);color:var(--red2);font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;">😵<br><span style="font-size:.6rem;">Again</span></button>
+              <button onclick="smartRateDifficulty(1)" style="padding:10px 4px;border-radius:10px;border:2px solid var(--amber);background:var(--amber-dim);color:var(--amber2);font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;">😓<br><span style="font-size:.6rem;">Hard</span></button>
+              <button onclick="smartRateDifficulty(3)" style="padding:10px 4px;border-radius:10px;border:2px solid var(--teal);background:var(--teal-dim);color:var(--teal2);font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;">🙂<br><span style="font-size:.6rem;">Good</span></button>
+              <button onclick="smartRateDifficulty(5)" style="padding:10px 4px;border-radius:10px;border:2px solid var(--green);background:var(--green-dim);color:var(--green2);font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;">😎<br><span style="font-size:.6rem;">Easy</span></button>
             </div>
           </div>
-
-          <!-- Stats row -->
-          <div id="smart-card-stats" style="display:none;font-size:.68rem;color:var(--text3);text-align:center;line-height:1.8;"></div>
+          <!-- Next button (shown after flip when difficulty mode OFF) -->
+          <button id="smart-next-btn" onclick="smartProceedToMC()" style="display:none;width:100%;" class="btn btn-primary">Got it — test me →</button>
         </div>
 
-        <!-- Bottom bar -->
-        <div style="padding:10px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:28px;">
-          <div style="text-align:center;"><div id="smart-done-n" style="font-size:1.3rem;font-weight:900;color:var(--purple2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Reviewed</div></div>
-          <div style="text-align:center;"><div id="smart-due-n" style="font-size:1.3rem;font-weight:900;color:var(--text2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Remaining</div></div>
+        <!-- PHASE 2: MC confirmation -->
+        <div id="smart-phase-mc" style="display:none;flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px;max-width:640px;margin:0 auto;width:100%;">
+          <div style="font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--purple2);width:100%;">Now pick the right answer:</div>
+          <div id="smart-mc-question" style="width:100%;background:var(--surface);border:2px solid rgba(155,89,182,.3);border-radius:16px;padding:22px;text-align:center;font-size:1.1rem;font-weight:800;line-height:1.4;"></div>
+          <div id="smart-mc-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;"></div>
+        </div>
+
+        <div style="padding:10px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:32px;">
+          <div style="text-align:center;"><div id="smart-correct-n" style="font-size:1.3rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Correct</div></div>
+          <div style="text-align:center;"><div id="smart-wrong-n" style="font-size:1.3rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.6rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Missed</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ GRAVITY MODE ═══ -->
+      <div class="view" id="view-gravity" style="flex-direction:column;overflow:hidden;">
+        <div class="study-nav" style="background:rgba(99,179,237,.06);border-bottom-color:rgba(99,179,237,.2);flex-shrink:0;">
+          <button class="study-back" onclick="exitGravity()">← Back</button>
+          <div class="study-title" style="color:#63b3ed;">🌧️ Gravity</div>
+          <div class="study-prog-track"><div class="study-prog-fill" id="gravity-prog" style="width:0%;background:linear-gradient(90deg,#63b3ed,var(--green));"></div></div>
+          <div class="study-count" id="gravity-count">0/0</div>
+        </div>
+        <!-- stats bar -->
+        <div style="display:flex;justify-content:center;gap:28px;padding:8px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;">
+          <div style="text-align:center;"><div id="gravity-correct-n" style="font-size:1.1rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Saved</div></div>
+          <div style="text-align:center;"><div id="gravity-wrong-n" style="font-size:1.1rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Crashed</div></div>
+          <div style="text-align:center;"><div id="gravity-combo-n" style="font-size:1.1rem;font-weight:900;color:var(--amber2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Combo</div></div>
+        </div>
+        <!-- arena -->
+        <div id="gravity-arena" style="flex:1;position:relative;overflow:hidden;background:var(--bg);min-height:0;">
+          <!-- danger zone line -->
+          <div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.4;"></div>
+          <!-- falling terms injected here by JS -->
+        </div>
+        <!-- input zone -->
+        <div style="padding:14px 20px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;">
+          <div style="max-width:560px;margin:0 auto;position:relative;">
+            <input id="gravity-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"
+              placeholder="Type the answer and press Enter…"
+              style="width:100%;padding:13px 50px 13px 16px;border-radius:12px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--font);font-size:1rem;font-weight:600;outline:none;transition:border-color .15s;"
+              onfocus="this.style.borderColor='#63b3ed'"
+              onblur="this.style.borderColor='var(--border2)'"
+              onkeydown="gravityInputKey(event)">
+            <button onclick="gravitySubmit()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#63b3ed;border:none;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">↵</button>
+          </div>
+          <div id="gravity-feedback" style="text-align:center;font-size:.78rem;font-weight:700;margin-top:6px;min-height:18px;color:var(--text3);"></div>
         </div>
       </div>
 
@@ -1903,7 +2016,10 @@ let soundEnabled = true;
 let volume = 0.5;
 let currentTheme = 'dark';
 let aiEnabled = true; // on by default, first-time prompt handled separately
-let sharingEnabled = true; // show/hide all sharing & codes features
+let sharingEnabled = true;
+let cardFontSize = 'medium'; // 'small' | 'medium' | 'large' | 'xlarge'
+let compactMode = false;
+let homeBlobsEnabled = true; // show/hide all sharing & codes features
 let aiSeenPrompt = false;
 let aiContext = 'set';
 let bgAnim = 'none';
@@ -2017,6 +2133,9 @@ function loadSettings() {
     }
     if (s.aiEnabled !== undefined) aiEnabled = s.aiEnabled;
     if (s.sharingEnabled !== undefined) sharingEnabled = s.sharingEnabled;
+    if (s.cardFontSize) cardFontSize = s.cardFontSize;
+    if (s.compactMode !== undefined) compactMode = s.compactMode;
+    if (s.homeBlobsEnabled !== undefined) homeBlobsEnabled = s.homeBlobsEnabled;
     aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
@@ -2024,9 +2143,12 @@ function loadSettings() {
   const at = document.getElementById('ai-toggle'); if (at) at.classList.toggle('on', aiEnabled);
   const st = document.getElementById('sharing-toggle'); if (st) st.classList.toggle('on', sharingEnabled);
   applySharingVisibility();
+  applyCardFontSize();
+  applyCompactMode();
+  applyHomeBlobsEnabled();
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
@@ -2378,11 +2500,7 @@ function renderHome(tab) {
   // ── HERO ──
   const heroHtml = `
     <div class="home-hero-section">
-      <div class="home-hero-blobs">
-        <div class="home-hero-blob hhb1"></div>
-        <div class="home-hero-blob hhb2"></div>
-        <div class="home-hero-blob hhb3"></div>
-      </div>
+      ${homeBlobsEnabled ? `<div class="home-hero-blobs"><div class="home-hero-blob hhb1"></div><div class="home-hero-blob hhb2"></div><div class="home-hero-blob hhb3"></div></div>` : ""}
       <div class="home-hero-inner">
         <div style="flex:1;min-width:240px;">
           <div class="home-greeting-text">${name ? `${greet}, <span class="hl">${esc(name)}</span>! 👋` : `${greet}! 👋`}</div>
@@ -2721,6 +2839,7 @@ const MODES = [
   {id:'fillin',      icon:'🧩', name:'Fill in Blank',   desc:'Definition shown, type the missing word'},
   {id:'spelling',    icon:'🔤', name:'Spelling',        desc:'Hear the term, type how its spelled'},
   {id:'smart',       icon:'📍', name:'Smart Review',    desc:'Cards you struggle with, spaced for memory'},
+  {id:'gravity',     icon:'🌧️', name:'Gravity',         desc:'Terms fall — type the answer before they land'},
 ];
 
 // ── SHARED SET (read-only live access) ──────────────
@@ -2814,13 +2933,13 @@ function renderSetPage(s, readOnly) {
   `;
 
   // Smart Review due badge
-  const _srBadge = document.getElementById('sr-due-badge');
-  if (_srBadge) {
+  const _srBadgeEl = document.getElementById('sr-due-badge');
+  if (_srBadgeEl) {
     if (!readOnly) {
-      _srBadge.innerHTML = getSmartBadge(s);
-      _srBadge.style.display = '';
+      _srBadgeEl.innerHTML = getSmartBadge(s);
+      _srBadgeEl.style.display = '';
     } else {
-      _srBadge.style.display = 'none';
+      _srBadgeEl.style.display = 'none';
     }
   }
 
@@ -2996,11 +3115,41 @@ function openStudyOpts() {
         </select>
       </div>`;
   } else if (mode === 'smart') {
-    const _sDue = smartSet ? getSmartDueCount(smartSet) : 0;
+    const _sDue = smartSet ? srDueCount(smartSet) : 0;
     body += `
       <div style="padding:10px 12px;background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.25);border-radius:8px;font-size:.75rem;color:var(--purple2);margin-bottom:12px;line-height:1.6;">
-        📍 <strong>Smart Review</strong> shows cards based on when you last reviewed them and how well you know them. Rate each card after flipping to set its next review date.
+        📍 Flip to see the answer, then pick the right one from 4 choices. Cards you miss come back sooner.
         ${_sDue > 0 ? `<br><strong>${_sDue} card${_sDue===1?'':'s'} due right now.</strong>` : ''}
+      </div>
+      <div class="settings-toggle-row">
+        <div><div class="settings-toggle-label">Difficulty rating</div><div class="settings-toggle-sub">After flipping, rate how hard it was (Again / Hard / Good / Easy)</div></div>
+        <button class="toggle" id="opt-smart-difficulty" onclick="this.classList.toggle('on')"></button>
+      </div>`;
+  } else if (mode === 'gravity') {
+    body += `
+      <div style="padding:10px 12px;background:rgba(99,179,237,.1);border:1px solid rgba(99,179,237,.25);border-radius:8px;font-size:.75rem;color:#63b3ed;margin-bottom:12px;line-height:1.6;">
+        🌧️ Terms fall from the top. Type the correct answer before they hit the ground!
+      </div>
+      <div class="field"><label class="flabel">Fall speed</label>
+        <select class="finp" id="opt-gravity-speed">
+          <option value="0.3">Slow (relaxed)</option>
+          <option value="0.5" selected>Normal</option>
+          <option value="0.8">Fast (challenging)</option>
+          <option value="1.2">Ludicrous 🔥</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Show</label>
+        <select class="finp" id="opt-gravity-dir">
+          <option value="normal">Term falls → type definition</option>
+          <option value="reverse">Definition falls → type term</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Typo tolerance</label>
+        <select class="finp" id="opt-gravity-tolerance">
+          <option value="0">Exact match</option>
+          <option value="1" selected>Allow 1 typo</option>
+          <option value="2">Allow 2 typos</option>
+        </select>
       </div>`;
   } else if (mode === 'spelling') {
     body += `
@@ -3128,7 +3277,11 @@ function confirmLaunch() {
     studyOpts.fillinDir = document.getElementById('opt-fillin-dir')?.value || 'normal';
     studyOpts.fillinTolerance = parseInt(document.getElementById('opt-fillin-tolerance')?.value || '1');
   } else if (mode === 'smart') {
-    // No extra opts — card count already handled universally
+    studyOpts.smartDifficulty = document.getElementById('opt-smart-difficulty')?.classList.contains('on') || false;
+  } else if (mode === 'gravity') {
+    studyOpts.gravitySpeed = parseFloat(document.getElementById('opt-gravity-speed')?.value || '0.5');
+    studyOpts.gravityDir = document.getElementById('opt-gravity-dir')?.value || 'normal';
+    studyOpts.gravityTolerance = parseInt(document.getElementById('opt-gravity-tolerance')?.value || '1');
   } else if (mode === 'spelling') {
     studyOpts.spellDir = document.getElementById('opt-spell-dir')?.value || 'term';
     studyOpts.spellRate = parseFloat(document.getElementById('opt-spell-rate')?.value || '1');
@@ -3275,6 +3428,7 @@ function launchStudy() {
   else if (selectedMode === 'fillin') startFillin();
   else if (selectedMode === 'spelling') startSpelling();
   else if (selectedMode === 'smart') startSmartReview();
+  else if (selectedMode === 'gravity') startGravity();
 }
 
 // ─────────────────────────────────────────────────
@@ -4750,84 +4904,73 @@ function exitSpelling() {
 
 
 
+
 // ─────────────────────────────────────────────────
-// SMART REVIEW — spaced repetition mode
+// SMART REVIEW — flip to see, MC to confirm
 // ─────────────────────────────────────────────────
 
-// SM-2 interval days by rating
-const SR_INTERVALS = { 0: 1, 1: 3, 3: 7, 5: 14 };
-
-// Ensure a card has SR fields, initializing from existing mastery if needed
-function ensureCardSR(card) {
-  if (!card.srInterval) card.srInterval = 1;
+function srInit(card) {
   if (!card.srNextReview) {
-    // Initialize based on existing mastery — known cards due in 7 days, unseen due now
-    const offset = card.mastery === 'know' ? 7 : card.mastery === 'review' ? 1 : 0;
-    card.srNextReview = Date.now() - (7 - offset) * 86400000; // already due if unseen/review
+    const daysOut = card.mastery === 'know' ? 7 : 0;
+    card.srNextReview = Date.now() + daysOut * 86400000;
   }
-  if (!card.srTimesCorrect) card.srTimesCorrect = 0;
-  if (!card.srTimesWrong) card.srTimesWrong = 0;
-  if (!card.srLastSeen) card.srLastSeen = 0;
+  if (card.srStreak === undefined)       card.srStreak = 0;
+  if (card.srTimesCorrect === undefined) card.srTimesCorrect = 0;
+  if (card.srTimesWrong === undefined)   card.srTimesWrong = 0;
   return card;
 }
 
-// Get cards due for review in a set
-function getSmartCards(s) {
+function srDueCards(s) {
   const now = Date.now();
-  const cards = allCards(s).map(c => ensureCardSR(c));
-  // Due = nextReview is in the past, or never reviewed
-  const due = cards.filter(c => c.srNextReview <= now);
-  // Sort: most overdue first, then by wrong rate
-  due.sort((a, b) => {
-    const aDays = (now - a.srNextReview) / 86400000;
-    const bDays = (now - b.srNextReview) / 86400000;
-    return bDays - aDays;
-  });
-  return due;
+  return allCards(s).map(c => srInit(c))
+    .filter(c => c.srNextReview <= now)
+    .sort((a, b) => a.srNextReview - b.srNextReview);
 }
 
-// Get count of due cards for the set page badge
-function getSmartDueCount(s) {
-  const now = Date.now();
-  return allCards(s).filter(c => {
-    ensureCardSR(c);
-    return c.srNextReview <= now;
-  }).length;
+function srDueCount(s) { return srDueCards(s).length; }
+
+function srSchedule(card, rating) {
+  // rating: 0=Again 1=Hard 3=Good 5=Easy (or auto from MC: 0=wrong 5=right)
+  const days = rating === 0 ? 1 : rating === 1 ? 3 : rating === 3 ? 7 : 21;
+  card.srNextReview = Date.now() + days * 86400000;
+  card.srStreak = rating >= 3 ? (card.srStreak || 0) + 1 : 0;
+  if (rating >= 3) { card.srTimesCorrect = (card.srTimesCorrect||0)+1; card.mastery='know'; }
+  else             { card.srTimesWrong  = (card.srTimesWrong||0)+1;  card.mastery='review'; }
+  autoSave();
 }
 
-// Smart Review state
-let smartCards = [], smartIdx = 0, smartDone = 0, smartFlipped = false;
-let smartSet = null;
+// State
+let smartCards=[], smartIdx=0, smartCorrect=0, smartWrong=0;
+let smartFlipped=false, smartUseDifficulty=false, smartMissedIds=new Set();
+let smartAllCards=[];
 
 function startSmartReview() {
-  smartSet = getCurrentSet();
-  if (!smartSet) return;
+  const s = getCurrentSet(); if (!s) return;
+  smartAllCards = allCards(s).map(c => srInit(c));
+  let due = srDueCards(s);
 
-  // Build card queue
-  let queue = getSmartCards(smartSet);
-
-  // If no cards due, offer to review all anyway
-  if (!queue.length) {
-    if (confirm('No cards are due for review right now! Review all ' + allCards(smartSet).length + ' cards anyway?')) {
-      queue = allCards(smartSet).map(c => ensureCardSR(c));
-      queue.sort((a, b) => {
-        const aRate = (a.srTimesCorrect + a.srTimesWrong) > 0
-          ? a.srTimesWrong / (a.srTimesCorrect + a.srTimesWrong) : 1;
-        const bRate = (b.srTimesCorrect + b.srTimesWrong) > 0
-          ? b.srTimesWrong / (b.srTimesCorrect + b.srTimesWrong) : 1;
-        return bRate - aRate; // hardest first
-      });
-    } else {
-      return;
-    }
+  if (!due.length) {
+    const weakest = [...smartAllCards]
+      .sort((a,b) => {
+        const at = (a.srTimesCorrect||0)+(a.srTimesWrong||0);
+        const bt = (b.srTimesCorrect||0)+(b.srTimesWrong||0);
+        const ar = at>0 ? (a.srTimesWrong||0)/at : 1;
+        const br = bt>0 ? (b.srTimesWrong||0)/bt : 1;
+        return br - ar;
+      })
+      .slice(0, 20);
+    const ok = confirm('All caught up — no cards due today!\n\nReview your ' + weakest.length + ' weakest cards instead?');
+    if (!ok) return;
+    due = weakest;
   }
 
-  // Apply card count limit from study opts
-  const limit = studyOpts.cardCount || queue.length;
-  smartCards = queue.slice(0, limit);
-  smartIdx = 0; smartDone = 0; smartFlipped = false;
+  const limit = studyOpts.cardCount || due.length;
+  smartCards = shuffle(due).slice(0, limit);
+  smartIdx=0; smartCorrect=0; smartWrong=0;
+  smartFlipped=false; smartMissedIds=new Set();
+  smartUseDifficulty = studyOpts.smartDifficulty || false;
 
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-smart').classList.add('active');
   renderSmartCard();
 }
@@ -4838,167 +4981,168 @@ function renderSmartCard() {
 
   const card = smartCards[smartIdx];
   const total = smartCards.length;
-  const pct = (smartIdx / total) * 100;
-
-  document.getElementById('smart-prog').style.width = pct + '%';
-  document.getElementById('smart-count').textContent = (smartIdx + 1) + '/' + total;
-  document.getElementById('smart-done-n').textContent = smartDone;
-  document.getElementById('smart-due-n').textContent = total - smartIdx;
-
-  // Card front
-  document.getElementById('smart-card-label').textContent = 'TERM';
-  document.getElementById('smart-card-front').textContent = card.front;
-  document.getElementById('smart-card-back').style.display = 'none';
-  document.getElementById('smart-card-back').textContent = card.back;
-  document.getElementById('smart-flip-hint').style.display = '';
-  document.getElementById('smart-rating-row').style.display = 'none';
+  document.getElementById('smart-prog').style.width = (smartIdx/total*100)+'%';
+  document.getElementById('smart-count').textContent = (smartIdx+1)+'/'+total;
+  document.getElementById('smart-correct-n').textContent = smartCorrect;
+  document.getElementById('smart-wrong-n').textContent = smartWrong;
 
   // Card stats
-  const total_attempts = (card.srTimesCorrect || 0) + (card.srTimesWrong || 0);
-  const accuracy = total_attempts > 0
-    ? Math.round((card.srTimesCorrect || 0) / total_attempts * 100) + '%'
-    : 'New';
-  const nextDue = card.srNextReview
-    ? (() => {
-        const days = Math.round((card.srNextReview - Date.now()) / 86400000);
-        if (days < 0) return Math.abs(days) + 'd overdue';
-        if (days === 0) return 'due today';
-        return 'due in ' + days + 'd';
-      })()
-    : 'new card';
-  const statsEl = document.getElementById('smart-card-stats');
-  statsEl.style.display = 'none';
-  statsEl.innerHTML = `Seen ${total_attempts}x · Accuracy: ${accuracy} · ${nextDue}`;
+  const seen = (card.srTimesCorrect||0)+(card.srTimesWrong||0);
+  const acc = seen>0 ? Math.round((card.srTimesCorrect||0)/seen*100)+'% accuracy' : 'New card';
+  document.getElementById('smart-card-stats').textContent = acc + (seen>0?' ('+seen+' reviews)':'');
+  const streak = card.srStreak||0;
+  document.getElementById('smart-streak-info').textContent = streak>=2 ? '🔥 '+streak+' streak' : '';
 
-  // Reset card style
-  const cardEl = document.getElementById('smart-card');
-  cardEl.style.borderColor = 'rgba(155,89,182,.3)';
+  // Show flip phase
+  showEl('smart-phase-flip', true);
+  showEl('smart-phase-mc', false);
+  document.getElementById('smart-front').textContent = card.front;
+  document.getElementById('smart-back').style.display = 'none';
+  document.getElementById('smart-back').textContent = card.back;
+  document.getElementById('smart-flip-hint').style.display = '';
+  document.getElementById('smart-difficulty-row').style.display = 'none';
+  document.getElementById('smart-next-btn').style.display = 'none';
+  document.getElementById('smart-card').style.borderColor = 'rgba(155,89,182,.3)';
+  document.getElementById('smart-card').style.cursor = 'pointer';
+}
+
+function showEl(id, show) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = show ? 'flex' : 'none';
 }
 
 function flipSmartCard() {
   if (smartFlipped) return;
   smartFlipped = true;
-
-  document.getElementById('smart-card-back').style.display = '';
+  document.getElementById('smart-back').style.display = '';
   document.getElementById('smart-flip-hint').style.display = 'none';
-  document.getElementById('smart-rating-row').style.display = '';
-  document.getElementById('smart-card-stats').style.display = '';
-  document.getElementById('smart-card-label').textContent = 'TERM → DEFINITION';
+  document.getElementById('smart-card').style.cursor = 'default';
   sndClick();
+
+  if (smartUseDifficulty) {
+    document.getElementById('smart-difficulty-row').style.display = '';
+  } else {
+    document.getElementById('smart-next-btn').style.display = '';
+  }
 }
 
-function rateSmartCard(rating) {
-  if (!smartFlipped) return;
+function smartRateDifficulty(rating) {
+  // Difficulty rating mode — rate then go to MC
   const card = smartCards[smartIdx];
+  card._pendingRating = rating; // store, apply after MC
+  smartProceedToMC();
+}
 
-  // Update SR fields
-  const now = Date.now();
-  const intervalDays = SR_INTERVALS[rating] || 1;
-  card.srInterval = intervalDays;
-  card.srNextReview = now + intervalDays * 86400000;
-  card.srLastSeen = now;
+function smartProceedToMC() {
+  const card = smartCards[smartIdx];
+  showEl('smart-phase-flip', false);
+  showEl('smart-phase-mc', true);
 
-  if (rating >= 3) {
-    card.srTimesCorrect = (card.srTimesCorrect || 0) + 1;
-    // Update legacy mastery too
-    if (rating === 5) card.mastery = 'know';
-    else if (card.mastery === 'unseen') card.mastery = 'review';
+  document.getElementById('smart-mc-question').textContent = card.front;
+
+  // Build 4 choices
+  const correct = card.back;
+  const wrongPool = smartAllCards.filter(c => c.back !== correct);
+  const wrongs = shuffle(wrongPool).slice(0,3).map(c=>c.back);
+  const choices = shuffle([correct, ...wrongs]);
+
+  document.getElementById('smart-mc-choices').innerHTML = choices.map(ch =>
+    `<button class="blitz-btn" data-chosen="${esc(ch)}" data-answer="${esc(correct)}" onclick="submitSmartMC(this)">${esc(ch)}</button>`
+  ).join('');
+}
+
+function submitSmartMC(btn) {
+  const chosen = btn.dataset.chosen;
+  const correct = btn.dataset.answer;
+  const card = smartCards[smartIdx];
+  const isCorrect = chosen === correct;
+
+  document.querySelectorAll('#smart-mc-choices .blitz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.dataset.chosen === correct) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+
+  if (isCorrect) {
+    smartCorrect++;
+    sndCorrect();
+    // Use pending difficulty rating if set, else auto-good
+    const rating = card._pendingRating !== undefined ? card._pendingRating : 5;
+    srSchedule(card, rating);
+    delete card._pendingRating;
   } else {
-    card.srTimesWrong = (card.srTimesWrong || 0) + 1;
-    card.mastery = 'review';
+    smartWrong++;
+    sndWrong();
+    srSchedule(card, 0); // again tomorrow
+    // Re-queue if not already missed
+    if (!smartMissedIds.has(card.front)) {
+      smartMissedIds.add(card.front);
+      smartCards.push({...card});
+    }
   }
 
-  // Flash card border color
-  const colors = { 0: 'var(--red)', 1: 'var(--amber)', 3: 'var(--teal)', 5: 'var(--green)' };
-  const cardEl = document.getElementById('smart-card');
-  cardEl.style.borderColor = colors[rating] || 'var(--border2)';
-
-  smartDone++;
-  autoSave();
-  sndClick();
-
-  setTimeout(() => {
-    smartIdx++;
-    renderSmartCard();
-  }, 300);
+  document.getElementById('smart-correct-n').textContent = smartCorrect;
+  document.getElementById('smart-wrong-n').textContent = smartWrong;
+  setTimeout(() => { smartIdx++; renderSmartCard(); }, isCorrect ? 400 : 900);
 }
 
 function finishSmartReview() {
-  const s = smartSet;
+  const s = getCurrentSet();
   if (s && !currentSharedCode) {
-    s.history = s.history || [];
-    s.history.push({ date: Date.now(), score: smartDone, total: smartCards.length, mode: 'Smart Review' });
+    s.history = s.history||[];
+    s.history.push({date:Date.now(), score:smartCorrect, total:smartCorrect+smartWrong, mode:'Smart Review'});
     autoSave();
   }
+  sndComplete();
 
-  // Custom results screen for smart review
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const dueTomorrow = s ? allCards(s).filter(c=>c.srNextReview && c.srNextReview <= Date.now()+86400000).length : 0;
+  const stillDue = s ? srDueCount(s) : 0;
+  const pct = (smartCorrect+smartWrong)>0 ? Math.round(smartCorrect/(smartCorrect+smartWrong)*100) : 0;
+
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   const el = document.getElementById('view-results');
   el.classList.add('active');
-
-  const nextDueCards = s ? allCards(s).filter(c => {
-    const tomorrow = Date.now() + 86400000;
-    return c.srNextReview && c.srNextReview <= tomorrow;
-  }).length : 0;
-
   el.innerHTML = `
     <div style="max-width:520px;margin:0 auto;padding:40px 24px;text-align:center;">
       <div style="font-size:3rem;margin-bottom:8px;">📍</div>
-      <div style="font-size:1.6rem;font-weight:900;margin-bottom:4px;">Review Complete</div>
-      <div style="font-size:.82rem;color:var(--text2);margin-bottom:28px;">Your intervals have been updated</div>
+      <div style="font-size:1.6rem;font-weight:900;margin-bottom:4px;">Smart Review Done</div>
+      <div style="font-size:.85rem;color:var(--text2);margin-bottom:28px;">Review schedule updated</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
-          <div style="font-size:2rem;font-weight:900;color:var(--purple2);">${smartDone}</div>
-          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Reviewed</div>
+          <div style="font-size:2rem;font-weight:900;color:var(--green2);">${smartCorrect}</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Correct</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
-          <div style="font-size:2rem;font-weight:900;color:var(--amber2);">${nextDueCards}</div>
+          <div style="font-size:2rem;font-weight:900;color:${pct>=80?'var(--green2)':pct>=60?'var(--amber2)':'var(--red2)'};">${pct}%</div>
+          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Accuracy</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
+          <div style="font-size:2rem;font-weight:900;color:var(--amber2);">${dueTomorrow}</div>
           <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Due Tomorrow</div>
         </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 12px;">
-          <div style="font-size:2rem;font-weight:900;color:var(--green2);">${s ? allCards(s).filter(c=>c.mastery==='know').length : 0}</div>
-          <div style="font-size:.65rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Mastered</div>
-        </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--text2);line-height:1.7;">
-        ${buildSmartSummary()}
-      </div>
+      ${stillDue>0
+        ? `<div style="background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:.8rem;color:var(--amber2);">⚡ <strong>${stillDue}</strong> card${stillDue===1?'':'s'} still due — keep going?</div>`
+        : `<div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.2);border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:.8rem;color:var(--green2);">✅ All caught up! Check back tomorrow.</div>`
+      }
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="startSmartReview()">📍 Review Again</button>
+        ${stillDue>0?`<button class="btn btn-primary" onclick="startSmartReview()">📍 Keep Going</button>`:''}
         <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
       </div>
     </div>`;
-  sndComplete();
-}
-
-function buildSmartSummary() {
-  const counts = { 0: 0, 1: 0, 3: 0, 5: 0 };
-  // We don't track per-card ratings during session, so summarize from card data
-  const s = smartSet; if (!s) return '';
-  const rated = smartCards;
-  // Show next review dates
-  const byInterval = {};
-  rated.forEach(card => {
-    const days = card.srInterval || 1;
-    byInterval[days] = (byInterval[days] || 0) + 1;
-  });
-  return Object.entries(byInterval)
-    .sort((a,b) => a[0]-b[0])
-    .map(([days, count]) => `${count} card${count===1?'':'s'} → review in ${days} day${days==1?'':'s'}`)
-    .join('<br>') || 'All cards reviewed';
+  if (pct >= 80) confetti();
 }
 
 function exitSmartReview() { goHome(); }
 
-// ── Update set page to show Smart Review due count ──
 function getSmartBadge(s) {
-  const due = getSmartDueCount(s);
-  if (due === 0) return '';
-  return `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.3);border-radius:8px;padding:5px 10px;font-size:.72rem;font-weight:800;color:var(--purple2);cursor:pointer;margin-bottom:12px;" onclick="selectedMode='smart';openStudyOpts()">
-    📍 ${due} card${due===1?'':'s'} due for review
+  const due = srDueCount(s);
+  if (due===0) return '';
+  return `<div onclick="selectedMode='smart';openStudyOpts()" style="display:inline-flex;align-items:center;gap:8px;background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.35);border-radius:10px;padding:8px 14px;font-size:.78rem;font-weight:800;color:var(--purple2);cursor:pointer;margin-bottom:14px;transition:all var(--transition);" onmouseover="this.style.background='rgba(155,89,182,.25)'" onmouseout="this.style.background='rgba(155,89,182,.15)'">
+    📍 ${due} card${due===1?'':'s'} due for review → Start Smart Review
   </div>`;
 }
-
 
 // ─────────────────────────────────────────────────
 // RESULTS
@@ -5040,6 +5184,285 @@ function showResults(score, total, mode) {
 }
 
 function exitStudy() { openSet(currentSetId); }
+
+// ─────────────────────────────────────────────────
+// GRAVITY MODE
+// ─────────────────────────────────────────────────
+let gravityCards = [];
+let gravityIdx = 0;
+let gravityCorrect = 0;
+let gravityWrong = 0;
+let gravityCombo = 0;
+let gravityBestCombo = 0;
+let gravityRAF = null;
+let gravityTerms = [];      // active falling DOM elements [{el, cardIdx, y, speed, width}]
+let gravityAnswered = new Set(); // cardIdx values already answered
+let gravityActive = false;
+let gravitySpeedMult = 0.5;
+let gravityDir = 'normal';
+let gravityTolerance = 1;
+let gravityArenaH = 400;
+let gravitySpawnTimer = 0;
+let gravitySpawnInterval = 120; // frames between spawns
+let gravityFrameCount = 0;
+let gravityTargetIdx = null; // index into gravityTerms[] of currently targeted term
+
+function startGravity() {
+  gravityCards = [...sessionCards];
+  gravityIdx = 0;
+  gravityCorrect = 0;
+  gravityWrong = 0;
+  gravityCombo = 0;
+  gravityBestCombo = 0;
+  gravityTerms = [];
+  gravityAnswered = new Set();
+  gravityActive = true;
+  gravitySpeedMult = studyOpts.gravitySpeed || 0.5;
+  gravityDir = studyOpts.gravityDir || 'normal';
+  gravityTolerance = studyOpts.gravityTolerance !== undefined ? studyOpts.gravityTolerance : 1;
+  gravityFrameCount = 0;
+  gravitySpawnTimer = 0;
+  // Spawn interval: faster speed = more frequent spawns
+  gravitySpawnInterval = Math.max(60, Math.round(150 / gravitySpeedMult));
+  gravityTargetIdx = null;
+
+  document.getElementById('view-gravity').classList.add('active');
+  const arena = document.getElementById('gravity-arena');
+  arena.innerHTML = '<div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.4;"></div>';
+
+  _gravityUpdateUI();
+
+  const inp = document.getElementById('gravity-input');
+  inp.value = '';
+  inp.focus();
+
+  if (gravityRAF) cancelAnimationFrame(gravityRAF);
+  gravityRAF = requestAnimationFrame(_gravityLoop);
+}
+
+function _gravityUpdateUI() {
+  const total = gravityCards.length;
+  const done = gravityAnswered.size;
+  document.getElementById('gravity-prog').style.width = (total ? Math.round(done/total*100) : 0) + '%';
+  document.getElementById('gravity-count').textContent = done + '/' + total;
+  document.getElementById('gravity-correct-n').textContent = gravityCorrect;
+  document.getElementById('gravity-wrong-n').textContent = gravityWrong;
+  document.getElementById('gravity-combo-n').textContent = gravityCombo;
+}
+
+function _gravityGetArenaH() {
+  return document.getElementById('gravity-arena')?.offsetHeight || 400;
+}
+function _gravityGetArenaW() {
+  return document.getElementById('gravity-arena')?.offsetWidth || 600;
+}
+
+function _gravityLoop() {
+  if (!gravityActive) return;
+  gravityFrameCount++;
+  const arenaH = _gravityGetArenaH();
+  const arenaW = _gravityGetArenaW();
+
+  // Spawn a new term if there are cards left and not too many on screen
+  const onScreen = gravityTerms.filter(t => !t.done).length;
+  const remaining = gravityCards.filter((_, i) => !gravityAnswered.has(i));
+  if (remaining.length > 0 && onScreen < 3 && gravityFrameCount >= gravitySpawnTimer) {
+    // Pick a card not yet on screen and not answered
+    const onScreenIdxs = new Set(gravityTerms.filter(t=>!t.done).map(t=>t.cardIdx));
+    const candidates = gravityCards.map((c,i)=>i).filter(i => !gravityAnswered.has(i) && !onScreenIdxs.has(i));
+    if (candidates.length > 0) {
+      const cardIdx = candidates[Math.floor(Math.random() * candidates.length)];
+      _gravitySpawnTerm(cardIdx, arenaW);
+      gravitySpawnTimer = gravityFrameCount + gravitySpawnInterval;
+    }
+  }
+
+  // Move all active terms down
+  let crashed = false;
+  gravityTerms.forEach(t => {
+    if (t.done) return;
+    t.y += gravitySpeedMult * (0.8 + Math.random() * 0.04); // slight jitter
+    t.el.style.top = t.y + 'px';
+
+    // Check if hit the ground
+    const termH = t.el.offsetHeight || 46;
+    if (t.y + termH >= arenaH) {
+      // Crashed!
+      t.done = true;
+      gravityAnswered.add(t.cardIdx);
+      gravityWrong++;
+      gravityCombo = 0;
+      crashed = true;
+      t.el.classList.add('wrong-flash');
+      // Show correct answer briefly
+      const card = gravityCards[t.cardIdx];
+      const correctAns = gravityDir === 'reverse' ? card.front : card.back;
+      t.el.textContent = '✗ ' + correctAns;
+      t.el.style.bottom = '4px';
+      t.el.style.top = '';
+      setTimeout(() => { t.el.remove(); }, 900);
+      _gravityUpdateUI();
+      _gravityShowFeedback('💥 Crashed! Answer: ' + correctAns, 'var(--red2)');
+      sndWrong();
+    }
+  });
+
+  // Remove done terms from array if their el is gone
+  gravityTerms = gravityTerms.filter(t => document.contains(t.el));
+
+  // Auto-target: highlight the lowest falling term
+  const active = gravityTerms.filter(t => !t.done);
+  if (active.length > 0) {
+    active.sort((a,b) => b.y - a.y);
+    const newTargetIdx = gravityTerms.indexOf(active[0]);
+    if (newTargetIdx !== gravityTargetIdx) {
+      // Un-highlight old
+      if (gravityTargetIdx !== null && gravityTerms[gravityTargetIdx]) {
+        gravityTerms[gravityTargetIdx]?.el?.classList.remove('targeted');
+      }
+      gravityTargetIdx = newTargetIdx;
+      gravityTerms[gravityTargetIdx]?.el?.classList.add('targeted');
+    }
+  } else {
+    gravityTargetIdx = null;
+  }
+
+  // Check if all cards answered
+  if (gravityAnswered.size >= gravityCards.length && gravityTerms.filter(t=>!t.done).length === 0) {
+    gravityActive = false;
+    cancelAnimationFrame(gravityRAF);
+    gravityRAF = null;
+    setTimeout(_gravityFinish, 400);
+    return;
+  }
+
+  gravityRAF = requestAnimationFrame(_gravityLoop);
+}
+
+function _gravitySpawnTerm(cardIdx, arenaW) {
+  const card = gravityCards[cardIdx];
+  const label = gravityDir === 'reverse' ? card.back : card.front;
+  const el = document.createElement('div');
+  el.className = 'gravity-term';
+  el.textContent = label;
+
+  const arena = document.getElementById('gravity-arena');
+  arena.appendChild(el);
+
+  // Position: random x, start just above arena
+  const w = Math.min(280, arenaW - 20);
+  const x = 10 + Math.random() * Math.max(10, arenaW - w - 20);
+  el.style.left = x + 'px';
+  el.style.top = '-60px';
+  el.style.maxWidth = w + 'px';
+
+  gravityTerms.push({ el, cardIdx, y: -60, done: false });
+}
+
+function gravityInputKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); gravitySubmit(); }
+}
+
+function gravitySubmit() {
+  if (!gravityActive) return;
+  const inp = document.getElementById('gravity-input');
+  const typed = inp.value.trim();
+  if (!typed) return;
+  inp.value = '';
+
+  // Find the targeted (lowest) active term
+  const active = gravityTerms.filter(t => !t.done);
+  if (!active.length) return;
+  active.sort((a,b) => b.y - a.y);
+  const target = active[0];
+  const card = gravityCards[target.cardIdx];
+  const correctAns = gravityDir === 'reverse' ? card.front : card.back;
+
+  const dist = levenshtein(typed.toLowerCase().trim(), correctAns.toLowerCase().trim());
+  const isCorrect = dist <= gravityTolerance;
+
+  target.done = true;
+  gravityAnswered.add(target.cardIdx);
+  target.el.classList.remove('targeted');
+
+  if (isCorrect) {
+    gravityCorrect++;
+    gravityCombo++;
+    if (gravityCombo > gravityBestCombo) gravityBestCombo = gravityCombo;
+    target.el.classList.add('correct-flash');
+    target.el.textContent = '✓ ' + correctAns;
+
+    // Combo burst
+    if (gravityCombo >= 2) {
+      const burst = document.createElement('div');
+      burst.className = 'gravity-combo-burst';
+      burst.textContent = gravityCombo + '× Combo!';
+      const rect = target.el.getBoundingClientRect();
+      const arenaRect = document.getElementById('gravity-arena').getBoundingClientRect();
+      burst.style.left = (rect.left - arenaRect.left + rect.width/2 - 40) + 'px';
+      burst.style.top = (rect.top - arenaRect.top) + 'px';
+      document.getElementById('gravity-arena').appendChild(burst);
+      setTimeout(() => burst.remove(), 750);
+    }
+
+    setTimeout(() => { target.el.remove(); }, 400);
+    _gravityShowFeedback(gravityCombo >= 3 ? '🔥 ' + gravityCombo + '× Combo!' : '✓ Correct!', 'var(--green2)');
+    sndCorrect();
+  } else {
+    gravityCombo = 0;
+    gravityWrong++;
+    target.el.classList.add('wrong-flash');
+    target.el.textContent = '✗ ' + correctAns;
+    setTimeout(() => { target.el.remove(); }, 800);
+    _gravityShowFeedback('✗ ' + correctAns, 'var(--red2)');
+    sndWrong();
+  }
+
+  // Re-target next lowest
+  gravityTargetIdx = null;
+  _gravityUpdateUI();
+}
+
+function _gravityShowFeedback(msg, color) {
+  const el = document.getElementById('gravity-feedback');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { if (el) el.textContent = ''; }, 1500);
+}
+
+function exitGravity() {
+  gravityActive = false;
+  if (gravityRAF) { cancelAnimationFrame(gravityRAF); gravityRAF = null; }
+  document.getElementById('view-gravity').classList.remove('active');
+  gravityTerms.forEach(t => { try { t.el.remove(); } catch(_){} });
+  gravityTerms = [];
+  openSet(currentSetId);
+}
+
+function _gravityFinish() {
+  const total = gravityCards.length;
+  // Save history
+  if (!currentSharedCode) {
+    const s = getCurrentSet();
+    if (s) {
+      if (!s.history) s.history = [];
+      s.history.push({ date: Date.now(), score: gravityCorrect, total, mode: 'Gravity', time: 0 });
+      autoSave();
+    }
+  }
+  document.getElementById('view-gravity').classList.remove('active');
+  gravityTerms = [];
+  // Use the standard results screen, but add best combo line
+  showResults(gravityCorrect, total, 'Gravity');
+  // Inject best combo into breakdown
+  if (gravityBestCombo >= 2) {
+    const bd = document.getElementById('results-breakdown');
+    if (bd) bd.innerHTML += `<div class="res-row"><div class="res-label">🔥 Best Combo</div><div class="res-val" style="color:var(--amber2)">${gravityBestCombo}×</div></div>`;
+  }
+}
+
 // ─────────────────────────────────────────────────
 // SPEED ROUND — floating bubble game
 // ─────────────────────────────────────────────────
@@ -5681,6 +6104,84 @@ function getCurrentSet() {
 }
 function allCards(s) { return s.cards||[]; }
 function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
+// ─── KEYBOARD SHORTCUTS ───────────────────────────
+document.addEventListener('keydown', e => {
+  // Don't fire if typing in an input
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  const active = document.querySelector('.view.active')?.id;
+
+  // Flashcards
+  if (active === 'view-flashcard') {
+    if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+    else if (e.code === 'ArrowRight' || e.key === 'l') fcMark('know');
+    else if (e.code === 'ArrowLeft'  || e.key === 'j') fcMark('review');
+    else if (e.key === 's') {
+      const card = sessionCards[fcIdx];
+      if (card) { card.starred = !card.starred; autoSave(); renderFCCard(); }
+    }
+    else if (e.code === 'Escape') goHome();
+  }
+
+  // Quiz / Test — 1-4 to pick answer
+  if (active === 'view-quiz') {
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= 4) {
+      const btns = document.querySelectorAll('#quiz-opts-container .quiz-opt:not([disabled])');
+      if (btns[num-1]) btns[num-1].click();
+    }
+    else if (e.code === 'Escape') goHome();
+  }
+
+  // Smart Review
+  if (active === 'view-smart') {
+    if (e.code === 'Space') { e.preventDefault(); flipSmartCard(); }
+    else if (e.code === 'ArrowRight' || e.key === 'k') smartKnow();
+    else if (e.code === 'ArrowLeft'  || e.key === 'j') smartDontKnow();
+    else if (e.code === 'Escape') exitSmartReview();
+  }
+
+  // Blitz — 1-4 to pick
+  if (active === 'view-blitz') {
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= 4) {
+      const btns = document.querySelectorAll('#blitz-choices .blitz-btn:not([disabled])');
+      if (btns[num-1]) btns[num-1].click();
+    }
+    else if (e.code === 'Escape') exitBlitz();
+  }
+
+  // Streak — 1-4 to pick
+  if (active === 'view-streak') {
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= 4) {
+      const btns = document.querySelectorAll('#streak-choices .streak-btn:not([disabled])');
+      if (btns[num-1]) btns[num-1].click();
+    }
+    else if (e.code === 'Escape') exitStreak();
+  }
+
+  // Spelling — Enter to submit
+  if (active === 'view-spelling') {
+    if (e.code === 'Escape') exitSpelling();
+  }
+
+  // Fill in blank — handled by input keydown already, but Esc to exit
+  if (active === 'view-fillin') {
+    if (e.code === 'Escape') exitFillin();
+  }
+
+  // Gravity — Escape to exit
+  if (active === 'view-gravity') {
+    if (e.code === 'Escape') exitGravity();
+  }
+
+  // Escape from any study view goes home
+  if (e.code === 'Escape' && active && active.startsWith('view-') && !['view-home','view-landing','view-settings'].includes(active)) {
+    // already handled per-mode above, this catches remaining ones
+  }
+});
+
+
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -6822,6 +7323,46 @@ const AI_ACTIONS = {
     { id:'explain',       icon:'💬', label:'Explain these concepts',  desc:'Get plain-language explanations' },
   ]
 };
+
+function applyCardFontSize() {
+  const sizes = {small:'.78rem', medium:'.88rem', large:'1rem', xlarge:'1.15rem'};
+  const sz = sizes[cardFontSize] || sizes.medium;
+  document.documentElement.style.setProperty('--card-font-size', sz);
+  document.querySelectorAll('.settings-fontsize-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.size === cardFontSize));
+}
+
+function setCardFontSize(size) {
+  cardFontSize = size;
+  applyCardFontSize();
+  saveSettings();
+}
+
+function applyCompactMode() {
+  document.body.classList.toggle('compact', compactMode);
+  const t = document.getElementById('compact-toggle');
+  if (t) t.classList.toggle('on', compactMode);
+}
+
+function toggleCompact() {
+  compactMode = !compactMode;
+  applyCompactMode();
+  saveSettings();
+}
+
+function applyHomeBlobsEnabled() {
+  const t = document.getElementById('home-blobs-toggle');
+  if (t) t.classList.toggle('on', homeBlobsEnabled);
+  // re-render home hero if visible
+  const hv = document.getElementById('view-home');
+  if (hv && hv.classList.contains('active')) renderHome();
+}
+
+function toggleHomeBlobs() {
+  homeBlobsEnabled = !homeBlobsEnabled;
+  applyHomeBlobsEnabled();
+  saveSettings();
+}
 
 function applySharingVisibility() {
   const show = sharingEnabled;
