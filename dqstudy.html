@@ -70,6 +70,106 @@
   --accent:#00ffcc; --accent2:#80ffee;
 }
 
+/* ── Glass: frosted dark glass ── */
+[data-theme="glass"] {
+  --bg:#0a0e1a; --bg2:rgba(255,255,255,.04); --surface:rgba(255,255,255,.07); --surface2:rgba(255,255,255,.1); --surface3:rgba(255,255,255,.13);
+  --border:rgba(255,255,255,.1); --border2:rgba(255,255,255,.18); --border3:rgba(255,255,255,.26);
+  --text:#f0f4ff; --text2:#9ab0d8; --text3:#4a6090; --text4:#1e3048;
+  --accent:#6eb5ff; --accent2:#a0d0ff; --accent-dim:rgba(110,181,255,.12);
+  --green:#2dcc6f; --green2:#4de888; --green-dim:rgba(45,204,111,.12);
+  --shadow:0 8px 32px rgba(0,0,0,.5); --shadow-sm:0 2px 16px rgba(0,0,0,.35);
+}
+body[data-theme="glass"] { background: linear-gradient(135deg, #0a0e1a 0%, #121830 50%, #0d1424 100%); background-attachment: fixed; }
+[data-theme="glass"] #topnav,
+[data-theme="glass"] .modal,
+[data-theme="glass"] .study-nav,
+[data-theme="glass"] .home-stat,
+[data-theme="glass"] .mode-btn,
+[data-theme="glass"] .home-set-card,
+[data-theme="glass"] .home-focus-card,
+[data-theme="glass"] .ob-step,
+[data-theme="glass"] .card-tile { backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+[data-theme="glass"] #topnav { background: rgba(10,14,26,.7); border-bottom: 1px solid rgba(255,255,255,.08); }
+[data-theme="glass"] .mode-btn { background: rgba(255,255,255,.06); }
+[data-theme="glass"] .mode-btn.selected { background: rgba(110,181,255,.15); border-color: rgba(110,181,255,.5); }
+
+/* ── Win8 / Metro tile feel ─────────────────────── */
+[data-theme="win8"] {
+  --bg:#1a1a2e; --bg2:#16213e; --surface:#0f3460; --surface2:#1a4a7a; --surface3:#1e5490;
+  --border:#0f3460; --border2:#1a4a7a; --border3:#2060aa;
+  --text:#ffffff; --text2:#b0c4de; --text3:#6a8db0; --text4:#2a4a6a;
+  --accent:#00b4d8; --accent2:#48cae4; --accent-dim:rgba(0,180,216,.15);
+  --green:#00b09b; --green2:#00d4b8; --green-dim:rgba(0,176,155,.12);
+  --red:#e63946; --red2:#ff6b75; --red-dim:rgba(230,57,70,.12);
+  --amber:#f77f00; --amber2:#fcbf49; --amber-dim:rgba(247,127,0,.12);
+  --purple:#7b2d8b; --purple2:#a855c8; --purple-dim:rgba(123,45,139,.12);
+  --font:'Segoe UI', 'Outfit', sans-serif;
+  --shadow: none; --shadow-sm: none;
+}
+/* Nuke ALL border-radius */
+[data-theme="win8"] *, [data-theme="win8"] *::before, [data-theme="win8"] *::after { border-radius: 0 !important; }
+[data-theme="win8"] #topnav { border-bottom: none; background: #1a1a2e; box-shadow: none; }
+[data-theme="win8"] #gbar { background: var(--accent); animation: none; height: 4px; }
+[data-theme="win8"] .nav-link.active { background: var(--accent); color: #fff; }
+[data-theme="win8"] .study-nav { background: var(--bg2); border-bottom: 3px solid var(--accent); }
+[data-theme="win8"] .study-prog-fill { background: var(--accent) !important; }
+[data-theme="win8"] .mode-btn { border: 0; background: var(--surface); transition: background .1s; }
+[data-theme="win8"] .mode-btn:hover { background: var(--surface2); transform: none; box-shadow: none; }
+[data-theme="win8"] .mode-btn.selected { background: var(--accent); border: none; }
+[data-theme="win8"] .mode-btn.selected .mode-btn-name,
+[data-theme="win8"] .mode-btn.selected .mode-btn-desc,
+[data-theme="win8"] .mode-btn.selected .mode-btn-icon { color: #fff !important; filter: none; }
+[data-theme="win8"] .start-big { background: var(--accent); letter-spacing: .1em; text-transform: uppercase; font-size: .8rem; }
+[data-theme="win8"] .start-big:hover { filter: brightness(1.15); transform: none; box-shadow: none; }
+[data-theme="win8"] .start-opt { border: 2px solid var(--border2); background: transparent; }
+[data-theme="win8"] .start-opt.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="win8"] .btn { border: none; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; font-size: .72rem; }
+[data-theme="win8"] .btn-primary { background: var(--accent); }
+[data-theme="win8"] .btn-ghost { background: var(--surface); color: var(--text2); border: 1px solid var(--border2); }
+[data-theme="win8"] .btn-ghost:hover { background: var(--surface2); transform: none; }
+[data-theme="win8"] .btn-danger { background: var(--red); color: #fff; }
+[data-theme="win8"] .home-set-card { border: 0; background: var(--surface); }
+[data-theme="win8"] .home-set-card:hover { transform: none; box-shadow: none; background: var(--surface2); }
+[data-theme="win8"] .home-set-card::before { display: none; }
+[data-theme="win8"] .home-stat { background: var(--surface); border: none; }
+[data-theme="win8"] .home-focus-card { border: 0; background: var(--surface); }
+[data-theme="win8"] .home-focus-card::before { height: 4px; background: var(--accent) !important; }
+[data-theme="win8"] .home-quick-btn { border: 1px solid var(--border2); background: var(--surface); backdrop-filter: none; }
+[data-theme="win8"] .home-quick-btn.primary { background: var(--accent); border-color: var(--accent); }
+[data-theme="win8"] .home-quick-btn:hover { transform: none; }
+[data-theme="win8"] .home-tab.active { background: var(--accent); border-color: var(--accent); }
+[data-theme="win8"] .card-tile { border: 1px solid var(--border2); background: var(--surface); }
+[data-theme="win8"] .card-tile:hover { background: var(--surface2); }
+[data-theme="win8"] .modal { border: 1px solid var(--border2); box-shadow: none; animation: none; }
+[data-theme="win8"] .modal-head { background: var(--accent); border-bottom: none; }
+[data-theme="win8"] .modal-title { color: #fff; }
+[data-theme="win8"] .modal-close { background: rgba(255,255,255,.2); color: #fff; }
+[data-theme="win8"] .finp { border: 1px solid var(--border2); background: var(--bg2); }
+[data-theme="win8"] .ob-step { border: 1px solid var(--border2); background: var(--surface); }
+[data-theme="win8"] .ob-step:hover { background: var(--surface2); }
+[data-theme="win8"] .chip { border: 1px solid var(--border2); }
+[data-theme="win8"] .home-section-title { border-bottom: 3px solid var(--accent); padding-bottom: 6px; }
+[data-theme="win8"] .gravity-term { border-width: 2px; }
+[data-theme="win8"] .mode-group-label { letter-spacing: .2em; font-size: .6rem; }
+[data-theme="win8"] .home-set-card-bar, [data-theme="win8"] .home-set-card-fill,
+[data-theme="win8"] .study-prog-track, [data-theme="win8"] .study-prog-fill { border-radius: 0 !important; }
+
+/* ── DQ: clean modern signature blue ── */
+[data-theme="dq"] {
+  --bg:#f6f8ff; --bg2:#eef1fb; --surface:#ffffff; --surface2:#f0f4ff; --surface3:#e8eeff;
+  --border:#dde5f8; --border2:#c0d0f0; --border3:#a0b8e8;
+  --text:#0f1b3d; --text2:#4060a0; --text3:#8098cc; --text4:#c0cce8;
+  --accent:#2563eb; --accent2:#3b82f6; --accent-dim:rgba(37,99,235,.08);
+  --green:#059669; --green2:#10b981; --green-dim:rgba(5,150,105,.08);
+  --red:#dc2626; --red2:#ef4444; --red-dim:rgba(220,38,38,.08);
+  --amber:#d97706; --amber2:#f59e0b; --amber-dim:rgba(217,119,6,.08);
+  --purple:#7c3aed; --purple2:#8b5cf6; --purple-dim:rgba(124,58,237,.08);
+  --shadow:0 2px 12px rgba(37,99,235,.08); --shadow-sm:0 1px 6px rgba(37,99,235,.06);
+}
+[data-theme="dq"] #topnav { background: #fff; border-bottom: 1px solid var(--border); }
+[data-theme="dq"] #gbar { background: linear-gradient(90deg,#2563eb,#7c3aed,#2563eb); background-size:400%; }
+[data-theme="dq"] .start-big { background: linear-gradient(135deg,#2563eb,#7c3aed); }
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; transition:background .3s, color .3s; overflow-x:hidden; }
@@ -289,54 +389,74 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .view { display:none; }
 .view.active { display:block; }
 #view-landing.active { display:flex; flex-direction:column; }
-#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active, #view-gravity.active { display:flex; flex-direction:column; }
+#view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active { display:flex; flex-direction:column; }
 
-/* ═══ GRAVITY MODE ═══ */
+/* ═══ TOOLTIPS ═══ */
+.tip { position:relative; display:inline-flex; }
+.tip-icon { font-size:.75rem; color:var(--text3); cursor:help; margin-left:5px; opacity:.6; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid var(--border2); transition:all .15s; }
+.tip-icon:hover { opacity:1; border-color:var(--accent); color:var(--accent2); }
+.tip-icon:hover::after {
+  content: attr(data-tip);
+  display:block;
+  position:fixed;
+  background:var(--surface3); color:var(--text); border:1px solid var(--border2);
+  border-radius:10px; padding:8px 12px; font-size:.7rem; font-weight:600; line-height:1.5;
+  white-space:normal; width:200px; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,.4);
+  pointer-events:none; margin-top:4px;
+  transform: translateX(-50%);
+  left: 50%;
+  top: calc(100% + 6px);
+  bottom: auto;
+}
+
+/* ═══ ONBOARDING STEPS ═══ */
+.ob-steps { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.ob-step { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; flex:1; min-width:160px; cursor:pointer; transition:all .15s; }
+.ob-step:hover { border-color:var(--border2); background:var(--surface2); }
+.ob-step-n { width:22px; height:22px; border-radius:50%; background:var(--accent-dim); color:var(--accent2); font-size:.7rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ob-step-text { font-size:.75rem; font-weight:700; }
+.ob-step-sub { font-size:.62rem; color:var(--text3); margin-top:1px; }
 .gravity-term {
   position: absolute;
   background: var(--surface);
   border: 2px solid rgba(99,179,237,.4);
-  border-radius: 14px;
-  padding: 10px 18px;
-  font-size: 1rem;
+  border-radius: 10px;
+  padding: 7px 13px;
+  font-size: .85rem;
   font-weight: 800;
   color: var(--text);
   white-space: nowrap;
-  max-width: 280px;
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,.3);
-  cursor: default;
-  transition: border-color .15s, box-shadow .15s;
+  box-shadow: 0 3px 10px rgba(0,0,0,.22);
   user-select: none;
+  transition: border-color .12s;
 }
 .gravity-term.targeted {
   border-color: #63b3ed;
-  box-shadow: 0 0 0 3px rgba(99,179,237,.25), 0 4px 16px rgba(0,0,0,.3);
+  box-shadow: 0 0 0 3px rgba(99,179,237,.2), 0 3px 10px rgba(0,0,0,.22);
 }
-.gravity-term.correct-flash {
-  border-color: var(--green);
-  background: var(--green-dim);
-  color: var(--green2);
-}
-.gravity-term.wrong-flash {
-  border-color: var(--red);
-  background: var(--red-dim);
-  color: var(--red2);
-}
+.gravity-term.correct-flash { border-color: var(--green); background: var(--green-dim); color: var(--green2); }
+.gravity-term.wrong-flash   { border-color: var(--red);   background: var(--red-dim);   color: var(--red2);   }
+.gravity-mc-btn { transition: background .12s, border-color .12s; }
+.gravity-mc-btn:hover { border-color: #63b3ed !important; background: rgba(99,179,237,.1) !important; color: #63b3ed !important; }
+.gravity-mc-btn.chosen-correct { border-color: var(--green) !important; background: var(--green-dim) !important; color: var(--green2) !important; pointer-events:none; }
+.gravity-mc-btn.chosen-wrong   { border-color: var(--red)   !important; background: var(--red-dim)   !important; color: var(--red2)   !important; pointer-events:none; }
 .gravity-combo-burst {
   position: absolute;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 900;
   color: var(--amber2);
   pointer-events: none;
   animation: gravityBurst .7s ease-out forwards;
   z-index: 10;
+  white-space: nowrap;
 }
 @keyframes gravityBurst {
   0%   { opacity:1; transform:translateY(0) scale(1); }
-  100% { opacity:0; transform:translateY(-40px) scale(1.3); }
+  100% { opacity:0; transform:translateY(-36px) scale(1.2); }
 }
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
@@ -517,17 +637,22 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .set-header-actions { display:flex; gap:8px; align-items:flex-start; }
 
 /* Study mode picker */
-.mode-picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; margin-bottom:20px; }
+.mode-picker { display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
+.mode-group-label { font-size:.58rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-top:6px; margin-bottom:4px; display:flex; align-items:center; position:relative; }
+.mode-group-row { display:flex; gap:6px; flex-wrap:wrap; }
 .mode-btn {
-  background:var(--surface); border:2px solid var(--border); border-radius:14px;
-  padding:14px 8px; cursor:pointer; transition:all var(--transition); text-align:center; position:relative; overflow:hidden;
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+  padding:9px 14px; cursor:pointer; transition:all var(--transition); position:relative;
+  flex:1; min-width:130px; max-width:220px;
 }
-.mode-btn:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.mode-btn:hover { border-color:var(--border2); background:var(--surface2); }
 .mode-btn.selected { border-color:var(--accent); background:var(--accent-dim); }
-.mode-btn-icon { font-size:1.6rem; margin-bottom:6px; display:block; }
-.mode-btn-name { font-size:.75rem; font-weight:800; }
-.mode-btn-desc { font-size:.6rem; color:var(--text2); margin-top:2px; line-height:1.3; }
+.mode-btn-icon { font-size:1.2rem; flex-shrink:0; }
+.mode-btn-name { font-size:.78rem; font-weight:800; white-space:nowrap; }
+.mode-btn-desc { font-size:.58rem; color:var(--text2); line-height:1.3; margin-top:1px; }
 .mode-btn.selected .mode-btn-name { color:var(--accent2); }
+.mode-btn-text { display:flex; flex-direction:column; }
 
 .start-bar { display:flex; gap:10px; align-items:center; margin-bottom:24px; }
 .start-big { flex:1; padding:14px; background:linear-gradient(135deg,var(--accent),var(--teal)); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:1rem; font-weight:900; cursor:pointer; transition:all var(--transition); letter-spacing:.01em; }
@@ -993,6 +1118,15 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="view" id="view-set" style="padding:24px;">
       <div class="set-header" id="set-header"></div>
       <div id="sr-due-badge"></div>
+      <!-- First-time hint banner -->
+      <div id="set-first-hint" style="display:none;background:linear-gradient(135deg,rgba(58,127,255,.12),rgba(45,204,111,.08));border:1px solid rgba(58,127,255,.25);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.4rem;">👇</div>
+        <div>
+          <div style="font-size:.8rem;font-weight:800;color:var(--accent2);margin-bottom:2px;">Ready to study?</div>
+          <div style="font-size:.72rem;color:var(--text2);line-height:1.5;">Pick a mode below and hit <strong>Start</strong>. Not sure? <strong>Flashcards</strong> is the best place to begin.</div>
+        </div>
+        <button onclick="this.parentElement.style.display='none'" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:4px;">✕</button>
+      </div>
       <div class="mode-picker" id="mode-picker"></div>
       <div class="start-bar" id="start-bar"></div>
       <div class="home-section-title" id="cards-section-head">Cards <span id="cards-count-label" style="color:var(--text2);font-weight:600;font-size:.7rem;text-transform:none;letter-spacing:0;margin-left:4px;"></span></div>
@@ -1003,7 +1137,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="view" id="view-flashcard">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
-        <div class="study-title" id="fc-title">Flashcards</div>
+        <div class="study-title" id="fc-title">📇 Flashcards</div>
         <div class="study-prog-track"><div class="study-prog-fill" id="fc-prog" style="width:0%"></div></div>
         <div class="study-count" id="fc-count">0/0</div>
       </div>
@@ -1052,7 +1186,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="view" id="view-quiz">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
-        <div class="study-title" id="quiz-title">Quiz</div>
+        <div class="study-title" id="quiz-title">❓ Quiz</div>
         <div class="study-prog-track"><div class="study-prog-fill" id="quiz-prog" style="width:0%"></div></div>
         <div class="study-count" id="quiz-count">1/10</div>
         <div class="quiz-timer" id="quiz-timer" style="display:none">0:00</div>
@@ -1066,9 +1200,9 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="view" id="view-matching">
       <div class="study-nav">
         <button class="study-back" onclick="exitStudy()">← Back</button>
-        <div class="study-title">Matching</div>
+        <div class="study-title">🔗 Matching</div>
         <div class="study-prog-track"><div class="study-prog-fill" id="match-prog" style="width:0%"></div></div>
-        <div class="study-count" id="match-count">0 matched</div>
+        <div class="study-count" id="match-count">0/0</div>
       </div>
       <div class="match-body">
         <div class="match-wrap">
@@ -1324,12 +1458,13 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div class="settings-section-title">ℹ️ About & Version</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
           <div style="font-size:1.1rem;font-weight:900;">DQstudy</div>
-          <div style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;">v1.0.0</div>
+          <div style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;">v1.2.0</div>
         </div>
         <div style="font-size:.75rem;color:var(--text2);line-height:1.7;margin-bottom:14px;">Part of the DQ Tools suite. Built for students. Data saved locally and synced to your DQ Account when signed in.</div>
         <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">📋 Changelog</div>
         <div style="font-size:.72rem;color:var(--text2);line-height:1.8;">
-          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--accent2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folders now support shared sets, Created by on shared sets, import count tracking, URL code import</div>
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--accent2);">v1.2.0</span> — Gravity mode (fullscreen falling-terms game), grouped mode picker with Learn/Practice/Challenge tiers, onboarding steps for new users, first-time set hints, consistent nav icons + X/Y counters across all modes, blitz &amp; streak card counters, fixed set opening bug, mode description cleanup</div>
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--text2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folders now support shared sets, Created by on shared sets, import count tracking, URL code import</div>
         </div>
       </div>
     </div>
@@ -1349,6 +1484,7 @@ textarea.finp { resize:vertical; min-height:50px; }
             <div id="blitz-secs" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;font-family:var(--mono);"></div>
           </div>
           <div id="blitz-score-display" style="font-size:.88rem;font-weight:900;font-family:var(--mono);color:var(--green2);">0</div>
+          <div id="blitz-card-count" style="font-size:.72rem;font-weight:700;color:var(--text3);font-family:var(--mono);white-space:nowrap;"></div>
         </div>
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;max-width:680px;margin:0 auto;width:100%;">
           <div id="blitz-term" style="background:var(--surface);border:2px solid var(--border2);border-radius:20px;padding:28px 32px;text-align:center;font-size:1.3rem;font-weight:800;width:100%;min-height:100px;display:flex;align-items:center;justify-content:center;line-height:1.4;"></div>
@@ -1368,6 +1504,7 @@ textarea.finp { resize:vertical; min-height:50px; }
           <button class="study-back" onclick="exitStreak()">← Back</button>
           <div class="study-title" style="color:var(--red2);">🎯 Streak</div>
           <div style="flex:1;"></div>
+          <div id="streak-card-count" style="font-size:.72rem;font-weight:700;color:var(--text3);font-family:var(--mono);white-space:nowrap;margin-right:8px;"></div>
           <div style="text-align:right;">
             <div style="font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">STREAK</div>
             <div id="streak-count" style="font-size:1.5rem;font-weight:900;font-family:var(--mono);line-height:1;color:var(--red2);">0</div>
@@ -1401,9 +1538,9 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="view" id="view-elimination">
         <div class="study-nav">
           <button class="study-back" onclick="exitElimination()">← Back</button>
-          <div class="study-title">🗑 Elimination</div>
+          <div class="study-title">🃏 Elimination</div>
           <div class="study-prog-track"><div class="study-prog-fill" id="elim-prog" style="width:0%"></div></div>
-          <div class="study-count" id="elim-count">0 left</div>
+          <div class="study-count" id="elim-count">0/0</div>
         </div>
         <!-- Card grid -->
         <div id="elim-grid" style="flex:1;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;overflow-y:auto;align-content:start;"></div>
@@ -1555,42 +1692,66 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
 
-      <!-- ═══ GRAVITY MODE ═══ -->
-      <div class="view" id="view-gravity" style="flex-direction:column;overflow:hidden;">
-        <div class="study-nav" style="background:rgba(99,179,237,.06);border-bottom-color:rgba(99,179,237,.2);flex-shrink:0;">
-          <button class="study-back" onclick="exitGravity()">← Back</button>
-          <div class="study-title" style="color:#63b3ed;">🌧️ Gravity</div>
-          <div class="study-prog-track"><div class="study-prog-fill" id="gravity-prog" style="width:0%;background:linear-gradient(90deg,#63b3ed,var(--green));"></div></div>
-          <div class="study-count" id="gravity-count">0/0</div>
-        </div>
-        <!-- stats bar -->
-        <div style="display:flex;justify-content:center;gap:28px;padding:8px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="text-align:center;"><div id="gravity-correct-n" style="font-size:1.1rem;font-weight:900;color:var(--green2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Saved</div></div>
-          <div style="text-align:center;"><div id="gravity-wrong-n" style="font-size:1.1rem;font-weight:900;color:var(--red2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Crashed</div></div>
-          <div style="text-align:center;"><div id="gravity-combo-n" style="font-size:1.1rem;font-weight:900;color:var(--amber2);">0</div><div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Combo</div></div>
-        </div>
-        <!-- arena -->
-        <div id="gravity-arena" style="flex:1;position:relative;overflow:hidden;background:var(--bg);min-height:0;">
-          <!-- danger zone line -->
-          <div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.4;"></div>
-          <!-- falling terms injected here by JS -->
-        </div>
-        <!-- input zone -->
-        <div style="padding:14px 20px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;">
-          <div style="max-width:560px;margin:0 auto;position:relative;">
-            <input id="gravity-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"
-              placeholder="Type the answer and press Enter…"
-              style="width:100%;padding:13px 50px 13px 16px;border-radius:12px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--font);font-size:1rem;font-weight:600;outline:none;transition:border-color .15s;"
-              onfocus="this.style.borderColor='#63b3ed'"
-              onblur="this.style.borderColor='var(--border2)'"
-              onkeydown="gravityInputKey(event)">
-            <button onclick="gravitySubmit()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#63b3ed;border:none;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">↵</button>
-          </div>
-          <div id="gravity-feedback" style="text-align:center;font-size:.78rem;font-weight:700;margin-top:6px;min-height:18px;color:var(--text3);"></div>
-        </div>
+  </main>
+</div>
+
+<!-- ═══ GRAVITY FULLSCREEN OVERLAY ═══ -->
+<div id="gravity-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;">
+
+  <!-- ── Nav bar ── -->
+  <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(99,179,237,.08);border-bottom:2px solid rgba(99,179,237,.2);flex-shrink:0;">
+    <button onclick="exitGravity()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 12px;color:var(--text2);font-family:var(--font);font-size:.75rem;font-weight:700;cursor:pointer;">← Exit</button>
+    <div style="font-size:.88rem;font-weight:800;color:#63b3ed;">🌧️ Gravity</div>
+    <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+      <div id="gravity-prog" style="height:100%;width:0%;background:linear-gradient(90deg,#63b3ed,var(--green));border-radius:3px;transition:width .4s ease;"></div>
+    </div>
+    <div id="gravity-count" style="font-size:.7rem;font-weight:700;color:var(--text2);font-family:var(--mono);white-space:nowrap;">0/0</div>
+    <div style="display:flex;gap:16px;margin-left:4px;">
+      <div style="text-align:center;"><div id="gravity-correct-n" style="font-size:.95rem;font-weight:900;color:var(--green2);line-height:1;">0</div><div style="font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Saved</div></div>
+      <div style="text-align:center;"><div id="gravity-wrong-n" style="font-size:.95rem;font-weight:900;color:var(--red2);line-height:1;">0</div><div style="font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Crashed</div></div>
+      <div style="text-align:center;"><div id="gravity-combo-n" style="font-size:.95rem;font-weight:900;color:var(--amber2);line-height:1;">0</div><div style="font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Combo</div></div>
+    </div>
+  </div>
+
+  <!-- ── Target strip: shows full text of lowest term ── -->
+  <div id="gravity-target-strip" style="display:none;padding:6px 16px;background:rgba(99,179,237,.06);border-bottom:1px solid rgba(99,179,237,.15);font-size:.8rem;line-height:1.5;flex-shrink:0;"></div>
+
+  <!-- ── Arena ── -->
+  <div id="gravity-arena" style="flex:1;position:relative;overflow:hidden;background:var(--bg);min-height:0;">
+    <div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.35;"></div>
+  </div>
+
+  <!-- ── Answer zone ── -->
+  <div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;">
+    <div style="max-width:640px;margin:0 auto;">
+
+      <!-- MC choices (hidden in type mode) -->
+      <div id="gravity-mc-choices" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+
+      <!-- Hybrid first-letter input (hidden unless hybrid mode) -->
+      <div id="gravity-hybrid-row" style="display:none;margin-bottom:8px;">
+        <label style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);display:block;margin-bottom:4px;">Type first letter(s) to confirm your choice:</label>
+        <input id="gravity-hybrid-inp" type="text" autocomplete="off" spellcheck="false" maxlength="4"
+          placeholder="e.g. ph…"
+          style="width:120px;padding:8px 12px;border-radius:8px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--mono);font-size:1rem;font-weight:700;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='#63b3ed'"
+          onblur="this.style.borderColor='var(--border2)'">
       </div>
 
-  </main>
+      <!-- Type input (hidden in pure MC mode) -->
+      <div id="gravity-type-row" style="position:relative;">
+        <input id="gravity-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"
+          placeholder="Type the answer and press Enter…"
+          style="width:100%;padding:11px 50px 11px 14px;border-radius:10px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--font);font-size:.95rem;font-weight:600;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='#63b3ed'"
+          onblur="this.style.borderColor='var(--border2)'"
+          onkeydown="gravityInputKey(event)">
+        <button onclick="gravitySubmit()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#63b3ed;border:none;border-radius:7px;width:32px;height:32px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;color:#fff;">↵</button>
+      </div>
+
+      <div id="gravity-feedback" style="text-align:center;font-size:.75rem;font-weight:700;margin-top:5px;min-height:16px;color:var(--text3);"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ ICON PICKER MODAL ═══ -->
@@ -2085,6 +2246,9 @@ function setVolume(v) { volume = parseFloat(v); saveSettings(); }
 const THEMES = [
   {id:'dark',      icon:'🌙', name:'Dark'},
   {id:'light',     icon:'☀️', name:'Light'},
+  {id:'dq',        icon:'💎', name:'DQ'},
+  {id:'glass',     icon:'🪟', name:'Glass'},
+  {id:'win8',      icon:'⊞', name:'Metro'},
   {id:'ocean',     icon:'🌊', name:'Ocean'},
   {id:'forest',    icon:'🌲', name:'Forest'},
   {id:'sunset',    icon:'🌅', name:'Sunset'},
@@ -2527,17 +2691,26 @@ function renderHome(tab) {
   if (!hasAnySets) {
     // New user — get them to create their first set
     focusCard = `
-      <div class="home-focus-card home-focus-new">
-        <div class="home-focus-emoji">🚀</div>
-        <div class="home-focus-body">
-          <div class="home-focus-label">Get started</div>
-          <div class="home-focus-title">Create your first flashcard set</div>
-          <div class="home-focus-sub">Add a topic, build cards, and start studying in minutes.</div>
-          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="openCreateModal()">＋ Create a Set</button>
-            ${aiEnabled ? `<button class="btn btn-ghost" onclick="openAIBuildModal()">✨ Build with AI</button>` : ''}
-            ${sharingEnabled ? `<button class="btn btn-ghost sharing-btn" onclick="showCodesView()">🔗 Import a Code</button>` : ''}
+      <div class="home-focus-card home-focus-new" style="cursor:default;">
+        <div class="home-focus-emoji">👋</div>
+        <div class="home-focus-body" style="width:100%;">
+          <div class="home-focus-label">Welcome to DQstudy</div>
+          <div class="home-focus-title" style="margin-bottom:12px;">Here's how to get started</div>
+          <div class="ob-steps">
+            <div class="ob-step" onclick="openCreateModal()">
+              <div class="ob-step-n">1</div>
+              <div><div class="ob-step-text">＋ Create a Set</div><div class="ob-step-sub">Add a topic & your cards</div></div>
+            </div>
+            ${aiEnabled ? `<div class="ob-step" onclick="openAIBuildModal()">
+              <div class="ob-step-n">✨</div>
+              <div><div class="ob-step-text">AI Build</div><div class="ob-step-sub">Describe a topic, AI makes cards</div></div>
+            </div>` : ''}
+            ${sharingEnabled ? `<div class="ob-step sharing-btn" onclick="showCodesView()">
+              <div class="ob-step-n">🔗</div>
+              <div><div class="ob-step-text">Import a Code</div><div class="ob-step-sub">Get a set someone shared</div></div>
+            </div>` : ''}
           </div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:4px;">Once you have a set, open it and pick a study mode to begin.</div>
         </div>
       </div>`;
   } else if (recentlyStudied) {
@@ -2827,19 +3000,19 @@ function toggleSbFolder(id, el) {
 // SET PAGE
 // ─────────────────────────────────────────────────
 const MODES = [
-  {id:'flashcards',  icon:'📇', name:'Flashcards',    desc:'Flip cards, mark what you know'},
-  {id:'quiz',        icon:'❓', name:'Multiple Choice', desc:'4 options, pick the right one'},
-  {id:'test',        icon:'⏱', name:'Timed Test',      desc:'Quiz with a countdown clock'},
-  {id:'matching',    icon:'🔗', name:'Matching',        desc:'Click to pair terms & definitions'},
-  {id:'learn',       icon:'🧠', name:'Write It',        desc:'Study → pick → type. Until you know it.'},
-  {id:'speed',       icon:'⚡', name:'Speed Round',     desc:'Tap the right bubble before time runs out'},
-  {id:'blitz',       icon:'💥', name:'Blitz',           desc:'60 sec — answer as many as you can'},
-  {id:'streak',      icon:'🎯', name:'Streak',          desc:'One wrong answer ends your run'},
-  {id:'elimination', icon:'🗑', name:'Elimination',     desc:'Answer cards to clear them from the board'},
-  {id:'fillin',      icon:'🧩', name:'Fill in Blank',   desc:'Definition shown, type the missing word'},
-  {id:'spelling',    icon:'🔤', name:'Spelling',        desc:'Hear the term, type how its spelled'},
-  {id:'smart',       icon:'📍', name:'Smart Review',    desc:'Cards you struggle with, spaced for memory'},
-  {id:'gravity',     icon:'🌧️', name:'Gravity',         desc:'Terms fall — type the answer before they land'},
+  {id:'flashcards',  icon:'📇', name:'Flashcards',       desc:'Flip cards, mark what you know'},
+  {id:'quiz',        icon:'❓', name:'Multiple Choice',   desc:'4 options, pick the right one'},
+  {id:'test',        icon:'⏱', name:'Timed Test',        desc:'Quiz with a countdown clock'},
+  {id:'matching',    icon:'🔗', name:'Matching',          desc:'Click to pair terms & definitions'},
+  {id:'learn',       icon:'🧠', name:'Write It',          desc:'Study → pick → type. Three phases.'},
+  {id:'speed',       icon:'⚡', name:'Speed Round',       desc:'Tap the right bubble before time runs out'},
+  {id:'blitz',       icon:'💥', name:'Blitz',             desc:'60 seconds — answer as many as you can'},
+  {id:'streak',      icon:'🎯', name:'Streak',            desc:'One wrong answer ends your run'},
+  {id:'elimination', icon:'🃏', name:'Elimination',       desc:'Answer cards to clear them from the board'},
+  {id:'fillin',      icon:'🧩', name:'Fill in Blank',     desc:'See the definition, type the missing word'},
+  {id:'spelling',    icon:'🔤', name:'Spelling',          desc:'Hear the term, type how it\'s spelled'},
+  {id:'smart',       icon:'📍', name:'Smart Review',      desc:'Spaced repetition — focuses on what you miss'},
+  {id:'gravity',     icon:'🌧️', name:'Gravity',           desc:'Terms fall — type the answer before they land'},
 ];
 
 // ── SHARED SET (read-only live access) ──────────────
@@ -2943,13 +3116,35 @@ function renderSetPage(s, readOnly) {
     }
   }
 
-  document.getElementById('mode-picker').innerHTML = MODES.map(m => `
-    <div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
-      <span class="mode-btn-icon">${m.icon}</span>
-      <div class="mode-btn-name">${m.name}</div>
-      <div class="mode-btn-desc">${m.desc}</div>
+  const MODE_GROUPS = [
+    { label: '📖 Learn', tip: 'Best for first exposure and spaced repetition', ids: ['flashcards', 'learn', 'smart'] },
+    { label: '✏️ Practice', tip: 'Test your knowledge with answers and feedback', ids: ['quiz', 'test', 'fillin', 'spelling', 'matching'] },
+    { label: '⚡ Challenge', tip: 'Timed and pressure modes for when you\'re ready', ids: ['speed', 'blitz', 'streak', 'elimination', 'gravity'] },
+  ];
+  document.getElementById('mode-picker').innerHTML = MODE_GROUPS.map(g => `
+    <div class="mode-group-label">${g.label} <span class="tip-icon" data-tip="${g.tip}">ⓘ</span></div>
+    <div class="mode-group-row">
+      ${g.ids.map(id => {
+        const m = MODES.find(x => x.id === id);
+        if (!m) return '';
+        return `<div class="mode-btn${m.id===selectedMode?' selected':''}" onclick="selectMode('${m.id}',this)">
+          <span class="mode-btn-icon">${m.icon}</span>
+          <div class="mode-btn-text">
+            <div class="mode-btn-name">${m.name}</div>
+            <div class="mode-btn-desc">${m.desc}</div>
+          </div>
+        </div>`;
+      }).join('')}
     </div>
   `).join('');
+
+  // First-time hint — show when set has never been studied
+  const _hintEl = document.getElementById('set-first-hint');
+  if (_hintEl) {
+    const neverStudied = !s.plays || s.plays === 0;
+    const hasCards = allCards(s).length > 0;
+    _hintEl.style.display = (neverStudied && hasCards) ? '' : 'none';
+  }
 
   renderStartBar();
   renderCardsGrid(s);
@@ -3130,6 +3325,13 @@ function openStudyOpts() {
       <div style="padding:10px 12px;background:rgba(99,179,237,.1);border:1px solid rgba(99,179,237,.25);border-radius:8px;font-size:.75rem;color:#63b3ed;margin-bottom:12px;line-height:1.6;">
         🌧️ Terms fall from the top. Type the correct answer before they hit the ground!
       </div>
+      <div class="field"><label class="flabel">Answer mode</label>
+        <select class="finp" id="opt-gravity-ansmode">
+          <option value="type">Type the answer (classic)</option>
+          <option value="mc">Multiple choice — pick from 4 options</option>
+          <option value="hybrid">Hybrid — MC + must type first letter to confirm</option>
+        </select>
+      </div>
       <div class="field"><label class="flabel">Fall speed</label>
         <select class="finp" id="opt-gravity-speed">
           <option value="0.3">Slow (relaxed)</option>
@@ -3282,6 +3484,7 @@ function confirmLaunch() {
     studyOpts.gravitySpeed = parseFloat(document.getElementById('opt-gravity-speed')?.value || '0.5');
     studyOpts.gravityDir = document.getElementById('opt-gravity-dir')?.value || 'normal';
     studyOpts.gravityTolerance = parseInt(document.getElementById('opt-gravity-tolerance')?.value || '1');
+    studyOpts.gravityAnsMode = document.getElementById('opt-gravity-ansmode')?.value || 'type';
   } else if (mode === 'spelling') {
     studyOpts.spellDir = document.getElementById('opt-spell-dir')?.value || 'term';
     studyOpts.spellRate = parseFloat(document.getElementById('opt-spell-rate')?.value || '1');
@@ -3729,7 +3932,7 @@ function startMatching() {
   const lefts  = shuffle(pairs.map(p => style === 'def-term' ? ({text:p.back,  id:p.front+'__'+p.back}) : ({text:p.front, id:p.front+'__'+p.back})));
   const rights = shuffle(pairs.map(p => style === 'def-term' ? ({text:p.front, id:p.front+'__'+p.back}) : ({text:p.back,  id:p.front+'__'+p.back})));
   document.getElementById('match-prog').style.width = '0%';
-  document.getElementById('match-count').textContent = '0 matched';
+  document.getElementById('match-count').textContent = '0/' + matchTotal;
   document.getElementById('match-cols').innerHTML = `
     <div>
       <div class="match-col-head">${style === 'def-term' ? 'Definitions' : 'Terms'}</div>
@@ -3771,7 +3974,7 @@ function matchClick(el) {
     sndCorrect();
     const pct = matchMatched/matchTotal*100;
     document.getElementById('match-prog').style.width = pct+'%';
-    document.getElementById('match-count').textContent = matchMatched+' matched';
+    document.getElementById('match-count').textContent = matchMatched+'/'+matchTotal;
     matchSel = null;
     if (matchMatched === matchTotal) {
       setTimeout(() => {
@@ -3844,7 +4047,7 @@ function renderLearnPhase() {
   const pct = (learnMastered / total) * 100;
 
   document.getElementById('learn-prog').style.width = pct + '%';
-  document.getElementById('learn-count-nav').textContent = learnMastered + '/' + total + ' mastered';
+  document.getElementById('learn-count-nav').textContent = learnMastered + '/' + total;
   document.getElementById('learn-known-n').textContent = learnMastered;
   document.getElementById('learn-left-n').textContent = unmastered.length;
   document.getElementById('learn-streak-n').textContent = learnStreak;
@@ -4118,6 +4321,8 @@ function renderBlitzCard() {
   document.getElementById('blitz-correct-n').textContent = blitzCorrect;
   document.getElementById('blitz-wrong-n').textContent = blitzWrong;
   document.getElementById('blitz-feedback').textContent = '';
+  const _blitzCardEl = document.getElementById('blitz-card-count');
+  if (_blitzCardEl) _blitzCardEl.textContent = (blitzIdx+1) + '/' + sessionCards.length;
 
   // Update cards/min
   const elapsed = (Date.now() - blitzStartTime) / 60000;
@@ -4259,6 +4464,8 @@ function renderStreakCard() {
   document.getElementById('streak-count').textContent = streakCount;
   document.getElementById('streak-best-display').textContent = Math.max(streakBest, streakCount);
   document.getElementById('streak-term').textContent = term;
+  const _scEl = document.getElementById('streak-card-count');
+  if (_scEl) _scEl.textContent = (streakIdx % sessionCards.length + 1) + '/' + sessionCards.length;
 
   // Build 4 MC choices
   const wrongPool = sessionCards.filter(c => {
@@ -4354,8 +4561,7 @@ function startElimination() {
   elimRemaining = elimCards.map((c, i) => i); // indices of remaining cards
   elimCorrect = 0; elimWrong = 0; elimSelectedIdx = null;
 
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-elimination').classList.add('active');
+  showView('elimination');
   document.getElementById('elim-overlay').style.display = 'none';
   document.getElementById('elim-complete').style.display = 'none';
   renderElimGrid();
@@ -4367,7 +4573,7 @@ function renderElimGrid() {
   const total = elimCards.length;
   const left = elimRemaining.length;
 
-  document.getElementById('elim-count').textContent = left + ' left';
+  document.getElementById('elim-count').textContent = (total - left) + '/' + total;
   const pct = ((total - left) / total) * 100;
   document.getElementById('elim-prog').style.width = pct + '%';
 
@@ -5195,17 +5401,18 @@ let gravityWrong = 0;
 let gravityCombo = 0;
 let gravityBestCombo = 0;
 let gravityRAF = null;
-let gravityTerms = [];      // active falling DOM elements [{el, cardIdx, y, speed, width}]
-let gravityAnswered = new Set(); // cardIdx values already answered
+let gravityTerms = [];
+let gravityAnswered = new Set();
 let gravityActive = false;
 let gravitySpeedMult = 0.5;
 let gravityDir = 'normal';
 let gravityTolerance = 1;
+let gravityAnsMode = 'type'; // 'type' | 'mc' | 'hybrid'
 let gravityArenaH = 400;
 let gravitySpawnTimer = 0;
-let gravitySpawnInterval = 120; // frames between spawns
+let gravitySpawnInterval = 120;
 let gravityFrameCount = 0;
-let gravityTargetIdx = null; // index into gravityTerms[] of currently targeted term
+let gravityTargetIdx = null;
 
 function startGravity() {
   gravityCards = [...sessionCards];
@@ -5220,21 +5427,50 @@ function startGravity() {
   gravitySpeedMult = studyOpts.gravitySpeed || 0.5;
   gravityDir = studyOpts.gravityDir || 'normal';
   gravityTolerance = studyOpts.gravityTolerance !== undefined ? studyOpts.gravityTolerance : 1;
+  gravityAnsMode = studyOpts.gravityAnsMode || 'type';
   gravityFrameCount = 0;
   gravitySpawnTimer = 0;
   // Spawn interval: faster speed = more frequent spawns
   gravitySpawnInterval = Math.max(60, Math.round(150 / gravitySpeedMult));
   gravityTargetIdx = null;
 
-  document.getElementById('view-gravity').classList.add('active');
+  const overlay = document.getElementById('gravity-overlay');
+  overlay.style.display = 'flex';
   const arena = document.getElementById('gravity-arena');
+  arena.innerHTML = '<div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.35;"></div>';
+
+  // Configure answer zone based on mode
+  const typeRow = document.getElementById('gravity-type-row');
+  const mcChoices = document.getElementById('gravity-mc-choices');
+  const hybridRow = document.getElementById('gravity-hybrid-row');
+  const hybridInp = document.getElementById('gravity-hybrid-inp');
+  const targetStrip = document.getElementById('gravity-target-strip');
+
+  if (gravityAnsMode === 'mc') {
+    typeRow.style.display = 'none';
+    hybridRow.style.display = 'none';
+  } else if (gravityAnsMode === 'hybrid') {
+    typeRow.style.display = 'none';
+    hybridRow.style.display = '';
+    if (hybridInp) hybridInp.value = '';
+  } else {
+    typeRow.style.display = '';
+    hybridRow.style.display = 'none';
+  }
+  if (mcChoices) { mcChoices.innerHTML = ''; mcChoices.style.display = 'none'; }
+  if (targetStrip) targetStrip.style.display = 'none';
   arena.innerHTML = '<div id="gravity-danger-line" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.4;"></div>';
 
   _gravityUpdateUI();
 
-  const inp = document.getElementById('gravity-input');
-  inp.value = '';
-  inp.focus();
+  // Focus the right input
+  if (gravityAnsMode === 'type') {
+    const inp = document.getElementById('gravity-input');
+    if (inp) { inp.value = ''; inp.focus(); }
+  } else if (gravityAnsMode === 'hybrid') {
+    const hi = document.getElementById('gravity-hybrid-inp');
+    if (hi) hi.value = '';
+  }
 
   if (gravityRAF) cancelAnimationFrame(gravityRAF);
   gravityRAF = requestAnimationFrame(_gravityLoop);
@@ -5316,14 +5552,22 @@ function _gravityLoop() {
     active.sort((a,b) => b.y - a.y);
     const newTargetIdx = gravityTerms.indexOf(active[0]);
     if (newTargetIdx !== gravityTargetIdx) {
-      // Un-highlight old
       if (gravityTargetIdx !== null && gravityTerms[gravityTargetIdx]) {
         gravityTerms[gravityTargetIdx]?.el?.classList.remove('targeted');
       }
       gravityTargetIdx = newTargetIdx;
       gravityTerms[gravityTargetIdx]?.el?.classList.add('targeted');
+      // Update target strip + MC choices on target change
+      _gravityUpdateTargetStrip();
     }
   } else {
+    if (gravityTargetIdx !== null) {
+      // Target cleared — hide strip and choices
+      const strip = document.getElementById('gravity-target-strip');
+      if (strip) strip.style.display = 'none';
+      const mc = document.getElementById('gravity-mc-choices');
+      if (mc) { mc.innerHTML = ''; mc.style.display = 'none'; }
+    }
     gravityTargetIdx = null;
   }
 
@@ -5344,13 +5588,17 @@ function _gravitySpawnTerm(cardIdx, arenaW) {
   const label = gravityDir === 'reverse' ? card.back : card.front;
   const el = document.createElement('div');
   el.className = 'gravity-term';
-  el.textContent = label;
+
+  // Truncate long labels — show short version on tile, full on target strip
+  const MAX_CHARS = 40;
+  const displayLabel = label.length > MAX_CHARS ? label.slice(0, MAX_CHARS - 1) + '…' : label;
+  el.textContent = displayLabel;
+  el.dataset.fullLabel = label;
 
   const arena = document.getElementById('gravity-arena');
   arena.appendChild(el);
 
-  // Position: random x, start just above arena
-  const w = Math.min(280, arenaW - 20);
+  const w = Math.min(260, arenaW - 20);
   const x = 10 + Math.random() * Math.max(10, arenaW - w - 20);
   el.style.left = x + 'px';
   el.style.top = '-60px';
@@ -5359,31 +5607,103 @@ function _gravitySpawnTerm(cardIdx, arenaW) {
   gravityTerms.push({ el, cardIdx, y: -60, done: false });
 }
 
-function gravityInputKey(e) {
-  if (e.key === 'Enter') { e.preventDefault(); gravitySubmit(); }
+function _gravityUpdateTargetStrip() {
+  const strip = document.getElementById('gravity-target-strip');
+  if (!strip) return;
+  const active = gravityTerms.filter(t => !t.done);
+  if (!active.length) { strip.style.display = 'none'; return; }
+  active.sort((a,b) => b.y - a.y);
+  const target = active[0];
+  const card = gravityCards[target.cardIdx];
+  const fullLabel = target.el.dataset.fullLabel || (gravityDir === 'reverse' ? card.back : card.front);
+  const correctAns = gravityDir === 'reverse' ? card.front : card.back;
+  strip.style.display = '';
+  strip.innerHTML = `<span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-right:8px;">TARGET</span><span style="font-weight:800;color:var(--accent2);">${esc(fullLabel)}</span>`;
+
+  // For MC/hybrid modes, render choice buttons
+  if (gravityAnsMode === 'mc' || gravityAnsMode === 'hybrid') {
+    _gravityRenderMCChoices(target, correctAns);
+  }
 }
 
-function gravitySubmit() {
-  if (!gravityActive) return;
-  const inp = document.getElementById('gravity-input');
-  const typed = inp.value.trim();
-  if (!typed) return;
-  inp.value = '';
+function _gravityRenderMCChoices(target, correctAns) {
+  const choiceArea = document.getElementById('gravity-mc-choices');
+  if (!choiceArea) return;
+  // Build wrong answers from other cards in the set
+  const wrongs = shuffle(gravityCards.filter((c,i) => i !== target.cardIdx))
+    .slice(0, 3)
+    .map(c => gravityDir === 'reverse' ? c.front : c.back);
+  const choices = shuffle([correctAns, ...wrongs]);
+  choiceArea.innerHTML = '';
+  choices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'gravity-mc-btn';
+    btn.dataset.chosen = ch;
+    btn.dataset.answer = correctAns;
+    btn.textContent = ch;
+    btn.style.cssText = 'flex:1;min-width:120px;max-width:280px;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;font-family:inherit;font-size:.8rem;font-weight:700;color:var(--text);cursor:pointer;text-align:left;line-height:1.3;';
+    btn.addEventListener('click', function() { gravityMCClick(this); });
+    choiceArea.appendChild(btn);
+  });
+  choiceArea.style.display = 'flex';
+}
 
-  // Find the targeted (lowest) active term
+function gravityMCClick(btn) {
+  if (!gravityActive) return;
+  const chosen = btn.dataset.chosen;
+  const correct = btn.dataset.answer;
+
+  // Disable all buttons immediately
+  const allBtns = document.querySelectorAll('#gravity-mc-choices .gravity-mc-btn');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+  if (gravityAnsMode === 'hybrid') {
+    const hybridVal = (document.getElementById('gravity-hybrid-inp')?.value || '').trim().toLowerCase();
+    if (!hybridVal || hybridVal[0] !== correct[0].toLowerCase()) {
+      // Re-enable buttons and flag the input
+      allBtns.forEach(b => b.style.pointerEvents = '');
+      const inp = document.getElementById('gravity-hybrid-inp');
+      if (inp) {
+        inp.style.borderColor = 'var(--red)';
+        inp.focus();
+        setTimeout(() => { inp.style.borderColor = ''; }, 700);
+      }
+      _gravityShowFeedback('⌨️ Type the first letter first!', 'var(--amber2)');
+      return;
+    }
+  }
+
+  const isCorrect = chosen === correct;
+
+  // Flash visual feedback on the buttons
+  btn.classList.add(isCorrect ? 'chosen-correct' : 'chosen-wrong');
+  if (!isCorrect) {
+    // Highlight the correct one too
+    allBtns.forEach(b => { if (b.dataset.chosen === correct) b.classList.add('chosen-correct'); });
+  }
+
+  // Small delay so user sees the flash, then process
+  setTimeout(() => { _gravityProcessAnswer(isCorrect, correct); }, 280);
+}
+
+function _gravityProcessAnswer(isCorrect, correctAns) {
   const active = gravityTerms.filter(t => !t.done);
   if (!active.length) return;
   active.sort((a,b) => b.y - a.y);
   const target = active[0];
-  const card = gravityCards[target.cardIdx];
-  const correctAns = gravityDir === 'reverse' ? card.front : card.back;
-
-  const dist = levenshtein(typed.toLowerCase().trim(), correctAns.toLowerCase().trim());
-  const isCorrect = dist <= gravityTolerance;
 
   target.done = true;
   gravityAnswered.add(target.cardIdx);
   target.el.classList.remove('targeted');
+  gravityTargetIdx = null;
+
+  // Clear MC choices and hybrid input for next card
+  const choiceArea = document.getElementById('gravity-mc-choices');
+  if (choiceArea) { choiceArea.innerHTML = ''; choiceArea.style.display = 'none'; }
+  const hybridInp = document.getElementById('gravity-hybrid-inp');
+  if (hybridInp) hybridInp.value = '';
+  const targetStrip = document.getElementById('gravity-target-strip');
+  if (targetStrip) targetStrip.style.display = 'none';
 
   if (isCorrect) {
     gravityCorrect++;
@@ -5391,8 +5711,6 @@ function gravitySubmit() {
     if (gravityCombo > gravityBestCombo) gravityBestCombo = gravityCombo;
     target.el.classList.add('correct-flash');
     target.el.textContent = '✓ ' + correctAns;
-
-    // Combo burst
     if (gravityCombo >= 2) {
       const burst = document.createElement('div');
       burst.className = 'gravity-combo-burst';
@@ -5404,7 +5722,6 @@ function gravitySubmit() {
       document.getElementById('gravity-arena').appendChild(burst);
       setTimeout(() => burst.remove(), 750);
     }
-
     setTimeout(() => { target.el.remove(); }, 400);
     _gravityShowFeedback(gravityCombo >= 3 ? '🔥 ' + gravityCombo + '× Combo!' : '✓ Correct!', 'var(--green2)');
     sndCorrect();
@@ -5417,10 +5734,30 @@ function gravitySubmit() {
     _gravityShowFeedback('✗ ' + correctAns, 'var(--red2)');
     sndWrong();
   }
-
-  // Re-target next lowest
-  gravityTargetIdx = null;
   _gravityUpdateUI();
+}
+
+function gravityInputKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); gravitySubmit(); }
+}
+
+function gravitySubmit() {
+  if (!gravityActive) return;
+  // In MC/hybrid modes, submit is handled by button clicks
+  if (gravityAnsMode === 'mc') return;
+  const inp = document.getElementById('gravity-input');
+  const typed = inp.value.trim();
+  if (!typed) return;
+  inp.value = '';
+
+  const active = gravityTerms.filter(t => !t.done);
+  if (!active.length) return;
+  active.sort((a,b) => b.y - a.y);
+  const target = active[0];
+  const card = gravityCards[target.cardIdx];
+  const correctAns = gravityDir === 'reverse' ? card.front : card.back;
+  const dist = levenshtein(typed.toLowerCase().trim(), correctAns.toLowerCase().trim());
+  _gravityProcessAnswer(dist <= gravityTolerance, correctAns);
 }
 
 function _gravityShowFeedback(msg, color) {
@@ -5435,9 +5772,9 @@ function _gravityShowFeedback(msg, color) {
 function exitGravity() {
   gravityActive = false;
   if (gravityRAF) { cancelAnimationFrame(gravityRAF); gravityRAF = null; }
-  document.getElementById('view-gravity').classList.remove('active');
   gravityTerms.forEach(t => { try { t.el.remove(); } catch(_){} });
   gravityTerms = [];
+  document.getElementById('gravity-overlay').style.display = 'none';
   openSet(currentSetId);
 }
 
@@ -5452,9 +5789,8 @@ function _gravityFinish() {
       autoSave();
     }
   }
-  document.getElementById('view-gravity').classList.remove('active');
+  document.getElementById('gravity-overlay').style.display = 'none';
   gravityTerms = [];
-  // Use the standard results screen, but add best combo line
   showResults(gravityCorrect, total, 'Gravity');
   // Inject best combo into breakdown
   if (gravityBestCombo >= 2) {
@@ -6170,9 +6506,9 @@ document.addEventListener('keydown', e => {
     if (e.code === 'Escape') exitFillin();
   }
 
-  // Gravity — Escape to exit
-  if (active === 'view-gravity') {
-    if (e.code === 'Escape') exitGravity();
+  // Gravity — Escape to exit (overlay, not a .view)
+  if (e.code === 'Escape' && document.getElementById('gravity-overlay')?.style.display === 'flex') {
+    exitGravity(); return;
   }
 
   // Escape from any study view goes home
