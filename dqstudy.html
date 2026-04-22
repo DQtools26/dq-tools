@@ -154,7 +154,113 @@ body[data-theme="glass"] { background: linear-gradient(135deg, #0a0e1a 0%, #1218
 [data-theme="win8"] .home-set-card-bar, [data-theme="win8"] .home-set-card-fill,
 [data-theme="win8"] .study-prog-track, [data-theme="win8"] .study-prog-fill { border-radius: 0 !important; }
 
-/* ── DQ: clean modern signature blue ── */
+/* ── Metro Lime ── */
+[data-theme="metro-lime"] {
+  --bg:#0e1a00; --bg2:#162600; --surface:#1e3800; --surface2:#2a4e00; --surface3:#346000;
+  --border:#1e3800; --border2:#2a4e00; --border3:#3a6400;
+  --text:#ffffff; --text2:#c8e6a0; --text3:#7aaa40; --text4:#3a5a10;
+  --accent:#70b800; --accent2:#96d420; --accent-dim:rgba(112,184,0,.15);
+  --green:#70b800; --green2:#96d420; --green-dim:rgba(112,184,0,.12);
+  --red:#e63946; --red2:#ff6b75; --red-dim:rgba(230,57,70,.12);
+  --amber:#f77f00; --amber2:#fcbf49; --amber-dim:rgba(247,127,0,.12);
+  --purple:#7b2d8b; --purple2:#a855c8; --purple-dim:rgba(123,45,139,.12);
+  --font:'Segoe UI', 'Outfit', sans-serif;
+  --shadow: none; --shadow-sm: none;
+}
+[data-theme="metro-lime"] *, [data-theme="metro-lime"] *::before, [data-theme="metro-lime"] *::after { border-radius: 0 !important; }
+[data-theme="metro-lime"] #topnav { border-bottom: none; background: #0e1a00; box-shadow: none; }
+[data-theme="metro-lime"] #gbar { background: var(--accent); animation: none; height: 4px; }
+[data-theme="metro-lime"] .nav-link.active { background: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .study-nav { background: var(--bg2); border-bottom: 3px solid var(--accent); }
+[data-theme="metro-lime"] .study-prog-fill { background: var(--accent) !important; }
+[data-theme="metro-lime"] .mode-btn { border: 0; background: var(--surface); transition: background .1s; }
+[data-theme="metro-lime"] .mode-btn:hover { background: var(--surface2); transform: none; box-shadow: none; }
+[data-theme="metro-lime"] .mode-btn.selected { background: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .mode-btn.selected .mode-btn-name, [data-theme="metro-lime"] .mode-btn.selected .mode-btn-desc, [data-theme="metro-lime"] .mode-btn.selected .mode-btn-icon { color: #fff !important; }
+[data-theme="metro-lime"] .start-big { background: var(--accent); letter-spacing: .1em; text-transform: uppercase; font-size: .8rem; }
+[data-theme="metro-lime"] .start-big:hover { filter: brightness(1.15); transform: none; box-shadow: none; }
+[data-theme="metro-lime"] .btn { border: none; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; font-size: .72rem; }
+[data-theme="metro-lime"] .btn-primary { background: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .btn-ghost { background: var(--surface); color: var(--text2); border: 1px solid var(--border2); }
+[data-theme="metro-lime"] .btn-ghost:hover { background: var(--surface2); transform: none; }
+[data-theme="metro-lime"] .btn-danger { background: var(--red); color: #fff; }
+[data-theme="metro-lime"] .home-set-card { border: 0; background: var(--surface); }
+[data-theme="metro-lime"] .home-set-card:hover { transform: none; box-shadow: none; background: var(--surface2); }
+[data-theme="metro-lime"] .home-set-card::before { display: none; }
+[data-theme="metro-lime"] .home-stat { background: var(--surface); border: none; }
+[data-theme="metro-lime"] .home-focus-card { border: 0; background: var(--surface); }
+[data-theme="metro-lime"] .home-focus-card::before { height: 4px; background: var(--accent) !important; }
+[data-theme="metro-lime"] .home-quick-btn { border: 1px solid var(--border2); background: var(--surface); backdrop-filter: none; }
+[data-theme="metro-lime"] .home-quick-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .home-quick-btn:hover { transform: none; }
+[data-theme="metro-lime"] .home-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .card-tile { background: var(--surface); border: 1px solid var(--border2); }
+[data-theme="metro-lime"] .card-tile:hover { background: var(--surface2); }
+[data-theme="metro-lime"] .modal { border: 1px solid var(--border2); box-shadow: none; animation: none; }
+[data-theme="metro-lime"] .modal-head { background: var(--accent); border-bottom: none; }
+[data-theme="metro-lime"] .modal-title { color: #fff; }
+[data-theme="metro-lime"] .modal-close { background: rgba(255,255,255,.2); color: #fff; }
+[data-theme="metro-lime"] .finp { border: 1px solid var(--border2); background: var(--bg2); }
+[data-theme="metro-lime"] .ob-step { background: var(--surface); border: 1px solid var(--border2); }
+[data-theme="metro-lime"] .ob-step:hover { background: var(--surface2); }
+[data-theme="metro-lime"] .home-section-title { border-bottom: 3px solid var(--accent); padding-bottom: 6px; }
+[data-theme="metro-lime"] .start-opt { border: 2px solid var(--border2); background: transparent; }
+[data-theme="metro-lime"] .start-opt.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-lime"] .study-prog-track, [data-theme="metro-lime"] .home-set-card-bar, [data-theme="metro-lime"] .home-set-card-fill { border-radius: 0 !important; }
+
+/* ── Metro Purple ── */
+[data-theme="metro-purple"] {
+  --bg:#1a0a2e; --bg2:#220d3c; --surface:#3a0e6e; --surface2:#4e1490; --surface3:#5e1aaa;
+  --border:#3a0e6e; --border2:#4e1490; --border3:#6020b0;
+  --text:#ffffff; --text2:#d8b4fe; --text3:#a855c8; --text4:#5b21b6;
+  --accent:#a855f7; --accent2:#c084fc; --accent-dim:rgba(168,85,247,.15);
+  --green:#00b09b; --green2:#00d4b8; --green-dim:rgba(0,176,155,.12);
+  --red:#e63946; --red2:#ff6b75; --red-dim:rgba(230,57,70,.12);
+  --amber:#f77f00; --amber2:#fcbf49; --amber-dim:rgba(247,127,0,.12);
+  --purple:#a855f7; --purple2:#c084fc; --purple-dim:rgba(168,85,247,.12);
+  --font:'Segoe UI', 'Outfit', sans-serif;
+  --shadow: none; --shadow-sm: none;
+}
+[data-theme="metro-purple"] *, [data-theme="metro-purple"] *::before, [data-theme="metro-purple"] *::after { border-radius: 0 !important; }
+[data-theme="metro-purple"] #topnav { border-bottom: none; background: #1a0a2e; box-shadow: none; }
+[data-theme="metro-purple"] #gbar { background: var(--accent); animation: none; height: 4px; }
+[data-theme="metro-purple"] .nav-link.active { background: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .study-nav { background: var(--bg2); border-bottom: 3px solid var(--accent); }
+[data-theme="metro-purple"] .study-prog-fill { background: var(--accent) !important; }
+[data-theme="metro-purple"] .mode-btn { border: 0; background: var(--surface); transition: background .1s; }
+[data-theme="metro-purple"] .mode-btn:hover { background: var(--surface2); transform: none; box-shadow: none; }
+[data-theme="metro-purple"] .mode-btn.selected { background: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .mode-btn.selected .mode-btn-name, [data-theme="metro-purple"] .mode-btn.selected .mode-btn-desc, [data-theme="metro-purple"] .mode-btn.selected .mode-btn-icon { color: #fff !important; }
+[data-theme="metro-purple"] .start-big { background: var(--accent); letter-spacing: .1em; text-transform: uppercase; font-size: .8rem; }
+[data-theme="metro-purple"] .start-big:hover { filter: brightness(1.15); transform: none; box-shadow: none; }
+[data-theme="metro-purple"] .btn { border: none; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; font-size: .72rem; }
+[data-theme="metro-purple"] .btn-primary { background: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .btn-ghost { background: var(--surface); color: var(--text2); border: 1px solid var(--border2); }
+[data-theme="metro-purple"] .btn-ghost:hover { background: var(--surface2); transform: none; }
+[data-theme="metro-purple"] .btn-danger { background: var(--red); color: #fff; }
+[data-theme="metro-purple"] .home-set-card { border: 0; background: var(--surface); }
+[data-theme="metro-purple"] .home-set-card:hover { transform: none; box-shadow: none; background: var(--surface2); }
+[data-theme="metro-purple"] .home-set-card::before { display: none; }
+[data-theme="metro-purple"] .home-stat { background: var(--surface); border: none; }
+[data-theme="metro-purple"] .home-focus-card { border: 0; background: var(--surface); }
+[data-theme="metro-purple"] .home-focus-card::before { height: 4px; background: var(--accent) !important; }
+[data-theme="metro-purple"] .home-quick-btn { border: 1px solid var(--border2); background: var(--surface); backdrop-filter: none; }
+[data-theme="metro-purple"] .home-quick-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .home-quick-btn:hover { transform: none; }
+[data-theme="metro-purple"] .home-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .card-tile { background: var(--surface); border: 1px solid var(--border2); }
+[data-theme="metro-purple"] .card-tile:hover { background: var(--surface2); }
+[data-theme="metro-purple"] .modal { border: 1px solid var(--border2); box-shadow: none; animation: none; }
+[data-theme="metro-purple"] .modal-head { background: var(--accent); border-bottom: none; }
+[data-theme="metro-purple"] .modal-title { color: #fff; }
+[data-theme="metro-purple"] .modal-close { background: rgba(255,255,255,.2); color: #fff; }
+[data-theme="metro-purple"] .finp { border: 1px solid var(--border2); background: var(--bg2); }
+[data-theme="metro-purple"] .ob-step { background: var(--surface); border: 1px solid var(--border2); }
+[data-theme="metro-purple"] .ob-step:hover { background: var(--surface2); }
+[data-theme="metro-purple"] .home-section-title { border-bottom: 3px solid var(--accent); padding-bottom: 6px; }
+[data-theme="metro-purple"] .start-opt { border: 2px solid var(--border2); background: transparent; }
+[data-theme="metro-purple"] .start-opt.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="metro-purple"] .study-prog-track, [data-theme="metro-purple"] .home-set-card-bar, [data-theme="metro-purple"] .home-set-card-fill { border-radius: 0 !important; }
 [data-theme="dq"] {
   --bg:#f6f8ff; --bg2:#eef1fb; --surface:#ffffff; --surface2:#f0f4ff; --surface3:#e8eeff;
   --border:#dde5f8; --border2:#c0d0f0; --border3:#a0b8e8;
@@ -487,6 +593,49 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .blob2 { width:400px; height:400px; background:var(--green); bottom:-80px; left:-80px; animation:blobFloat 13s ease-in-out infinite reverse; }
 .blob3 { width:300px; height:300px; background:var(--purple); top:50%; left:50%; transform:translate(-50%,-50%); animation:blobFloat 8s ease-in-out infinite 2s; }
 @keyframes blobFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-20px) scale(1.05)} 66%{transform:translate(-10px,15px) scale(.97)} }
+
+/* ── Micro-animations ── */
+@keyframes bounce    { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} 60%{transform:translateY(-4px)} }
+@keyframes wiggle    { 0%,100%{transform:rotate(0deg)} 20%{transform:rotate(-8deg)} 50%{transform:rotate(7deg)} 75%{transform:rotate(-4deg)} }
+@keyframes jelly     { 0%,100%{transform:scale(1,1)} 30%{transform:scale(1.12,.88)} 50%{transform:scale(.92,1.08)} 70%{transform:scale(1.05,.95)} }
+@keyframes heartbeat { 0%,100%{transform:scale(1)} 14%{transform:scale(1.12)} 28%{transform:scale(1)} 42%{transform:scale(1.08)} 70%{transform:scale(1)} }
+@keyframes floatUp   { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
+@keyframes popBounce { 0%{transform:scale(0.5)} 60%{transform:scale(1.15)} 80%{transform:scale(0.95)} 100%{transform:scale(1)} }
+@keyframes pulseRing { 0%{box-shadow:0 0 0 0 rgba(45,204,111,.5)} 70%{box-shadow:0 0 0 10px rgba(45,204,111,0)} 100%{box-shadow:0 0 0 0 rgba(45,204,111,0)} }
+@keyframes shake2    { 0%,100%{transform:translateX(0) rotate(0)} 20%{transform:translateX(-5px) rotate(-2deg)} 40%{transform:translateX(5px) rotate(2deg)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+
+.anim-bounce    { animation: bounce    .5s ease; }
+.anim-wiggle    { animation: wiggle    .4s ease; }
+.anim-jelly     { animation: jelly     .4s ease; }
+.anim-heartbeat { animation: heartbeat 1.2s ease infinite; }
+.anim-popbounce { animation: popBounce .45s cubic-bezier(.36,.07,.19,.97); }
+.anim-pulse-ring{ animation: pulseRing .6s ease; }
+.anim-shake2    { animation: shake2    .35s ease; }
+.anim-float-up  { animation: floatUp   .35s ease both; }
+
+/* Button tactile feedback */
+.btn:active { transform: scale(0.96) !important; transition: transform .08s !important; }
+.btn-primary:active { box-shadow: none !important; }
+.nav-icon-btn:active { transform: scale(0.9); }
+
+/* Home stat card entrance */
+.track-stat { animation: floatUp .4s ease both; }
+.track-stat:nth-child(1) { animation-delay: .05s; }
+.track-stat:nth-child(2) { animation-delay: .1s; }
+.track-stat:nth-child(3) { animation-delay: .15s; }
+.track-stat:nth-child(4) { animation-delay: .2s; }
+
+/* Mode btn selected gets a quick jelly */
+.mode-btn.selected { animation: jelly .35s ease; }
+
+/* Set card hover float */
+.home-set-card:hover, .track-set-row:hover { transition: transform .2s ease, border-color .2s, box-shadow .2s; }
+
+/* Results emoji pulses */
+.results-emoji { animation: popIn .4s ease, heartbeat 2s ease 1s infinite; }
+
+/* Gam widget bounce on first render */
+.gam-home-widget { animation: floatUp .4s .3s ease both; }
 .landing-content { position:relative; z-index:1; text-align:center; max-width:600px; }
 .landing-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(58,127,255,.3); border-radius:100px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:20px; animation:fadeIn .5s ease; }
 .landing-title { font-size:clamp(2.5rem,6vw,4rem); font-weight:900; letter-spacing:-.05em; line-height:.95; margin-bottom:14px; animation:fadeInUp .5s .1s both; }
@@ -919,11 +1068,12 @@ body.compact #view-set { padding:14px; }
 .track-pct { font-size:.75rem; font-weight:900; min-width:38px; text-align:right; }
 
 /* ═══════════════ SETTINGS ═══════════════ */
-#view-settings { padding:24px; max-width:680px; margin:0 auto; }
+#view-settings { padding:0; max-width:none; margin:0; overflow-y:auto; height:calc(100vh - 55px); }
+.settings-inner { padding:24px; max-width:680px; margin:0 auto; padding-bottom:60px; }
 .settings-title { font-size:1.3rem; font-weight:900; margin-bottom:18px; }
 .settings-section { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:12px; }
 .settings-section-title { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
-.theme-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.theme-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:8px; }
 .theme-option { padding:10px 8px; border-radius:10px; border:2px solid var(--border); cursor:pointer; text-align:center; transition:all var(--transition); }
 .theme-option:hover { border-color:var(--border2); }
 .theme-option.active { border-color:var(--accent); background:var(--accent-dim); }
@@ -1343,10 +1493,14 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ TRACKING VIEW ═══ -->
-    <div class="view" id="view-tracking" style="padding:28px;">
+    <div class="view" id="view-tracking" style="padding:28px;overflow-y:auto;height:calc(100vh - 55px);">
       <div style="font-size:1.5rem;font-weight:900;margin-bottom:6px;">📊 Progress Tracker</div>
       <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Track your mastery across all study sets.</div>
       <div class="track-stats-grid" id="track-stats-grid"></div>
+      <div class="track-section-head" style="margin-top:24px;">Accuracy Over Time</div>
+      <div id="track-accuracy-chart" style="margin-bottom:24px;"></div>
+      <div class="track-section-head">Study Mode Breakdown</div>
+      <div id="track-mode-chart" style="margin-bottom:24px;"></div>
       <div class="track-section-head">Set Mastery</div>
       <div id="track-sets-list"></div>
     </div>
@@ -1389,7 +1543,8 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ SETTINGS VIEW ═══ -->
-    <div class="view" id="view-settings" style="padding:28px;max-width:680px;">
+    <div class="view" id="view-settings">
+      <div class="settings-inner">
       <div style="font-size:1.5rem;font-weight:900;margin-bottom:18px;">⚙️ Settings</div>
       <div class="settings-section">
         <div class="settings-section-title">🎨 Theme</div>
@@ -1479,6 +1634,8 @@ textarea.finp { resize:vertical; min-height:50px; }
           <button class="btn btn-ghost btn-sm" onclick="showGamPanel()" style="flex-shrink:0;">🎮 Open</button>
         </div>
       </div>
+      <div class="settings-section">
+        <div class="settings-section-title">💾 Data</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
           <button class="btn btn-ghost btn-sm" onclick="showGamPanel()">🎮 View Progress</button>
@@ -1499,7 +1656,8 @@ textarea.finp { resize:vertical; min-height:50px; }
           <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--text2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folder improvements</div>
         </div>
       </div>
-    </div>
+      </div><!-- /.settings-inner -->
+    </div><!-- /#view-settings -->
 
 
       <!-- ═══ BLITZ MODE ═══ -->
@@ -2329,17 +2487,19 @@ function setVolume(v) { volume = parseFloat(v); saveSettings(); }
 // THEMES
 // ─────────────────────────────────────────────────
 const THEMES = [
-  {id:'dark',      icon:'🌙', name:'Dark'},
-  {id:'light',     icon:'☀️', name:'Light'},
-  {id:'dq',        icon:'💎', name:'DQ'},
-  {id:'glass',     icon:'🪟', name:'Glass'},
-  {id:'win8',      icon:'⊞', name:'Metro'},
-  {id:'ocean',     icon:'🌊', name:'Ocean'},
-  {id:'forest',    icon:'🌲', name:'Forest'},
-  {id:'sunset',    icon:'🌅', name:'Sunset'},
-  {id:'midnight',  icon:'🌌', name:'Midnight'},
-  {id:'candy',     icon:'🍬', name:'Candy'},
-  {id:'neon',      icon:'⚡', name:'Neon'},
+  {id:'dark',          icon:'🌙', name:'Dark'},
+  {id:'light',         icon:'☀️', name:'Light'},
+  {id:'dq',            icon:'💎', name:'DQ'},
+  {id:'glass',         icon:'🪟', name:'Glass'},
+  {id:'win8',          icon:'⊞', name:'Metro Blue'},
+  {id:'metro-lime',    icon:'⊞', name:'Metro Lime'},
+  {id:'metro-purple',  icon:'⊞', name:'Metro Purple'},
+  {id:'ocean',         icon:'🌊', name:'Ocean'},
+  {id:'forest',        icon:'🌲', name:'Forest'},
+  {id:'sunset',        icon:'🌅', name:'Sunset'},
+  {id:'midnight',      icon:'🌌', name:'Midnight'},
+  {id:'candy',         icon:'🍬', name:'Candy'},
+  {id:'neon',          icon:'⚡', name:'Neon'},
 ];
 function setTheme(id) {
   currentTheme = id;
@@ -3013,6 +3173,7 @@ function showView(id) {
 function goHome() {
   renderHome();
   showView('home');
+  animateHomeStats();
 }
 
 // ─────────────────────────────────────────────────
@@ -3535,14 +3696,6 @@ function renderSetPage(s, readOnly) {
   // Show/hide AI button based on setting
   const aiBtn = document.getElementById('ai-set-btn');
   if (aiBtn) aiBtn.style.display = aiEnabled ? '' : 'none';
-}
-
-function selectMode(id, el) {
-  selectedMode = id;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
-  if (el) el.classList.add('selected');
-  renderStartBar();
-  sndClick();
 }
 
 function renderStartBar() {
@@ -5788,6 +5941,9 @@ function showResults(score, total, mode, gamExtra = {}) {
   // Apply AI button visibility
   const aiBtn = document.getElementById('results-ai-btn');
   if (aiBtn) aiBtn.style.display = aiEnabled ? '' : 'none';
+  // Micro-animations
+  setTimeout(bounceResultsEmoji, 300);
+  if (gamEnabled) setTimeout(gamNavBtnPulse, 800);
 }
 
 function exitStudy() { openSet(currentSetId); }
@@ -6369,6 +6525,80 @@ function exitSpeedRound() {
 function retryStudy() { launchStudy(); }
 
 // ─────────────────────────────────────────────────
+// MICRO-ANIMATIONS
+// ─────────────────────────────────────────────────
+function animEl(el, cls, duration = 500) {
+  if (!el) return;
+  el.classList.remove(cls);
+  void el.offsetWidth; // reflow to restart
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), duration);
+}
+
+// Animate correct/wrong sounds with a visual bounce/shake
+const _origSndCorrect = sndCorrect;
+const _origSndWrong = sndWrong;
+// Patch sndCorrect to also animate the currently focused study card
+function sndCorrectAnim(elId) {
+  sndCorrect();
+  animEl(document.getElementById(elId), 'anim-bounce', 500);
+}
+function sndWrongAnim(elId) {
+  sndWrong();
+  animEl(document.getElementById(elId), 'anim-shake2', 400);
+}
+
+// Animate mode btn on select
+function selectMode(id, el) {
+  selectedMode = id;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  if (el) {
+    el.classList.add('selected');
+    animEl(el, 'anim-jelly', 400);
+  }
+  renderStartBar();
+  sndClick();
+}
+
+// Animate home stats on render
+function animateTrackStats() {
+  document.querySelectorAll('.track-stat').forEach((el, i) => {
+    el.style.animationDelay = (i * 0.06) + 's';
+    el.classList.remove('anim-float-up');
+    void el.offsetWidth;
+    el.classList.add('anim-float-up');
+  });
+}
+
+// Animate home stat tiles
+function animateHomeStats() {
+  setTimeout(() => {
+    document.querySelectorAll('.home-stat').forEach((el, i) => {
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.style.transition = 'opacity .3s ease, transform .3s ease';
+        el.style.opacity = '';
+        animEl(el, 'anim-float-up', 400);
+      }, i * 80);
+    });
+  }, 100);
+}
+
+// Wiggle the gam nav btn when XP is earned
+function gamNavBtnPulse() {
+  const btn = document.getElementById('gam-nav-btn');
+  if (btn) animEl(btn, 'anim-wiggle', 450);
+}
+
+// Bounce the results emoji
+function bounceResultsEmoji() {
+  const el = document.getElementById('results-emoji');
+  if (el) animEl(el, 'anim-bounce', 600);
+}
+
+
+
+// ─────────────────────────────────────────────────
 // CONFETTI
 // ─────────────────────────────────────────────────
 function launchConfetti() {
@@ -6402,32 +6632,132 @@ function launchConfetti() {
 // TRACKING
 // ─────────────────────────────────────────────────
 function showTracking() {
-  const allH = sets.flatMap(s=>s.history||[]);
+  const allH = sets.flatMap(s => (s.history||[]).map(h => ({...h, setName: s.name})));
+  allH.sort((a,b) => a.date - b.date);
   const avgScore = allH.length ? Math.round(allH.reduce((n,h)=>n+h.score/h.total*100,0)/allH.length) : 0;
+  const totalCards = sets.reduce((n,s)=>n+allCards(s).length,0);
+  const totalPlays = sets.reduce((n,s)=>n+(s.plays||0),0);
+
   document.getElementById('track-stats-grid').innerHTML = [
     ['📚', sets.length, 'Study Sets'],
-    ['📇', sets.reduce((n,s)=>n+allCards(s).length,0), 'Total Cards'],
-    ['▶', sets.reduce((n,s)=>n+(s.plays||0),0), 'Sessions'],
+    ['📇', totalCards, 'Total Cards'],
+    ['▶', totalPlays, 'Sessions'],
     ['📊', avgScore+'%', 'Avg Score'],
   ].map(([icon,n,label])=>`<div class="track-stat"><div class="track-stat-icon">${icon}</div><div class="track-stat-n">${n}</div><div class="track-stat-label">${label}</div></div>`).join('');
 
+  // ── Accuracy over time chart ──
+  const chartEl = document.getElementById('track-accuracy-chart');
+  if (allH.length < 2) {
+    chartEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);font-size:.8rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;">Complete at least 2 sessions to see your accuracy chart.</div>`;
+  } else {
+    const pts = allH.slice(-30);
+    const W = 560, H = 120, PAD = 12;
+    const scores = pts.map(h => Math.round(h.score/h.total*100));
+    const minS = Math.max(0, Math.min(...scores) - 10);
+    const maxS = Math.min(100, Math.max(...scores) + 10);
+    const range = maxS - minS || 1;
+    const xs = scores.map((_,i) => PAD + (i/(scores.length-1)) * (W - PAD*2));
+    const ys = scores.map(s => H - PAD - ((s - minS)/range) * (H - PAD*2));
+    const polyline = xs.map((x,i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+    const area = `M${xs[0].toFixed(1)},${ys[0].toFixed(1)} ` + xs.map((x,i)=>`L${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ') + ` L${xs[xs.length-1].toFixed(1)},${H-PAD} L${xs[0].toFixed(1)},${H-PAD} Z`;
+    const avgY = (H - PAD - ((avgScore - minS)/range) * (H - PAD*2)).toFixed(1);
+    const dateLabel = ts => { const d = new Date(ts); return d.toLocaleDateString('en',{month:'short',day:'numeric'}); };
+    chartEl.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:.7rem;font-weight:700;color:var(--text3);">Last ${scores.length} sessions</span>
+          <span style="font-size:.7rem;font-weight:800;color:var(--accent2);">Avg ${avgScore}%</span>
+        </div>
+        <svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible;display:block;">
+          <defs>
+            <linearGradient id="cGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1"/>
+          <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1"/>
+          <line x1="${PAD}" y1="${avgY}" x2="${W-PAD}" y2="${avgY}" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+          <path d="${area}" fill="url(#cGrad)"/>
+          <polyline points="${polyline}" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${xs.map((x,i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="3" fill="var(--accent2)" opacity="0.85"/>`).join('')}
+          <text x="${PAD}" y="${H+10}" font-size="9" fill="var(--text3)" font-family="inherit">${dateLabel(pts[0].date)}</text>
+          <text x="${W-PAD}" y="${H+10}" font-size="9" fill="var(--text3)" font-family="inherit" text-anchor="end">${dateLabel(pts[pts.length-1].date)}</text>
+        </svg>
+      </div>`;
+  }
+
+  // ── Mode breakdown bar chart ──
+  const modeEl = document.getElementById('track-mode-chart');
+  const modeTotals = {};
+  allH.forEach(h => {
+    const m = h.mode || 'Other';
+    if (!modeTotals[m]) modeTotals[m] = { sessions:0, totalPct:0 };
+    modeTotals[m].sessions++;
+    modeTotals[m].totalPct += Math.round(h.score/h.total*100);
+  });
+  const modeEntries = Object.entries(modeTotals)
+    .map(([m,d]) => ({ mode:m, sessions:d.sessions, avg:Math.round(d.totalPct/d.sessions) }))
+    .sort((a,b) => b.sessions - a.sessions).slice(0, 8);
+  if (!modeEntries.length) {
+    modeEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);font-size:.8rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;">No session data yet.</div>`;
+  } else {
+    const maxSess = Math.max(...modeEntries.map(e => e.sessions));
+    modeEl.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+      ${modeEntries.map(e => {
+        const barPct = Math.round(e.sessions/maxSess*100);
+        const color = e.avg >= 80 ? 'var(--green2)' : e.avg >= 60 ? 'var(--amber2)' : 'var(--red2)';
+        return `<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;margin-bottom:4px;">
+            <span>${e.mode}</span>
+            <span style="color:var(--text3);">${e.sessions} session${e.sessions!==1?'s':''} · <span style="color:${color};">${e.avg}% avg</span></span>
+          </div>
+          <div style="height:7px;background:var(--border);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${barPct}%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:4px;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // ── Set mastery list with sparklines ──
   document.getElementById('track-sets-list').innerHTML = sets.map(s => {
     const cards = allCards(s);
     const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
-    const hist = (s.history||[]).slice(-1)[0];
+    const hist = s.history || [];
+    const lastH = hist.slice(-1)[0];
+    let sparkSvg = '';
+    if (hist.length >= 2) {
+      const pts = hist.slice(-8);
+      const sw = 60, sh = 22;
+      const scores = pts.map(h => Math.round(h.score/h.total*100));
+      const minS = Math.max(0, Math.min(...scores) - 5);
+      const maxS = Math.min(100, Math.max(...scores) + 5);
+      const range = maxS - minS || 1;
+      const xs = scores.map((_,i) => 2 + (i/(scores.length-1))*(sw-4));
+      const ys = scores.map(sc => sh - 2 - ((sc-minS)/range)*(sh-4));
+      const trend = scores[scores.length-1] >= scores[0];
+      const col = trend ? 'var(--green2)' : 'var(--red2)';
+      sparkSvg = `<svg viewBox="0 0 ${sw} ${sh}" width="${sw}" height="${sh}" style="flex-shrink:0;">
+        <polyline points="${xs.map((x,i)=>`${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ')}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${xs[xs.length-1].toFixed(1)}" cy="${ys[ys.length-1].toFixed(1)}" r="2.5" fill="${col}"/>
+      </svg>`;
+    }
     return `<div class="track-set-row" onclick="openSet('${s.id}')">
       <div class="track-set-icon-big">${s.icon||'📖'}</div>
       <div class="track-set-info">
         <div class="track-set-name">${esc(s.name)}</div>
-        <div class="track-set-sub">${s.class||''} ${s.unit?'· '+s.unit:''} · ${cards.length} cards${hist?' · Last: '+Math.round(hist.score/hist.total*100)+'%':''}</div>
+        <div class="track-set-sub">${s.class||''} ${s.unit?'· '+s.unit:''} · ${cards.length} cards${lastH?' · Last: '+Math.round(lastH.score/lastH.total*100)+'%':''}</div>
         <div class="track-mastery-track"><div class="track-mastery-fill" style="width:${mastery}%"></div></div>
       </div>
+      ${sparkSvg}
       <div class="track-pct" style="color:${mastery>=80?'var(--green2)':mastery>=60?'var(--amber2)':'var(--text2)'}">${mastery}%</div>
     </div>`;
   }).join('') || '<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">No data yet</div><div class="empty-sub">Study some sets to see your progress here.</div></div>';
-  // directly activate the view without going through showView (avoids loop)
+
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-tracking').classList.add('active');
+  setTimeout(animateTrackStats, 50);
 }
 
 // ─────────────────────────────────────────────────
