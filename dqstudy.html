@@ -391,6 +391,19 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 #view-landing.active { display:flex; flex-direction:column; }
 #view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active { display:flex; flex-direction:column; }
 
+/* ═══ GAMIFICATION ═══ */
+.gam-home-widget {
+  margin-top: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color .15s;
+  max-width: 360px;
+}
+.gam-home-widget:hover { border-color: var(--border2); }
+
 /* ═══ TOOLTIPS ═══ */
 .tip { position:relative; display:inline-flex; }
 .tip-icon { font-size:.75rem; color:var(--text3); cursor:help; margin-left:5px; opacity:.6; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid var(--border2); transition:all .15s; }
@@ -1050,6 +1063,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
   </div>
   <div class="nav-spacer"></div>
+  <button class="nav-icon-btn" title="Your progress" onclick="showGamPanel()" id="gam-nav-btn">🎮</button>
   <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
   <button class="nav-icon-btn" title="Settings" onclick="showView('settings')">⚙️</button>
   <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
@@ -1247,6 +1261,7 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="results-msg" id="results-msg">—</div>
       <div class="results-sub" id="results-sub"></div>
       <div class="results-breakdown" id="results-breakdown"></div>
+      <div id="results-gam-widget"></div>
       <div class="results-actions" id="results-actions"></div>
     </div>
 
@@ -1448,9 +1463,25 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">💾 Data</div>
+        <div class="settings-section-title">🎮 Gamification</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">XP, Levels & Achievements</div>
+            <div class="settings-toggle-sub">Track XP, daily streaks, and unlock achievements as you study</div>
+          </div>
+          <button class="toggle on" id="gam-toggle" onclick="toggleGamSetting()"></button>
+        </div>
+        <div class="settings-toggle-row" style="margin-top:4px;">
+          <div>
+            <div class="settings-toggle-label" style="font-size:.75rem;">View your progress</div>
+            <div class="settings-toggle-sub">See levels, achievements, and streak history</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="showGamPanel()" style="flex-shrink:0;">🎮 Open</button>
+        </div>
+      </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
+          <button class="btn btn-ghost btn-sm" onclick="showGamPanel()">🎮 View Progress</button>
           <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Clear All Data</button>
         </div>
       </div>
@@ -1458,13 +1489,14 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div class="settings-section-title">ℹ️ About & Version</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
           <div style="font-size:1.1rem;font-weight:900;">DQstudy</div>
-          <div style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;">v1.2.0</div>
+          <div style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;">v1.3.0</div>
         </div>
         <div style="font-size:.75rem;color:var(--text2);line-height:1.7;margin-bottom:14px;">Part of the DQ Tools suite. Built for students. Data saved locally and synced to your DQ Account when signed in.</div>
         <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">📋 Changelog</div>
         <div style="font-size:.72rem;color:var(--text2);line-height:1.8;">
-          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--accent2);">v1.2.0</span> — Gravity mode (fullscreen falling-terms game), grouped mode picker with Learn/Practice/Challenge tiers, onboarding steps for new users, first-time set hints, consistent nav icons + X/Y counters across all modes, blitz &amp; streak card counters, fixed set opening bug, mode description cleanup</div>
-          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--text2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folders now support shared sets, Created by on shared sets, import count tracking, URL code import</div>
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--accent2);">v1.3.0</span> — Gamification: XP system, 8 levels (Rookie→Prodigy), 12 achievements, daily streak tracking, XP widget on home + results screen, 🎮 nav button</div>
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--text2);">v1.2.0</span> — Gravity mode, grouped mode picker, Glass/Metro/DQ themes, onboarding steps, consistent nav counters</div>
+          <div style="margin-bottom:6px;"><span style="font-weight:800;color:var(--text2);">v1.0.0</span> — Landing/auth overhaul, 2-col home layout, icon picker, sharing toggle, matching scoring fix, folder improvements</div>
         </div>
       </div>
     </div>
@@ -1750,6 +1782,58 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
 
       <div id="gravity-feedback" style="text-align:center;font-size:.75rem;font-weight:700;margin-top:5px;min-height:16px;color:var(--text3);"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GAMIFICATION MODAL ═══ -->
+<div class="modal-overlay" id="gam-modal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-head">
+      <div class="modal-title">🎮 Your Progress</div>
+      <button class="modal-close" onclick="closeModal('gam-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;max-height:70vh;">
+
+      <!-- Level + XP bar -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:16px;background:var(--surface2);border-radius:12px;">
+        <div id="gam-level-icon" style="font-size:2.4rem;line-height:1;">🌱</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+            <div id="gam-level-name" style="font-size:1.1rem;font-weight:900;">Rookie</div>
+            <div id="gam-xp-text" style="font-size:.7rem;color:var(--text3);">0 XP total</div>
+          </div>
+          <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:4px;">
+            <div id="gam-xp-bar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .5s ease;"></div>
+          </div>
+          <div id="gam-next-text" style="font-size:.65rem;color:var(--text3);"></div>
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="gam-streak-n" style="font-size:1.4rem;font-weight:900;color:var(--amber2);">0</div>
+          <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:2px;">Day Streak</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="gam-sessions-n" style="font-size:1.4rem;font-weight:900;color:var(--accent2);">0</div>
+          <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:2px;">Sessions</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="gam-ach-n" style="font-size:1.4rem;font-weight:900;color:var(--purple2);">0 / 12</div>
+          <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:2px;">Achievements</div>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div style="font-size:.62rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">🏅 Achievements</div>
+      <div id="gam-ach-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px;"></div>
+
+      <!-- Levels -->
+      <div style="font-size:.62rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">📈 Levels</div>
+      <div id="gam-levels-list"></div>
+
     </div>
   </div>
 </div>
@@ -2181,6 +2265,7 @@ let sharingEnabled = true;
 let cardFontSize = 'medium'; // 'small' | 'medium' | 'large' | 'xlarge'
 let compactMode = false;
 let homeBlobsEnabled = true; // show/hide all sharing & codes features
+let gamEnabled = true; // show/hide gamification (XP, streak, achievements)
 let aiSeenPrompt = false;
 let aiContext = 'set';
 let bgAnim = 'none';
@@ -2300,19 +2385,22 @@ function loadSettings() {
     if (s.cardFontSize) cardFontSize = s.cardFontSize;
     if (s.compactMode !== undefined) compactMode = s.compactMode;
     if (s.homeBlobsEnabled !== undefined) homeBlobsEnabled = s.homeBlobsEnabled;
+    if (s.gamEnabled !== undefined) gamEnabled = s.gamEnabled;
     aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
   const t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled);
   const at = document.getElementById('ai-toggle'); if (at) at.classList.toggle('on', aiEnabled);
   const st = document.getElementById('sharing-toggle'); if (st) st.classList.toggle('on', sharingEnabled);
+  const gt = document.getElementById('gam-toggle'); if (gt) gt.classList.toggle('on', gamEnabled);
   applySharingVisibility();
   applyCardFontSize();
   applyCompactMode();
   applyHomeBlobsEnabled();
+  applyGamVisibility();
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
@@ -2374,6 +2462,7 @@ function bootApp() {
   _appState = 'app';
   applySharingVisibility();
   applyAIVisibility();
+  applyGamVisibility();
   // Check for ?code= URL param — auto-import shared set
   const _urlCode = new URLSearchParams(window.location.search).get('code');
   // Note: DQS1 codes are too long for URLs in practice — only DQ-XXXX codes work as links
@@ -2428,6 +2517,299 @@ async function handleURLCode(code) {
 
 // Always load local data synchronously — it's ready before anything else
 const localTimestamp = loadLocal();
+loadGam();
+
+// ─────────────────────────────────────────────────
+// GAMIFICATION
+// ─────────────────────────────────────────────────
+
+const GAM_LEVELS = [
+  { level:1, name:'Rookie',     min:0,    icon:'🌱', color:'#6b7280' },
+  { level:2, name:'Beginner',   min:100,  icon:'📗', color:'#22c55e' },
+  { level:3, name:'Scholar',    min:300,  icon:'📘', color:'#3b82f6' },
+  { level:4, name:'Studious',   min:700,  icon:'📙', color:'#f59e0b' },
+  { level:5, name:'Expert',     min:1500, icon:'🔬', color:'#8b5cf6' },
+  { level:6, name:'Master',     min:3000, icon:'🏆', color:'#f97316' },
+  { level:7, name:'Legend',     min:6000, icon:'⭐', color:'#eab308' },
+  { level:8, name:'Prodigy',    min:12000,icon:'💎', color:'#06b6d4' },
+];
+
+const GAM_ACHIEVEMENTS = [
+  { id:'first_study',    icon:'🎯', name:'First Steps',        desc:'Complete your first study session',                    check: g => g.totalSessions >= 1 },
+  { id:'perfect',        icon:'💯', name:'Perfectionist',      desc:'Score 100% on any session',                           check: (g,score,total) => total > 0 && score === total },
+  { id:'on_fire',        icon:'🔥', name:'On Fire',            desc:'Reach a 3-day study streak',                          check: g => g.streak >= 3 },
+  { id:'week_streak',    icon:'📅', name:'Week Warrior',       desc:'Maintain a 7-day study streak',                       check: g => g.streak >= 7 },
+  { id:'century',        icon:'💯', name:'Century',            desc:'Earn 100 XP total',                                   check: g => g.xp >= 100 },
+  { id:'scholar',        icon:'📚', name:'Scholar',            desc:'Reach Scholar level (300 XP)',                        check: g => g.xp >= 300 },
+  { id:'legend',         icon:'⭐', name:'Legend',             desc:'Reach Legend level (6000 XP)',                        check: g => g.xp >= 6000 },
+  { id:'speed_demon',    icon:'⚡', name:'Speed Demon',        desc:'Complete a Speed Round session',                      check: (g,s,t,mode) => mode === 'Speed Round' },
+  { id:'gravity_master', icon:'🌧️', name:'Gravity Master',    desc:'Complete a Gravity session with 5+ combo',            check: (g,s,t,mode,extra) => mode === 'Gravity' && (extra?.combo||0) >= 5 },
+  { id:'night_owl',      icon:'🦉', name:'Night Owl',          desc:'Study after 10 PM',                                   check: g => new Date().getHours() >= 22 },
+  { id:'early_bird',     icon:'🐦', name:'Early Bird',         desc:'Study before 7 AM',                                   check: g => new Date().getHours() < 7 },
+  { id:'set_collector',  icon:'📂', name:'Collector',          desc:'Own 5 or more study sets',                            check: g => sets.filter(s=>!s.isSnapshot).length >= 5 },
+];
+
+// XP per mode (base, adjusted by accuracy)
+const GAM_XP_BASE = {
+  'Flashcards':10, 'Multiple Choice':15, 'Timed Test':20,
+  'Matching':12, 'Write It':18, 'Speed Round':16,
+  'Blitz':14, 'Streak':14, 'Elimination':16,
+  'Fill in Blank':18, 'Spelling':18, 'Smart Review':20, 'Gravity':16,
+};
+
+let gam = {
+  xp: 0, level: 1, streak: 0, lastStudyDate: null,
+  totalSessions: 0, achievements: {},
+};
+
+function loadGam() {
+  try {
+    const s = JSON.parse(localStorage.getItem('dqstudy-gam') || '{}');
+    if (s.xp !== undefined) gam = { ...gam, ...s };
+    // Ensure achievements is always an object
+    if (!gam.achievements || typeof gam.achievements !== 'object') gam.achievements = {};
+  } catch(_) {}
+}
+
+function saveGam() {
+  localStorage.setItem('dqstudy-gam', JSON.stringify(gam));
+  const _u = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+  if (_u) DQAuth.saveData('dqstudy-gam', gam);
+}
+
+function gamShowStreakToast(streak) {
+  // Remove any existing streak toast
+  const existing = document.getElementById('streak-toast');
+  if (existing) existing.remove();
+
+  const msgs = [
+    { min: 2,  msg: `🔥 ${streak}-Day Streak!`, sub: 'You studied yesterday too — keep it up!' },
+    { min: 3,  msg: `🔥 ${streak}-Day Streak!`, sub: 'You\'re on a roll! Consistency is everything.' },
+    { min: 7,  msg: `⭐ ${streak}-Day Streak!`, sub: 'A whole week of studying. Seriously impressive.' },
+    { min: 14, msg: `💎 ${streak}-Day Streak!`, sub: 'Two weeks straight. You\'re unstoppable.' },
+    { min: 30, msg: `👑 ${streak}-Day Streak!`, sub: 'Thirty days. Legendary dedication.' },
+  ];
+  // Pick highest matching message
+  const msg = [...msgs].reverse().find(m => streak >= m.min) || msgs[0];
+
+  const toast = document.createElement('div');
+  toast.id = 'streak-toast';
+  toast.style.cssText = `
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    z-index: 9000; background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff; border-radius: 16px; padding: 14px 24px; text-align: center;
+    box-shadow: 0 8px 32px rgba(245,158,11,.4); min-width: 260px; max-width: 360px;
+    opacity: 0; transition: opacity .3s ease, transform .3s ease;
+    font-family: var(--font);
+  `;
+  toast.innerHTML = `
+    <div style="font-size:1.1rem;font-weight:900;letter-spacing:-.01em;margin-bottom:3px;">${msg.msg}</div>
+    <div style="font-size:.75rem;opacity:.9;font-weight:600;line-height:1.4;">${msg.sub}</div>
+  `;
+
+  document.body.appendChild(toast);
+  // Animate in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    });
+  });
+  // Animate out after 3.5s
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(-16px)';
+    setTimeout(() => toast.remove(), 350);
+  }, 3500);
+}
+
+async function loadGamCloud() {
+  try {
+    const _u = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
+    if (!_u) return;
+    const cloud = await DQAuth.loadData('dqstudy-gam');
+    if (cloud && cloud.xp !== undefined && cloud.xp > gam.xp) {
+      gam = { ...gam, ...cloud };
+      if (!gam.achievements) gam.achievements = {};
+      saveGam();
+    }
+  } catch(_) {}
+}
+
+function gamGetLevel(xp) {
+  let cur = GAM_LEVELS[0];
+  for (const l of GAM_LEVELS) { if (xp >= l.min) cur = l; else break; }
+  return cur;
+}
+
+function gamGetNextLevel(xp) {
+  for (const l of GAM_LEVELS) { if (xp < l.min) return l; }
+  return null; // max level
+}
+
+function gamUpdateStreak() {
+  const today = new Date().toDateString();
+  const last  = gam.lastStudyDate;
+  if (last === today) return; // already credited today
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  gam.streak = (last === yesterday) ? gam.streak + 1 : 1;
+  gam.lastStudyDate = today;
+}
+
+// Called from showResults. extra = {combo} for gravity, etc.
+function gamAwardSession(score, total, mode, extra = {}) {
+  const pct = total > 0 ? score / total : 0;
+  const base = GAM_XP_BASE[mode] || 10;
+  // XP = base × accuracy_mult × streak_bonus
+  const accMult  = 0.5 + pct * 1.5;   // 0.5× at 0%, 2× at 100%
+  const streakBonus = Math.min(1 + (gam.streak - 1) * 0.05, 1.5); // +5% per streak day, cap 1.5×
+  const xpEarned = Math.max(1, Math.round(base * accMult * streakBonus));
+
+  const todayStr = new Date().toDateString();
+  const wasAlreadyToday = gam.lastStudyDate === todayStr;
+  const prevStreak = gam.streak;
+  gamUpdateStreak();
+  // streakExtended = streak went up AND this is the first study of today
+  const streakExtended = !wasAlreadyToday && gam.streak > 1;
+  const prevXP    = gam.xp;
+  const prevLevel = gamGetLevel(prevXP).level;
+  gam.xp += xpEarned;
+  gam.totalSessions++;
+  const newLevel = gamGetLevel(gam.xp).level;
+  const leveledUp = newLevel > prevLevel;
+
+  // Check achievements
+  const newlyUnlocked = [];
+  for (const ach of GAM_ACHIEVEMENTS) {
+    if (gam.achievements[ach.id]) continue; // already unlocked
+    let unlocked = false;
+    try { unlocked = ach.check(gam, score, total, mode, extra); } catch(_) {}
+    if (unlocked) {
+      gam.achievements[ach.id] = Date.now();
+      newlyUnlocked.push(ach);
+    }
+  }
+
+  saveGam();
+  return { xpEarned, prevXP, newXP: gam.xp, leveledUp, newLevel: gamGetLevel(gam.xp), newlyUnlocked, streakExtended, currentStreak: gam.streak };
+}
+
+function gamRenderResultsWidget(result) {
+  const { xpEarned, prevXP, newXP, leveledUp, newLevel, newlyUnlocked } = result;
+  const next = gamGetNextLevel(newXP);
+  const nextMin = next ? next.min : newXP;
+  const prevMin = gamGetLevel(prevXP).min;
+  const rangeTotal = nextMin - prevMin;
+  const rangeNow   = newXP - prevMin;
+  const pct = next ? Math.min(100, Math.round(rangeNow / rangeTotal * 100)) : 100;
+
+  return `
+    <div id="gam-results-widget" style="width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin:12px 0;text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:1.4rem;">${newLevel.icon}</span>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:.78rem;font-weight:800;color:${newLevel.color};">${newLevel.name}</span>
+            <span style="font-size:.7rem;font-weight:700;color:var(--accent2);">+${xpEarned} XP</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;">
+            <div style="height:100%;width:${pct}%;background:${newLevel.color};border-radius:3px;transition:width .6s ease;"></div>
+          </div>
+          <div style="font-size:.6rem;color:var(--text3);margin-top:3px;">${newXP} XP${next ? ` · ${next.min - newXP} to ${next.name}` : ' · Max level!'}</div>
+        </div>
+      </div>
+      ${leveledUp ? `<div style="text-align:center;padding:8px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:8px;font-size:.8rem;font-weight:800;color:var(--amber2);margin-bottom:8px;">🎉 Level Up! You're now a ${newLevel.name}!</div>` : ''}
+      ${newlyUnlocked.map(a => `
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:8px;margin-bottom:6px;">
+          <span style="font-size:1.1rem;">${a.icon}</span>
+          <div><div style="font-size:.75rem;font-weight:800;color:var(--amber2);">Achievement unlocked: ${a.name}</div><div style="font-size:.62rem;color:var(--text3);">${a.desc}</div></div>
+        </div>`).join('')}
+      ${gam.streak > 1 ? `<div style="font-size:.65rem;color:var(--text3);text-align:center;">🔥 ${gam.streak}-day streak bonus applied</div>` : ''}
+    </div>`;
+}
+
+function gamRenderHomeWidget() {
+  const lvl  = gamGetLevel(gam.xp);
+  const next = gamGetNextLevel(gam.xp);
+  const pct  = next ? Math.min(100, Math.round((gam.xp - lvl.min) / (next.min - lvl.min) * 100)) : 100;
+  const today = new Date().toDateString();
+  const studiedToday = gam.lastStudyDate === today;
+  return `
+    <div class="gam-home-widget">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:1.2rem;">${lvl.icon}</span>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <span style="font-size:.75rem;font-weight:900;color:${lvl.color};">${lvl.name}</span>
+            <span style="font-size:.65rem;font-weight:700;color:var(--text3);">${gam.xp} XP</span>
+          </div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:3px;">
+            <div style="height:100%;width:${pct}%;background:${lvl.color};border-radius:2px;transition:width .5s;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <div style="font-size:.65rem;color:${gam.streak >= 3 ? 'var(--amber2)' : 'var(--text3)'};">
+          ${gam.streak >= 1 ? '🔥' : '💤'} ${gam.streak > 0 ? gam.streak + '-day streak' : 'No streak yet'}
+        </div>
+        <div style="font-size:.65rem;color:${studiedToday ? 'var(--green2)' : 'var(--text3)'};">
+          ${studiedToday ? '✅ Studied today' : '📖 Study to keep streak'}
+        </div>
+      </div>
+    </div>`;
+}
+
+function showGamPanel() {
+  if (!gamEnabled) return;
+  const lvl  = gamGetLevel(gam.xp);
+  const next = gamGetNextLevel(gam.xp);
+  const pct  = next ? Math.min(100, Math.round((gam.xp - lvl.min) / (next.min - lvl.min) * 100)) : 100;
+  const unlockedCount = Object.keys(gam.achievements).length;
+
+  document.getElementById('gam-level-icon').textContent = lvl.icon;
+  document.getElementById('gam-level-name').textContent = lvl.name;
+  document.getElementById('gam-level-name').style.color = lvl.color;
+  document.getElementById('gam-xp-text').textContent = gam.xp + ' XP total';
+  document.getElementById('gam-xp-bar').style.width = pct + '%';
+  document.getElementById('gam-xp-bar').style.background = lvl.color;
+  document.getElementById('gam-next-text').textContent = next ? `${next.min - gam.xp} XP to ${next.name}` : 'Max level reached! 🏆';
+  document.getElementById('gam-streak-n').textContent = gam.streak;
+  document.getElementById('gam-sessions-n').textContent = gam.totalSessions;
+  document.getElementById('gam-ach-n').textContent = unlockedCount + ' / ' + GAM_ACHIEVEMENTS.length;
+
+  // Render all levels
+  document.getElementById('gam-levels-list').innerHTML = GAM_LEVELS.map(l => {
+    const reached = gam.xp >= l.min;
+    const isCur   = l.level === lvl.level;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);opacity:${reached ? 1 : 0.4};">
+      <span style="font-size:1.2rem;${isCur ? '' : ''}">${l.icon}</span>
+      <div style="flex:1;">
+        <span style="font-size:.8rem;font-weight:800;color:${reached ? l.color : 'var(--text3)'};">${l.name}</span>
+        ${isCur ? '<span style="font-size:.6rem;background:var(--accent-dim);color:var(--accent2);border-radius:100px;padding:1px 7px;margin-left:6px;font-weight:700;">Current</span>' : ''}
+        <div style="font-size:.62rem;color:var(--text3);">${l.min} XP</div>
+      </div>
+      ${reached ? '<span style="color:var(--green2);font-size:.9rem;">✓</span>' : ''}
+    </div>`;
+  }).join('');
+
+  // Render achievements
+  document.getElementById('gam-ach-list').innerHTML = GAM_ACHIEVEMENTS.map(a => {
+    const unlocked = !!gam.achievements[a.id];
+    const ts = gam.achievements[a.id];
+    const dateStr = ts ? new Date(ts).toLocaleDateString() : '';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${unlocked ? 'rgba(255,215,0,.05)' : 'var(--surface)'};border:1px solid ${unlocked ? 'rgba(255,215,0,.2)' : 'var(--border)'};border-radius:10px;opacity:${unlocked ? 1 : 0.5};">
+      <span style="font-size:1.4rem;">${a.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:.78rem;font-weight:800;color:${unlocked ? 'var(--amber2)' : 'var(--text2)'};">${a.name}</div>
+        <div style="font-size:.62rem;color:var(--text3);">${a.desc}</div>
+        ${unlocked ? `<div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Unlocked ${dateStr}</div>` : ''}
+      </div>
+      ${unlocked ? '<span style="font-size:1rem;">🏅</span>' : '<span style="font-size:.9rem;color:var(--border2);">🔒</span>'}
+    </div>`;
+  }).join('');
+
+  openModal('gam-modal');
+}
 
 // ─── AUTH + INIT ───────────────────────────────────
 // State machine: 'waiting' → 'landing' → 'booting' → 'app'
@@ -2458,6 +2840,7 @@ async function _handleSignIn(user) {
   if (_appState === 'app') {
     isLoggedIn = true;
     await _loadCloudData(user);
+    loadGamCloud();
     renderSidebar();
     renderHome();
   }
@@ -2676,6 +3059,7 @@ function renderHome(tab) {
             ${sharingEnabled ? `<button class="home-quick-btn sharing-btn" onclick="showCodesView()">🔗 Codes</button>` : ''}
             <button class="home-quick-btn" onclick="showView('tracking')">📊 Progress</button>
           </div>
+          ${gamEnabled ? gamRenderHomeWidget().replace('<div class="gam-home-widget">', '<div class="gam-home-widget" onclick="showGamPanel()" title="View your progress">') : ''}
         </div>
         <div class="home-hero-stats">
           <div class="home-stat"><div class="home-stat-n">${myMine.length}</div><div class="home-stat-label">Sets</div></div>
@@ -5353,7 +5737,7 @@ function getSmartBadge(s) {
 // ─────────────────────────────────────────────────
 // RESULTS
 // ─────────────────────────────────────────────────
-function showResults(score, total, mode) {
+function showResults(score, total, mode, gamExtra = {}) {
   if (quizTimerInt) { clearInterval(quizTimerInt); quizTimerInt = null; }
   const pct = total > 0 ? Math.round(score/total*100) : 0;
   const isGreat = pct >= 80, isOk = pct >= 60;
@@ -5385,8 +5769,25 @@ function showResults(score, total, mode) {
     <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
     <button class="btn btn-ghost ai-btn" onclick="openAIModal('results')" id="results-ai-btn" style="display:none">🤖 AI Help</button>
   `;
+
+  // Award XP and show gamification widget
+  const gamWidget = document.getElementById('results-gam-widget');
+  if (gamEnabled) {
+    const gamResult = gamAwardSession(score, total, mode, gamExtra);
+    if (gamWidget) gamWidget.innerHTML = gamRenderResultsWidget(gamResult);
+    // Streak celebration toast — shown after a short delay so results screen is visible first
+    if (gamResult.streakExtended) {
+      setTimeout(() => gamShowStreakToast(gamResult.currentStreak), 600);
+    }
+  } else {
+    if (gamWidget) gamWidget.innerHTML = '';
+  }
+
   showView('results');
   if (isGreat) { sndComplete(); launchConfetti(); } else { sndWrong(); }
+  // Apply AI button visibility
+  const aiBtn = document.getElementById('results-ai-btn');
+  if (aiBtn) aiBtn.style.display = aiEnabled ? '' : 'none';
 }
 
 function exitStudy() { openSet(currentSetId); }
@@ -5791,7 +6192,7 @@ function _gravityFinish() {
   }
   document.getElementById('gravity-overlay').style.display = 'none';
   gravityTerms = [];
-  showResults(gravityCorrect, total, 'Gravity');
+  showResults(gravityCorrect, total, 'Gravity', { combo: gravityBestCombo });
   // Inject best combo into breakdown
   if (gravityBestCombo >= 2) {
     const bd = document.getElementById('results-breakdown');
@@ -7725,6 +8126,23 @@ function toggleAISetting() {
   const t = document.getElementById('ai-toggle');
   if (t) t.classList.toggle('on', aiEnabled);
   updateAIButtonVisibility();
+  saveSettings();
+}
+
+function applyGamVisibility() {
+  const show = gamEnabled;
+  const navBtn = document.getElementById('gam-nav-btn');
+  if (navBtn) navBtn.style.display = show ? '' : 'none';
+  // Home widget is rendered dynamically in renderHome, so just re-render if on home
+  const homeActive = document.getElementById('view-home')?.classList.contains('active');
+  if (homeActive) renderHome();
+}
+
+function toggleGamSetting() {
+  gamEnabled = !gamEnabled;
+  const t = document.getElementById('gam-toggle');
+  if (t) t.classList.toggle('on', gamEnabled);
+  applyGamVisibility();
   saveSettings();
 }
 
