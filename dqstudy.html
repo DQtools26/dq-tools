@@ -3326,7 +3326,7 @@ async function showDailyKnowledge() {
   const dayKey = new Date().toISOString().slice(0, 10);
   let questions = null;
 
-  // Try Supabase cache — same questions for everyone
+  // 1. Try Supabase cache — same questions for everyone
   try {
     const cacheRes = await fetch(
       DQS_URL + '/rest/v1/daily_challenge?day_key=eq.' + dayKey + '&select=questions',
@@ -3334,30 +3334,51 @@ async function showDailyKnowledge() {
     );
     if (cacheRes.ok) {
       const rows = await cacheRes.json();
-      if (rows && rows[0] && rows[0].questions) questions = rows[0].questions;
+      if (rows && rows[0] && rows[0].questions) {
+        const raw = rows[0].questions;
+        questions = Array.isArray(raw) ? raw : JSON.parse(raw);
+        if (!Array.isArray(questions) || !questions[0]?.correct) questions = null;
+      }
     }
   } catch(_) {}
 
-  // Not cached — fetch fresh from OpenTDB and write to Supabase
+  // 2. Try The Trivia API (CORS-friendly, no key needed)
   if (!questions) {
     try {
-      const res = await fetch('https://opentdb.com/api.php?amount=10&type=multiple&encode=url3986');
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      if (data.response_code !== 0 || !data.results?.length) throw new Error();
-      const seed = _dailySeed();
-      questions = _seededShuffle(data.results, seed).map((q, i) => {
-        const correct = decodeURIComponent(q.correct_answer);
-        const opts = _seededShuffle([correct, ...q.incorrect_answers.map(a => decodeURIComponent(a))], seed + i);
-        return { question: decodeURIComponent(q.question), category: decodeURIComponent(q.category), difficulty: q.difficulty, correct, opts };
+      const res = await fetch('https://the-trivia-api.com/v2/questions?limit=10', {
+        headers: { 'Accept': 'application/json' }
       });
-      // Cache in Supabase so everyone else gets same set
-      fetch(DQS_URL + '/rest/v1/daily_challenge', {
-        method: 'POST',
-        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=ignore-duplicates' },
-        body: JSON.stringify({ day_key: dayKey, questions })
-      }).catch(() => {});
-    } catch(err) { _renderDailyError(); return; }
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length >= 5) {
+          const seed = _dailySeed();
+          questions = _seededShuffle(data, seed).slice(0, 10).map((q, i) => {
+            const correct = q.correctAnswer;
+            const opts = _seededShuffle([correct, ...q.incorrectAnswers], seed + i);
+            return {
+              question: q.question?.text || q.question,
+              category: q.category || 'General',
+              difficulty: q.difficulty || 'medium',
+              correct, opts
+            };
+          });
+        }
+      }
+    } catch(_) {}
+  }
+
+  // 3. Fallback — built-in question bank (works offline, no CORS)
+  if (!questions) {
+    questions = _getDailyFallbackQuestions();
+  }
+
+  // Cache in Supabase for other users
+  if (questions) {
+    fetch(DQS_URL + '/rest/v1/daily_challenge', {
+      method: 'POST',
+      headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=ignore-duplicates' },
+      body: JSON.stringify({ day_key: dayKey, questions })
+    }).catch(() => {});
   }
 
   _dailyQuestions = questions;
@@ -3367,13 +3388,132 @@ async function showDailyKnowledge() {
   _renderDailyQuestion();
 }
 
+function _getDailyFallbackQuestions() {
+  // 100-question rotating bank — pick 10 by day seed so same for everyone
+  const bank = [
+    {q:"What is the chemical symbol for gold?", c:"Au", w:["Ag","Gd","Go"], cat:"Science"},
+    {q:"How many sides does a hexagon have?", c:"6", w:["5","7","8"], cat:"Math"},
+    {q:"Who painted the Mona Lisa?", c:"Leonardo da Vinci", w:["Michelangelo","Raphael","Botticelli"], cat:"Art"},
+    {q:"What is the capital of Japan?", c:"Tokyo", w:["Kyoto","Osaka","Hiroshima"], cat:"Geography"},
+    {q:"Which planet is closest to the Sun?", c:"Mercury", w:["Venus","Mars","Earth"], cat:"Science"},
+    {q:"How many bones are in the adult human body?", c:"206", w:["198","212","220"], cat:"Science"},
+    {q:"What language has the most native speakers worldwide?", c:"Mandarin Chinese", w:["English","Spanish","Hindi"], cat:"Language"},
+    {q:"In what year did World War II end?", c:"1945", w:["1943","1944","1946"], cat:"History"},
+    {q:"What is the largest ocean on Earth?", c:"Pacific", w:["Atlantic","Indian","Arctic"], cat:"Geography"},
+    {q:"Who wrote 'Romeo and Juliet'?", c:"William Shakespeare", w:["Christopher Marlowe","Ben Jonson","John Milton"], cat:"Literature"},
+    {q:"What is the square root of 144?", c:"12", w:["11","13","14"], cat:"Math"},
+    {q:"Which element has the atomic number 1?", c:"Hydrogen", w:["Helium","Lithium","Oxygen"], cat:"Science"},
+    {q:"What is the fastest land animal?", c:"Cheetah", w:["Lion","Pronghorn","Ostrich"], cat:"Nature"},
+    {q:"How many continents are there on Earth?", c:"7", w:["5","6","8"], cat:"Geography"},
+    {q:"What currency does Japan use?", c:"Yen", w:["Won","Yuan","Baht"], cat:"World"},
+    {q:"Who developed the theory of relativity?", c:"Albert Einstein", w:["Isaac Newton","Niels Bohr","Max Planck"], cat:"Science"},
+    {q:"What is the longest river in the world?", c:"Nile", w:["Amazon","Yangtze","Mississippi"], cat:"Geography"},
+    {q:"In computing, what does CPU stand for?", c:"Central Processing Unit", w:["Core Processing Unit","Central Program Unit","Computer Processing Unit"], cat:"Tech"},
+    {q:"What is the hardest natural substance on Earth?", c:"Diamond", w:["Graphite","Corundum","Quartz"], cat:"Science"},
+    {q:"Which country invented the printing press?", c:"Germany", w:["China","England","France"], cat:"History"},
+    {q:"What is the smallest country in the world?", c:"Vatican City", w:["Monaco","San Marino","Liechtenstein"], cat:"Geography"},
+    {q:"How many strings does a standard guitar have?", c:"6", w:["4","5","7"], cat:"Music"},
+    {q:"Who was the first person to walk on the Moon?", c:"Neil Armstrong", w:["Buzz Aldrin","Yuri Gagarin","Alan Shepard"], cat:"History"},
+    {q:"What is the most abundant gas in Earth's atmosphere?", c:"Nitrogen", w:["Oxygen","Carbon dioxide","Argon"], cat:"Science"},
+    {q:"Which ocean is the Bermuda Triangle in?", c:"Atlantic", w:["Pacific","Indian","Caribbean"], cat:"Geography"},
+    {q:"What is the powerhouse of the cell?", c:"Mitochondria", w:["Nucleus","Ribosome","Chloroplast"], cat:"Science"},
+    {q:"In what year did the Berlin Wall fall?", c:"1989", w:["1987","1991","1985"], cat:"History"},
+    {q:"What is the national animal of Australia?", c:"Kangaroo", w:["Koala","Platypus","Emu"], cat:"Nature"},
+    {q:"Who wrote '1984'?", c:"George Orwell", w:["Aldous Huxley","Ray Bradbury","H.G. Wells"], cat:"Literature"},
+    {q:"What is the chemical formula for water?", c:"H₂O", w:["H₂O₂","HO","H₃O"], cat:"Science"},
+    {q:"Which planet has the most moons?", c:"Saturn", w:["Jupiter","Uranus","Neptune"], cat:"Science"},
+    {q:"How many players are on a standard soccer team?", c:"11", w:["9","10","12"], cat:"Sports"},
+    {q:"What is the tallest mountain in the world?", c:"Mount Everest", w:["K2","Kangchenjunga","Makalu"], cat:"Geography"},
+    {q:"Who invented the telephone?", c:"Alexander Graham Bell", w:["Thomas Edison","Nikola Tesla","Guglielmo Marconi"], cat:"History"},
+    {q:"What is the capital of France?", c:"Paris", w:["Lyon","Marseille","Bordeaux"], cat:"Geography"},
+    {q:"How many hours are in a week?", c:"168", w:["152","176","144"], cat:"Math"},
+    {q:"Which gas do plants absorb from the atmosphere?", c:"Carbon dioxide", w:["Oxygen","Nitrogen","Hydrogen"], cat:"Science"},
+    {q:"What is the largest planet in our solar system?", c:"Jupiter", w:["Saturn","Neptune","Uranus"], cat:"Science"},
+    {q:"Who painted the Sistine Chapel ceiling?", c:"Michelangelo", w:["Leonardo da Vinci","Raphael","Donatello"], cat:"Art"},
+    {q:"What is the capital of Australia?", c:"Canberra", w:["Sydney","Melbourne","Brisbane"], cat:"Geography"},
+    {q:"In what year did the Titanic sink?", c:"1912", w:["1910","1914","1908"], cat:"History"},
+    {q:"Which country has the most natural lakes?", c:"Canada", w:["Russia","United States","Finland"], cat:"Geography"},
+    {q:"What is the speed of light approximately?", c:"300,000 km/s", w:["150,000 km/s","500,000 km/s","1,000,000 km/s"], cat:"Science"},
+    {q:"Who composed 'Für Elise'?", c:"Ludwig van Beethoven", w:["Wolfgang Mozart","Johann Bach","Franz Schubert"], cat:"Music"},
+    {q:"How many teeth does an adult human have?", c:"32", w:["28","30","34"], cat:"Science"},
+    {q:"What is the capital of Brazil?", c:"Brasília", w:["Rio de Janeiro","São Paulo","Salvador"], cat:"Geography"},
+    {q:"Which element is a liquid at room temperature?", c:"Mercury", w:["Lead","Tin","Iron"], cat:"Science"},
+    {q:"What sport is played at Wimbledon?", c:"Tennis", w:["Cricket","Croquet","Badminton"], cat:"Sports"},
+    {q:"Who invented the World Wide Web?", c:"Tim Berners-Lee", w:["Bill Gates","Steve Jobs","Vint Cerf"], cat:"Tech"},
+    {q:"What is the largest desert in the world?", c:"Antarctic Desert", w:["Sahara","Arabian","Gobi"], cat:"Geography"},
+    {q:"Which vitamin does sunlight provide?", c:"Vitamin D", w:["Vitamin A","Vitamin C","Vitamin B12"], cat:"Science"},
+    {q:"What is the smallest bone in the human body?", c:"Stapes", w:["Incus","Malleus","Femur"], cat:"Science"},
+    {q:"Who was the first female Prime Minister of the UK?", c:"Margaret Thatcher", w:["Theresa May","Angela Merkel","Indira Gandhi"], cat:"History"},
+    {q:"What is the most spoken language in South America?", c:"Portuguese", w:["Spanish","Quechua","English"], cat:"Language"},
+    {q:"In chess, which piece can only move diagonally?", c:"Bishop", w:["Rook","Knight","Pawn"], cat:"Games"},
+    {q:"What is the name of the longest bone in the human body?", c:"Femur", w:["Tibia","Humerus","Fibula"], cat:"Science"},
+    {q:"Which country is home to the Great Barrier Reef?", c:"Australia", w:["Philippines","Indonesia","Fiji"], cat:"Geography"},
+    {q:"What is the boiling point of water at sea level?", c:"100°C", w:["90°C","110°C","95°C"], cat:"Science"},
+    {q:"Who founded Microsoft?", c:"Bill Gates and Paul Allen", w:["Steve Jobs","Steve Wozniak","Mark Zuckerberg"], cat:"Tech"},
+    {q:"What is the national language of Brazil?", c:"Portuguese", w:["Spanish","English","French"], cat:"Language"},
+    {q:"How many planets are in our solar system?", c:"8", w:["7","9","10"], cat:"Science"},
+    {q:"What is the currency of the United Kingdom?", c:"Pound Sterling", w:["Euro","Dollar","Franc"], cat:"World"},
+    {q:"Who wrote 'The Great Gatsby'?", c:"F. Scott Fitzgerald", w:["Ernest Hemingway","John Steinbeck","William Faulkner"], cat:"Literature"},
+    {q:"What is the largest organ in the human body?", c:"Skin", w:["Liver","Brain","Heart"], cat:"Science"},
+    {q:"Which country has the largest population?", c:"India", w:["China","United States","Indonesia"], cat:"World"},
+    {q:"What is the sum of angles in a triangle?", c:"180°", w:["90°","270°","360°"], cat:"Math"},
+    {q:"Who was the first President of the United States?", c:"George Washington", w:["John Adams","Thomas Jefferson","Benjamin Franklin"], cat:"History"},
+    {q:"What gas makes fizzy drinks fizzy?", c:"Carbon dioxide", w:["Oxygen","Nitrogen","Helium"], cat:"Science"},
+    {q:"Which country is the Eiffel Tower in?", c:"France", w:["Belgium","Switzerland","Italy"], cat:"Geography"},
+    {q:"What is the most popular sport in the world?", c:"Football (Soccer)", w:["Basketball","Cricket","Tennis"], cat:"Sports"},
+    {q:"How many zeroes are in one million?", c:"6", w:["5","7","8"], cat:"Math"},
+    {q:"What is the capital of Canada?", c:"Ottawa", w:["Toronto","Vancouver","Montreal"], cat:"Geography"},
+    {q:"Who invented the lightbulb?", c:"Thomas Edison", w:["Nikola Tesla","Benjamin Franklin","James Watt"], cat:"History"},
+    {q:"Which blood type is the universal donor?", c:"O negative", w:["A positive","B negative","AB positive"], cat:"Science"},
+    {q:"What is the largest country by area?", c:"Russia", w:["Canada","China","United States"], cat:"Geography"},
+    {q:"How many days are in a leap year?", c:"366", w:["364","365","367"], cat:"Math"},
+    {q:"What is the capital of Italy?", c:"Rome", w:["Milan","Florence","Venice"], cat:"Geography"},
+    {q:"What is the atomic number of carbon?", c:"6", w:["8","12","14"], cat:"Science"},
+    {q:"Who wrote 'Pride and Prejudice'?", c:"Jane Austen", w:["Charlotte Brontë","Emily Brontë","Mary Shelley"], cat:"Literature"},
+    {q:"What is the main ingredient in guacamole?", c:"Avocado", w:["Mango","Tomato","Lime"], cat:"Food"},
+    {q:"How many keys does a standard piano have?", c:"88", w:["76","92","84"], cat:"Music"},
+    {q:"What is the capital of Spain?", c:"Madrid", w:["Barcelona","Seville","Valencia"], cat:"Geography"},
+    {q:"Which animal is known as the 'Ship of the Desert'?", c:"Camel", w:["Horse","Elephant","Donkey"], cat:"Nature"},
+    {q:"What does DNA stand for?", c:"Deoxyribonucleic acid", w:["Deoxyribonitric acid","Diribonucleic acid","Deoxyribonucleotide acid"], cat:"Science"},
+    {q:"In what country were the 2016 Summer Olympics held?", c:"Brazil", w:["China","United Kingdom","Greece"], cat:"Sports"},
+    {q:"Who is the author of the Harry Potter series?", c:"J.K. Rowling", w:["J.R.R. Tolkien","C.S. Lewis","Philip Pullman"], cat:"Literature"},
+    {q:"How many chambers does the human heart have?", c:"4", w:["2","3","5"], cat:"Science"},
+    {q:"What is the tallest building in the world?", c:"Burj Khalifa", w:["Shanghai Tower","One World Trade Center","CN Tower"], cat:"World"},
+    {q:"What is the freezing point of water in Fahrenheit?", c:"32°F", w:["0°F","100°F","212°F"], cat:"Science"},
+    {q:"Which country gave the Statue of Liberty to the USA?", c:"France", w:["England","Spain","Italy"], cat:"History"},
+    {q:"How many colors are in a rainbow?", c:"7", w:["5","6","8"], cat:"Science"},
+    {q:"What is the currency of China?", c:"Yuan (Renminbi)", w:["Yen","Won","Baht"], cat:"World"},
+    {q:"Who directed 'Schindler's List'?", c:"Steven Spielberg", w:["Martin Scorsese","Stanley Kubrick","Francis Ford Coppola"], cat:"Film"},
+    {q:"What is the most common element in the universe?", c:"Hydrogen", w:["Helium","Oxygen","Carbon"], cat:"Science"},
+    {q:"Which country has the most time zones?", c:"France", w:["Russia","United States","China"], cat:"Geography"},
+    {q:"What is the capital of Egypt?", c:"Cairo", w:["Alexandria","Luxor","Giza"], cat:"Geography"},
+    {q:"Who developed penicillin?", c:"Alexander Fleming", w:["Louis Pasteur","Joseph Lister","Edward Jenner"], cat:"History"},
+    {q:"How many Great Lakes are there in North America?", c:"5", w:["4","6","7"], cat:"Geography"},
+  ];
+
+  const seed = _dailySeed();
+  const shuffled = _seededShuffle(bank, seed);
+  const picked = shuffled.slice(0, 10);
+  return picked.map((q, i) => {
+    const opts = _seededShuffle([q.c, ...q.w], seed + i);
+    return { question: q.q, category: q.cat, difficulty: 'medium', correct: q.c, opts };
+  });
+}
+
 function _renderDailyLoading() {
   const body = document.getElementById('daily-body'); if (!body) return;
   body.innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-size:2.5rem;margin-bottom:12px;animation:heartbeat 1.2s ease infinite;">🧠</div><div style="font-size:.9rem;font-weight:700;color:var(--text2);">Loading today's questions…</div></div>`;
 }
 function _renderDailyError() {
-  const body = document.getElementById('daily-body'); if (!body) return;
-  body.innerHTML = `<div style="text-align:center;padding:40px 20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;"><div style="font-size:2rem;margin-bottom:12px;">😕</div><div style="font-size:.9rem;font-weight:700;margin-bottom:6px;">Couldn't load today's questions</div><div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">Check your connection and try again.</div><button class="btn btn-primary" onclick="showDailyKnowledge()">↺ Retry</button></div>`;
+  const body = document.getElementById('daily-body');
+  if (!body) return;
+  body.innerHTML = `
+    <div style="text-align:center;padding:40px 20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;">
+      <div style="font-size:2rem;margin-bottom:12px;">😕</div>
+      <div style="font-size:.9rem;font-weight:700;margin-bottom:6px;">Couldn't load today's questions</div>
+      <div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">The trivia API may be temporarily unavailable. Check your connection and try again.</div>
+      <button class="btn btn-primary" onclick="showDailyKnowledge()">↺ Retry</button>
+    </div>`;
 }
 
 function _renderDailyQuestion() {
