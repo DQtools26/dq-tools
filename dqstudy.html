@@ -496,6 +496,37 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .view.active { display:block; }
 #view-landing.active { display:flex; flex-direction:column; }
 #view-flashcard.active, #view-quiz.active, #view-results.active, #view-learn.active, #view-matching.active, #view-speed.active, #view-blitz.active, #view-streak.active, #view-elimination.active, #view-fillin.active, #view-spelling.active, #view-smart.active { display:flex; flex-direction:column; }
+#view-daily.active, #view-tracking.active, #view-settings.active { display:block; }
+
+/* ═══ DAILY KNOWLEDGE ═══ */
+.dk-question-card { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:20px; margin-bottom:14px; transition:border-color .15s; animation:floatUp .35s ease both; }
+.dk-question-card.answered { border-color:var(--border2); }
+.dk-q-meta { font-size:.6rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; display:flex; gap:10px; }
+.dk-q-text { font-size:.95rem; font-weight:700; line-height:1.5; margin-bottom:14px; color:var(--text); }
+.dk-choices { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.dk-choice { padding:10px 14px; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; font-family:var(--font); font-size:.78rem; font-weight:700; color:var(--text); cursor:pointer; text-align:left; transition:all .12s; line-height:1.3; }
+.dk-choice:hover:not(:disabled) { border-color:var(--accent); background:var(--accent-dim); color:var(--accent2); }
+.dk-choice:disabled { cursor:default; }
+.dk-choice.correct { border-color:var(--green) !important; background:var(--green-dim) !important; color:var(--green2) !important; }
+.dk-choice.wrong   { border-color:var(--red)   !important; background:var(--red-dim)   !important; color:var(--red2)   !important; }
+.dk-choice.reveal-correct { border-color:var(--green); background:var(--green-dim); color:var(--green2); }
+.dk-result-banner { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; margin-bottom:14px; animation:popBounce .4s ease; }
+[data-theme="win8"] .dk-choice { border-radius:0 !important; }
+[data-theme="win8"] .dk-question-card { border-radius:0 !important; }
+
+/* ═══ GLOBAL SEARCH ═══ */
+.search-group-label { font-size:.58rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); padding:6px 18px 4px; }
+.search-result-item { display:flex; align-items:center; gap:12px; padding:9px 18px; cursor:pointer; transition:background .1s; border-radius:0; }
+.search-result-item:hover, .search-result-item.focused { background:var(--surface2); }
+.search-result-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; }
+.search-result-main { flex:1; min-width:0; }
+.search-result-title { font-size:.82rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.search-result-sub { font-size:.65rem; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.search-result-badge { font-size:.6rem; font-weight:800; background:var(--accent-dim); color:var(--accent2); border-radius:100px; padding:2px 8px; flex-shrink:0; }
+.search-highlight { background:rgba(58,127,255,.18); border-radius:3px; padding:0 2px; color:var(--accent2); font-weight:900; }
+.search-empty { padding:32px 20px; text-align:center; color:var(--text3); font-size:.82rem; }
+[data-theme="win8"] .search-result-item:hover,
+[data-theme="win8"] .search-result-item.focused { background:var(--surface2); border-radius:0 !important; }
 
 /* ═══ GAMIFICATION ═══ */
 .gam-home-widget {
@@ -1211,8 +1242,19 @@ textarea.finp { resize:vertical; min-height:50px; }
     <button class="nav-link sharing-btn" id="codes-nav-link" onclick="showCodesView()">🔗 Codes</button>
     <button class="nav-link" onclick="showFolders()">📁 Folders</button>
     <button class="nav-link" onclick="showView('tracking')">📊 Progress</button>
+    <button class="nav-link" onclick="showView('daily')" id="daily-nav-link">🧠 Daily</button>
   </div>
   <div class="nav-spacer"></div>
+  <!-- Search pill (visible on wider screens) -->
+  <button onclick="openSearch()" id="search-pill"
+    style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 12px;color:var(--text3);font-family:var(--font);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;margin-right:4px;"
+    onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'"
+    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'"
+    title="Search ⌘K">
+    <span>🔍</span>
+    <span id="search-pill-label">Search</span>
+    <kbd style="font-size:.6rem;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-family:var(--mono);color:var(--text3);">⌘K</kbd>
+  </button>
   <button class="nav-icon-btn" title="Your progress" onclick="showGamPanel()" id="gam-nav-btn">🎮</button>
   <button class="nav-icon-btn" title="Sound" onclick="toggleSound()" id="sound-btn">🔊</button>
   <button class="nav-icon-btn" title="Settings" onclick="showView('settings')">⚙️</button>
@@ -1635,7 +1677,15 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">💾 Data</div>
+        <div class="settings-section-title">🧠 Daily Knowledge</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">Show Daily Challenge</div>
+            <div class="settings-toggle-sub">10 daily trivia questions — same for everyone, resets at midnight</div>
+          </div>
+          <button class="toggle on" id="daily-toggle" onclick="toggleDailySetting()"></button>
+        </div>
+      </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Export All</button>
           <button class="btn btn-ghost btn-sm" onclick="showGamPanel()">🎮 View Progress</button>
@@ -1882,6 +1932,20 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
 
+    <!-- ═══ DAILY KNOWLEDGE ═══ -->
+    <div class="view" id="view-daily" style="overflow-y:auto;height:calc(100vh - 55px);">
+      <div style="max-width:640px;margin:0 auto;padding:32px 24px 80px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="font-size:1.6rem;font-weight:900;">🧠 Daily Knowledge</div>
+          <div id="daily-date-badge" style="font-size:.65rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border:1px solid rgba(58,127,255,.3);border-radius:100px;padding:3px 10px;"></div>
+        </div>
+        <div style="color:var(--text2);font-size:.82rem;margin-bottom:24px;">10 trivia questions — same for everyone today. Come back tomorrow for a new set.</div>
+        <div id="daily-body">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1992,6 +2056,30 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div style="font-size:.62rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">📈 Levels</div>
       <div id="gam-levels-list"></div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GLOBAL SEARCH ═══ -->
+<div id="search-overlay" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="if(event.target===this)closeSearch()">
+  <div id="search-box" style="position:absolute;top:80px;left:50%;transform:translateX(-50%);width:min(640px,92vw);background:var(--surface);border:1.5px solid var(--border2);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 120px);">
+    <!-- Input row -->
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);">
+      <span style="font-size:1.1rem;opacity:.5;">🔍</span>
+      <input id="search-input" type="text" autocomplete="off" spellcheck="false"
+        placeholder="Search sets, cards, topics…"
+        style="flex:1;border:none;background:transparent;color:var(--text);font-family:var(--font);font-size:1rem;font-weight:600;outline:none;"
+        oninput="renderSearchResults(this.value)"
+        onkeydown="searchKeyNav(event)">
+      <kbd style="font-size:.65rem;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;color:var(--text3);font-family:var(--mono);">Esc</kbd>
+    </div>
+    <!-- Results -->
+    <div id="search-results" style="overflow-y:auto;max-height:calc(100vh - 220px);padding:8px 0;"></div>
+    <!-- Footer hint -->
+    <div style="padding:8px 18px;border-top:1px solid var(--border);font-size:.62rem;color:var(--text3);display:flex;gap:16px;">
+      <span><kbd style="font-size:.6rem;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-family:var(--mono);">↑↓</kbd> Navigate</span>
+      <span><kbd style="font-size:.6rem;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-family:var(--mono);">↵</kbd> Open</span>
+      <span><kbd style="font-size:.6rem;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-family:var(--mono);">Esc</kbd> Close</span>
     </div>
   </div>
 </div>
@@ -2424,6 +2512,7 @@ let cardFontSize = 'medium'; // 'small' | 'medium' | 'large' | 'xlarge'
 let compactMode = false;
 let homeBlobsEnabled = true; // show/hide all sharing & codes features
 let gamEnabled = true; // show/hide gamification (XP, streak, achievements)
+let dailyEnabled = true; // show/hide daily knowledge mode
 let aiSeenPrompt = false;
 let aiContext = 'set';
 let bgAnim = 'none';
@@ -2546,6 +2635,7 @@ function loadSettings() {
     if (s.compactMode !== undefined) compactMode = s.compactMode;
     if (s.homeBlobsEnabled !== undefined) homeBlobsEnabled = s.homeBlobsEnabled;
     if (s.gamEnabled !== undefined) gamEnabled = s.gamEnabled;
+    if (s.dailyEnabled !== undefined) dailyEnabled = s.dailyEnabled;
     aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
@@ -2553,6 +2643,7 @@ function loadSettings() {
   const at = document.getElementById('ai-toggle'); if (at) at.classList.toggle('on', aiEnabled);
   const st = document.getElementById('sharing-toggle'); if (st) st.classList.toggle('on', sharingEnabled);
   const gt = document.getElementById('gam-toggle'); if (gt) gt.classList.toggle('on', gamEnabled);
+  const dt = document.getElementById('daily-toggle'); if (dt) dt.classList.toggle('on', dailyEnabled);
   applySharingVisibility();
   applyCardFontSize();
   applyCompactMode();
@@ -2560,7 +2651,7 @@ function loadSettings() {
   applyGamVisibility();
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled, dailyEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
@@ -2623,6 +2714,7 @@ function bootApp() {
   applySharingVisibility();
   applyAIVisibility();
   applyGamVisibility();
+  applyDailyVisibility();
   // Check for ?code= URL param — auto-import shared set
   const _urlCode = new URLSearchParams(window.location.search).get('code');
   // Note: DQS1 codes are too long for URLs in practice — only DQ-XXXX codes work as links
@@ -2971,7 +3063,454 @@ function showGamPanel() {
   openModal('gam-modal');
 }
 
-// ─── AUTH + INIT ───────────────────────────────────
+// ─────────────────────────────────────────────────
+// DAILY KNOWLEDGE
+// ─────────────────────────────────────────────────
+
+
+// Simple toast helper (reuse or create)
+function showToast(msg) {
+  let t = document.getElementById('dq-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'dq-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:.8rem;font-weight:700;z-index:9999;pointer-events:none;transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+
+let _searchFocusIdx = -1;
+let _searchResults  = []; // flat list of {type, id, cardIdx?, action}
+
+function openSearch() {
+  const overlay = document.getElementById('search-overlay');
+  const inp     = document.getElementById('search-input');
+  overlay.style.display = '';
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    inp.value = '';
+    inp.focus();
+    renderSearchResults('');
+  });
+  animEl(document.getElementById('search-box'), 'anim-popbounce', 450);
+}
+
+function closeSearch() {
+  const overlay = document.getElementById('search-overlay');
+  overlay.style.display = 'none';
+  _searchFocusIdx = -1;
+  _searchResults  = [];
+}
+
+function _highlight(text, query) {
+  if (!query) return esc(text);
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return esc(text);
+  return esc(text.slice(0, idx))
+    + `<mark class="search-highlight">${esc(text.slice(idx, idx + query.length))}</mark>`
+    + esc(text.slice(idx + query.length));
+}
+
+function renderSearchResults(q) {
+  q = (q || '').trim();
+  _searchFocusIdx = -1;
+  _searchResults  = [];
+  const el = document.getElementById('search-results');
+
+  if (!q) {
+    // Show recent sets as default
+    const recent = [...sets].filter(s => s.plays > 0)
+      .sort((a,b) => (b.history?.slice(-1)[0]?.date||0) - (a.history?.slice(-1)[0]?.date||0))
+      .slice(0, 5);
+    if (!recent.length) {
+      el.innerHTML = `<div class="search-empty">Start typing to search your sets and cards.</div>`;
+      return;
+    }
+    el.innerHTML = `<div class="search-group-label">Recently Studied</div>`
+      + recent.map((s,i) => {
+          _searchResults.push({ action: () => { closeSearch(); openSet(s.id); } });
+          return `<div class="search-result-item" data-idx="${_searchResults.length-1}" onclick="searchActivate(${_searchResults.length-1})">
+            <span class="search-result-icon">${s.icon||'📖'}</span>
+            <div class="search-result-main">
+              <div class="search-result-title">${esc(s.name)}</div>
+              <div class="search-result-sub">${[s.class, s.unit].filter(Boolean).join(' · ') || allCards(s).length + ' cards'}</div>
+            </div>
+            <span class="search-result-badge">Set</span>
+          </div>`;
+        }).join('');
+    return;
+  }
+
+  const ql = q.toLowerCase();
+  const sections = [];
+
+  // ── Sets ──
+  const matchedSets = sets.filter(s =>
+    s.name.toLowerCase().includes(ql) ||
+    (s.class||'').toLowerCase().includes(ql) ||
+    (s.unit||'').toLowerCase().includes(ql)
+  ).slice(0, 6);
+  if (matchedSets.length) {
+    const items = matchedSets.map(s => {
+      _searchResults.push({ action: () => { closeSearch(); openSet(s.id); } });
+      const sub = [s.class, s.unit].filter(Boolean).join(' · ') || allCards(s).length + ' cards';
+      return `<div class="search-result-item" data-idx="${_searchResults.length-1}" onclick="searchActivate(${_searchResults.length-1})">
+        <span class="search-result-icon">${s.icon||'📖'}</span>
+        <div class="search-result-main">
+          <div class="search-result-title">${_highlight(s.name, q)}</div>
+          <div class="search-result-sub">${esc(sub)}</div>
+        </div>
+        <span class="search-result-badge">Set</span>
+      </div>`;
+    }).join('');
+    sections.push(`<div class="search-group-label">Sets</div>${items}`);
+  }
+
+  // ── Cards (front + back) ──
+  const cardHits = [];
+  for (const s of sets) {
+    if (cardHits.length >= 8) break;
+    for (let ci = 0; ci < allCards(s).length; ci++) {
+      if (cardHits.length >= 8) break;
+      const card = allCards(s)[ci];
+      const frontMatch = card.front.toLowerCase().includes(ql);
+      const backMatch  = card.back.toLowerCase().includes(ql);
+      if (frontMatch || backMatch) {
+        cardHits.push({ s, card, ci, frontMatch });
+      }
+    }
+  }
+  if (cardHits.length) {
+    const items = cardHits.map(({ s, card, ci, frontMatch }) => {
+      _searchResults.push({ action: () => { closeSearch(); openSet(s.id); } });
+      const matchText  = frontMatch ? card.front : card.back;
+      const otherText  = frontMatch ? card.back  : card.front;
+      return `<div class="search-result-item" data-idx="${_searchResults.length-1}" onclick="searchActivate(${_searchResults.length-1})">
+        <span class="search-result-icon">${s.icon||'📖'}</span>
+        <div class="search-result-main">
+          <div class="search-result-title">${_highlight(matchText, q)}</div>
+          <div class="search-result-sub">↳ ${esc(otherText.slice(0,60))}${otherText.length>60?'…':''} · ${esc(s.name)}</div>
+        </div>
+        <span class="search-result-badge">Card</span>
+      </div>`;
+    }).join('');
+    sections.push(`<div class="search-group-label">Cards</div>${items}`);
+  }
+
+  // ── Shared sets ──
+  const matchedShared = sharedWithMe.filter(e =>
+    (e.name||'').toLowerCase().includes(ql) ||
+    (e.cachedData?.name||'').toLowerCase().includes(ql)
+  ).slice(0, 3);
+  if (matchedShared.length) {
+    const items = matchedShared.map(e => {
+      _searchResults.push({ action: () => { closeSearch(); openSharedSet(e.code); } });
+      return `<div class="search-result-item" data-idx="${_searchResults.length-1}" onclick="searchActivate(${_searchResults.length-1})">
+        <span class="search-result-icon">${e.icon||'📦'}</span>
+        <div class="search-result-main">
+          <div class="search-result-title">${_highlight(e.name||e.code, q)}</div>
+          <div class="search-result-sub">Shared set · ${e.ownerName||'Unknown'}</div>
+        </div>
+        <span class="search-result-badge" style="background:var(--purple-dim);color:var(--purple2);">Shared</span>
+      </div>`;
+    }).join('');
+    sections.push(`<div class="search-group-label">Shared Sets</div>${items}`);
+  }
+
+  if (!sections.length) {
+    el.innerHTML = `<div class="search-empty">No results for "<strong>${esc(q)}</strong>"<br><span style="font-size:.72rem;margin-top:6px;display:block;">Try searching a card term, set name, or class.</span></div>`;
+    return;
+  }
+
+  el.innerHTML = sections.join('');
+}
+
+function searchActivate(idx) {
+  const item = _searchResults[idx];
+  if (item) item.action();
+}
+
+function searchKeyNav(e) {
+  const items = document.querySelectorAll('#search-results .search-result-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _searchFocusIdx = Math.min(_searchFocusIdx + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _searchFocusIdx = Math.max(_searchFocusIdx - 1, 0);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_searchFocusIdx >= 0 && _searchFocusIdx < _searchResults.length) {
+      searchActivate(_searchFocusIdx);
+    } else if (_searchResults.length > 0) {
+      searchActivate(0);
+    }
+    return;
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeSearch();
+    return;
+  } else {
+    return;
+  }
+  items.forEach((el, i) => el.classList.toggle('focused', i === _searchFocusIdx));
+  items[_searchFocusIdx]?.scrollIntoView({ block:'nearest' });
+}
+
+// ⌘K / Ctrl+K global shortcut
+
+// ⌘K / Ctrl+K global shortcut
+
+// ─────────────────────────────────────────────────
+// DAILY KNOWLEDGE
+// ─────────────────────────────────────────────────
+const DAILY_STORAGE_KEY = 'dqstudy-daily';
+let _dailyQuestions  = [];
+let _dailyIdx        = 0;
+let _dailyAnswers    = [];
+let _dailyComplete   = false;
+
+function _dailySeed() { return Math.floor(Date.now() / 86400000); }
+function _todayKey()  { return DAILY_STORAGE_KEY + '-' + _dailySeed(); }
+
+function _loadDailyResult() {
+  try { return JSON.parse(localStorage.getItem(_todayKey()) || 'null'); } catch(_) { return null; }
+}
+function _saveDailyResult(answers) {
+  localStorage.setItem(_todayKey(), JSON.stringify({ answers, ts: Date.now() }));
+}
+function _decode(str) {
+  const ta = document.createElement('textarea'); ta.innerHTML = str; return ta.value;
+}
+function _seededShuffle(arr, seed) {
+  const a = [...arr]; let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+async function showDailyKnowledge() {
+  if (!dailyEnabled) { goHome(); return; }
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-daily').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const nl = document.getElementById('daily-nav-link');
+  if (nl) nl.classList.add('active');
+
+  const badge = document.getElementById('daily-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('en', {weekday:'short', month:'short', day:'numeric'});
+
+  const saved = _loadDailyResult();
+  if (saved && saved.answers && saved.answers.length >= 10) {
+    _dailyAnswers = saved.answers; _dailyComplete = true;
+    _renderDailyResults(true); return;
+  }
+  if (_dailyQuestions.length === 10) {
+    _dailyIdx = saved?.answers?.length || 0;
+    _dailyAnswers = saved?.answers || [];
+    _renderDailyQuestion(); return;
+  }
+
+  _renderDailyLoading();
+
+  const dayKey = new Date().toISOString().slice(0, 10);
+  let questions = null;
+
+  // Try Supabase cache — same questions for everyone
+  try {
+    const cacheRes = await fetch(
+      DQS_URL + '/rest/v1/daily_challenge?day_key=eq.' + dayKey + '&select=questions',
+      { headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY } }
+    );
+    if (cacheRes.ok) {
+      const rows = await cacheRes.json();
+      if (rows && rows[0] && rows[0].questions) questions = rows[0].questions;
+    }
+  } catch(_) {}
+
+  // Not cached — fetch fresh from OpenTDB and write to Supabase
+  if (!questions) {
+    try {
+      const res = await fetch('https://opentdb.com/api.php?amount=10&type=multiple&encode=url3986');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data.response_code !== 0 || !data.results?.length) throw new Error();
+      const seed = _dailySeed();
+      questions = _seededShuffle(data.results, seed).map((q, i) => {
+        const correct = decodeURIComponent(q.correct_answer);
+        const opts = _seededShuffle([correct, ...q.incorrect_answers.map(a => decodeURIComponent(a))], seed + i);
+        return { question: decodeURIComponent(q.question), category: decodeURIComponent(q.category), difficulty: q.difficulty, correct, opts };
+      });
+      // Cache in Supabase so everyone else gets same set
+      fetch(DQS_URL + '/rest/v1/daily_challenge', {
+        method: 'POST',
+        headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=ignore-duplicates' },
+        body: JSON.stringify({ day_key: dayKey, questions })
+      }).catch(() => {});
+    } catch(err) { _renderDailyError(); return; }
+  }
+
+  _dailyQuestions = questions;
+  _dailyIdx = saved?.answers?.length || 0;
+  _dailyAnswers = saved?.answers || [];
+  _dailyComplete = false;
+  _renderDailyQuestion();
+}
+
+function _renderDailyLoading() {
+  const body = document.getElementById('daily-body'); if (!body) return;
+  body.innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-size:2.5rem;margin-bottom:12px;animation:heartbeat 1.2s ease infinite;">🧠</div><div style="font-size:.9rem;font-weight:700;color:var(--text2);">Loading today's questions…</div></div>`;
+}
+function _renderDailyError() {
+  const body = document.getElementById('daily-body'); if (!body) return;
+  body.innerHTML = `<div style="text-align:center;padding:40px 20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;"><div style="font-size:2rem;margin-bottom:12px;">😕</div><div style="font-size:.9rem;font-weight:700;margin-bottom:6px;">Couldn't load today's questions</div><div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">Check your connection and try again.</div><button class="btn btn-primary" onclick="showDailyKnowledge()">↺ Retry</button></div>`;
+}
+
+function _renderDailyQuestion() {
+  const body = document.getElementById('daily-body'); if (!body || !_dailyQuestions.length) return;
+  const q = _dailyQuestions[_dailyIdx];
+  const num = _dailyIdx + 1;
+  const pct = Math.round((_dailyIdx / 10) * 100);
+  const diffColor = q.difficulty === 'hard' ? 'var(--red2)' : q.difficulty === 'medium' ? 'var(--amber2)' : 'var(--green2)';
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+      <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;transition:width .4s ease;"></div>
+      </div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--text3);white-space:nowrap;">${num} / 10</div>
+    </div>
+    <div id="daily-q-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;animation:floatUp .3s ease;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <span style="font-size:.62rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);border-radius:100px;padding:2px 9px;">${_decode(q.category)}</span>
+        <span style="font-size:.62rem;font-weight:800;color:${diffColor};text-transform:capitalize;">${q.difficulty}</span>
+      </div>
+      <div style="font-size:1rem;font-weight:700;line-height:1.55;">${_decode(q.question)}</div>
+    </div>
+    <div id="daily-opts" style="display:flex;flex-direction:column;gap:10px;">
+      ${q.opts.map((opt, i) => `
+        <button class="daily-opt-btn" data-opt="${i}" onclick="dailyAnswer(${i})"
+          style="width:100%;padding:13px 16px;background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;font-family:var(--font);font-size:.88rem;font-weight:700;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:10px;"
+          onmouseover="if(!this.dataset.locked)this.style.borderColor='var(--accent)'"
+          onmouseout="if(!this.dataset.locked)this.style.borderColor='var(--border2)'">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:900;flex-shrink:0;">${'ABCD'[i]}</span>
+          <span>${_decode(opt)}</span>
+        </button>`).join('')}
+    </div>
+    <div id="daily-feedback" style="display:none;margin-top:16px;"></div>`;
+}
+
+function dailyAnswer(optIdx) {
+  const q = _dailyQuestions[_dailyIdx];
+  const chosen = q.opts[optIdx];
+  const isCorrect = chosen === q.correct;
+  document.querySelectorAll('.daily-opt-btn').forEach(b => {
+    b.dataset.locked = '1'; b.style.cursor = 'default';
+    const opt = q.opts[parseInt(b.dataset.opt)];
+    if (opt === q.correct) { b.style.background='var(--green-dim)'; b.style.borderColor='var(--green)'; b.style.color='var(--green2)'; }
+    else if (b.dataset.opt == optIdx && !isCorrect) { b.style.background='var(--red-dim)'; b.style.borderColor='var(--red)'; b.style.color='var(--red2)'; }
+    else b.style.opacity = '0.4';
+  });
+  _dailyAnswers.push({ correct: isCorrect, chosen, answer: q.correct, question: q.question });
+  const fb = document.getElementById('daily-feedback');
+  if (fb) {
+    fb.style.display = '';
+    fb.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:${isCorrect?'var(--green-dim)':'var(--red-dim)'};border:1px solid ${isCorrect?'var(--green)':'var(--red)'};border-radius:12px;margin-bottom:12px;">
+        <span style="font-size:1.2rem;">${isCorrect?'✅':'❌'}</span>
+        <div>
+          <div style="font-weight:800;font-size:.82rem;color:${isCorrect?'var(--green2)':'var(--red2)'};">${isCorrect?'Correct!':'Not quite.'}</div>
+          ${!isCorrect?`<div style="font-size:.72rem;color:var(--text2);margin-top:2px;">The answer was: <strong>${_decode(q.correct)}</strong></div>`:''}
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="dailyNext()">${_dailyIdx < 9 ? 'Next Question →' : 'See Results 🎉'}</button>`;
+    if (isCorrect) sndCorrect(); else sndWrong();
+  }
+}
+
+function dailyNext() {
+  _dailyIdx++;
+  if (_dailyIdx >= 10) {
+    _dailyComplete = true;
+    _saveDailyResult(_dailyAnswers);
+    if (gamEnabled) gamAwardSession(_dailyAnswers.filter(a=>a.correct).length, 10, 'Daily Knowledge');
+    _renderDailyResults(false);
+  } else {
+    _renderDailyQuestion();
+  }
+}
+
+function _renderDailyResults(alreadyDone) {
+  const body = document.getElementById('daily-body'); if (!body) return;
+  const score = _dailyAnswers.filter(a=>a.correct).length;
+  const pct   = Math.round(score/10*100);
+  const emoji = pct===100?'🏆':pct>=80?'🎉':pct>=60?'👍':pct>=40?'📚':'💪';
+  const msg   = pct===100?'Perfect score! Incredible.':pct>=80?'Great job today!':pct>=60?'Solid effort!':pct>=40?'Keep practicing!':'Better luck tomorrow!';
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:24px;animation:popIn .4s ease;">
+      <div style="font-size:3.5rem;margin-bottom:8px;">${emoji}</div>
+      <div style="font-size:2.5rem;font-weight:900;letter-spacing:-.04em;">${score}/10</div>
+      <div style="font-size:1rem;color:var(--text2);margin-top:4px;">${msg}</div>
+      ${alreadyDone?`<div style="font-size:.72rem;color:var(--text3);margin-top:6px;">You already completed today's quiz.</div>`:''}
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;margin-bottom:16px;">
+      <div style="font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Today's Results</div>
+      <div style="font-size:1.5rem;line-height:1.9;letter-spacing:3px;margin-bottom:10px;">${_dailyAnswers.map(a=>a.correct?'🟩':'🟥').join('')}</div>
+      <div style="font-size:.72rem;color:var(--text3);">${score} correct · ${10-score} wrong</div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Review</div>
+      ${_dailyAnswers.map((a,i)=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid ${a.correct?'rgba(45,204,111,.2)':'rgba(255,80,80,.15)'};border-radius:10px;margin-bottom:8px;">
+          <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">${a.correct?'✅':'❌'}</span>
+          <div>
+            <div style="font-size:.76rem;font-weight:700;line-height:1.4;">${_decode(a.question)}</div>
+            ${!a.correct?`<div style="font-size:.67rem;color:var(--green2);margin-top:3px;">✓ ${_decode(a.answer)}</div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="dailyShare()" style="flex:1;">📤 Share Results</button>
+      <button class="btn btn-ghost" onclick="goHome()" style="flex:1;">🏠 Home</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:.68rem;color:var(--text3);">New questions tomorrow 🌅</div>`;
+}
+
+function dailyShare() {
+  const score = _dailyAnswers.filter(a=>a.correct).length;
+  const emoji = score===10?'🏆':score>=8?'🎉':score>=6?'👍':'📚';
+  const shareDate = new Date().toLocaleDateString('en',{month:'short',day:'numeric'});
+  const grid = _dailyAnswers.map(a=>a.correct?'🟩':'🟥').join('');
+  const rows = grid.match(/.{1,5}/g) || [grid];
+  const shareText = `🧠 DQstudy Daily Knowledge — ${shareDate}\n${score}/10 ${emoji}\n\n${rows.join('\n')}`;
+  if (navigator.share) {
+    navigator.share({title:'DQstudy Daily Knowledge', text: shareText}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(shareText).then(() => {
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:10px 18px;font-size:.78rem;font-weight:700;z-index:9999;box-shadow:var(--shadow);white-space:nowrap;';
+      t.textContent = '✅ Copied to clipboard!';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), 2200);
+    });
+  }
+}
+
+function getDailyStatus() {
+  const saved = _loadDailyResult();
+  if (!saved) return null;
+  return { score: saved.answers.filter(a=>a.correct).length, done: saved.answers.length >= 10 };
+}
+
 // State machine: 'waiting' → 'landing' → 'booting' → 'app'
 // This prevents double-boots, race conditions, and stuck landing screens.
 
@@ -3158,9 +3697,10 @@ setInterval(() => {
 // ─────────────────────────────────────────────────
 function showView(id) {
   if (id === 'tracking') { showTracking(); return; }
-  if (id === 'folders') { showFolders(); return; }
-  if (id === 'allsets') { showAllSets(); return; }
-  if (id === 'codes') { showCodesView(); return; }
+  if (id === 'folders')  { showFolders();  return; }
+  if (id === 'allsets')  { showAllSets();  return; }
+  if (id === 'codes')    { showCodesView(); return; }
+  if (id === 'daily')    { showDailyKnowledge(); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const el = document.getElementById('view-' + id);
   if (el) { el.classList.add('active'); }
@@ -3361,7 +3901,34 @@ function renderHome(tab) {
       ${nudgeCards.join('')}
     </div>` : '';
 
-  // ── ACTION GRID (bottom of left col) ──
+  // ── DAILY KNOWLEDGE TEASER ──
+  const dailyTeaserHtml = (() => {
+    if (!dailyEnabled) return '';
+    const today = new Date().toLocaleDateString('en', {weekday:'short', month:'short', day:'numeric'});
+    const dailyStatus = getDailyStatus();
+    if (dailyStatus && dailyStatus.done) {
+      const grid = Array(10).fill('').map((_,i) =>
+        _dailyAnswers[i] ? (_dailyAnswers[i].correct ? '🟩' : '🟥') : '⬜'
+      ).join('');
+      return `<div onclick="showView('daily')" style="cursor:pointer;margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:.72rem;font-weight:900;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">🧠 Daily Knowledge · ${today}</div>
+          <div style="font-size:.72rem;font-weight:800;color:var(--green2);">✓ Done — ${dailyStatus.score}/10</div>
+        </div>
+        <div style="font-size:1.1rem;letter-spacing:2px;">${grid}</div>
+      </div>`;
+    }
+    return `<div onclick="showView('daily')" style="cursor:pointer;margin-top:14px;background:linear-gradient(135deg,rgba(58,127,255,.1),rgba(45,204,111,.07));border:1px solid rgba(58,127,255,.25);border-radius:14px;padding:14px 16px;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(58,127,255,.25)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:.72rem;font-weight:900;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;">🧠 Daily Knowledge</div>
+          <div style="font-size:.82rem;font-weight:700;">Today's 10 trivia questions are ready</div>
+          <div style="font-size:.68rem;color:var(--text3);margin-top:2px;">${today} · New questions every day</div>
+        </div>
+        <div style="font-size:1.6rem;margin-left:12px;">→</div>
+      </div>
+    </div>`;
+  })();
   const actionGrid = `
     <div class="home-sec" style="margin-top:20px;">
       <span class="home-sec-title">More actions</span>
@@ -3428,6 +3995,7 @@ function renderHome(tab) {
     <div class="home-left">
       ${focusCard}
       ${nudgesHtml}
+      ${dailyTeaserHtml}
       ${actionGrid}
     </div>
     <div class="home-right">
@@ -7173,6 +7741,20 @@ function allCards(s) { return s.cards||[]; }
 function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
 // ─── KEYBOARD SHORTCUTS ───────────────────────────
 document.addEventListener('keydown', e => {
+  // ⌘K or Ctrl+K — open search from anywhere
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    const overlay = document.getElementById('search-overlay');
+    if (overlay.style.display === 'none' || !overlay.style.display) openSearch();
+    else closeSearch();
+    return;
+  }
+
+  // Close search on Escape even from input
+  if (e.key === 'Escape' && document.getElementById('search-overlay')?.style.display !== 'none') {
+    closeSearch(); return;
+  }
+
   // Don't fire if typing in an input
   if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
   const active = document.querySelector('.view.active')?.id;
@@ -8456,6 +9038,23 @@ function toggleAISetting() {
   const t = document.getElementById('ai-toggle');
   if (t) t.classList.toggle('on', aiEnabled);
   updateAIButtonVisibility();
+  saveSettings();
+}
+
+function applyDailyVisibility() {
+  const navLink = document.getElementById('daily-nav-link');
+  if (navLink) navLink.style.display = dailyEnabled ? '' : 'none';
+  // If we're on the daily view and it was just disabled, go home
+  const active = document.querySelector('.view.active')?.id;
+  if (!dailyEnabled && active === 'view-daily') goHome();
+}
+
+function toggleDailySetting() {
+  dailyEnabled = !dailyEnabled;
+  const t = document.getElementById('daily-toggle');
+  if (t) t.classList.toggle('on', dailyEnabled);
+  applyDailyVisibility();
+  renderHome(); // refresh teaser
   saveSettings();
 }
 
