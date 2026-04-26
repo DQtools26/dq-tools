@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TNYF9DN593');
+  </script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Categories — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0b0c10; --bg2:#13141a; --bg3:#1a1b23;
+      --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.15);
+      --text:#f0f0f4; --muted:#7b7c8a;
+      --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
+      --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+    .b1 { width:500px;height:500px;background:rgba(77,232,136,0.06);top:-100px;left:-100px; }
+    .b2 { width:400px;height:400px;background:rgba(58,127,255,0.05);bottom:0;right:-80px; }
+
+    /* NAV */
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px; }
+    .nav-logo { font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .nav-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent); }
+    .nav-links { display:flex;align-items:center;gap:2px; }
+    .nav-links a { font-size:0.77rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:6px;transition:color .15s,background .15s;white-space:nowrap; }
+    .nav-links a:hover { color:var(--text);background:rgba(255,255,255,0.06); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-hamburger { display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:6px;margin-left:4px; }
+    .nav-hamburger span { display:block;width:18px;height:2px;background:var(--muted);border-radius:2px; }
+    @media(max-width:640px){
+      .nav-links { display:none; }
+      .nav-links.open { display:flex;flex-direction:column;align-items:flex-start;position:fixed;top:56px;left:0;right:0;background:rgba(11,12,16,0.98);border-bottom:1px solid var(--border);padding:12px 20px 16px;gap:4px;z-index:99; }
+      .nav-hamburger { display:flex; }
+    }
+    .nav-right { margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .btn-icon { width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s; }
+    .btn-icon:hover { border-color:var(--border-hi);color:var(--text); }
+    #dq-auth-btn { display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0; }
+    #dq-auth-btn:hover { border-color:#3a7fff;color:#e8eef8; }
+    #dq-auth-btn.logged-in { border-color:rgba(77,232,136,.35);color:#e8eef8; }
+    #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
+    #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+    /* MAIN */
+    main { position:relative;z-index:1;max-width:980px;margin:0 auto;padding:36px 20px 100px; }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom:24px;animation:fadeUp .4s ease both; }
+    .page-title { font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em; }
+    .page-sub   { font-size:0.82rem;color:var(--muted);margin-top:4px; }
+
+    /* TOOLBAR */
+    .toolbar { display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;animation:fadeUp .4s ease .05s both; }
+    .search-wrap { flex:1;min-width:180px;position:relative; }
+    .search-wrap input { width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.83rem;padding:8px 12px 8px 34px;outline:none;transition:border-color .15s; }
+    .search-wrap input:focus { border-color:var(--accent); }
+    .search-wrap input::placeholder { color:var(--muted); }
+    .search-icon { position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:0.85rem;pointer-events:none; }
+    .view-btns { display:flex;gap:4px; }
+    .view-btn { width:32px;height:32px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s; }
+    .view-btn.active { background:var(--bg2);border-color:var(--border-hi);color:var(--text); }
+    .sort-select { background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.8rem;padding:7px 10px;outline:none;cursor:pointer; }
+
+    /* SECTION LABEL */
+    .section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px; }
+
+    /* GRID VIEW */
+    .cat-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px; }
+    .cat-card { background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 14px 44px;cursor:pointer;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden;transition:border-color .15s,transform .15s,background .15s;animation:fadeUp .35s ease both; }
+    .cat-card:hover { border-color:var(--border-hi);background:rgba(255,255,255,0.03);transform:translateY(-2px); }
+    .cat-card.pinned { border-color:rgba(245,200,66,0.35); }
+    .cat-emoji { font-size:1.5rem;line-height:1; }
+    .cat-name  { font-size:0.8rem;font-weight:500;color:var(--text);line-height:1.3; }
+    .cat-plays { font-size:0.64rem;color:var(--muted); }
+    .cat-qcount { font-size:0.62rem;color:var(--muted); }
+    .cat-rank  { position:absolute;top:8px;right:8px;font-size:0.6rem;font-weight:700;color:var(--gold);background:rgba(245,200,66,0.1);border-radius:4px;padding:1px 5px; }
+    .cat-badge { position:absolute;top:8px;left:8px;font-size:0.58rem;font-weight:700;border-radius:4px;padding:1px 6px; }
+    .badge-hot  { background:rgba(255,107,107,0.15);color:var(--red); }
+    .badge-new  { background:rgba(58,127,255,0.15);color:var(--blue); }
+    .badge-top  { background:rgba(245,200,66,0.15);color:var(--gold); }
+    .card-actions { position:absolute;bottom:0;left:0;right:0;display:flex;border-top:1px solid var(--border); }
+    .card-action-btn { flex:1;background:none;border:none;cursor:pointer;font-size:0.7rem;font-family:var(--font-b);color:var(--muted);padding:8px 4px;transition:background .15s,color .15s;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center; }
+    .card-action-btn:first-child { border-right:1px solid var(--border); }
+    .card-action-btn:hover { background:rgba(255,255,255,0.05);color:var(--text); }
+    .card-action-btn.pinned-act { color:var(--gold); }
+
+    /* LIST VIEW */
+    .cat-list { display:flex;flex-direction:column;gap:6px; }
+    .cat-row { background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:13px 16px;display:flex;align-items:center;gap:14px;transition:border-color .15s,background .15s;animation:fadeUp .3s ease both; }
+    .cat-row:hover { border-color:var(--border-hi);background:rgba(255,255,255,0.03); }
+    .cat-row.pinned { border-color:rgba(245,200,66,0.3); }
+    .row-emoji { font-size:1.3rem;flex-shrink:0; }
+    .row-info  { flex:1;min-width:0; }
+    .row-name  { font-size:0.85rem;font-weight:500;color:var(--text); }
+    .row-meta  { font-size:0.67rem;color:var(--muted); }
+    .row-badge { font-size:0.6rem;font-weight:700;border-radius:4px;padding:1px 6px;flex-shrink:0; }
+    .row-rank  { font-size:0.68rem;font-weight:700;color:var(--gold);flex-shrink:0;min-width:28px;text-align:right; }
+    .row-pin   { background:none;border:none;cursor:pointer;font-size:1rem;flex-shrink:0;opacity:0.35;transition:opacity .15s; }
+    .cat-row:hover .row-pin, .cat-row.pinned .row-pin { opacity:1; }
+    .row-play  { background:var(--accent);color:#071209;border:none;border-radius:7px;padding:5px 13px;font-family:var(--font-b);font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none;transition:background .15s; }
+    .row-play:hover { background:#65f0a0; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease both; }
+    @media(min-width:600px){ .modal-overlay { align-items:center; } }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:460px;padding:24px 22px 28px;position:relative;animation:slideUp .25s ease both;max-height:90vh;overflow-y:auto; }
+    @media(min-width:600px){ .modal { border-radius:20px; } }
+    .modal-close { position:absolute;top:14px;right:14px;background:var(--bg3);border:none;color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:color .15s; }
+    .modal-close:hover { color:var(--text); }
+    .modal-top { display:flex;align-items:flex-start;gap:14px;margin-bottom:16px; }
+    .modal-emoji-big { font-size:2.5rem;line-height:1;flex-shrink:0; }
+    .modal-title { font-family:var(--font-d);font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:2px; }
+    .modal-meta  { font-size:0.75rem;color:var(--muted); }
+    .modal-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px; }
+    .modal-stat  { background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center; }
+    .modal-stat strong { display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;color:var(--text);margin-bottom:2px; }
+    .modal-stat span { font-size:0.62rem;color:var(--muted); }
+    .modal-rating { background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px; }
+    .modal-rating-title { font-size:0.72rem;font-weight:600;color:var(--muted);margin-bottom:10px;letter-spacing:.05em;text-transform:uppercase; }
+    .rating-bars { display:flex;flex-direction:column;gap:6px;margin-bottom:12px; }
+    .rating-bar-row { display:flex;align-items:center;gap:8px;font-size:0.72rem; }
+    .rating-bar-label { width:18px;text-align:center;flex-shrink:0; }
+    .rating-bar-track { flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden; }
+    .rating-bar-fill  { height:100%;border-radius:3px;transition:width .6s ease; }
+    .bar-up   { background:var(--accent); }
+    .bar-down { background:var(--red); }
+    .rating-bar-count { font-size:0.65rem;color:var(--muted);width:24px;text-align:right;flex-shrink:0; }
+    .rating-btns { display:flex;gap:8px; }
+    .rating-btn { flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;padding:8px;font-family:var(--font-b);font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--muted);transition:all .15s; }
+    .rating-btn:hover { border-color:var(--border-hi);color:var(--text); }
+    .rating-btn.voted-up   { background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.4);color:var(--accent); }
+    .rating-btn.voted-down { background:rgba(255,107,107,0.1);border-color:rgba(255,107,107,0.4);color:var(--red); }
+    .modal-pin-share { display:flex;gap:8px;margin-bottom:16px; }
+    .btn-sm { display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-family:var(--font-b);font-size:0.79rem;font-weight:500;cursor:pointer;transition:all .15s;border:none;padding:7px 14px;background:var(--bg3);color:var(--muted);border:1px solid var(--border); }
+    .btn-sm:hover { color:var(--text);border-color:var(--border-hi); }
+    .btn-sm.pinned { color:var(--gold);border-color:rgba(245,200,66,0.4);background:rgba(245,200,66,0.08); }
+    .modal-play-btn { display:block;width:100%;text-align:center;background:var(--accent);color:#071209;border-radius:12px;padding:14px;font-family:var(--font-d);font-size:1rem;font-weight:800;text-decoration:none;letter-spacing:-0.01em;transition:background .15s,transform .1s; }
+    .modal-play-btn:hover { background:#65f0a0; }
+    .modal-play-btn:active { transform:scale(0.98); }
+
+    /* EMPTY */
+    .empty { text-align:center;padding:48px 20px;color:var(--muted);font-size:0.85rem; }
+    .empty .big { font-size:2.2rem;margin-bottom:10px; }
+
+    /* TOAST */
+    .toast { position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap; }
+    .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+    @keyframes fadeUp   { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+    @keyframes slideUp  { from { transform:translateY(40px);opacity:0; } to { transform:translateY(0);opacity:1; } }
+
+    /* WATERMARK / FAB */
+    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+    .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
+    .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+    .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+    .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease;}
+    .fab2-items.open{max-height:400px;opacity:1;}
+    .fab2-item{display:flex;align-items:center;position:relative;}
+    .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+    .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+    .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+    .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="categories.html" class="active">Categories</a>
+    <a href="play.html">Play</a>
+    <a href="stats.html">Stats</a>
+    <a href="history.html">History</a>
+    <a href="shop.html">🛒 Shop</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-top">
+      <div class="modal-emoji-big" id="mEmoji">🧠</div>
+      <div>
+        <div class="modal-title" id="mTitle">Category</div>
+        <div class="modal-meta"  id="mMeta">Loading…</div>
+      </div>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat"><strong id="mGlobalPlays">—</strong><span>Global plays</span></div>
+      <div class="modal-stat"><strong id="mRank">—</strong><span>Global rank</span></div>
+      <div class="modal-stat"><strong id="mQCount">—</strong><span>Questions</span></div>
+    </div>
+
+    <!-- RATING SECTION -->
+    <div class="modal-rating">
+      <div class="modal-rating-title">Did you like this category?</div>
+      <div class="rating-bars">
+        <div class="rating-bar-row">
+          <span class="rating-bar-label">👍</span>
+          <div class="rating-bar-track"><div class="rating-bar-fill bar-up" id="barUp" style="width:0%"></div></div>
+          <span class="rating-bar-count" id="mUpCount">0</span>
+        </div>
+        <div class="rating-bar-row">
+          <span class="rating-bar-label">👎</span>
+          <div class="rating-bar-track"><div class="rating-bar-fill bar-down" id="barDown" style="width:0%"></div></div>
+          <span class="rating-bar-count" id="mDownCount">0</span>
+        </div>
+      </div>
+      <div class="rating-btns">
+        <button class="rating-btn" id="rateUpBtn"   onclick="submitRating(1)">👍 Yes!</button>
+        <button class="rating-btn" id="rateDownBtn" onclick="submitRating(-1)">👎 Not really</button>
+      </div>
+    </div>
+
+    <div class="modal-pin-share">
+      <button class="btn-sm" id="mPinBtn" onclick="modalTogglePin()">📌 Pin</button>
+      <button class="btn-sm" onclick="modalShare()">🔗 Share</button>
+    </div>
+    <a class="modal-play-btn" id="mPlayBtn" href="#">▶ Play Now</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<main>
+  <div class="page-header">
+    <div class="page-title">Categories</div>
+    <div class="page-sub" id="pageSubtitle">24 topics · tap to explore</div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search categories…" oninput="render()">
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="render()">
+      <option value="rank">Best Ranked</option>
+      <option value="alpha">A–Z</option>
+      <option value="newest">Newest</option>
+    </select>
+    <div class="view-btns">
+      <button class="view-btn active" id="btnGrid" onclick="setView('grid')" title="Grid">⊞</button>
+      <button class="view-btn"        id="btnList" onclick="setView('list')" title="List">☰</button>
+    </div>
+  </div>
+  <div id="catContainer"></div>
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn"
+    onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+var CATS = [
+  {id:9,  name:'General Knowledge',    emoji:'🧠'},
+  {id:10, name:'Books',                emoji:'📚'},
+  {id:11, name:'Film',                 emoji:'🎬'},
+  {id:12, name:'Music',                emoji:'🎵'},
+  {id:13, name:'Musicals & Theatre',   emoji:'🎭'},
+  {id:14, name:'Television',           emoji:'📺'},
+  {id:15, name:'Video Games',          emoji:'🎮'},
+  {id:16, name:'Board Games',          emoji:'♟️'},
+  {id:17, name:'Science & Nature',     emoji:'🔬'},
+  {id:18, name:'Computers',            emoji:'💻'},
+  {id:19, name:'Mathematics',          emoji:'➗'},
+  {id:20, name:'Mythology',            emoji:'⚡'},
+  {id:21, name:'Sports',               emoji:'🏆'},
+  {id:22, name:'Geography',            emoji:'🌍'},
+  {id:23, name:'History',              emoji:'🏛️'},
+  {id:24, name:'Politics',             emoji:'🗳️'},
+  {id:25, name:'Art',                  emoji:'🎨'},
+  {id:26, name:'Celebrities',          emoji:'⭐'},
+  {id:27, name:'Animals',              emoji:'🦁'},
+  {id:28, name:'Vehicles',             emoji:'🚗'},
+  {id:29, name:'Comics',               emoji:'💬'},
+  {id:30, name:'Gadgets',              emoji:'📱'},
+  {id:31, name:'Anime & Manga',        emoji:'✏️'},
+  {id:32, name:'Cartoons & Animation', emoji:'🎞️'},
+];
+
+// ── STATE ──
+var globalStats = {};  // { catId: { plays, up, down } } — from dqtrivia_categories table
+var playerStats = {};  // personal: catRanks, pinnedCats, catRatings (my votes)
+var viewMode    = localStorage.getItem('dqt_catview') || 'grid';
+var qCounts     = {};
+var openCat     = null;
+var sb          = null; // Supabase client from DQAuth
+
+function getRanks()     { return playerStats.catRanks   || {}; }
+function getPinned()    { return playerStats.pinnedCats || []; }
+function getMyRatings() { return playerStats.catRatings  || {}; }
+
+// ── COMPOSITE SCORE (global: plays + ratings + question pool size) ──
+// plays × 10 + upvotes × 15 − downvotes × 10 + questionCount ÷ 100
+function getScore(cat) {
+  var g  = globalStats[cat.id] || { plays:0, up:0, down:0 };
+  var qc = qCounts[cat.id] || 0;
+  return (g.plays * 10) + (g.up * 15) - (g.down * 10) + (qc / 100);
+}
+
+// ── FETCH GLOBAL STATS ──
+async function fetchGlobalStats() {
+  if (!sb) return;
+  var res = await sb.from('dqtrivia_categories').select('id,plays,rating_up,rating_down');
+  if (res.error || !res.data) return;
+  res.data.forEach(function(row) {
+    globalStats[row.id] = { plays: row.plays || 0, up: row.rating_up || 0, down: row.rating_down || 0 };
+  });
+  render();
+}
+
+// ── RECORD A PLAY (called when user clicks Play on a category) ──
+// Exposed globally so play.html can call window.dqtRecordPlay(catId) after finishing a game
+async function recordPlay(catId) {
+  catId = parseInt(catId);
+  // Personal stat
+  if (!playerStats.catRanks) playerStats.catRanks = {};
+  playerStats.catRanks[catId] = (playerStats.catRanks[catId] || 0) + 1;
+  doSyncPersonal({ catRanks: playerStats.catRanks });
+  // Global stat via RPC
+  if (sb) {
+    await sb.rpc('increment_category_plays', { cat_id: catId });
+    if (!globalStats[catId]) globalStats[catId] = { plays:0, up:0, down:0 };
+    globalStats[catId].plays++;
+    render();
+  }
+}
+window.dqtRecordPlay = recordPlay;
+
+// ── SUBMIT RATING (yes/no after playing) ──
+// val = 1 (yes / thumbs up) or -1 (no / thumbs down)
+// Exposed globally so play.html can call window.dqtRateCategory(catId, 1)
+async function submitRating(val) {
+  if (openCat === null && arguments.length > 1) openCat = parseInt(arguments[0]);
+  if (openCat === null) return;
+  var catId    = openCat;
+  var myRatings = getMyRatings();
+  var prev     = myRatings[catId] || 0;
+
+  // Toggle off if same vote
+  var newVal = (prev === val) ? 0 : val;
+
+  if (!sb) return;
+
+  // Remove old vote from global
+  if (prev === 1)  await sb.rpc('decrement_category_rating', { cat_id: catId, col: 'rating_up' });
+  if (prev === -1) await sb.rpc('decrement_category_rating', { cat_id: catId, col: 'rating_down' });
+
+  // Apply new vote
+  if (newVal === 1)  await sb.rpc('increment_category_rating', { cat_id: catId, col: 'rating_up' });
+  if (newVal === -1) await sb.rpc('increment_category_rating', { cat_id: catId, col: 'rating_down' });
+
+  // Update local cache
+  if (!globalStats[catId]) globalStats[catId] = { plays:0, up:0, down:0 };
+  if (prev === 1)     globalStats[catId].up   = Math.max(0, globalStats[catId].up - 1);
+  if (prev === -1)    globalStats[catId].down = Math.max(0, globalStats[catId].down - 1);
+  if (newVal === 1)   globalStats[catId].up++;
+  if (newVal === -1)  globalStats[catId].down++;
+
+  // Save my vote to personal stats
+  playerStats.catRatings = getMyRatings();
+  playerStats.catRatings[catId] = newVal;
+  doSyncPersonal({ catRatings: playerStats.catRatings });
+
+  showToast(newVal === 1 ? '👍 Thanks for the rating!' : newVal === -1 ? '👎 Noted!' : 'Rating removed');
+
+  // Update modal UI
+  refreshModalRatings(catId);
+  render();
+}
+// Also expose a 2-arg version for play.html: dqtRateCategory(catId, val)
+window.dqtRateCategory = function(catId, val) {
+  openCat = parseInt(catId);
+  submitRating(val);
+};
+
+function refreshModalRatings(catId) {
+  var g  = globalStats[catId] || { up:0, down:0 };
+  var my = (playerStats.catRatings || {})[catId] || 0;
+  var total = g.up + g.down;
+  document.getElementById('mUpCount').textContent   = g.up;
+  document.getElementById('mDownCount').textContent = g.down;
+  document.getElementById('barUp').style.width   = total > 0 ? Math.round(g.up   / total * 100) + '%' : '0%';
+  document.getElementById('barDown').style.width = total > 0 ? Math.round(g.down / total * 100) + '%' : '0%';
+  document.getElementById('rateUpBtn').className   = 'rating-btn' + (my === 1  ? ' voted-up'   : '');
+  document.getElementById('rateDownBtn').className = 'rating-btn' + (my === -1 ? ' voted-down' : '');
+}
+
+// ── SORTING ──
+function getSorted() {
+  var sort = document.getElementById('sortSelect').value;
+  var list = CATS.slice();
+  if (sort === 'alpha') {
+    list.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  } else if (sort === 'newest') {
+    list.sort(function(a,b){ return b.id - a.id; });
+  } else {
+    list.sort(function(a,b){ return getScore(b) - getScore(a); });
+  }
+  return list;
+}
+
+function getFiltered() {
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) return getSorted();
+  return getSorted().filter(function(c){ return c.name.toLowerCase().indexOf(q) !== -1; });
+}
+
+// ── BADGE ──
+function getBadge(cat, rank) {
+  var g = globalStats[cat.id] || { plays:0 };
+  if (rank === 0 && g.plays > 0) return { cls:'badge-top', label:'🔥 #1' };
+  if (rank < 3  && g.plays > 0) return { cls:'badge-hot', label:'📈 Top' };
+  if (g.plays === 0)             return { cls:'badge-new', label:'✨ New' };
+  return null;
+}
+
+// ── RENDER ──
+function render() {
+  var filtered  = getFiltered();
+  var pinned    = getPinned();
+  var allSorted = getSorted();
+  var pinnedList   = filtered.filter(function(c){ return pinned.indexOf(c.id) !== -1; });
+  var unpinnedList = filtered.filter(function(c){ return pinned.indexOf(c.id) === -1; });
+
+  var totalGlobal = Object.values(globalStats).reduce(function(s,g){ return s+(g.plays||0); }, 0);
+  document.getElementById('pageSubtitle').textContent = totalGlobal > 0
+    ? '24 topics · ' + totalGlobal.toLocaleString() + ' global plays · tap to explore'
+    : '24 topics · tap a category to explore';
+
+  var html = '';
+  if (pinnedList.length > 0) {
+    html += '<div class="section-lbl">📌 Pinned</div>' + renderSection(pinnedList, allSorted, pinned);
+  }
+  if (unpinnedList.length > 0) {
+    if (pinnedList.length > 0) html += '<div class="section-lbl">All Categories</div>';
+    html += renderSection(unpinnedList, allSorted, pinned);
+  }
+  if (filtered.length === 0) {
+    html = '<div class="empty"><div class="big">🔍</div>No categories match that search.</div>';
+  }
+  document.getElementById('catContainer').innerHTML = html;
+}
+
+function renderSection(list, allSorted, pinned) {
+  var fn = viewMode === 'list' ? rowHTML : cardHTML;
+  var wrap = viewMode === 'list' ? 'cat-list' : 'cat-grid';
+  return '<div class="' + wrap + '">' + list.map(function(c){ return fn(c, allSorted, pinned); }).join('') + '</div>';
+}
+
+function cardHTML(cat, allSorted, pinned) {
+  var g        = globalStats[cat.id] || { plays:0 };
+  var rank     = allSorted.indexOf(cat);
+  var isPinned = pinned.indexOf(cat.id) !== -1;
+  var badge    = getBadge(cat, rank);
+  var qc       = qCounts[cat.id] ? qCounts[cat.id].toLocaleString() + ' Qs' : '';
+  var showRank = document.getElementById('sortSelect').value === 'rank' && rank < 3 && g.plays > 0;
+  return '<div class="cat-card' + (isPinned?' pinned':'') + '" onclick="openModal(' + cat.id + ')">'
+    + (badge    ? '<div class="cat-badge ' + badge.cls + '">' + badge.label + '</div>' : '')
+    + (showRank ? '<div class="cat-rank">#' + (rank+1) + '</div>' : '')
+    + '<div class="cat-emoji">' + cat.emoji + '</div>'
+    + '<div class="cat-name">'  + cat.name  + '</div>'
+    + '<div class="cat-plays">' + (g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'Be first!') + '</div>'
+    + (qc ? '<div class="cat-qcount">' + qc + '</div>' : '')
+    + '<div class="card-actions">'
+    +   '<button class="card-action-btn' + (isPinned?' pinned-act':'') + '" onclick="quickPin(' + cat.id + ',event)">' + (isPinned?'📌':'🔖') + '</button>'
+    +   '<a class="card-action-btn" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="recordPlay(' + cat.id + ')">▶ Play</a>'
+    + '</div></div>';
+}
+
+function rowHTML(cat, allSorted, pinned) {
+  var g        = globalStats[cat.id] || { plays:0 };
+  var rank     = allSorted.indexOf(cat);
+  var isPinned = pinned.indexOf(cat.id) !== -1;
+  var badge    = getBadge(cat, rank);
+  var qc       = qCounts[cat.id] ? qCounts[cat.id].toLocaleString() + ' Qs' : '';
+  var showRank = document.getElementById('sortSelect').value === 'rank' && rank < 3 && g.plays > 0;
+  return '<div class="cat-row' + (isPinned?' pinned':'') + '" onclick="openModal(' + cat.id + ')">'
+    + '<div class="row-emoji">' + cat.emoji + '</div>'
+    + '<div class="row-info">'
+    +   '<div class="row-name">' + cat.name + '</div>'
+    +   '<div class="row-meta">' + (g.plays > 0 ? g.plays.toLocaleString() + ' global plays' : 'No plays yet') + (qc ? ' · ' + qc : '') + '</div>'
+    + '</div>'
+    + (badge    ? '<div class="row-badge ' + badge.cls + '">' + badge.label + '</div>' : '')
+    + (showRank ? '<div class="row-rank">#' + (rank+1) + '</div>' : '')
+    + '<button class="row-pin" onclick="quickPin(' + cat.id + ',event)">' + (isPinned?'📌':'🔖') + '</button>'
+    + '<a class="row-play" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="event.stopPropagation();recordPlay(' + cat.id + ')">Play →</a>'
+    + '</div>';
+}
+
+// ── PIN ──
+function quickPin(id, e) { e.preventDefault(); e.stopPropagation(); togglePinById(id); }
+function modalTogglePin() { if (openCat !== null) togglePinById(openCat); }
+
+function togglePinById(id) {
+  var pinned = getPinned().slice();
+  var idx    = pinned.indexOf(id);
+  var nowPinned = idx === -1;
+  if (nowPinned) pinned.push(id); else pinned.splice(idx, 1);
+  playerStats.pinnedCats = pinned;
+  doSyncPersonal({ pinnedCats: pinned });
+  showToast(nowPinned ? '📌 Pinned!' : 'Unpinned');
+  // Update modal pin button if open
+  if (openCat === id) {
+    var btn = document.getElementById('mPinBtn');
+    if (btn) { btn.textContent = nowPinned ? '📌 Pinned' : '📌 Pin'; btn.classList.toggle('pinned', nowPinned); }
+  }
+  render();
+}
+
+// ── MODAL ──
+function openModal(id) {
+  openCat = id;
+  var cat      = CATS.find(function(c){ return c.id === id; });
+  var g        = globalStats[id] || { plays:0, up:0, down:0 };
+  var allSorted = getSorted();
+  var rank     = allSorted.indexOf(cat);
+  var isPinned = getPinned().indexOf(id) !== -1;
+
+  document.getElementById('mEmoji').textContent = cat.emoji;
+  document.getElementById('mTitle').textContent = cat.name;
+  document.getElementById('mMeta').textContent  = g.plays > 0
+    ? 'Ranked #' + (rank+1) + ' globally'
+    : 'No one has played this yet — be first!';
+  document.getElementById('mGlobalPlays').textContent = g.plays > 0 ? g.plays.toLocaleString() : '0';
+  document.getElementById('mRank').textContent  = g.plays > 0 ? '#' + (rank+1) : '—';
+  document.getElementById('mQCount').textContent = qCounts[id] ? qCounts[id].toLocaleString() : '…';
+
+  refreshModalRatings(id);
+
+  var pinBtn = document.getElementById('mPinBtn');
+  pinBtn.textContent = isPinned ? '📌 Pinned' : '📌 Pin';
+  pinBtn.classList.toggle('pinned', isPinned);
+
+  document.getElementById('mPlayBtn').href =
+    'play.html?mode=personal&cat=' + id + '&catname=' + encodeURIComponent(cat.name);
+
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  openCat = null;
+}
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModalDirect(); });
+
+function modalShare() {
+  var cat = CATS.find(function(c){ return c.id === openCat; });
+  if (!cat) return;
+  var url = window.location.origin + window.location.pathname.replace('categories.html','') + 'play.html?cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name);
+  if (navigator.share) {
+    navigator.share({ title: 'DQtrivia · ' + cat.name, url: url });
+  } else {
+    navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Link copied!'); });
+  }
+}
+
+// ── VIEW ──
+function setView(v) {
+  viewMode = v;
+  localStorage.setItem('dqt_catview', v);
+  document.getElementById('btnGrid').classList.toggle('active', v === 'grid');
+  document.getElementById('btnList').classList.toggle('active', v === 'list');
+  render();
+}
+
+// ── PERSONAL SYNC (uses DQAuth.saveData) ──
+function doSyncPersonal(partial) {
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+  Object.assign(playerStats, partial);
+  DQAuth.saveData('dqtrivia_stats', playerStats);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  if (!user) { window.location.replace('landing.html'); return; }
+  sb = DQAuth.getSupabase(); // get the authenticated Supabase client
+  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+    playerStats = saved || {};
+    render();
+    fetchGlobalStats();
+    fetchQCounts();
+  });
+});
+
+// ── QUESTION COUNTS ──
+function fetchQCounts() {
+  CATS.forEach(function(cat, i) {
+    setTimeout(function() {
+      fetch('https://opentdb.com/api_count.php?category=' + cat.id)
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.category_question_count) {
+            qCounts[cat.id] = d.category_question_count.total_question_count || 0;
+          }
+          // Re-render periodically as counts come in
+          if (i % 6 === 0) render();
+        }).catch(function(){});
+    }, i * 300);
+  });
+}
+
+// ── SOUND ──
+var soundOn = localStorage.getItem('dqt_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('dqt_sound', soundOn?'on':'off');
+  document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+}
+document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+
+// ── HAMBURGER ──
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
