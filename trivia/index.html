@@ -185,6 +185,7 @@
     <a href="play.html">Play</a>
     <a href="stats.html">Stats</a>
     <a href="history.html">History</a>
+    <a href="shop.html">🛒 Shop</a>
     <a href="#join">Join Game</a>
   </div>
   <div class="nav-right">
@@ -291,7 +292,6 @@
 </div>
 
 <script>
-// ── CATEGORIES (all 24 verified IDs) ──
 var CATS = [
   {id:9,  name:'General Knowledge',    emoji:'🧠'},
   {id:10, name:'Books',                emoji:'📚'},
@@ -319,32 +319,55 @@ var CATS = [
   {id:32, name:'Cartoons & Animation', emoji:'🎞️'},
 ];
 
-// ── STATE ──
 var playerStats = {};
+var globalStats = {}; // { catId: { plays, up, down } } from dqtrivia_categories
+var sb          = null;
 
-function getRanks()  { return playerStats.catRanks   || {}; }
 function getPinned() { return playerStats.pinnedCats || []; }
 
-// ── RENDER CATEGORIES ──
+// ── COMPOSITE SCORE — same formula as categories.html ──
+// plays×10 + up×15 − down×10
+function getScore(cat) {
+  var g = globalStats[cat.id] || { plays:0, up:0, down:0 };
+  return (g.plays * 10) + (g.up * 15) - (g.down * 10);
+}
+
+function globalSorted() {
+  return CATS.slice().sort(function(a,b){ return getScore(b) - getScore(a); });
+}
+
+// ── FETCH GLOBAL STATS FROM SUPABASE ──
+async function fetchGlobalStats() {
+  if (!sb) return;
+  var res = await sb.from('dqtrivia_categories').select('id,plays,rating_up,rating_down');
+  if (res.error || !res.data) return;
+  res.data.forEach(function(row) {
+    globalStats[row.id] = { plays: row.plays || 0, up: row.rating_up || 0, down: row.rating_down || 0 };
+  });
+  renderCats();
+  renderPinned();
+}
+
+// ── RENDER TRENDING CATEGORIES ──
 function renderCats() {
-  var ranks  = getRanks();
+  var sorted = globalSorted();
   var pinned = getPinned();
-  var sorted = CATS.slice().sort(function(a,b){ return (ranks[b.id]||0)-(ranks[a.id]||0); });
-  var hasPlays = Object.keys(ranks).length > 0;
+  var anyPlays = sorted.some(function(c){ var g = globalStats[c.id]; return g && g.plays > 0; });
 
-  document.getElementById('catTitle').textContent = hasPlays ? 'Your Top Categories' : 'Trending Categories';
+  document.getElementById('catTitle').textContent = anyPlays ? 'Trending Categories' : 'Categories';
 
-  // Exclude pinned from main list
+  // Exclude pinned, show top 8
   var list = sorted.filter(function(c){ return pinned.indexOf(c.id) === -1; }).slice(0, 8);
 
   document.getElementById('catGrid').innerHTML = list.map(function(cat) {
-    var plays = ranks[cat.id] || 0;
-    var rank  = sorted.indexOf(cat);
-    return '<a class="cat-chip" href="play.html?cat='+cat.id+'&catname='+encodeURIComponent(cat.name)+'" onclick="recordPlay('+cat.id+')">'
-      + (rank < 3 ? '<div class="cat-rank">#'+(rank+1)+'</div>' : '')
+    var g         = globalStats[cat.id] || { plays:0 };
+    var globalRank = sorted.indexOf(cat); // 0-based position in full sorted list
+    var showRank  = globalRank < 3 && g.plays > 0;
+    return '<a class="cat-chip" href="categories.html" onclick="sessionStorage.setItem(\'dqt_open_cat\','+cat.id+')">'
+      + (showRank ? '<div class="cat-rank">#'+(globalRank+1)+'</div>' : '')
       + '<div class="cat-emoji">'+cat.emoji+'</div>'
       + '<div class="cat-name">'+cat.name+'</div>'
-      + '<div class="cat-meta">'+(plays > 0 ? plays+' play'+(plays!==1?'s':'') : 'New')+'</div>'
+      + '<div class="cat-meta">'+(g.plays > 0 ? g.plays.toLocaleString()+' plays' : 'New')+'</div>'
       + '</a>';
   }).join('');
 }
@@ -355,28 +378,25 @@ function renderPinned() {
   var section = document.getElementById('pinnedSection');
   if (pinned.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  var ranks = getRanks();
+
+  var sorted = globalSorted();
   document.getElementById('pinnedGrid').innerHTML = pinned.map(function(id) {
     var cat = CATS.find(function(c){ return c.id === id; });
     if (!cat) return '';
-    var plays = ranks[id] || 0;
-    return '<a class="cat-chip pinned" href="play.html?cat='+cat.id+'&catname='+encodeURIComponent(cat.name)+'" onclick="recordPlay('+cat.id+')">'
+    var g = globalStats[id] || { plays:0 };
+    var globalRank = sorted.indexOf(cat);
+    var showRank = globalRank < 3 && g.plays > 0;
+    return '<a class="cat-chip pinned" href="categories.html" onclick="sessionStorage.setItem(\'dqt_open_cat\','+cat.id+')">'
       + '<div class="cat-pin">📌</div>'
+      + (showRank ? '<div class="cat-rank">#'+(globalRank+1)+'</div>' : '')
       + '<div class="cat-emoji">'+cat.emoji+'</div>'
       + '<div class="cat-name">'+cat.name+'</div>'
-      + '<div class="cat-meta">'+(plays > 0 ? plays+' play'+(plays!==1?'s':'') : 'New')+'</div>'
+      + '<div class="cat-meta">'+(g.plays > 0 ? g.plays.toLocaleString()+' plays' : 'New')+'</div>'
       + '</a>';
   }).join('');
 }
 
-// ── RECORD PLAY ──
-function recordPlay(id) {
-  if (!playerStats.catRanks) playerStats.catRanks = {};
-  playerStats.catRanks[id] = (playerStats.catRanks[id] || 0) + 1;
-  doSync({ catRanks: playerStats.catRanks });
-}
-
-// ── APPLY STATS TO PAGE ──
+// ── APPLY PERSONAL STATS ──
 function applyStats(data) {
   if (!data) data = {};
   playerStats = data;
@@ -396,7 +416,7 @@ function applyStats(data) {
     document.getElementById('cTitle').textContent = data.lastCat.name;
     document.getElementById('cSub').textContent   = 'Pick up where you left off.';
     var btn = document.getElementById('cBtn');
-    btn.href        = 'play.html?cat='+data.lastCat.id+'&catname='+encodeURIComponent(data.lastCat.name);
+    btn.href        = 'play.html?mode=personal&cat='+data.lastCat.id+'&catname='+encodeURIComponent(data.lastCat.name);
     btn.textContent = '▶ Play Again';
   }
 
@@ -404,7 +424,6 @@ function applyStats(data) {
   renderCats();
 }
 
-// ── SYNC TO SUPABASE ──
 function doSync(partial) {
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
   Object.assign(playerStats, partial);
@@ -414,10 +433,8 @@ function doSync(partial) {
 // ── AUTH ──
 window.addEventListener('dq:authready', function(e) {
   var user = e.detail && e.detail.user;
-  if (!user) {
-    window.location.replace('landing.html');
-    return;
-  }
+  if (!user) { window.location.replace('landing.html'); return; }
+  sb = DQAuth.getSupabase();
   var profile = DQAuth.getProfile();
   if (profile && profile.displayName) {
     document.getElementById('greetName').textContent = profile.displayName.split(' ')[0];
@@ -425,6 +442,7 @@ window.addEventListener('dq:authready', function(e) {
   DQAuth.loadData('dqtrivia_stats').then(function(saved) {
     applyStats(saved || {});
     checkStreak(saved);
+    fetchGlobalStats(); // load global rankings after personal stats
   });
 });
 
@@ -479,8 +497,6 @@ function toggleNav() { document.getElementById('navLinks').classList.toggle('ope
 // ── INIT ──
 setGreeting();
 renderStreakBar(0);
-// Categories will render after dq:authready fires and stats load
-// Show skeletons in the meantime (already in HTML)
 </script>
 </body>
 </html>
