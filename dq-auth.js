@@ -1,18 +1,10 @@
 /**
  * DQ Tools — Auth System (dq-auth.js)
- * Uses Firebase Auth (email/password + Google) + Supabase for data storage.
+ * Supabase Auth (email/password + Google) + Supabase for data storage.
+ * Replaces Firebase Auth entirely.
  */
 
 // ─── CONFIG ─────────────────────────────────────────────────────────
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDhcxCdbRSVmr8fyE2yhm7PGS0oXuFF5Mo",
-  authDomain: "dq-tools-2026.firebaseapp.com",
-  projectId: "dq-tools-2026",
-  storageBucket: "dq-tools-2026.firebasestorage.app",
-  messagingSenderId: "710062944668",
-  appId: "1:710062944668:web:139eb2867512380ae6d859"
-};
-
 const SUPABASE_URL = "https://awpxwnfvbxtitmcxreep.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cHh3bmZ2Ynh0aXRtY3hyZWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDgyNzIsImV4cCI6MjA4OTA4NDI3Mn0.BeWCPJjexVbs_fd3FGU2SWRndrZHhj8cT1RT8_Dq3q4";
 
@@ -20,7 +12,6 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const PRESET_AVATARS = ['🧪','🎓','📐','🧮','⚗️','🔬','📊','🌟','🦊','🐺','🦁','🐉','🚀','⚡','🌙','🔥'];
 
 // ─── STATE ───────────────────────────────────────────────────────────
-let _auth = null;
 let _sb = null;
 let _user = null;
 let _profile = null;
@@ -96,7 +87,7 @@ const CSS = `
 .dq-tab { flex: 1; padding: 8px; border-radius: 9px; font-family: inherit; font-size: .75rem; font-weight: 700; cursor: pointer; background: #192233; border: 1.5px solid #1e3048; color: #7a9abf; transition: all .15s; }
 .dq-tab.on { background: rgba(58,127,255,.15); border-color: #3a7fff; color: #60a0ff; }
 .dq-auth-label { font-size: .68rem; font-weight: 700; color: #7a9abf; margin-bottom: 5px; display: block; }
-.dq-auth-inp { width: 100%; background: #192233; border: 1.5px solid #1e3048; border-radius: 9px; padding: 10px 13px; color: #e8eef8; font-family: inherit; font-size: .88rem; outline: none; transition: border-color .15s; margin-bottom: 11px; }
+.dq-auth-inp { width: 100%; background: #192233; border: 1.5px solid #1e3048; border-radius: 9px; padding: 10px 13px; color: #e8eef8; font-family: inherit; font-size: .88rem; outline: none; transition: border-color .15s; margin-bottom: 11px; box-sizing: border-box; }
 .dq-auth-inp:focus { border-color: #3a7fff; }
 .dq-auth-inp::placeholder { color: #3d5878; }
 .dq-pw-wrap { position: relative; margin-bottom: 11px; }
@@ -135,7 +126,9 @@ const CSS = `
 #dq-resend-btn:hover { background: rgba(232,144,32,.15); }
 `;
 
-// ─── SUPABASE HELPERS ────────────────────────────────────────────────
+// ─── SUPABASE DATA HELPERS ───────────────────────────────────────────
+// These are unchanged — your data table stays exactly the same
+
 async function sbSave(userId, key, payload) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data`, {
     method: 'POST',
@@ -158,12 +151,7 @@ async function sbSave(userId, key, payload) {
 async function sbLoad(userId, key) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${userId}&data_key=eq.${encodeURIComponent(key)}&select=payload`,
-    {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
-    }
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
   );
   if (!res.ok) return null;
   const rows = await res.json();
@@ -174,61 +162,43 @@ async function sbLoad(userId, key) {
 async function sbDelete(userId, key) {
   await fetch(
     `${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${userId}&data_key=eq.${encodeURIComponent(key)}`,
-    {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
-    }
+    { method: 'DELETE', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
   );
 }
 
 async function sbGetAllKeys(userId) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${userId}&select=data_key,saved_at`,
-    {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
-    }
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
   );
   if (!res.ok) return [];
   const rows = await res.json();
   return rows.map(r => ({ key: r.data_key, savedAt: r.saved_at }));
 }
 
-// Profile stored in Supabase for cross-device sync
-// Falls back to localStorage if Supabase fails
+// ─── PROFILE HELPERS ─────────────────────────────────────────────────
 async function dqSaveProfile(uid, data) {
-  // Always save to localStorage as instant cache
   try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
-  // Also save to Supabase for cross-device sync
-  try {
-    await sbSave(uid, 'profile', typeof data === 'string' ? JSON.parse(data) : data);
-  } catch (_) {}
+  try { await sbSave(uid, 'profile', typeof data === 'string' ? JSON.parse(data) : data); } catch (_) {}
 }
+
 async function dqLoadProfile(uid) {
-  // Try Supabase first for freshest data
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${uid}&data_key=eq.profile&select=payload`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_data?user_id=eq.${uid}&data_key=eq.profile&select=payload`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
     if (res.ok) {
       const rows = await res.json();
       if (rows.length) {
         let data = rows[0].payload;
-        // Handle both single and double stringified payloads
         if (typeof data === 'string') data = JSON.parse(data);
         if (typeof data === 'string') data = JSON.parse(data);
-        // Update local cache
         try { localStorage.setItem(`dq_profile_${uid}`, JSON.stringify(data)); } catch (_) {}
         return data;
       }
     }
   } catch (_) {}
-  // Fall back to localStorage cache
   try { const v = localStorage.getItem(`dq_profile_${uid}`); return v ? JSON.parse(v) : null; } catch (_) { return null; }
 }
 
@@ -238,7 +208,6 @@ function buildUI() {
   s.textContent = CSS;
   document.head.appendChild(s);
 
-  // User dropdown
   const dd = document.createElement('div');
   dd.id = 'dq-user-dropdown';
   dd.innerHTML = `
@@ -253,18 +222,15 @@ function buildUI() {
     <button class="dq-dd-btn danger" onclick="DQAuth.signOut()">🚪 Sign Out</button>`;
   document.body.appendChild(dd);
 
-  // Save toast
   const badge = document.createElement('div');
   badge.id = 'dq-save-badge';
   document.body.appendChild(badge);
 
-  // Verify banner
   const banner = document.createElement('div');
   banner.id = 'dq-verify-banner';
   banner.innerHTML = `⚠️ Please verify your email to unlock all features. <button id="dq-resend-btn" onclick="DQAuth.resendVerification()">Resend Email</button>`;
   document.body.appendChild(banner);
 
-  // Auth modal
   buildAuthModal();
 
   document.addEventListener('click', () => {
@@ -301,6 +267,11 @@ function buildAuthModal() {
       <div class="dq-pw-strength" id="dq-pw-strength"></div>
       <div id="dq-auth-err"></div>
       <button id="dq-auth-submit" onclick="DQAuth.submit()">Sign In</button>
+      <div class="dq-auth-divider"><span>or</span></div>
+      <button id="dq-google-btn" onclick="DQAuth.signInWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Continue with Google
+      </button>
       <div class="dq-auth-footer">
         <button class="dq-auth-link" onclick="DQAuth.closeModal()">Continue without account</button>
       </div>
@@ -327,16 +298,17 @@ function updateNavBtn(user) {
   if (!btn) return;
 
   if (user) {
-    const name = _profile?.displayName || user.displayName || user.email.split('@')[0];
+    const name = _profile?.displayName || user.user_metadata?.full_name || user.email.split('@')[0];
     label.textContent = name.split(' ')[0];
     btn.classList.add('logged-in');
 
+    const googleAvatar = user.user_metadata?.avatar_url;
     if (_profile?.photoType === 'upload' && _profile?.photoURL) {
       avatar.innerHTML = `<img src="${_profile.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     } else if (_profile?.photoType === 'emoji' && _profile?.photoURL) {
       avatar.textContent = _profile.photoURL;
-    } else if (user.photoURL) {
-      avatar.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else if (googleAvatar) {
+      avatar.innerHTML = `<img src="${googleAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     } else {
       avatar.textContent = name[0].toUpperCase();
       avatar.style.cssText = 'background:linear-gradient(135deg,#2dcc6f,#3a7fff);color:#090c12;font-weight:900;font-size:.75rem;';
@@ -344,8 +316,11 @@ function updateNavBtn(user) {
 
     document.getElementById('dq-dd-name').textContent = name;
     document.getElementById('dq-dd-email').textContent = user.email;
+
+    // Supabase uses email_confirmed_at instead of emailVerified
+    const verified = !!user.email_confirmed_at;
     const vs = document.getElementById('dq-dd-verify-status');
-    if (user.emailVerified) {
+    if (verified) {
       vs.innerHTML = '<span class="dq-dd-verified">✓ Email verified</span>';
       banner?.classList.remove('show');
     } else {
@@ -379,51 +354,47 @@ function updateFabAuth(loggedIn, name) {
     : `<span class="fab2-label">Sign In</span><a class="fab2-icon" href="#" onclick="event.preventDefault();DQAuth.openModal()">🔑</a>`;
 }
 
-// ─── FIREBASE INIT ───────────────────────────────────────────────────
-async function initFirebase() {
+// ─── SUPABASE INIT ───────────────────────────────────────────────────
+async function initSupabase() {
   try {
-    const [
-      { initializeApp },
-      { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-        createUserWithEmailAndPassword, signOut, sendEmailVerification,
-        sendPasswordResetEmail, updateProfile }
-    ] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'),
-    ]);
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    _sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const app = initializeApp(FIREBASE_CONFIG);
-    _auth = getAuth(app);
+    // Handle OAuth redirect (Google sign-in lands back here)
+    const { data: { session } } = await _sb.auth.getSession();
+    await handleSession(session?.user || null);
 
-    window._DQFire = { signInWithEmailAndPassword, createUserWithEmailAndPassword,
-      signOut, sendEmailVerification, sendPasswordResetEmail,
-      updateProfile };
-
-    onAuthStateChanged(_auth, async user => {
-      _user = user;
-      if (user) {
-        _profile = await dqLoadProfile(user.uid);
-        if (!_profile) {
-          _profile = {
-            displayName: user.displayName || user.email.split('@')[0],
-            email: user.email,
-            photoType: 'emoji',
-            photoURL: '🎓',
-            createdAt: Date.now()
-          };
-          dqSaveProfile(user.uid, _profile);
-        }
-      } else {
-        _profile = null;
-      }
-      updateNavBtn(user);
-      window.dispatchEvent(new CustomEvent('dq:authready', { detail: { user } }));
+    // Listen for auth changes (sign in, sign out, token refresh)
+    _sb.auth.onAuthStateChange(async (_event, session) => {
+      await handleSession(session?.user || null);
+      window.dispatchEvent(new CustomEvent('dq:authready', { detail: { user: session?.user || null } }));
     });
 
   } catch (e) {
-    console.warn('[DQAuth] Firebase init failed:', e);
+    console.warn('[DQAuth] Supabase init failed:', e);
     window.dispatchEvent(new CustomEvent('dq:authready', { detail: { user: null } }));
   }
+}
+
+async function handleSession(user) {
+  _user = user;
+  if (user) {
+    _profile = await dqLoadProfile(user.id);
+    if (!_profile) {
+      const name = user.user_metadata?.full_name || user.email.split('@')[0];
+      _profile = {
+        displayName: name,
+        email: user.email,
+        photoType: 'emoji',
+        photoURL: '🎓',
+        createdAt: Date.now()
+      };
+      dqSaveProfile(user.id, _profile);
+    }
+  } else {
+    _profile = null;
+  }
+  updateNavBtn(user);
 }
 
 // ─── PUBLIC API ──────────────────────────────────────────────────────
@@ -457,8 +428,20 @@ window.DQAuth = {
     document.getElementById('dq-user-dropdown').classList.toggle('open');
   },
 
+  async signInWithGoogle() {
+    if (!_sb) return;
+    showErr('');
+    const { error } = await _sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.href
+      }
+    });
+    if (error) showErr('Google sign-in failed. Try again.');
+  },
+
   async submit() {
-    if (!_auth) return;
+    if (!_sb) return;
     const btn = document.getElementById('dq-auth-submit');
     const isUp = document.getElementById('dq-tab-up').classList.contains('on');
     const email = document.getElementById('dq-auth-email').value.trim();
@@ -477,29 +460,28 @@ window.DQAuth = {
     btn.disabled = true; btn.textContent = '…'; showErr('');
 
     try {
-      const { signInWithEmailAndPassword, createUserWithEmailAndPassword,
-              sendEmailVerification, updateProfile } = window._DQFire;
       if (isUp) {
-        const cred = await createUserWithEmailAndPassword(_auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
-        await sendEmailVerification(cred.user);
-        const profile = { displayName: name, email, photoType: 'emoji', photoURL: '🎓', createdAt: Date.now() };
-        dqSaveProfile(cred.user.uid, profile);
+        const { error } = await _sb.auth.signUp({
+          email,
+          password: pass,
+          options: { data: { full_name: name } }
+        });
+        if (error) throw error;
         DQAuth.closeModal();
         DQAuth.toast('✓ Account created! Check your email to verify.');
       } else {
-        await signInWithEmailAndPassword(_auth, email, pass);
+        const { error } = await _sb.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
         DQAuth.closeModal();
       }
     } catch (e) {
       const msg = {
-        'auth/invalid-credential': 'Wrong email or password.',
-        'auth/user-not-found': 'No account with that email.',
-        'auth/wrong-password': 'Wrong password.',
-        'auth/email-already-in-use': 'An account with that email already exists.',
-        'auth/invalid-email': 'Please enter a valid email.',
-        'auth/too-many-requests': 'Too many attempts. Try again later.',
-      }[e.code] || 'Something went wrong. Try again.';
+        'Invalid login credentials': 'Wrong email or password.',
+        'Email not confirmed': 'Please verify your email first.',
+        'User already registered': 'An account with that email already exists.',
+        'Password should be at least 6 characters': 'Password is too short.',
+        'over_email_send_rate_limit': 'Too many attempts. Try again later.',
+      }[e.message] || e.message || 'Something went wrong. Try again.';
       showErr(msg);
       btn.disabled = false;
       btn.textContent = isUp ? 'Create Account' : 'Sign In';
@@ -507,47 +489,34 @@ window.DQAuth = {
   },
 
   async signOut() {
-    if (!_auth) return;
-    await window._DQFire.signOut(_auth);
+    if (!_sb) return;
+    try { localStorage.removeItem(`dq_profile_${_user?.id}`); } catch (_) {}
+    await _sb.auth.signOut();
     document.getElementById('dq-user-dropdown').classList.remove('open');
-    // Clear local profile cache on sign out
-    try { if (_user) localStorage.removeItem(`dq_profile_${_user.uid}`); } catch (_) {}
-  },
-
-  async logoutAllDevices() {
-    // Firebase doesn't support true "logout all devices" on the free plan.
-    // Best we can do: sign out this device and show a message.
-    // If user is on another device, their session will expire naturally
-    // or they can sign out manually.
-    if (!_auth) return;
-    document.getElementById('dq-user-dropdown')?.classList.remove('open');
-    await window._DQFire.signOut(_auth);
-    DQAuth.toast('✓ Signed out. Other devices will sign out when their session expires.');
-    setTimeout(() => window.location.href = 'index.html', 1500);
   },
 
   async forgotPassword() {
     const email = document.getElementById('dq-auth-email').value.trim();
     if (!email) { showErr('Enter your email above first.'); return; }
-    try {
-      await window._DQFire.sendPasswordResetEmail(_auth, email);
-      DQAuth.toast('✓ Password reset email sent!');
-      DQAuth.closeModal();
-    } catch (_) { showErr('Could not send reset email. Check the address.'); }
+    const { error } = await _sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/account.html'
+    });
+    if (error) { showErr('Could not send reset email. Check the address.'); return; }
+    DQAuth.toast('✓ Password reset email sent!');
+    DQAuth.closeModal();
   },
 
   async resendVerification() {
     if (!_user) return;
-    try {
-      await window._DQFire.sendEmailVerification(_user);
-      DQAuth.toast('✓ Verification email resent!');
-    } catch (_) { DQAuth.toast('Could not resend. Try again shortly.'); }
+    const { error } = await _sb.auth.resend({ type: 'signup', email: _user.email });
+    if (error) { DQAuth.toast('Could not resend. Try again shortly.'); return; }
+    DQAuth.toast('✓ Verification email resent!');
   },
 
-  // ── DATA API ─────────────────────────────────────────────────────
+  // ── DATA API — identical interface to before ──────────────────────
   async saveData(key, data) {
     if (_user) {
-      const ok = await sbSave(_user.uid, key, data);
+      const ok = await sbSave(_user.id, key, data);   // .id instead of .uid
       if (ok) { DQAuth.toast('✓ Saved to your DQ Account'); return true; }
     }
     try { localStorage.setItem('dq_' + key, JSON.stringify(data)); } catch (_) {}
@@ -556,7 +525,7 @@ window.DQAuth = {
 
   async loadData(key) {
     if (_user) {
-      const d = await sbLoad(_user.uid, key);
+      const d = await sbLoad(_user.id, key);
       if (d !== null) return d;
     }
     try { const v = localStorage.getItem('dq_' + key); return v ? JSON.parse(v) : null; }
@@ -564,13 +533,13 @@ window.DQAuth = {
   },
 
   async deleteData(key) {
-    if (_user) await sbDelete(_user.uid, key);
+    if (_user) await sbDelete(_user.id, key);
     try { localStorage.removeItem('dq_' + key); } catch (_) {}
     DQAuth.toast('✓ Data deleted.');
   },
 
   async getAllDataKeys() {
-    if (_user) return await sbGetAllKeys(_user.uid);
+    if (_user) return await sbGetAllKeys(_user.id);
     return [];
   },
 
@@ -620,7 +589,7 @@ window.DQAuth = {
   updateProfile(updates) {
     if (!_user) return;
     _profile = { ..._profile, ...updates };
-    dqSaveProfile(_user.uid, _profile); // async, fire and forget
+    dqSaveProfile(_user.id, _profile);
     updateNavBtn(_user);
   },
 
@@ -645,7 +614,7 @@ function showErr(msg) {
 // ─── BOOT ────────────────────────────────────────────────────────────
 function boot() {
   buildUI();
-  initFirebase();
+  initSupabase();
 }
 
 if (document.readyState === 'loading') {
