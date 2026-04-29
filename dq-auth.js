@@ -597,13 +597,17 @@ window.DQAuth = {
     const keys = await DQAuth.getAllDataKeys();
     const visible = keys.filter(({ key }) => key !== 'profile');
     const LABELS = {
-      gpa:            { icon:'🎓', label:'GPA Review',     desc:'Saved GPA data and course grades' },
-      courseplanner:  { icon:'📅', label:'Course Planner', desc:'4-year course schedule' },
-      geocalc_prefs:  { icon:'📐', label:'GeoCalc',        desc:'Decimal preference' },
-      algicalc_prefs: { icon:'📊', label:'AlgCalc',        desc:'Settings and preferences' },
-      mathcalc_prefs: { icon:'🧮', label:'MathCalc',       desc:'Settings and preferences' },
-      dqtable_prefs:  { icon:'⚗️', label:'DQtable',        desc:'Settings and preferences' },
-      dqtasks:        { icon:'✅', label:'DQTasks',         desc:'Tasks, assignments, events, notes' },
+      gpa:               { icon:'🎓', label:'GPA Review',                    desc:'Course grades and GPA data' },
+      courseplanner:     { icon:'📅', label:'Course Planner',                desc:'4-year academic schedule' },
+      dqtasks:           { icon:'✅', label:'DQTasks',                       desc:'Tasks, assignments and events' },
+      dqtasks_prefs:     { icon:'✅', label:'DQTasks — Color Theme & Settings', desc:'Color theme, display preferences' },
+      dqstudy:           { icon:'📚', label:'DQ Study',                      desc:'Flashcards and study progress' },
+      'dqstudy-settings':{ icon:'📚', label:'DQ Study — Settings',           desc:'Study mode preferences' },
+      'dqstudy-gam':     { icon:'📚', label:'DQ Study — Streaks & XP',       desc:'Gamification progress' },
+      geocalc_prefs:     { icon:'📐', label:'GeoCalc — Settings',            desc:'Decimal and display preferences' },
+      algicalc_prefs:    { icon:'📊', label:'AlgCalc — Settings',            desc:'Settings and preferences' },
+      mathcalc_prefs:    { icon:'🧮', label:'MathCalc — Settings',           desc:'Settings and preferences' },
+      dqtable_prefs:     { icon:'⚗️', label:'DQTable — Settings',            desc:'Settings and preferences' },
     };
     document.getElementById('dq-data-modal')?.remove();
     const modal = document.createElement('div');
