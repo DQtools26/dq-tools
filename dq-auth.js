@@ -365,31 +365,16 @@ function updateNavBtn(user) {
       banner?.classList.add('show');
     }
 
-    updateFabAuth(true, name);
   } else {
     btn.classList.remove('logged-in');
     label.textContent = 'Sign In';
     avatar.textContent = '👤';
     avatar.style.cssText = '';
     banner?.classList.remove('show');
-    updateFabAuth(false, null);
   }
 }
 
-function updateFabAuth(loggedIn, name) {
-  const fabMenu = document.getElementById('fab2menu');
-  if (!fabMenu) return;
-  let item = document.getElementById('dq-fab-auth-item');
-  if (!item) {
-    item = document.createElement('div');
-    item.className = 'fab2-item';
-    item.id = 'dq-fab-auth-item';
-    fabMenu.insertBefore(item, fabMenu.firstChild);
-  }
-  item.innerHTML = loggedIn
-    ? `<span class="fab2-label">My Account</span><a class="fab2-icon" href="account.html">👤</a>`
-    : `<span class="fab2-label">Sign In</span><a class="fab2-icon" href="#" onclick="event.preventDefault();DQAuth.openModal()">🔑</a>`;
-}
+
 
 // ─── SUPABASE INIT ───────────────────────────────────────────────────
 async function initSupabase() {
