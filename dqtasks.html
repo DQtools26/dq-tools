@@ -11,7 +11,6 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
-  <script src="dq-shared.js" defer></script>
   <script src="dq-auth.js" defer></script>
   <title>DQTasks — Student Productivity Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -8223,85 +8222,6 @@ if (document.readyState !== 'loading') setTimeout(initClock, 100);
   .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;white-space:nowrap;}
 </style>
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
-  </div>
-</div>
-
-<!-- ═══════════════ DQAdd Modal ═══════════════ -->
-<div class="modal-overlay" id="dqadd-modal" style="align-items:flex-start;padding-top:60px;overflow-y:auto;">
-  <div class="modal" style="max-width:560px;padding:0;overflow:visible;border-radius:18px;margin-bottom:40px;">
-    <!-- Header -->
-    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--surface);">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="font-size:1.1rem;font-weight:900;">⚡ Quick Add</div>
-        <button onclick="closeModal('dqadd-modal')" style="margin-left:auto;background:transparent;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;line-height:1;padding:4px;">✕</button>
-      </div>
-      <div style="position:relative;">
-        <input type="text" id="dqadd-input"
-          placeholder="e.g. Finish Geometry HW tomorrow 10am  or  Study session Tuesday 4pm"
-          style="width:100%;background:var(--surface2);border:2px solid var(--border2);border-radius:10px;
-                 padding:12px 14px;color:var(--text);font-family:var(--app-font);font-size:0.92rem;
-                 outline:none;transition:border-color 0.15s;"
-          oninput="dqAddParse(this.value)"
-          onkeydown="dqAddKeydown(event)"
-          onfocus="this.style.borderColor='var(--blue2)'"
-          onblur="this.style.borderColor='var(--border2)'">
-      </div>
-      <!-- Example hints -->
-      <div id="dqadd-hints" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-        <span class="tag tag-blue" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">📚 Finish HW tomorrow</span>
-        <span class="tag tag-purple" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">📅 Study session Tuesday 3pm</span>
-        <span class="tag tag-green" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">✅ Clean desk</span>
-        <span class="tag tag-amber" onclick="dqAddExample(this)" style="cursor:pointer;font-size:0.6rem;">⏳ Countdown graduation</span>
-      </div>
-    </div>
-
-    <!-- Parsed preview -->
-    <div id="dqadd-preview" style="padding:16px 20px;background:var(--bg2);display:none;">
-      <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Detected</div>
-      <div id="dqadd-preview-content"></div>
-    </div>
-
-    <!-- Adjustments -->
-    <div id="dqadd-adjust" style="padding:14px 20px;border-top:1px solid var(--border);display:none;">
-      <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Adjust</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="dqadd-fields"></div>
-    </div>
-
-    <!-- Footer -->
-    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--surface);">
-      <button class="btn btn-primary" style="flex:1;" id="dqadd-save-btn" onclick="dqAddSave()" disabled>✓ Add</button>
-      <button class="btn btn-ghost" onclick="closeModal('dqadd-modal')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- Clock & Timezone Panel -->
-<div id="clock-panel" style="display:none;position:fixed;z-index:10000;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:20px;box-shadow:0 8px 40px rgba(0,0,0,0.35);min-width:280px;font-family:var(--app-font);color:var(--text);">
-  <!-- Analog clock -->
-  <div style="display:flex;justify-content:center;margin-bottom:14px;">
-    <canvas id="analog-clock" width="160" height="160" style="border-radius:50%;"></canvas>
-  </div>
-  <!-- Digital time + date -->
-  <div style="text-align:center;margin-bottom:14px;">
-    <div id="clock-digital" style="font-size:2rem;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;"></div>
-    <div id="clock-date-full" style="font-size:0.78rem;color:var(--text2);margin-top:2px;"></div>
-  </div>
-  <!-- Format toggle -->
-  <div style="display:flex;gap:6px;margin-bottom:12px;">
-    <button id="clock-fmt-12" onclick="setClockFormat(12)" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;background:var(--blue-dim);color:var(--blue2);">12h</button>
-    <button id="clock-fmt-24" onclick="setClockFormat(24)" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;background:var(--surface2);color:var(--text2);">24h</button>
-  </div>
-  <!-- Timezone -->
-  <div style="background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
-    <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;">Timezone</div>
-    <div id="clock-tz-display" style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"></div>
-    <select id="clock-tz-select" class="form-select" style="font-size:0.75rem;padding:5px 8px;width:100%;margin-bottom:8px;" onchange="setTimezone(this.value)">
-    </select>
-    <button onclick="autoSyncTimezone()" style="width:100%;padding:6px;border-radius:7px;border:1px solid var(--border2);background:var(--surface3);color:var(--text2);font-family:var(--app-font);font-size:0.72rem;font-weight:700;cursor:pointer;">🔄 Auto Sync from Device</button>
-  </div>
-  <button onclick="document.getElementById('clock-panel').style.display='none'" style="width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--app-font);font-size:0.75rem;font-weight:700;cursor:pointer;">Close</button>
-</div>
-
+  <script src="dq-fab.js"></script>
 </body>
 </html>
