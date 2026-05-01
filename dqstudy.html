@@ -3765,7 +3765,7 @@ function updateLandingCTA() {
   if (!cta) return;
   const user = typeof DQAuth !== 'undefined' ? DQAuth.getUser?.() : null;
   const profile = typeof DQAuth !== 'undefined' ? DQAuth.getProfile?.() : null;
-  const name = profile?.displayName || user?.displayName || user?.email?.split('@')[0] || null;
+  const name = profile?.displayName   || user?.user_metadata?.full_name   || user?.email?.split('@')[0]   || null;
   const safeName = (name||'Me').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (user) {
     cta.innerHTML = `
@@ -3792,7 +3792,7 @@ setInterval(() => {
   if (_appState !== 'landing' && _appState !== 'waiting') return;
   if (typeof DQAuth === 'undefined') return;
   const user = DQAuth.getUser?.() || null;
-  const uid = user?.uid || null;
+  const uid = user?.id || user?.uid || null;
 
   // Show landing if authready hasn't fired yet but DQAuth is already available
   if (_appState === 'waiting' && !_initialAuthReceived) {
