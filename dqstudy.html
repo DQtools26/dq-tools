@@ -8199,7 +8199,7 @@ async function generateShortCode(s, access, expiry) {
   const _u = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
   if (!_u) return null;
   try {
-    const uid = _u.uid;
+    const uid = _u.id || _u.uid;
     // Check if this set already has a code in shared_sets
     const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=code`, {
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
@@ -8237,7 +8237,7 @@ async function revokeShortCode(setId) {
   const _ru = (typeof DQAuth !== 'undefined') ? DQAuth.getUser?.() : null;
   if (!_ru) return;
   try {
-    const uid = _ru.uid;
+    const uid = _ru.id || _ru.uid;
     await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}`, {
       method: 'DELETE',
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
@@ -8300,7 +8300,7 @@ async function renderCodesView() {
   if (_cu) { isLoggedIn = true; } // sync flag
   if (_cu) {
     try {
-      const uid = DQAuth.getUser().uid;
+      const uid = _cu.id || _cu.uid;
       const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?owner_uid=eq.${uid}&select=*`, {
         headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
       });
@@ -8485,7 +8485,7 @@ async function openManageCode(setId) {
   let data = null;
   try {
     if (typeof DQAuth !== 'undefined' && DQAuth.getUser?.()) {
-      const uid = DQAuth.getUser().uid;
+      const uid = _cu.id || _cu.uid;
       const res = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${setId}&owner_uid=eq.${uid}&select=*`, {
         headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
       });
@@ -8587,7 +8587,7 @@ async function refreshShortCode() {
   isLoggedIn = true; // sync flag in case it fell behind
   // Check for existing code first (via Supabase shared_sets)
   try {
-    const uid = _authUser.uid;
+    const uid = _authUser.id || _authUser.uid;
     const checkRes = await fetch(`${DQS_URL}/rest/v1/shared_sets?set_id=eq.${s.id}&owner_uid=eq.${uid}&select=*`, {
       headers: { 'apikey': DQS_KEY, 'Authorization': 'Bearer ' + DQS_KEY }
     });
