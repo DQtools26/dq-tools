@@ -90,8 +90,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   #app{padding:65px 14px 40px;}
 }
 </style>
-  <script src="dq-shared.js" defer></script>
-  <script src="dq-auth.js" defer></script>
 </head>
 <body>
 
@@ -320,8 +318,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 <!-- Watermark & FAB -->
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
-  </div>
-</div>
 
 <script>
 function showTab(name, el) {
@@ -338,5 +334,6 @@ const hash = location.hash.replace('#','');
 if (hash === 'terms') showTab('terms', document.querySelectorAll('.tab')[1]);
 else if (hash === 'ai') showTab('ai', document.querySelectorAll('.tab')[2]);
 </script>
+  <script src="dq-fab.js"></script>
 </body>
 </html>
