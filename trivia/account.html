@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <title>Account — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:#0b0c10; color:#f0f0f4;
+      font-family:'DM Sans', system-ui, sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; flex-direction:column; gap:12px; text-align:center;
+    }
+    .spinner { width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:#4de888;border-radius:50%;animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    p { font-size:0.82rem; color:#7b7c8a; }
+    a { color:#4de888; text-decoration:none; font-size:0.78rem; }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <p>Redirecting to your Account…</p>
+  <a href="../account.html">Click here if not redirected</a>
+  <script>
+    // Preserve any hash/search so deep links still work
+    window.location.replace('../account.html' + window.location.search + window.location.hash);
+  </script>
+</body>
+</html>
