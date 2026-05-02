@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TNYF9DN593');
+  </script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Shop — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0b0c10; --bg2:#13141a; --bg3:#1a1b23;
+      --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.15);
+      --text:#f0f0f4; --muted:#7b7c8a;
+      --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
+      --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+    .b1 { width:500px;height:500px;background:rgba(245,200,66,0.06);top:-100px;right:-100px; }
+    .b2 { width:400px;height:400px;background:rgba(77,232,136,0.05);bottom:0;left:-80px; }
+
+    /* NAV */
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px; }
+    .nav-logo { font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .nav-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent); }
+    .nav-links { display:flex;align-items:center;gap:2px; }
+    .nav-links a { font-size:0.77rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:6px;transition:color .15s,background .15s;white-space:nowrap; }
+    .nav-links a:hover { color:var(--text);background:rgba(255,255,255,0.06); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-hamburger { display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:6px; }
+    .nav-hamburger span { display:block;width:18px;height:2px;background:var(--muted);border-radius:2px; }
+    @media(max-width:640px){
+      .nav-links { display:none; }
+      .nav-links.open { display:flex;flex-direction:column;align-items:flex-start;position:fixed;top:56px;left:0;right:0;background:rgba(11,12,16,0.98);border-bottom:1px solid var(--border);padding:12px 20px 16px;gap:4px;z-index:99; }
+      .nav-hamburger { display:flex; }
+    }
+    .nav-right { margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .btn-icon { width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s; }
+    .btn-icon:hover { border-color:var(--border-hi);color:var(--text); }
+    #dq-auth-btn { display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0; }
+    #dq-auth-btn:hover { border-color:#3a7fff;color:#e8eef8; }
+    #dq-auth-btn.logged-in { border-color:rgba(77,232,136,.35);color:#e8eef8; }
+    #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
+    #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+    /* MAIN */
+    main { position:relative;z-index:1;max-width:980px;margin:0 auto;padding:36px 20px 100px; }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom:28px;animation:fadeUp .4s ease both; }
+    .page-title { font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em; }
+    .page-sub   { font-size:0.82rem;color:var(--muted);margin-top:4px; }
+
+    /* COIN BALANCE BAR */
+    .balance-bar {
+      background:var(--bg2); border:1px solid rgba(245,200,66,0.25);
+      border-radius:14px; padding:16px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
+      margin-bottom:28px;
+      animation:fadeUp .4s ease .05s both;
+    }
+    .balance-left { display:flex;align-items:center;gap:12px; }
+    .coin-icon { font-size:1.8rem;line-height:1; }
+    .balance-amount { font-family:var(--font-d);font-size:1.6rem;font-weight:800;color:var(--gold);letter-spacing:-0.02em; }
+    .balance-label  { font-size:0.72rem;color:var(--muted);margin-top:1px; }
+    .earn-hint { font-size:0.75rem;color:var(--muted);text-align:right; }
+    .earn-hint strong { color:var(--accent); }
+
+    /* TABS */
+    .tabs { display:flex;gap:6px;margin-bottom:20px;animation:fadeUp .4s ease .1s both; }
+    .tab-btn {
+      padding:7px 16px;border-radius:9px;font-family:var(--font-b);font-size:0.8rem;font-weight:500;
+      cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);
+      transition:all .15s;
+    }
+    .tab-btn.active { background:var(--bg2);border-color:var(--border-hi);color:var(--text); }
+    .tab-btn:hover:not(.active) { color:var(--text); }
+
+    /* SECTION LABEL */
+    .section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:24px 0 12px; }
+
+    /* SHOP GRID */
+    .shop-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px; }
+
+    .shop-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:14px; padding:0; overflow:hidden;
+      transition:border-color .15s, transform .15s;
+      animation:fadeUp .35s ease both;
+      display:flex; flex-direction:column;
+    }
+    .shop-card:hover { border-color:var(--border-hi); transform:translateY(-2px); }
+    .shop-card.owned { border-color:rgba(77,232,136,0.3); }
+    .shop-card.equipped { border-color:rgba(77,232,136,0.6); }
+
+    /* PREVIEW AREA */
+    .card-preview {
+      height:100px; display:flex; align-items:center; justify-content:center;
+      font-size:2.2rem; position:relative; overflow:hidden;
+    }
+    /* Theme previews */
+    .preview-dark     { background:linear-gradient(135deg,#0b0c10,#13141a); }
+    .preview-ocean    { background:linear-gradient(135deg,#0a1628,#0d2d4a); }
+    .preview-forest   { background:linear-gradient(135deg,#0a1a0d,#0f2b14); }
+    .preview-sunset   { background:linear-gradient(135deg,#1a0a0a,#2b1a0a); }
+    .preview-midnight { background:linear-gradient(135deg,#08080f,#12103a); }
+    .preview-candy    { background:linear-gradient(135deg,#1a0a1a,#2a0a2a); }
+    .preview-neon     { background:linear-gradient(135deg,#040408,#0a0a14); }
+    .preview-metro    { background:linear-gradient(135deg,#111118,#1a1a28); }
+    /* Badge previews */
+    .preview-badge { background:var(--bg3); }
+    /* Effect previews */
+    .preview-effect { background:var(--bg3); }
+
+    .preview-neon-glow { animation:neonPulse 2s ease-in-out infinite; }
+    @keyframes neonPulse { 0%,100%{text-shadow:0 0 10px #4de888,0 0 20px #4de888;} 50%{text-shadow:0 0 20px #4de888,0 0 40px #4de888,0 0 60px #4de888;} }
+
+    .card-body { padding:12px 14px 14px; flex:1; display:flex; flex-direction:column; }
+    .card-name  { font-family:var(--font-d);font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:2px; }
+    .card-desc  { font-size:0.68rem;color:var(--muted);margin-bottom:10px;line-height:1.4;flex:1; }
+    .card-footer { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+    .card-price { display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:700;color:var(--gold); }
+    .card-price.free { color:var(--accent); }
+    .card-price.owned-label { color:var(--muted);font-size:0.72rem; }
+
+    .buy-btn {
+      border-radius:7px;padding:5px 12px;font-family:var(--font-b);font-size:0.72rem;font-weight:700;
+      cursor:pointer;border:none;transition:all .15s;flex-shrink:0;
+    }
+    .buy-btn:active { transform:scale(0.96); }
+    .buy-btn-gold   { background:rgba(245,200,66,0.15);color:var(--gold);border:1px solid rgba(245,200,66,0.3); }
+    .buy-btn-gold:hover { background:rgba(245,200,66,0.25); }
+    .buy-btn-free   { background:var(--accent);color:#071209; }
+    .buy-btn-free:hover { background:#65f0a0; }
+    .buy-btn-owned  { background:rgba(77,232,136,0.1);color:var(--accent);border:1px solid rgba(77,232,136,0.25);cursor:default; }
+    .buy-btn-equip  { background:var(--blue);color:#fff; }
+    .buy-btn-equip:hover { background:#5a9bff; }
+    .buy-btn-equipped { background:rgba(77,232,136,0.2);color:var(--accent);border:1px solid rgba(77,232,136,0.4);cursor:default;font-size:0.65rem; }
+
+    .badge-new-item { position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:0.55rem;font-weight:700;border-radius:4px;padding:1px 5px;letter-spacing:.05em; }
+    .badge-popular  { position:absolute;top:8px;right:8px;background:rgba(245,200,66,0.2);color:var(--gold);font-size:0.55rem;font-weight:700;border-radius:4px;padding:1px 5px; }
+
+    /* TOAST */
+    .toast { position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap; }
+    .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+    /* CONFIRM MODAL */
+    .confirm-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px; }
+    .confirm-box { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:360px;width:100%;text-align:center; }
+    .confirm-emoji { font-size:2.4rem;margin-bottom:12px; }
+    .confirm-title { font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:6px; }
+    .confirm-sub   { font-size:0.8rem;color:var(--muted);margin-bottom:18px;line-height:1.5; }
+    .confirm-price { font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:18px; }
+    .confirm-btns  { display:flex;gap:8px; }
+    .confirm-btn   { flex:1;padding:10px;border-radius:9px;font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;border:none;transition:all .15s; }
+    .confirm-btn-cancel { background:var(--bg3);color:var(--muted);border:1px solid var(--border); }
+    .confirm-btn-cancel:hover { color:var(--text); }
+    .confirm-btn-buy { background:var(--gold);color:#0a0800; }
+    .confirm-btn-buy:hover { background:#ffd94d; }
+
+    @keyframes fadeUp { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+
+    /* WATERMARK / FAB */
+    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+    .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
+    .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+    .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+    .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease;}
+    .fab2-items.open{max-height:400px;opacity:1;}
+    .fab2-item{display:flex;align-items:center;position:relative;}
+    .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+    .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+    .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+    .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="play.html">Play</a>
+    <a href="stats.html">Stats</a>
+    <a href="history.html">History</a>
+    <a href="shop.html" class="active">🛒 Shop</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+<div id="confirmOverlay" style="display:none"></div>
+
+<main>
+  <div class="page-header">
+    <div class="page-title">🛒 Shop</div>
+    <div class="page-sub">Spend your coins on themes, badges, and effects</div>
+  </div>
+
+  <!-- COIN BALANCE -->
+  <div class="balance-bar">
+    <div class="balance-left">
+      <div class="coin-icon">🪙</div>
+      <div>
+        <div class="balance-amount" id="coinBalance">0</div>
+        <div class="balance-label">coins available</div>
+      </div>
+    </div>
+    <div class="earn-hint">Play games to earn coins.<br>Daily challenge = <strong>+50 coins</strong></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('themes')">🎨 Themes</button>
+    <button class="tab-btn" onclick="setTab('badges')">🎭 Badges</button>
+    <button class="tab-btn" onclick="setTab('effects')">⚡ Effects</button>
+  </div>
+
+  <div id="shopContent"></div>
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn"
+    onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+// ── SHOP CATALOGUE ──
+var SHOP = {
+  themes: [
+    { id:'dark',     name:'Dark',      desc:'The default. Clean and easy on the eyes.',  price:0,   preview:'preview-dark',     emoji:'🌑', free:true },
+    { id:'ocean',    name:'Ocean',     desc:'Deep blue tones, calming and focused.',      price:150, preview:'preview-ocean',    emoji:'🌊' },
+    { id:'forest',   name:'Forest',    desc:'Earthy greens, grounded and natural.',       price:150, preview:'preview-forest',   emoji:'🌿' },
+    { id:'sunset',   name:'Sunset',    desc:'Warm amber and red, high energy.',           price:200, preview:'preview-sunset',   emoji:'🌅', badge:'popular' },
+    { id:'midnight', name:'Midnight',  desc:'Deep indigo, stars and mystery.',            price:200, preview:'preview-midnight', emoji:'🌙' },
+    { id:'candy',    name:'Candy',     desc:'Sweet purples and pinks, playful vibes.',    price:250, preview:'preview-candy',    emoji:'🍬', badge:'new' },
+    { id:'neon',     name:'Neon',      desc:'Electric glows on pure black.',              price:300, preview:'preview-neon',     emoji:'⚡', neonGlow:true },
+    { id:'metro',    name:'Metro',     desc:'Urban, sharp, geometric.',                   price:300, preview:'preview-metro',    emoji:'🏙️' },
+  ],
+  badges: [
+    { id:'rookie',   name:'Rookie',    desc:'Just getting started.',                      price:0,   emoji:'🥉', free:true },
+    { id:'scholar',  name:'Scholar',   desc:'A mind for knowledge.',                      price:100, emoji:'📖' },
+    { id:'champion', name:'Champion',  desc:'Risen to the top.',                          price:250, emoji:'🏆', badge:'popular' },
+    { id:'legend',   name:'Legend',    desc:'Feared by all competitors.',                 price:500, emoji:'🐉' },
+    { id:'ghost',    name:'Ghost',     desc:'Silent. Deadly. Undetected.',                price:350, emoji:'👻', badge:'new' },
+    { id:'wizard',   name:'Wizard',    desc:'Magic fingers, magic answers.',              price:400, emoji:'🧙' },
+  ],
+  effects: [
+    { id:'none',      name:'None',         desc:'No effect. Clean and simple.',           price:0,   emoji:'⬜', free:true },
+    { id:'confetti',  name:'Confetti',     desc:'Celebrate every correct answer.',        price:200, emoji:'🎊', badge:'popular' },
+    { id:'lightning', name:'Lightning',    desc:'Crack! Speed energy on every answer.',   price:250, emoji:'⚡' },
+    { id:'fire',      name:'Fire',         desc:'Blazing streak animations.',             price:300, emoji:'🔥', badge:'new' },
+    { id:'stars',     name:'Stars',        desc:'Twinkle on correct answers.',            price:150, emoji:'✨' },
+    { id:'matrix',    name:'Matrix Rain',  desc:'Green digits fall on a win screen.',    price:400, emoji:'💻' },
+  ]
+};
+
+// ── STATE ──
+// Saved under 'dqtrivia_stats' → coins, ownedItems, equippedItems
+// ownedItems:    ['dark','rookie','none', ...]
+// equippedItems: { theme:'dark', badge:'rookie', effect:'none' }
+var playerStats  = {};
+var currentTab   = 'themes';
+
+function getCoins()    { return playerStats.coins        || 0; }
+function getOwned()    { return playerStats.ownedItems   || ['dark','rookie','none']; }
+function getEquipped() { return playerStats.equippedItems || { theme:'dark', badge:'rookie', effect:'none' }; }
+
+// ── TABS ──
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.toggle('active', ['themes','badges','effects'][i] === tab);
+  });
+  renderShop();
+}
+
+// ── RENDER SHOP ──
+function renderShop() {
+  var items    = SHOP[currentTab];
+  var owned    = getOwned();
+  var equipped = getEquipped();
+  var key      = currentTab === 'themes' ? 'theme' : currentTab === 'badges' ? 'badge' : 'effect';
+
+  var html = '<div class="shop-grid">' + items.map(function(item) {
+    var isOwned    = owned.indexOf(item.id) !== -1 || item.free;
+    var isEquipped = equipped[key] === item.id;
+    var cardCls    = isEquipped ? 'shop-card equipped' : isOwned ? 'shop-card owned' : 'shop-card';
+
+    // Preview area
+    var previewInner = item.neonGlow
+      ? '<span class="preview-neon-glow">' + item.emoji + '</span>'
+      : item.emoji;
+    var badgeHTML = item.badge === 'new'     ? '<div class="badge-new-item">NEW</div>'
+                  : item.badge === 'popular' ? '<div class="badge-popular">🔥 Popular</div>'
+                  : '';
+
+    // Footer
+    var priceHTML, btnHTML;
+    if (isEquipped) {
+      priceHTML = '';
+      btnHTML   = '<button class="buy-btn buy-btn-equipped">✓ Equipped</button>';
+    } else if (isOwned) {
+      priceHTML = '<span class="card-price owned-label">Owned</span>';
+      btnHTML   = '<button class="buy-btn buy-btn-equip" onclick="equipItem(\'' + currentTab + '\',\'' + item.id + '\')">Equip</button>';
+    } else if (item.free) {
+      priceHTML = '<span class="card-price free">Free</span>';
+      btnHTML   = '<button class="buy-btn buy-btn-equip" onclick="equipItem(\'' + currentTab + '\',\'' + item.id + '\')">Equip</button>';
+    } else {
+      priceHTML = '<span class="card-price">🪙 ' + item.price + '</span>';
+      btnHTML   = '<button class="buy-btn buy-btn-gold" onclick="confirmBuy(\'' + currentTab + '\',\'' + item.id + '\')">Buy</button>';
+    }
+
+    return '<div class="' + cardCls + '">'
+      + '<div class="card-preview ' + (item.preview || 'preview-badge') + '">'
+      +   previewInner + badgeHTML
+      + '</div>'
+      + '<div class="card-body">'
+      +   '<div class="card-name">' + item.name + '</div>'
+      +   '<div class="card-desc">' + item.desc + '</div>'
+      +   '<div class="card-footer">' + priceHTML + btnHTML + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('') + '</div>';
+
+  document.getElementById('shopContent').innerHTML = html;
+}
+
+// ── CONFIRM BUY ──
+function confirmBuy(tab, id) {
+  var item = SHOP[tab].find(function(i){ return i.id === id; });
+  if (!item) return;
+  if (getCoins() < item.price) {
+    showToast('❌ Not enough coins!');
+    return;
+  }
+  var overlay = document.getElementById('confirmOverlay');
+  overlay.style.display = 'flex';
+  overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = '<div class="confirm-box">'
+    + '<div class="confirm-emoji">' + item.emoji + '</div>'
+    + '<div class="confirm-title">' + item.name + '</div>'
+    + '<div class="confirm-sub">' + item.desc + '</div>'
+    + '<div class="confirm-price">🪙 ' + item.price + ' coins</div>'
+    + '<div class="confirm-btns">'
+    +   '<button class="confirm-btn confirm-btn-cancel" onclick="closeConfirm()">Cancel</button>'
+    +   '<button class="confirm-btn confirm-btn-buy" onclick="completeBuy(\'' + tab + '\',\'' + id + '\')">Buy Now</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+
+function completeBuy(tab, id) {
+  var item = SHOP[tab].find(function(i){ return i.id === id; });
+  if (!item) return;
+  if (getCoins() < item.price) { showToast('❌ Not enough coins!'); closeConfirm(); return; }
+
+  // Deduct coins, add to owned, auto-equip
+  var newCoins = getCoins() - item.price;
+  var owned    = getOwned().slice();
+  if (owned.indexOf(id) === -1) owned.push(id);
+
+  var key      = tab === 'themes' ? 'theme' : tab === 'badges' ? 'badge' : 'effect';
+  var equipped = Object.assign({}, getEquipped());
+  equipped[key] = id;
+
+  playerStats.coins        = newCoins;
+  playerStats.ownedItems   = owned;
+  playerStats.equippedItems = equipped;
+
+  doSync({ coins: newCoins, ownedItems: owned, equippedItems: equipped });
+  document.getElementById('coinBalance').textContent = newCoins;
+
+  closeConfirm();
+  showToast('🎉 ' + item.name + ' purchased & equipped!');
+  renderShop();
+}
+
+// ── EQUIP ──
+function equipItem(tab, id) {
+  var key      = tab === 'themes' ? 'theme' : tab === 'badges' ? 'badge' : 'effect';
+  var equipped = Object.assign({}, getEquipped());
+  equipped[key] = id;
+  playerStats.equippedItems = equipped;
+  doSync({ equippedItems: equipped });
+  showToast('✓ Equipped!');
+  renderShop();
+}
+
+// ── SYNC ──
+function doSync(partial) {
+  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
+  Object.assign(playerStats, partial);
+  DQAuth.saveData('dqtrivia_stats', playerStats);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  if (!user) { window.location.replace('landing.html'); return; }
+  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+    playerStats = saved || {};
+    document.getElementById('coinBalance').textContent = getCoins();
+    renderShop();
+  });
+});
+
+// ── SOUND ──
+var soundOn = localStorage.getItem('dqt_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('dqt_sound', soundOn?'on':'off');
+  document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+}
+document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+
+// ── HAMBURGER ──
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+// ── INIT ──
+renderShop(); // render with empty state, auth fills in coins + owned
+</script>
+</body>
+</html>
