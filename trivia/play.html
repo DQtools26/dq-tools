@@ -25,6 +25,14 @@
       --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
       --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
     }
+    /* ── THEME OVERRIDES (applied when user has equipped a theme) ── */
+    body.theme-ocean  { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
+    body.theme-forest { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --accent:#4de888; --border:rgba(77,232,136,0.1); }
+    body.theme-sunset { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
+    body.theme-midnight { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
+    body.theme-candy  { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
+    body.theme-neon   { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
+    body.theme-metro  { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
     body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
     .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
     .b1 { width:500px;height:500px;background:rgba(77,232,136,0.06);top:-100px;left:-100px; }
@@ -239,6 +247,7 @@
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
     <button class="btn-icon" id="quitBtn" onclick="confirmQuit()" title="Quit game" style="display:none;">✕</button>
+    <span id="equippedBadge" style="font-size:1rem;flex-shrink:0;" title=""></span>
     <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
       <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
     </button>
@@ -260,8 +269,9 @@
 <div class="fab2-wrap">
   <div class="fab2-items" id="fab2menu">
     <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
-    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="account.html">👤</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtrivia</span><a class="fab2-icon" href="index.html">🎮</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
     <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
     <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
@@ -284,6 +294,23 @@ var CATS = {
   17:'🔬',18:'💻',19:'➗',20:'⚡',21:'🏆',22:'🌍',23:'🏛️',24:'🗳️',
   25:'🎨',26:'⭐',27:'🦁',28:'🚗',29:'💬',30:'📱',31:'✏️',32:'🎞️'
 };
+
+// ── APPLY EQUIPPED COSMETICS ──
+function applyCosmetics(stats) {
+  var equipped = (stats && stats.equippedItems) || {};
+  // Theme
+  var theme = equipped.theme || 'dark';
+  document.body.className = document.body.className.replace(/\btheme-\S+/g, '').trim();
+  if (theme !== 'dark') document.body.classList.add('theme-' + theme);
+  // Badge — show in nav next to auth button
+  var badge = equipped.badge || 'rookie';
+  var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+  var badgeEl = document.getElementById('equippedBadge');
+  if (badgeEl) {
+    badgeEl.textContent = BADGE_EMOJIS[badge] || '';
+    badgeEl.title = badge.charAt(0).toUpperCase() + badge.slice(1) + ' badge';
+  }
+}
 
 // ── LEVEL THRESHOLDS ──
 var LEVELS = [
@@ -976,6 +1003,7 @@ window.addEventListener('dq:authready', function(e) {
   if (user) {
     DQAuth.loadData('dqtrivia_stats').then(function(saved) {
       playerStats = saved || {};
+      applyCosmetics(playerStats);
       getToken().then(function(tok){ fetchQuestions(tok); });
     });
   } else {
