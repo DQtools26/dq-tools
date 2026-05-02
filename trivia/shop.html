@@ -25,7 +25,17 @@
       --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
       --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+
+    /* ── LIVE THEME OVERRIDES — applied to body via class ── */
+    body.theme-ocean    { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
+    body.theme-forest   { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --accent:#4de888; --border:rgba(77,232,136,0.1); }
+    body.theme-sunset   { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
+    body.theme-midnight { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
+    body.theme-candy    { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
+    body.theme-neon     { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
+    body.theme-metro    { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
+
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; transition:background .4s,color .3s; }
     .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
     .b1 { width:500px;height:500px;background:rgba(245,200,66,0.06);top:-100px;right:-100px; }
     .b2 { width:400px;height:400px;background:rgba(77,232,136,0.05);bottom:0;left:-80px; }
@@ -62,15 +72,15 @@
     .page-title { font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em; }
     .page-sub   { font-size:0.82rem;color:var(--muted);margin-top:4px; }
 
+    /* ACTIVE THEME BANNER */
+    .active-banner { background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:13px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;animation:fadeUp .4s ease .02s both;transition:all .4s; }
+    .active-banner-icon { font-size:1.4rem; }
+    .active-banner-text { flex:1; }
+    .active-banner-text strong { display:block;font-size:0.82rem;font-weight:600;color:var(--accent); }
+    .active-banner-text span { font-size:0.7rem;color:var(--muted); }
+
     /* COIN BALANCE BAR */
-    .balance-bar {
-      background:var(--bg2); border:1px solid rgba(245,200,66,0.25);
-      border-radius:14px; padding:16px 20px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; flex-wrap:wrap;
-      margin-bottom:28px;
-      animation:fadeUp .4s ease .05s both;
-    }
+    .balance-bar { background:var(--bg2);border:1px solid rgba(245,200,66,0.25);border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:28px;animation:fadeUp .4s ease .05s both; }
     .balance-left { display:flex;align-items:center;gap:12px; }
     .coin-icon { font-size:1.8rem;line-height:1; }
     .balance-amount { font-family:var(--font-d);font-size:1.6rem;font-weight:800;color:var(--gold);letter-spacing:-0.02em; }
@@ -80,71 +90,51 @@
 
     /* TABS */
     .tabs { display:flex;gap:6px;margin-bottom:20px;animation:fadeUp .4s ease .1s both; }
-    .tab-btn {
-      padding:7px 16px;border-radius:9px;font-family:var(--font-b);font-size:0.8rem;font-weight:500;
-      cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);
-      transition:all .15s;
-    }
+    .tab-btn { padding:7px 16px;border-radius:9px;font-family:var(--font-b);font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .15s; }
     .tab-btn.active { background:var(--bg2);border-color:var(--border-hi);color:var(--text); }
     .tab-btn:hover:not(.active) { color:var(--text); }
-
-    /* SECTION LABEL */
-    .section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:24px 0 12px; }
 
     /* SHOP GRID */
     .shop-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px; }
 
-    .shop-card {
-      background:var(--bg2); border:1px solid var(--border);
-      border-radius:14px; padding:0; overflow:hidden;
-      transition:border-color .15s, transform .15s;
-      animation:fadeUp .35s ease both;
-      display:flex; flex-direction:column;
-    }
-    .shop-card:hover { border-color:var(--border-hi); transform:translateY(-2px); }
-    .shop-card.owned { border-color:rgba(77,232,136,0.3); }
-    .shop-card.equipped { border-color:rgba(77,232,136,0.6); }
+    .shop-card { background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:0;overflow:hidden;transition:border-color .15s,transform .15s;animation:fadeUp .35s ease both;display:flex;flex-direction:column; }
+    .shop-card:hover { border-color:var(--border-hi);transform:translateY(-2px); }
+    .shop-card.owned   { border-color:rgba(77,232,136,0.3); }
+    .shop-card.equipped-card { border-color:rgba(77,232,136,0.6);box-shadow:0 0 0 1px rgba(77,232,136,0.2); }
 
     /* PREVIEW AREA */
-    .card-preview {
-      height:100px; display:flex; align-items:center; justify-content:center;
-      font-size:2.2rem; position:relative; overflow:hidden;
-    }
-    /* Theme previews */
+    .card-preview { height:100px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative;overflow:hidden;transition:background .4s; }
     .preview-dark     { background:linear-gradient(135deg,#0b0c10,#13141a); }
-    .preview-ocean    { background:linear-gradient(135deg,#0a1628,#0d2d4a); }
-    .preview-forest   { background:linear-gradient(135deg,#0a1a0d,#0f2b14); }
-    .preview-sunset   { background:linear-gradient(135deg,#1a0a0a,#2b1a0a); }
-    .preview-midnight { background:linear-gradient(135deg,#08080f,#12103a); }
-    .preview-candy    { background:linear-gradient(135deg,#1a0a1a,#2a0a2a); }
-    .preview-neon     { background:linear-gradient(135deg,#040408,#0a0a14); }
-    .preview-metro    { background:linear-gradient(135deg,#111118,#1a1a28); }
-    /* Badge previews */
+    .preview-ocean    { background:linear-gradient(135deg,#040e1c,#071629); }
+    .preview-forest   { background:linear-gradient(135deg,#030e05,#061809); }
+    .preview-sunset   { background:linear-gradient(135deg,#12060a,#2a1018); }
+    .preview-midnight { background:linear-gradient(135deg,#05050f,#0e0e2d); }
+    .preview-candy    { background:linear-gradient(135deg,#100514,#260e30); }
+    .preview-neon     { background:linear-gradient(135deg,#020208,#080818); }
+    .preview-metro    { background:linear-gradient(135deg,#0d0d14,#1b1b2c); }
     .preview-badge { background:var(--bg3); }
-    /* Effect previews */
     .preview-effect { background:var(--bg3); }
 
     .preview-neon-glow { animation:neonPulse 2s ease-in-out infinite; }
-    @keyframes neonPulse { 0%,100%{text-shadow:0 0 10px #4de888,0 0 20px #4de888;} 50%{text-shadow:0 0 20px #4de888,0 0 40px #4de888,0 0 60px #4de888;} }
+    @keyframes neonPulse { 0%,100%{text-shadow:0 0 10px #39ff14,0 0 20px #39ff14;}50%{text-shadow:0 0 20px #39ff14,0 0 40px #39ff14,0 0 60px #39ff14;} }
 
-    .card-body { padding:12px 14px 14px; flex:1; display:flex; flex-direction:column; }
+    /* EQUIPPED RING on preview */
+    .card-preview.is-equipped::after { content:'✓ Equipped';position:absolute;bottom:0;left:0;right:0;background:rgba(77,232,136,0.85);color:#071209;font-family:var(--font-b);font-size:0.62rem;font-weight:700;text-align:center;padding:3px; }
+
+    .card-body { padding:12px 14px 14px;flex:1;display:flex;flex-direction:column; }
     .card-name  { font-family:var(--font-d);font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:2px; }
     .card-desc  { font-size:0.68rem;color:var(--muted);margin-bottom:10px;line-height:1.4;flex:1; }
     .card-footer { display:flex;align-items:center;justify-content:space-between;gap:8px; }
     .card-price { display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:700;color:var(--gold); }
-    .card-price.free { color:var(--accent); }
-    .card-price.owned-label { color:var(--muted);font-size:0.72rem; }
+    .card-price.free         { color:var(--accent); }
+    .card-price.owned-label  { color:var(--muted);font-size:0.72rem; }
 
-    .buy-btn {
-      border-radius:7px;padding:5px 12px;font-family:var(--font-b);font-size:0.72rem;font-weight:700;
-      cursor:pointer;border:none;transition:all .15s;flex-shrink:0;
-    }
+    .buy-btn { border-radius:7px;padding:5px 12px;font-family:var(--font-b);font-size:0.72rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;flex-shrink:0; }
     .buy-btn:active { transform:scale(0.96); }
     .buy-btn-gold   { background:rgba(245,200,66,0.15);color:var(--gold);border:1px solid rgba(245,200,66,0.3); }
     .buy-btn-gold:hover { background:rgba(245,200,66,0.25); }
     .buy-btn-free   { background:var(--accent);color:#071209; }
     .buy-btn-free:hover { background:#65f0a0; }
-    .buy-btn-owned  { background:rgba(77,232,136,0.1);color:var(--accent);border:1px solid rgba(77,232,136,0.25);cursor:default; }
     .buy-btn-equip  { background:var(--blue);color:#fff; }
     .buy-btn-equip:hover { background:#5a9bff; }
     .buy-btn-equipped { background:rgba(77,232,136,0.2);color:var(--accent);border:1px solid rgba(77,232,136,0.4);cursor:default;font-size:0.65rem; }
@@ -170,9 +160,8 @@
     .confirm-btn-buy { background:var(--gold);color:#0a0800; }
     .confirm-btn-buy:hover { background:#ffd94d; }
 
-    @keyframes fadeUp { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
 
-    /* WATERMARK / FAB */
     .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
     .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
     .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
@@ -203,6 +192,7 @@
   </div>
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <span id="navBadge" style="font-size:1rem;" title="Equipped badge"></span>
     <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
       <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
     </button>
@@ -216,6 +206,15 @@
   <div class="page-header">
     <div class="page-title">🛒 Shop</div>
     <div class="page-sub">Spend your coins on themes, badges, and effects</div>
+  </div>
+
+  <!-- ACTIVE COSMETICS BANNER -->
+  <div class="active-banner" id="activeBanner">
+    <div class="active-banner-icon" id="activeBannerIcon">🌑</div>
+    <div class="active-banner-text">
+      <strong id="activeBannerName">Dark Theme · Rookie Badge · No Effect</strong>
+      <span>Currently equipped — changes apply live across DQtrivia</span>
+    </div>
   </div>
 
   <!-- COIN BALANCE -->
@@ -244,15 +243,15 @@
 <div class="fab2-wrap">
   <div class="fab2-items" id="fab2menu">
     <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
-    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="account.html">👤</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtrivia</span><a class="fab2-icon" href="index.html">🎮</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
     <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
     <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
     <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
   </div>
-  <button class="fab2-toggle" id="fab2btn"
-    onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
 </div>
 
 <script>
@@ -278,24 +277,51 @@ var SHOP = {
   ],
   effects: [
     { id:'none',      name:'None',         desc:'No effect. Clean and simple.',           price:0,   emoji:'⬜', free:true },
+    { id:'stars',     name:'Stars',        desc:'Twinkle on correct answers.',            price:150, emoji:'✨' },
     { id:'confetti',  name:'Confetti',     desc:'Celebrate every correct answer.',        price:200, emoji:'🎊', badge:'popular' },
     { id:'lightning', name:'Lightning',    desc:'Crack! Speed energy on every answer.',   price:250, emoji:'⚡' },
     { id:'fire',      name:'Fire',         desc:'Blazing streak animations.',             price:300, emoji:'🔥', badge:'new' },
-    { id:'stars',     name:'Stars',        desc:'Twinkle on correct answers.',            price:150, emoji:'✨' },
-    { id:'matrix',    name:'Matrix Rain',  desc:'Green digits fall on a win screen.',    price:400, emoji:'💻' },
+    { id:'matrix',    name:'Matrix Rain',  desc:'Green digits fall on a win screen.',     price:400, emoji:'💻' },
   ]
 };
 
 // ── STATE ──
-// Saved under 'dqtrivia_stats' → coins, ownedItems, equippedItems
-// ownedItems:    ['dark','rookie','none', ...]
-// equippedItems: { theme:'dark', badge:'rookie', effect:'none' }
 var playerStats  = {};
 var currentTab   = 'themes';
 
 function getCoins()    { return playerStats.coins        || 0; }
 function getOwned()    { return playerStats.ownedItems   || ['dark','rookie','none']; }
 function getEquipped() { return playerStats.equippedItems || { theme:'dark', badge:'rookie', effect:'none' }; }
+
+// ── APPLY THEME LIVE TO PAGE ──
+function applyThemeLive(themeId) {
+  document.body.className = document.body.className.replace(/\btheme-\S+/g, '').trim();
+  if (themeId && themeId !== 'dark') {
+    document.body.classList.add('theme-' + themeId);
+  }
+}
+
+// ── APPLY ALL COSMETICS (theme + badge display) ──
+function applyCosmetics() {
+  var eq = getEquipped();
+  // Theme
+  applyThemeLive(eq.theme || 'dark');
+  // Badge in nav
+  var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+  var navBadge = document.getElementById('navBadge');
+  if (navBadge) navBadge.textContent = BADGE_EMOJIS[eq.badge || 'rookie'] || '';
+  // Active banner
+  var themeItem  = SHOP.themes.find(function(i){ return i.id === (eq.theme  || 'dark'); });
+  var badgeItem  = SHOP.badges.find(function(i){ return i.id === (eq.badge  || 'rookie'); });
+  var effectItem = SHOP.effects.find(function(i){ return i.id === (eq.effect || 'none'); });
+  var icon = document.getElementById('activeBannerIcon');
+  var name = document.getElementById('activeBannerName');
+  if (icon) icon.textContent = (themeItem ? themeItem.emoji : '🌑');
+  if (name) name.textContent =
+    (themeItem ? themeItem.name : 'Dark') + ' Theme · ' +
+    (badgeItem ? badgeItem.emoji + ' ' + badgeItem.name : '🥉 Rookie') + ' Badge · ' +
+    (effectItem && effectItem.id !== 'none' ? effectItem.emoji + ' ' + effectItem.name + ' Effect' : 'No Effect');
+}
 
 // ── TABS ──
 function setTab(tab) {
@@ -316,9 +342,8 @@ function renderShop() {
   var html = '<div class="shop-grid">' + items.map(function(item) {
     var isOwned    = owned.indexOf(item.id) !== -1 || item.free;
     var isEquipped = equipped[key] === item.id;
-    var cardCls    = isEquipped ? 'shop-card equipped' : isOwned ? 'shop-card owned' : 'shop-card';
+    var cardCls    = isEquipped ? 'shop-card equipped-card' : isOwned ? 'shop-card owned' : 'shop-card';
 
-    // Preview area
     var previewInner = item.neonGlow
       ? '<span class="preview-neon-glow">' + item.emoji + '</span>'
       : item.emoji;
@@ -326,16 +351,14 @@ function renderShop() {
                   : item.badge === 'popular' ? '<div class="badge-popular">🔥 Popular</div>'
                   : '';
 
-    // Footer
+    var previewCls = 'card-preview ' + (item.preview || 'preview-badge') + (isEquipped ? ' is-equipped' : '');
+
     var priceHTML, btnHTML;
     if (isEquipped) {
       priceHTML = '';
       btnHTML   = '<button class="buy-btn buy-btn-equipped">✓ Equipped</button>';
-    } else if (isOwned) {
+    } else if (isOwned || item.free) {
       priceHTML = '<span class="card-price owned-label">Owned</span>';
-      btnHTML   = '<button class="buy-btn buy-btn-equip" onclick="equipItem(\'' + currentTab + '\',\'' + item.id + '\')">Equip</button>';
-    } else if (item.free) {
-      priceHTML = '<span class="card-price free">Free</span>';
       btnHTML   = '<button class="buy-btn buy-btn-equip" onclick="equipItem(\'' + currentTab + '\',\'' + item.id + '\')">Equip</button>';
     } else {
       priceHTML = '<span class="card-price">🪙 ' + item.price + '</span>';
@@ -343,7 +366,7 @@ function renderShop() {
     }
 
     return '<div class="' + cardCls + '">'
-      + '<div class="card-preview ' + (item.preview || 'preview-badge') + '">'
+      + '<div class="' + previewCls + '">'
       +   previewInner + badgeHTML
       + '</div>'
       + '<div class="card-body">'
@@ -361,10 +384,8 @@ function renderShop() {
 function confirmBuy(tab, id) {
   var item = SHOP[tab].find(function(i){ return i.id === id; });
   if (!item) return;
-  if (getCoins() < item.price) {
-    showToast('❌ Not enough coins!');
-    return;
-  }
+  if (getCoins() < item.price) { showToast('❌ Not enough coins!'); return; }
+
   var overlay = document.getElementById('confirmOverlay');
   overlay.style.display = 'flex';
   overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;';
@@ -380,16 +401,13 @@ function confirmBuy(tab, id) {
     + '</div>';
 }
 
-function closeConfirm() {
-  document.getElementById('confirmOverlay').style.display = 'none';
-}
+function closeConfirm() { document.getElementById('confirmOverlay').style.display = 'none'; }
 
 function completeBuy(tab, id) {
   var item = SHOP[tab].find(function(i){ return i.id === id; });
   if (!item) return;
   if (getCoins() < item.price) { showToast('❌ Not enough coins!'); closeConfirm(); return; }
 
-  // Deduct coins, add to owned, auto-equip
   var newCoins = getCoins() - item.price;
   var owned    = getOwned().slice();
   if (owned.indexOf(id) === -1) owned.push(id);
@@ -398,8 +416,8 @@ function completeBuy(tab, id) {
   var equipped = Object.assign({}, getEquipped());
   equipped[key] = id;
 
-  playerStats.coins        = newCoins;
-  playerStats.ownedItems   = owned;
+  playerStats.coins         = newCoins;
+  playerStats.ownedItems    = owned;
   playerStats.equippedItems = equipped;
 
   doSync({ coins: newCoins, ownedItems: owned, equippedItems: equipped });
@@ -407,6 +425,9 @@ function completeBuy(tab, id) {
 
   closeConfirm();
   showToast('🎉 ' + item.name + ' purchased & equipped!');
+
+  // Apply cosmetics immediately
+  applyCosmetics();
   renderShop();
 }
 
@@ -418,6 +439,8 @@ function equipItem(tab, id) {
   playerStats.equippedItems = equipped;
   doSync({ equippedItems: equipped });
   showToast('✓ Equipped!');
+  // Apply immediately so user sees theme change live
+  applyCosmetics();
   renderShop();
 }
 
@@ -444,6 +467,7 @@ window.addEventListener('dq:authready', function(e) {
   DQAuth.loadData('dqtrivia_stats').then(function(saved) {
     playerStats = saved || {};
     document.getElementById('coinBalance').textContent = getCoins();
+    applyCosmetics();
     renderShop();
   });
 });
@@ -460,8 +484,8 @@ document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
 // ── HAMBURGER ──
 function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
 
-// ── INIT ──
-renderShop(); // render with empty state, auth fills in coins + owned
+// ── INIT (render shell with empty state while auth loads) ──
+renderShop();
 </script>
 </body>
 </html>
