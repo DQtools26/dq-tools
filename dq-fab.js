@@ -8,8 +8,7 @@
     { label: 'GPA Review',     href: 'gpareview.html',        icon: '🎓' },
     { label: 'DQ Study',       href: 'dqstudy.html',          icon: '📚' },
     { label: 'MathCalc',       href: 'mathcalc.html',         icon: '🧮' },
-    { label: 'GeoCalc',        href: 'geocalc.html',          icon: '📐' },
-    { label: 'AlgCalc',        href: 'algicalc.html',         icon: '📊' },
+    { label: 'DQtrivia',        href: 'trivia/index.html',          icon: '🎮' },
     { label: 'Terms & Policies', href: 'termsandpolicies.html', icon: '📋' },
   ];
 
