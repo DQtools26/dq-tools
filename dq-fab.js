@@ -8,7 +8,7 @@
     { label: 'GPA Review',     href: 'gpareview.html',        icon: '🎓' },
     { label: 'DQ Study',       href: 'dqstudy.html',          icon: '📚' },
     { label: 'MathCalc',       href: 'mathcalc.html',         icon: '🧮' },
-    { label: 'DQtrivia',        href: 'trivia/index.html',          icon: '🎮' },
+    { label: 'DQtrivia', href: 'https://dqtools26.github.io/dq-tools/trivia/', icon: '🎮' },
     { label: 'Terms & Policies', href: 'termsandpolicies.html', icon: '📋' },
   ];
 
