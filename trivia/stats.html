@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TNYF9DN593');
+  </script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Stats — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0b0c10; --bg2:#13141a; --bg3:#1a1b23;
+      --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.15);
+      --text:#f0f0f4; --muted:#7b7c8a;
+      --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
+      --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+    .b1 { width:500px;height:500px;background:rgba(58,127,255,0.06);top:-100px;right:-100px; }
+    .b2 { width:400px;height:400px;background:rgba(77,232,136,0.05);bottom:0;left:-80px; }
+
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px; }
+    .nav-logo { font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .nav-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent); }
+    .nav-links { display:flex;align-items:center;gap:2px; }
+    .nav-links a { font-size:0.77rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:6px;transition:color .15s,background .15s;white-space:nowrap; }
+    .nav-links a:hover { color:var(--text);background:rgba(255,255,255,0.06); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-hamburger { display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:6px; }
+    .nav-hamburger span { display:block;width:18px;height:2px;background:var(--muted);border-radius:2px; }
+    @media(max-width:640px){
+      .nav-links { display:none; }
+      .nav-links.open { display:flex;flex-direction:column;align-items:flex-start;position:fixed;top:56px;left:0;right:0;background:rgba(11,12,16,0.98);border-bottom:1px solid var(--border);padding:12px 20px 16px;gap:4px;z-index:99; }
+      .nav-hamburger { display:flex; }
+    }
+    .nav-right { margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .btn-icon { width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s; }
+    .btn-icon:hover { border-color:var(--border-hi);color:var(--text); }
+    #dq-auth-btn { display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0; }
+    #dq-auth-btn:hover { border-color:#3a7fff;color:#e8eef8; }
+    #dq-auth-btn.logged-in { border-color:rgba(77,232,136,.35);color:#e8eef8; }
+    #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
+    #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+    main { position:relative;z-index:1;max-width:980px;margin:0 auto;padding:36px 20px 100px; }
+
+    .page-header { margin-bottom:28px;animation:fadeUp .4s ease both; }
+    .page-title  { font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em; }
+    .page-sub    { font-size:0.82rem;color:var(--muted);margin-top:4px; }
+
+    /* LOADING */
+    .loading-screen { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px; }
+    .loading-spinner { width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* EMPTY STATE */
+    .empty-state { text-align:center;padding:60px 20px; }
+    .empty-emoji { font-size:3rem;margin-bottom:12px; }
+    .empty-title { font-family:var(--font-d);font-size:1.1rem;font-weight:800;margin-bottom:6px; }
+    .empty-sub   { font-size:0.8rem;color:var(--muted);margin-bottom:20px; }
+    .empty-btn   { display:inline-block;padding:10px 24px;background:var(--accent);color:#071209;border-radius:10px;font-weight:700;font-size:0.85rem;text-decoration:none;transition:background .15s; }
+    .empty-btn:hover { background:#65f0a0; }
+
+    /* HERO PROFILE CARD */
+    .profile-card { background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px;animation:fadeUp .4s ease .05s both;position:relative;overflow:hidden; }
+    .profile-card-bg { position:absolute;right:-20px;top:-20px;font-size:7rem;opacity:0.04;pointer-events:none;line-height:1; }
+    .profile-top { display:flex;align-items:center;gap:16px;margin-bottom:18px; }
+    .profile-avatar { width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:2px solid rgba(77,232,136,0.3); }
+    .profile-name { font-family:var(--font-d);font-size:1.1rem;font-weight:800; }
+    .profile-level { font-size:0.75rem;color:var(--muted); }
+    .profile-level strong { color:var(--accent); }
+    .profile-badge-display { margin-left:auto;font-size:1.4rem;flex-shrink:0; }
+
+    /* XP BAR */
+    .xp-bar-wrap { margin-bottom:4px; }
+    .xp-bar-labels { display:flex;justify-content:space-between;font-size:0.7rem;color:var(--muted);margin-bottom:5px; }
+    .xp-bar-bg { height:7px;background:var(--bg3);border-radius:100px;overflow:hidden; }
+    .xp-bar-fill { height:100%;background:linear-gradient(90deg,var(--accent),#3aebff);border-radius:100px;transition:width 1s ease; }
+    .xp-bar-hint { font-size:0.65rem;color:var(--muted);margin-top:4px; }
+
+    /* STAT GRID */
+    .stat-grid { display:grid;gap:10px;margin-bottom:16px; }
+    .stat-grid-2 { grid-template-columns:repeat(2,1fr); }
+    .stat-grid-3 { grid-template-columns:repeat(3,1fr); }
+    .stat-grid-4 { grid-template-columns:repeat(4,1fr); }
+    @media(max-width:480px){
+      .stat-grid-4 { grid-template-columns:repeat(2,1fr); }
+      .stat-grid-3 { grid-template-columns:repeat(3,1fr); }
+    }
+
+    .stat-tile { background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 14px;animation:fadeUp .35s ease both; }
+    .stat-tile.accent { border-color:rgba(77,232,136,0.25);background:rgba(77,232,136,0.04); }
+    .stat-tile.gold   { border-color:rgba(245,200,66,0.25);background:rgba(245,200,66,0.04); }
+    .stat-tile.blue   { border-color:rgba(58,127,255,0.25);background:rgba(58,127,255,0.04); }
+    .stat-tile.red    { border-color:rgba(255,107,107,0.2); }
+    .stat-icon  { font-size:1.2rem;margin-bottom:8px; }
+    .stat-value { font-family:var(--font-d);font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;line-height:1; }
+    .stat-label { font-size:0.68rem;color:var(--muted);margin-top:3px; }
+    .stat-value.accent { color:var(--accent); }
+    .stat-value.gold   { color:var(--gold); }
+    .stat-value.blue   { color:var(--blue); }
+    .stat-value.red    { color:var(--red); }
+
+    /* SECTION LABEL */
+    .section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:24px 0 10px;animation:fadeUp .4s ease both; }
+
+    /* STREAK CARD */
+    .streak-card { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;animation:fadeUp .4s ease .1s both; }
+    .streak-top { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+    .streak-title { font-family:var(--font-d);font-size:0.9rem;font-weight:800; }
+    .streak-num { font-family:var(--font-d);font-size:2rem;font-weight:800;color:var(--gold); }
+    .streak-7bar { display:flex;gap:5px; }
+    .streak-day { flex:1;height:28px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--muted);transition:all .2s; }
+    .streak-day.done { background:rgba(245,200,66,0.2);border-color:rgba(245,200,66,0.4);color:var(--gold); }
+    .streak-day.today { border-color:var(--accent); }
+
+    /* ACCURACY CHART */
+    .chart-card { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;animation:fadeUp .4s ease .12s both; }
+    .chart-title { font-family:var(--font-d);font-size:0.88rem;font-weight:800;margin-bottom:14px; }
+    .chart-wrap { position:relative; }
+    .bar-chart { display:flex;align-items:flex-end;gap:4px;height:80px; }
+    .bar-item { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px; }
+    .bar-fill { width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .6s ease; }
+    .bar-fill.high   { background:var(--accent); }
+    .bar-fill.medium { background:var(--gold); }
+    .bar-fill.low    { background:var(--red); }
+    .bar-lbl { font-size:0.55rem;color:var(--muted);white-space:nowrap; }
+
+    /* LINE CHART (XP over time) */
+    .line-chart-svg { width:100%;overflow:visible; }
+    .lc-line { fill:none;stroke:var(--blue);stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+    .lc-area { fill:url(#blueGrad);opacity:0.15; }
+    .lc-dot  { fill:var(--blue);stroke:var(--bg2);stroke-width:2; }
+
+    /* CATEGORY BREAKDOWN */
+    .cat-breakdown { display:flex;flex-direction:column;gap:8px;animation:fadeUp .4s ease .14s both; }
+    .cat-row { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px; }
+    .cat-row-emoji { font-size:1.2rem;flex-shrink:0; }
+    .cat-row-info  { flex:1;min-width:0; }
+    .cat-row-name  { font-size:0.82rem;font-weight:500; }
+    .cat-row-plays { font-size:0.65rem;color:var(--muted); }
+    .cat-row-acc   { font-size:0.75rem;font-weight:700;flex-shrink:0; }
+    .acc-high { color:var(--accent); }
+    .acc-med  { color:var(--gold); }
+    .acc-low  { color:var(--red); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+
+    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+    .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
+    .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+    .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+    .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease;}
+    .fab2-items.open{max-height:400px;opacity:1;}
+    .fab2-item{display:flex;align-items:center;position:relative;}
+    .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+    .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+    .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+    .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="play.html">Play</a>
+    <a href="stats.html" class="active">Stats</a>
+    <a href="history.html">History</a>
+    <a href="shop.html">🛒 Shop</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<main>
+  <div id="pageContent">
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+var CATS_MAP = {
+  9:{n:'General Knowledge',e:'🧠'},10:{n:'Books',e:'📚'},11:{n:'Film',e:'🎬'},
+  12:{n:'Music',e:'🎵'},13:{n:'Musicals & Theatre',e:'🎭'},14:{n:'Television',e:'📺'},
+  15:{n:'Video Games',e:'🎮'},16:{n:'Board Games',e:'♟️'},17:{n:'Science & Nature',e:'🔬'},
+  18:{n:'Computers',e:'💻'},19:{n:'Mathematics',e:'➗'},20:{n:'Mythology',e:'⚡'},
+  21:{n:'Sports',e:'🏆'},22:{n:'Geography',e:'🌍'},23:{n:'History',e:'🏛️'},
+  24:{n:'Politics',e:'🗳️'},25:{n:'Art',e:'🎨'},26:{n:'Celebrities',e:'⭐'},
+  27:{n:'Animals',e:'🦁'},28:{n:'Vehicles',e:'🚗'},29:{n:'Comics',e:'💬'},
+  30:{n:'Gadgets',e:'📱'},31:{n:'Anime & Manga',e:'✏️'},32:{n:'Cartoons & Animation',e:'🎞️'}
+};
+
+var LEVELS = [
+  {name:'Rookie',min:0,next:500},{name:'Challenger',min:500,next:1500},
+  {name:'Pro',min:1500,next:3500},{name:'Master',min:3500,next:7000},
+  {name:'Legend',min:7000,next:Infinity}
+];
+
+var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+
+function getLevelObj(xp) {
+  for (var i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) return LEVELS[i];
+  }
+  return LEVELS[0];
+}
+
+function fmtNum(n) { return (n||0).toLocaleString(); }
+function fmtPct(n) { return Math.round(n||0) + '%'; }
+
+function render(stats) {
+  if (!stats || (stats.totalGames||0) === 0) {
+    document.getElementById('pageContent').innerHTML =
+      '<div class="page-header"><div class="page-title">📊 Stats</div></div>' +
+      '<div class="empty-state">' +
+        '<div class="empty-emoji">🎮</div>' +
+        '<div class="empty-title">No games played yet</div>' +
+        '<div class="empty-sub">Play your first game to start tracking your stats.</div>' +
+        '<a href="categories.html" class="empty-btn">Start Playing →</a>' +
+      '</div>';
+    return;
+  }
+
+  var xp       = stats.xp || 0;
+  var lvlObj   = getLevelObj(xp);
+  var lvlIdx   = LEVELS.indexOf(lvlObj);
+  var xpInLvl  = xp - lvlObj.min;
+  var xpNeeded = lvlObj.next === Infinity ? xp : lvlObj.next - lvlObj.min;
+  var xpPct    = lvlObj.next === Infinity ? 100 : Math.min(100, Math.round((xpInLvl / xpNeeded) * 100));
+
+  var totalGames     = stats.totalGames || 0;
+  var totalCorrect   = stats.totalCorrect || 0;
+  var totalQuestions = stats.totalQuestions || 0;
+  var overallAcc     = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+  var coins          = stats.coins || 0;
+  var streak         = stats.streak || 0;
+
+  // Badge emoji
+  var badgeId    = (stats.equippedItems && stats.equippedItems.badge) || 'rookie';
+  var badgeEmoji = BADGE_EMOJIS[badgeId] || '🥉';
+
+  // Category analysis from gameHistory
+  var history    = stats.gameHistory || [];
+  var catStats   = {}; // catId -> {plays, correct, total}
+  history.forEach(function(g) {
+    if (g.catId) {
+      if (!catStats[g.catId]) catStats[g.catId] = {plays:0,correct:0,total:0};
+      catStats[g.catId].plays++;
+      catStats[g.catId].correct += (g.correct||0);
+      catStats[g.catId].total   += (g.total||0);
+    }
+  });
+
+  // Best & worst category
+  var catArr = Object.keys(catStats).map(function(id) {
+    var c   = catStats[id];
+    var acc = c.total > 0 ? Math.round(c.correct/c.total*100) : 0;
+    return { id:parseInt(id), plays:c.plays, acc:acc };
+  });
+  catArr.sort(function(a,b){ return b.plays - a.plays; });
+  var bestCat  = catArr.slice().sort(function(a,b){return b.acc-a.acc;})[0];
+  var worstCat = catArr.slice().sort(function(a,b){return a.acc-b.acc;})[0];
+
+  // Last 10 games accuracy
+  var last10 = history.slice(-10);
+
+  // XP over last 10 games
+  var xpPoints = history.slice(-10).map(function(g){ return g.xp || 0; });
+
+  // Streak calendar (last 7 days)
+  var today = new Date();
+  var days  = [];
+  for (var d = 6; d >= 0; d--) {
+    var dt = new Date(today);
+    dt.setDate(dt.getDate() - d);
+    var dStr = dt.toISOString().slice(0,10);
+    var played = history.some(function(g){ return g.date === dStr; });
+    var isToday = d === 0;
+    days.push({ label: ['Su','Mo','Tu','We','Th','Fr','Sa'][dt.getDay()], played:played, isToday:isToday });
+  }
+
+  // Build HTML
+  var html =
+    '<div class="page-header"><div class="page-title">📊 Stats</div><div class="page-sub">Your DQtrivia performance overview</div></div>' +
+
+    // Profile card
+    '<div class="profile-card">' +
+      '<div class="profile-card-bg">' + badgeEmoji + '</div>' +
+      '<div class="profile-top">' +
+        '<div class="profile-avatar">' + badgeEmoji + '</div>' +
+        '<div>' +
+          '<div class="profile-name">' + lvlObj.name + '</div>' +
+          '<div class="profile-level">Level ' + (lvlIdx+1) + ' · <strong>' + fmtNum(xp) + ' XP</strong></div>' +
+        '</div>' +
+        '<div class="profile-badge-display" title="Equipped badge">' + badgeEmoji + '</div>' +
+      '</div>' +
+      '<div class="xp-bar-wrap">' +
+        '<div class="xp-bar-labels"><span>' + lvlObj.name + '</span><span>' + (lvlObj.next === Infinity ? 'MAX' : lvlObj.name === 'Legend' ? 'MAX' : LEVELS[lvlIdx+1].name) + '</span></div>' +
+        '<div class="xp-bar-bg"><div class="xp-bar-fill" style="width:' + xpPct + '%"></div></div>' +
+        '<div class="xp-bar-hint">' + (lvlObj.next === Infinity ? 'Max level reached!' : fmtNum(xpInLvl) + ' / ' + fmtNum(xpNeeded) + ' XP to next level') + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Core stats
+    '<div class="stat-grid stat-grid-4">' +
+      tile('🎮', fmtNum(totalGames), 'Games Played', '') +
+      tile('✅', fmtPct(overallAcc), 'Accuracy', overallAcc >= 70 ? 'accent' : overallAcc >= 40 ? 'gold' : 'red') +
+      tile('🔥', streak, 'Day Streak', 'gold') +
+      tile('🪙', fmtNum(coins), 'Coins', 'gold') +
+    '</div>' +
+
+    '<div class="stat-grid stat-grid-3">' +
+      tile('✓', fmtNum(totalCorrect), 'Correct Answers', 'accent') +
+      tile('❓', fmtNum(totalQuestions), 'Total Questions', '') +
+      tile('⚡', fmtNum(xp), 'Total XP', 'blue') +
+    '</div>';
+
+  // Streak bar
+  html +=
+    '<div class="section-lbl">Weekly Streak</div>' +
+    '<div class="streak-card">' +
+      '<div class="streak-top"><div class="streak-title">🔥 Current Streak</div><div class="streak-num">' + streak + ' days</div></div>' +
+      '<div class="streak-7bar">' +
+        days.map(function(d){
+          return '<div class="streak-day' + (d.played?' done':'') + (d.isToday?' today':'') + '">' + (d.played?'✓':d.label) + '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+
+  // Accuracy chart (last 10)
+  if (last10.length > 0) {
+    html += '<div class="section-lbl">Last ' + last10.length + ' Games — Accuracy</div>' +
+      '<div class="chart-card">' +
+        '<div class="chart-title">Accuracy per game</div>' +
+        '<div class="bar-chart">' +
+          last10.map(function(g, i) {
+            var acc = g.accuracy !== undefined ? g.accuracy : (g.total > 0 ? Math.round(g.correct/g.total*100) : 0);
+            var h   = Math.max(4, Math.round(acc * 0.8));
+            var cls = acc >= 70 ? 'high' : acc >= 40 ? 'medium' : 'low';
+            var dateStr = g.date ? g.date.slice(5) : '';
+            return '<div class="bar-item">' +
+              '<div class="bar-fill ' + cls + '" style="height:' + h + 'px;" title="' + acc + '%"></div>' +
+              '<div class="bar-lbl">' + dateStr + '</div>' +
+              '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+  }
+
+  // XP line chart
+  if (xpPoints.length > 1) {
+    var maxXP = Math.max.apply(null, xpPoints) || 1;
+    var w = 100; var h2 = 60;
+    var pts = xpPoints.map(function(v, i) {
+      var x = (i / (xpPoints.length - 1)) * w;
+      var y = h2 - (v / maxXP) * h2;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    var areaPath = 'M' + xpPoints.map(function(v,i){
+      var x=(i/(xpPoints.length-1))*w, y=h2-(v/maxXP)*h2;
+      return x.toFixed(1)+' '+y.toFixed(1);
+    }).join('L') + 'L' + w + ' ' + h2 + 'L0 ' + h2 + 'Z';
+
+    html += '<div class="section-lbl">XP Earned — Last ' + xpPoints.length + ' Games</div>' +
+      '<div class="chart-card">' +
+        '<div class="chart-title">XP per game</div>' +
+        '<svg class="line-chart-svg" viewBox="0 0 100 ' + h2 + '" preserveAspectRatio="none" style="height:70px">' +
+          '<defs><linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a7fff"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>' +
+          '<path class="lc-area" d="' + areaPath + '"/>' +
+          '<polyline class="lc-line" points="' + pts + '"/>' +
+          xpPoints.map(function(v,i){
+            var x=(i/(xpPoints.length-1))*w, y=h2-(v/maxXP)*h2;
+            return '<circle class="lc-dot" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="2"/>';
+          }).join('') +
+        '</svg>' +
+      '</div>';
+  }
+
+  // Category breakdown
+  if (catArr.length > 0) {
+    var topCats = catArr.slice(0, 8);
+    html += '<div class="section-lbl">Category Breakdown</div>' +
+      '<div class="cat-breakdown">' +
+      topCats.map(function(c) {
+        var cat  = CATS_MAP[c.id] || {n:'Unknown',e:'❓'};
+        var accCls = c.acc >= 70 ? 'acc-high' : c.acc >= 40 ? 'acc-med' : 'acc-low';
+        return '<div class="cat-row">' +
+          '<div class="cat-row-emoji">' + cat.e + '</div>' +
+          '<div class="cat-row-info">' +
+            '<div class="cat-row-name">' + cat.n + '</div>' +
+            '<div class="cat-row-plays">' + c.plays + ' game' + (c.plays===1?'':'s') + ' played</div>' +
+          '</div>' +
+          '<div class="cat-row-acc ' + accCls + '">' + c.acc + '%</div>' +
+        '</div>';
+      }).join('') +
+      '</div>';
+  }
+
+  // Best / worst highlight
+  if (bestCat && worstCat && bestCat.id !== worstCat.id) {
+    var bestInfo  = CATS_MAP[bestCat.id]  || {n:'Unknown',e:'❓'};
+    var worstInfo = CATS_MAP[worstCat.id] || {n:'Unknown',e:'❓'};
+    html += '<div class="section-lbl" style="margin-top:24px;">Highlights</div>' +
+      '<div class="stat-grid stat-grid-2">' +
+        '<div class="stat-tile accent"><div class="stat-icon">' + bestInfo.e + '</div><div class="stat-value accent">' + bestCat.acc + '%</div><div class="stat-label">Best: ' + bestInfo.n + '</div></div>' +
+        '<div class="stat-tile red"><div class="stat-icon">' + worstInfo.e + '</div><div class="stat-value red">' + worstCat.acc + '%</div><div class="stat-label">Needs work: ' + worstInfo.n + '</div></div>' +
+      '</div>';
+  }
+
+  html += '<div style="text-align:center;margin-top:28px;"><a href="history.html" style="color:var(--muted);font-size:0.8rem;text-decoration:none;">View full game history →</a></div>';
+
+  document.getElementById('pageContent').innerHTML = html;
+}
+
+function tile(icon, value, label, colorClass) {
+  var valCls = colorClass ? ' ' + colorClass : '';
+  return '<div class="stat-tile' + (colorClass ? ' ' + colorClass : '') + '">' +
+    '<div class="stat-icon">' + icon + '</div>' +
+    '<div class="stat-value' + valCls + '">' + value + '</div>' +
+    '<div class="stat-label">' + label + '</div>' +
+    '</div>';
+}
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  if (!user) { window.location.replace('landing.html'); return; }
+  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+    render(saved || {});
+  });
+});
+
+// ── SOUND ──
+var soundOn = localStorage.getItem('dqt_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('dqt_sound', soundOn?'on':'off');
+  document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+}
+document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+
+// ── HAMBURGER ──
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+</script>
+</body>
+</html>
