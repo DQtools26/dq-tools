@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TNYF9DN593');
+  </script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Lobby — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0b0c10; --bg2:#13141a; --bg3:#1a1b23;
+      --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.15);
+      --text:#f0f0f4; --muted:#7b7c8a;
+      --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
+      --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+    .b1 { width:600px;height:600px;background:rgba(58,127,255,0.07);top:-150px;left:-150px; }
+    .b2 { width:500px;height:500px;background:rgba(77,232,136,0.06);bottom:-100px;right:-100px; }
+
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px; }
+    .nav-logo { font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .nav-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent); }
+    .nav-right { margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    #dq-auth-btn { display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0; }
+    #dq-auth-btn:hover { border-color:#3a7fff;color:#e8eef8; }
+    #dq-auth-btn.logged-in { border-color:rgba(77,232,136,.35);color:#e8eef8; }
+    #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
+    #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+    main { position:relative;z-index:1;max-width:600px;margin:0 auto;padding:36px 20px 100px; }
+
+    /* ── JOIN FLOW ── */
+    .join-wrap { display:flex;flex-direction:column;align-items:center;text-align:center;gap:0; }
+    .join-icon  { font-size:3.5rem;margin-bottom:12px; }
+    .join-title { font-family:var(--font-d);font-size:clamp(1.4rem,4vw,2rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:8px; }
+    .join-sub   { font-size:0.85rem;color:var(--muted);margin-bottom:28px;max-width:340px; }
+
+    .join-card { background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:24px;width:100%;margin-bottom:12px;animation:fadeUp .4s ease both; }
+    .join-card-title { font-family:var(--font-d);font-size:0.9rem;font-weight:800;margin-bottom:4px; }
+    .join-card-sub   { font-size:0.75rem;color:var(--muted);margin-bottom:16px; }
+
+    .code-input-wrap { display:flex;gap:8px;margin-bottom:12px; }
+    .code-input { flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-d);font-size:1.4rem;font-weight:800;letter-spacing:.2em;text-align:center;padding:12px 8px;outline:none;text-transform:uppercase;transition:border-color .15s; }
+    .code-input:focus { border-color:var(--accent); }
+    .code-input::placeholder { font-size:1rem;letter-spacing:.05em;font-weight:400; }
+
+    .name-input { width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-b);font-size:0.9rem;padding:11px 14px;outline:none;margin-bottom:12px;transition:border-color .15s; }
+    .name-input:focus { border-color:var(--accent); }
+    .name-input::placeholder { color:var(--muted); }
+
+    .join-btn { width:100%;padding:13px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-family:var(--font-b);font-size:0.9rem;font-weight:700;cursor:pointer;transition:all .15s; }
+    .join-btn:hover { background:#65f0a0; }
+    .join-btn:active { transform:scale(0.98); }
+    .join-btn:disabled { opacity:0.4;cursor:default; }
+
+    .or-divider { display:flex;align-items:center;gap:10px;margin:14px 0; }
+    .or-divider::before,.or-divider::after { content:'';flex:1;height:1px;background:var(--border); }
+    .or-divider span { font-size:0.7rem;color:var(--muted); }
+
+    .back-link { font-size:0.78rem;color:var(--muted);text-decoration:none;margin-top:8px;transition:color .15s; }
+    .back-link:hover { color:var(--text); }
+
+    /* ── ERROR / STATES ── */
+    .join-error { background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.25);border-radius:10px;padding:10px 14px;font-size:0.8rem;color:var(--red);margin-bottom:12px;display:none; }
+    .join-error.show { display:block; }
+
+    /* ── LOBBY ROOM ── */
+    .lobby-wrap { animation:fadeUp .4s ease both; }
+
+    .room-header { background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-bottom:14px;text-align:center;position:relative; }
+    .room-badge  { display:inline-flex;align-items:center;gap:6px;background:rgba(58,127,255,0.1);border:1px solid rgba(58,127,255,0.25);border-radius:100px;padding:4px 12px;font-size:0.72rem;font-weight:600;color:var(--blue);margin-bottom:10px; }
+    .room-badge-dot { width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);} }
+    .room-code-display { font-family:var(--font-d);font-size:2.5rem;font-weight:800;letter-spacing:.25em;color:var(--accent);margin:8px 0 4px; }
+    .room-code-hint { font-size:0.72rem;color:var(--muted); }
+    .room-copy-btn { margin-top:10px;padding:6px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-family:var(--font-b);font-size:0.75rem;color:var(--muted);cursor:pointer;transition:all .15s; }
+    .room-copy-btn:hover { color:var(--text);border-color:var(--border-hi); }
+
+    .waiting-status { background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px; }
+    .wait-spinner { width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .wait-text strong { display:block;font-size:0.85rem;font-weight:600; }
+    .wait-text span { font-size:0.72rem;color:var(--muted); }
+
+    .players-section { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 18px;margin-bottom:14px; }
+    .players-title { font-family:var(--font-d);font-size:0.82rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between; }
+    .player-count-badge { background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:2px 10px;font-size:0.68rem;font-weight:600;color:var(--muted); }
+    .players-list { display:flex;flex-direction:column;gap:7px; }
+    .player-row { display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;transition:border-color .2s; }
+    .player-row.me { border-color:rgba(77,232,136,0.3); }
+    .player-avatar { width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0; }
+    .player-name { font-size:0.83rem;font-weight:500;flex:1; }
+    .player-me-badge { font-size:0.6rem;font-weight:700;color:var(--accent);background:rgba(77,232,136,0.1);border:1px solid rgba(77,232,136,0.2);border-radius:4px;padding:1px 6px; }
+    .player-host-badge { font-size:0.6rem;font-weight:700;color:var(--gold);background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:4px;padding:1px 6px; }
+
+    /* MINI TRIVIA (waiting game) */
+    .mini-trivia { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 18px;margin-bottom:14px; }
+    .mini-title  { font-family:var(--font-d);font-size:0.82rem;font-weight:800;margin-bottom:2px; }
+    .mini-sub    { font-size:0.68rem;color:var(--muted);margin-bottom:12px; }
+    .mini-q      { font-size:0.85rem;font-weight:500;margin-bottom:12px;line-height:1.4; }
+    .mini-answers { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
+    .mini-ans { padding:9px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;font-size:0.78rem;cursor:pointer;transition:all .15s;text-align:left; }
+    .mini-ans:hover { border-color:var(--border-hi); }
+    .mini-ans.correct { background:rgba(77,232,136,0.12);border-color:rgba(77,232,136,0.5);color:var(--accent); }
+    .mini-ans.wrong   { background:rgba(255,107,107,0.1);border-color:rgba(255,107,107,0.4);color:var(--red); }
+    .mini-ans:disabled { cursor:default; }
+    .mini-score { font-size:0.75rem;color:var(--muted);margin-top:10px;text-align:center; }
+    .mini-score strong { color:var(--accent); }
+    .mini-next { width:100%;margin-top:10px;padding:8px;background:var(--accent);color:#071209;border:none;border-radius:9px;font-family:var(--font-b);font-size:0.78rem;font-weight:700;cursor:pointer;display:none; }
+    .mini-next:hover { background:#65f0a0; }
+
+    /* LEAVE + HOST BTN */
+    .lobby-actions { display:flex;gap:8px; }
+    .leave-btn { flex:1;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;font-family:var(--font-b);font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s; }
+    .leave-btn:hover { border-color:var(--red);color:var(--red); }
+    .host-start-btn { flex:2;padding:11px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-family:var(--font-b);font-size:0.88rem;font-weight:700;cursor:pointer;transition:all .15s;display:none; }
+    .host-start-btn:hover { background:#65f0a0; }
+
+    /* COMING SOON note */
+    .realtime-note { background:rgba(58,127,255,0.06);border:1px solid rgba(58,127,255,0.15);border-radius:11px;padding:11px 14px;font-size:0.73rem;color:var(--muted);margin-bottom:14px;text-align:center;line-height:1.5; }
+    .realtime-note strong { color:var(--blue); }
+
+    /* TOAST */
+    .toast { position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap; }
+    .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);} }
+
+    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+    .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
+    .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+    .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+    .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease;}
+    .fab2-items.open{max-height:400px;opacity:1;}
+    .fab2-item{display:flex;align-items:center;position:relative;}
+    .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+    .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+    .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+    .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="toast" id="toast"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <div class="nav-right">
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<main id="mainContent">
+  <!-- filled by JS -->
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtrivia</span><a class="fab2-icon" href="index.html">🎮</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+// ── URL PARAMS ──
+var params    = new URLSearchParams(window.location.search);
+var urlCode   = (params.get('code') || '').toUpperCase().trim();
+
+// ── STATE ──
+var currentUser  = null;
+var displayName  = '';
+var roomCode     = '';
+var isHost       = false;
+var playerStats  = {};
+// Simulated room players (real Supabase Realtime is a future build)
+var roomPlayers  = [];
+var miniScore    = 0;
+var miniTotal    = 0;
+var miniAnswered = false;
+var miniQuestions = [];
+var miniQIndex   = 0;
+
+// ── MINI TRIVIA QUESTIONS (lobby warmup, no XP) ──
+var WARMUP_QS = [
+  {q:'What country invented pizza?',a:'Italy',w:['France','Greece','USA']},
+  {q:'How many sides does a hexagon have?',a:'6',w:['5','7','8']},
+  {q:'What is the fastest land animal?',a:'Cheetah',w:['Lion','Horse','Falcon']},
+  {q:'Which planet is known as the Red Planet?',a:'Mars',w:['Venus','Jupiter','Saturn']},
+  {q:'What element does "O" represent on the periodic table?',a:'Oxygen',w:['Gold','Osmium','Oganesson']},
+  {q:'Who painted the Mona Lisa?',a:'Leonardo da Vinci',w:['Michelangelo','Picasso','Rembrandt']},
+  {q:'What is the capital of Japan?',a:'Tokyo',w:['Kyoto','Osaka','Seoul']},
+  {q:'How many continents are there?',a:'7',w:['5','6','8']},
+  {q:'What is H₂O commonly known as?',a:'Water',w:['Hydrogen','Helium','Oxygen']},
+  {q:'In what year did World War II end?',a:'1945',w:['1939','1941','1944']},
+  {q:'How many strings does a standard guitar have?',a:'6',w:['4','5','7']},
+  {q:'What is the largest ocean?',a:'Pacific',w:['Atlantic','Indian','Arctic']},
+];
+
+function shuffle(arr) { return arr.slice().sort(function(){ return Math.random()-0.5; }); }
+
+function getMiniQuestion() {
+  if (miniQuestions.length === 0) {
+    miniQuestions = shuffle(WARMUP_QS);
+  }
+  return miniQuestions[miniQIndex % miniQuestions.length];
+}
+
+// ── RENDER JOIN FORM ──
+function renderJoinForm(prefillCode) {
+  var codeVal = (prefillCode || urlCode || '');
+  document.getElementById('mainContent').innerHTML =
+    '<div class="join-wrap">' +
+      '<div class="join-icon">🎮</div>' +
+      '<div class="join-title">Join a Game</div>' +
+      '<div class="join-sub">Enter a room code to join a live multiplayer game.</div>' +
+      '<div class="join-card">' +
+        '<div class="join-card-title">Room Code</div>' +
+        '<div class="join-card-sub">Ask your host for the 6-letter code.</div>' +
+        '<div class="join-error" id="joinError"></div>' +
+        '<div class="code-input-wrap">' +
+          '<input class="code-input" id="codeInput" type="text" maxlength="6" placeholder="ABCDEF" value="' + codeVal + '" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,\'\');" onkeydown="if(event.key===\'Enter\')tryJoin()">' +
+        '</div>' +
+        '<input class="name-input" id="nameInput" type="text" maxlength="20" placeholder="Your display name…" value="' + (displayName || '') + '" onkeydown="if(event.key===\'Enter\')tryJoin()">' +
+        '<button class="join-btn" id="joinBtn" onclick="tryJoin()">Join Room →</button>' +
+        '<div class="or-divider"><span>or</span></div>' +
+        '<button class="join-btn" style="background:var(--bg3);color:var(--muted);border:1px solid var(--border);" onclick="renderHostForm()">🎤 Host a Game</button>' +
+      '</div>' +
+      '<a href="index.html" class="back-link">← Back to Home</a>' +
+    '</div>';
+
+  // Auto-focus code or name
+  if (codeVal.length === 6) {
+    var ni = document.getElementById('nameInput');
+    if (ni) ni.focus();
+  } else {
+    var ci = document.getElementById('codeInput');
+    if (ci) ci.focus();
+  }
+}
+
+// ── RENDER HOST FORM ──
+function renderHostForm() {
+  document.getElementById('mainContent').innerHTML =
+    '<div class="join-wrap">' +
+      '<div class="join-icon">🎤</div>' +
+      '<div class="join-title">Host a Game</div>' +
+      '<div class="join-sub">Create a room and share the code with your players.</div>' +
+      '<div class="join-card">' +
+        '<div class="join-card-title">Your name</div>' +
+        '<div class="join-card-sub">Players will see you as the host.</div>' +
+        '<input class="name-input" id="hostNameInput" type="text" maxlength="20" placeholder="Your display name…" value="' + (displayName || '') + '" onkeydown="if(event.key===\'Enter\')createRoom()">' +
+        '<button class="join-btn" id="createBtn" onclick="createRoom()">🚀 Create Room</button>' +
+      '</div>' +
+      '<a href="#" class="back-link" onclick="renderJoinForm()">← Back to Join</a>' +
+    '</div>';
+  var inp = document.getElementById('hostNameInput');
+  if (inp) inp.focus();
+}
+
+// ── TRY JOIN ──
+function tryJoin() {
+  var code = (document.getElementById('codeInput').value || '').toUpperCase().trim();
+  var name = (document.getElementById('nameInput').value || '').trim();
+  var err  = document.getElementById('joinError');
+
+  if (code.length < 4) { showError(err, 'Please enter a valid room code.'); return; }
+  if (!name) { showError(err, 'Please enter a display name.'); return; }
+
+  err.classList.remove('show');
+  var btn = document.getElementById('joinBtn');
+  btn.disabled = true; btn.textContent = 'Joining…';
+
+  roomCode    = code;
+  displayName = name;
+  isHost      = false;
+
+  // Simulate joining (Supabase Realtime is future — for now show the lobby)
+  setTimeout(function() {
+    enterLobby(code, name, false);
+  }, 800);
+}
+
+// ── CREATE ROOM ──
+function createRoom() {
+  var name = (document.getElementById('hostNameInput').value || '').trim();
+  if (!name) {
+    var inp = document.getElementById('hostNameInput');
+    inp.style.borderColor = 'var(--red)';
+    return;
+  }
+  displayName = name;
+  isHost      = true;
+
+  var btn = document.getElementById('createBtn');
+  btn.disabled = true; btn.textContent = 'Creating room…';
+
+  // Generate a random 6-char code
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code  = '';
+  for (var i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  roomCode = code;
+
+  // Update URL without reload
+  history.replaceState(null, '', 'lobby.html?code=' + code);
+
+  setTimeout(function() {
+    enterLobby(code, name, true);
+  }, 600);
+}
+
+// ── ENTER LOBBY ──
+function enterLobby(code, name, hosting) {
+  // Seed players list with self
+  roomPlayers = [
+    { name: name, me: true, host: hosting, avatar: getAvatarEmoji(name) }
+  ];
+  // If joining (not hosting), add a fake host placeholder
+  if (!hosting) {
+    roomPlayers.unshift({ name: 'Host', me: false, host: true, avatar: '👑' });
+  }
+  renderLobby();
+  // Simulate other players joining over time
+  if (hosting) {
+    simulatePlayerJoins();
+  }
+}
+
+// ── SIMULATE PLAYERS (placeholder until real Realtime) ──
+var joinTimer = null;
+var fakeNames = ['Alex','Sam','Jordan','Riley','Morgan','Casey','Quinn','Drew','Blake','Avery'];
+function simulatePlayerJoins() {
+  var idx = 0;
+  joinTimer = setInterval(function() {
+    if (idx >= 3 || roomPlayers.length >= 8) { clearInterval(joinTimer); return; }
+    var n = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    roomPlayers.push({ name: n, me: false, host: false, avatar: getAvatarEmoji(n) });
+    updatePlayersList();
+    idx++;
+  }, 3000 + Math.random() * 4000);
+}
+
+function getAvatarEmoji(name) {
+  var emojis = ['🧑','👩','🧔','👨‍🦱','👩‍🦰','🧑‍🦳','👩‍🦳','🧑‍🦱'];
+  var code = 0;
+  for (var i = 0; i < name.length; i++) code += name.charCodeAt(i);
+  return emojis[code % emojis.length];
+}
+
+// ── RENDER LOBBY ──
+function renderLobby() {
+  miniQIndex = 0;
+  miniQuestions = shuffle(WARMUP_QS);
+
+  var shareURL = window.location.origin + window.location.pathname + '?code=' + roomCode;
+
+  document.getElementById('mainContent').innerHTML =
+    '<div class="lobby-wrap">' +
+      '<div class="room-header">' +
+        '<div class="room-badge"><div class="room-badge-dot"></div>Live Room</div>' +
+        '<div class="room-code-display">' + roomCode + '</div>' +
+        '<div class="room-code-hint">Share this code with players</div>' +
+        '<button class="room-copy-btn" onclick="copyCode()">📋 Copy Join Link</button>' +
+      '</div>' +
+
+      '<div class="realtime-note">⚡ <strong>Note:</strong> Live multiplayer sync is coming soon! For now this is a lobby preview — share the code and everyone can warm up with mini-trivia while you wait.</div>' +
+
+      '<div class="waiting-status">' +
+        '<div class="wait-spinner"></div>' +
+        '<div class="wait-text">' +
+          '<strong>Waiting for ' + (isHost ? 'players' : 'host') + '</strong>' +
+          '<span>' + (isHost ? 'Start the game when everyone\'s ready' : 'The host will start shortly') + '</span>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="players-section">' +
+        '<div class="players-title">Players <span class="player-count-badge" id="playerCountBadge">' + roomPlayers.length + '</span></div>' +
+        '<div class="players-list" id="playersList">' + renderPlayersList() + '</div>' +
+      '</div>' +
+
+      '<div class="mini-trivia" id="miniTrivia">' +
+        '<div class="mini-title">🧠 Warm-up Trivia</div>' +
+        '<div class="mini-sub">No XP — just for fun while you wait!</div>' +
+        renderMiniQ() +
+      '</div>' +
+
+      '<div class="lobby-actions">' +
+        '<button class="leave-btn" onclick="leaveLobby()">Leave</button>' +
+        (isHost ? '<button class="host-start-btn" id="hostStartBtn" style="display:block" onclick="startGame()">▶ Start Game</button>' : '') +
+      '</div>' +
+    '</div>';
+}
+
+function renderPlayersList() {
+  return roomPlayers.map(function(p) {
+    return '<div class="player-row' + (p.me?' me':'') + '">' +
+      '<div class="player-avatar">' + p.avatar + '</div>' +
+      '<div class="player-name">' + p.name + '</div>' +
+      (p.me ? '<span class="player-me-badge">You</span>' : '') +
+      (p.host ? '<span class="player-host-badge">Host</span>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function updatePlayersList() {
+  var pl = document.getElementById('playersList');
+  var pc = document.getElementById('playerCountBadge');
+  if (pl) pl.innerHTML = renderPlayersList();
+  if (pc) pc.textContent = roomPlayers.length;
+}
+
+// ── MINI TRIVIA ──
+function renderMiniQ() {
+  var q = miniQuestions[miniQIndex % miniQuestions.length];
+  var answers = shuffle([q.a].concat(q.w));
+  miniAnswered = false;
+
+  return '<div class="mini-q" id="miniQText">' + q.q + '</div>' +
+    '<div class="mini-answers" id="miniAnswers">' +
+      answers.map(function(ans) {
+        return '<button class="mini-ans" onclick="answerMini(this,\'' + escQ(ans) + '\',\'' + escQ(q.a) + '\')">' + ans + '</button>';
+      }).join('') +
+    '</div>' +
+    '<div class="mini-score" id="miniScore">Score: <strong>' + miniScore + '</strong> / ' + miniTotal + '</div>' +
+    '<button class="mini-next" id="miniNextBtn" onclick="nextMiniQ()">Next →</button>';
+}
+
+function escQ(s) { return s.replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+
+function answerMini(btn, chosen, correct) {
+  if (miniAnswered) return;
+  miniAnswered = true;
+  miniTotal++;
+  var btns = document.querySelectorAll('.mini-ans');
+  btns.forEach(function(b){ b.disabled = true; });
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    miniScore++;
+  } else {
+    btn.classList.add('wrong');
+    btns.forEach(function(b){
+      var txt = b.textContent.trim();
+      if (txt === correct) b.classList.add('correct');
+    });
+  }
+  var sc = document.getElementById('miniScore');
+  if (sc) sc.innerHTML = 'Score: <strong>' + miniScore + '</strong> / ' + miniTotal;
+  var nb = document.getElementById('miniNextBtn');
+  if (nb) nb.style.display = 'block';
+}
+
+function nextMiniQ() {
+  miniQIndex++;
+  var mt = document.getElementById('miniTrivia');
+  if (mt) {
+    mt.querySelector('.mini-q, .mini-answers, .mini-score, .mini-next') && (function(){
+      // Re-render just the question part
+      var q = miniQuestions[miniQIndex % miniQuestions.length];
+      var answers = shuffle([q.a].concat(q.w));
+      miniAnswered = false;
+      var qEl = document.getElementById('miniQText');
+      var aEl = document.getElementById('miniAnswers');
+      var nb  = document.getElementById('miniNextBtn');
+      var sc  = document.getElementById('miniScore');
+      if (qEl) qEl.textContent = q.q;
+      if (aEl) aEl.innerHTML = answers.map(function(ans) {
+        return '<button class="mini-ans" onclick="answerMini(this,\'' + escQ(ans) + '\',\'' + escQ(q.a) + '\')">' + ans + '</button>';
+      }).join('');
+      if (nb) nb.style.display = 'none';
+      if (sc) sc.innerHTML = 'Score: <strong>' + miniScore + '</strong> / ' + miniTotal;
+    })();
+  }
+}
+
+// ── COPY CODE ──
+function copyCode() {
+  var url = window.location.origin + window.location.pathname + '?code=' + roomCode;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Join link copied!'); });
+  } else {
+    showToast('Code: ' + roomCode);
+  }
+}
+
+// ── LEAVE / START ──
+function leaveLobby() {
+  clearInterval(joinTimer);
+  window.location.replace('index.html');
+}
+
+function startGame() {
+  clearInterval(joinTimer);
+  // Navigate to play in live mode
+  window.location.href = 'play.html?mode=live&room=' + roomCode;
+}
+
+// ── SHOW ERROR ──
+function showError(el, msg) {
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 3500);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  currentUser = user;
+
+  // Pre-fill display name from profile
+  if (user) {
+    DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+      playerStats = saved || {};
+    });
+    var profile = DQAuth.getProfile && DQAuth.getProfile();
+    if (profile && profile.displayName) {
+      displayName = profile.displayName.split(' ')[0];
+    }
+  }
+
+  // Decide what to show
+  if (urlCode && urlCode.length >= 4) {
+    // Code in URL — go straight to join form with it prefilled
+    renderJoinForm(urlCode);
+  } else {
+    renderJoinForm();
+  }
+});
+</script>
+</body>
+</html>
