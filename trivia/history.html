@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TNYF9DN593');
+  </script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>History — DQtrivia</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0b0c10; --bg2:#13141a; --bg3:#1a1b23;
+      --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.15);
+      --text:#f0f0f4; --muted:#7b7c8a;
+      --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
+      --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+    .b1 { width:500px;height:500px;background:rgba(245,200,66,0.05);top:-100px;right:-100px; }
+    .b2 { width:400px;height:400px;background:rgba(77,232,136,0.04);bottom:0;left:-80px; }
+
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px; }
+    .nav-logo { font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .nav-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent); }
+    .nav-links { display:flex;align-items:center;gap:2px; }
+    .nav-links a { font-size:0.77rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:6px;transition:color .15s,background .15s;white-space:nowrap; }
+    .nav-links a:hover { color:var(--text);background:rgba(255,255,255,0.06); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-hamburger { display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:6px; }
+    .nav-hamburger span { display:block;width:18px;height:2px;background:var(--muted);border-radius:2px; }
+    @media(max-width:640px){
+      .nav-links { display:none; }
+      .nav-links.open { display:flex;flex-direction:column;align-items:flex-start;position:fixed;top:56px;left:0;right:0;background:rgba(11,12,16,0.98);border-bottom:1px solid var(--border);padding:12px 20px 16px;gap:4px;z-index:99; }
+      .nav-hamburger { display:flex; }
+    }
+    .nav-right { margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .btn-icon { width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s; }
+    .btn-icon:hover { border-color:var(--border-hi);color:var(--text); }
+    #dq-auth-btn { display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0; }
+    #dq-auth-btn:hover { border-color:#3a7fff;color:#e8eef8; }
+    #dq-auth-btn.logged-in { border-color:rgba(77,232,136,.35);color:#e8eef8; }
+    #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
+    #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
+
+    main { position:relative;z-index:1;max-width:760px;margin:0 auto;padding:36px 20px 100px; }
+
+    .page-header { margin-bottom:24px;animation:fadeUp .4s ease both; }
+    .page-title  { font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em; }
+    .page-sub    { font-size:0.82rem;color:var(--muted);margin-top:4px; }
+
+    /* LOADING */
+    .loading-screen { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px; }
+    .loading-spinner { width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* EMPTY STATE */
+    .empty-state { text-align:center;padding:60px 20px; }
+    .empty-emoji { font-size:3rem;margin-bottom:12px; }
+    .empty-title { font-family:var(--font-d);font-size:1.1rem;font-weight:800;margin-bottom:6px; }
+    .empty-sub   { font-size:0.8rem;color:var(--muted);margin-bottom:20px; }
+    .empty-btn   { display:inline-block;padding:10px 24px;background:var(--accent);color:#071209;border-radius:10px;font-weight:700;font-size:0.85rem;text-decoration:none;transition:background .15s; }
+    .empty-btn:hover { background:#65f0a0; }
+
+    /* TOOLBAR */
+    .toolbar { display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;animation:fadeUp .4s ease .05s both; }
+    .filter-select { background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.8rem;padding:7px 10px;outline:none;cursor:pointer; }
+    .filter-select:focus { border-color:var(--accent); }
+    .toolbar-right { margin-left:auto;font-size:0.75rem;color:var(--muted); }
+    .clear-btn { padding:7px 14px;background:transparent;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-family:var(--font-b);font-size:0.75rem;cursor:pointer;transition:all .15s; }
+    .clear-btn:hover { border-color:var(--red);color:var(--red); }
+
+    /* SUMMARY BAR */
+    .summary-bar { background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:18px;animation:fadeUp .4s ease .06s both; }
+    .summary-item { text-align:center; }
+    .summary-val  { font-family:var(--font-d);font-size:1.1rem;font-weight:800; }
+    .summary-lbl  { font-size:0.65rem;color:var(--muted); }
+    .summary-val.accent { color:var(--accent); }
+    .summary-val.gold   { color:var(--gold); }
+
+    /* DATE GROUP */
+    .date-group { margin-bottom:6px; }
+    .date-label { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding-left:2px; }
+
+    /* HISTORY ROW */
+    .history-row {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:13px; padding:0; overflow:hidden;
+      margin-bottom:8px; cursor:pointer;
+      transition:border-color .15s;
+      animation:fadeUp .3s ease both;
+    }
+    .history-row:hover { border-color:var(--border-hi); }
+    .history-row.win  { border-left:3px solid var(--accent); }
+    .history-row.loss { border-left:3px solid var(--red); }
+
+    .row-main { display:flex;align-items:center;gap:12px;padding:13px 16px; }
+    .row-emoji { font-size:1.3rem;flex-shrink:0; }
+    .row-info  { flex:1;min-width:0; }
+    .row-cat   { font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .row-meta  { font-size:0.67rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:1px; }
+    .row-mode  { background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:0.6rem;font-weight:600; }
+    .row-score { font-family:var(--font-d);font-size:1rem;font-weight:800;flex-shrink:0; }
+    .row-score.win  { color:var(--accent); }
+    .row-score.loss { color:var(--muted); }
+    .row-chevron { font-size:0.7rem;color:var(--muted);flex-shrink:0;transition:transform .2s; }
+    .history-row.open .row-chevron { transform:rotate(180deg); }
+
+    /* EXPANDED DETAIL */
+    .row-detail { display:none;padding:0 16px 14px;border-top:1px solid var(--border); }
+    .history-row.open .row-detail { display:block; }
+    .detail-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding-top:12px; }
+    .detail-tile { background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 10px;text-align:center; }
+    .detail-val  { font-family:var(--font-d);font-size:0.95rem;font-weight:800; }
+    .detail-lbl  { font-size:0.6rem;color:var(--muted);margin-top:2px; }
+    .detail-val.accent { color:var(--accent); }
+    .detail-val.gold   { color:var(--gold); }
+    .detail-val.blue   { color:var(--blue); }
+    .detail-actions { display:flex;gap:8px;margin-top:12px; }
+    .detail-btn { flex:1;padding:8px;border-radius:8px;font-family:var(--font-b);font-size:0.75rem;font-weight:700;cursor:pointer;border:none;text-align:center;text-decoration:none;display:block;transition:all .15s; }
+    .detail-btn-play  { background:var(--accent);color:#071209; }
+    .detail-btn-play:hover { background:#65f0a0; }
+    .detail-btn-ghost { background:var(--bg3);border:1px solid var(--border);color:var(--muted); }
+    .detail-btn-ghost:hover { color:var(--text);border-color:var(--border-hi); }
+
+    /* PAGINATION */
+    .pagination { display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;animation:fadeUp .4s ease both; }
+    .page-btn { padding:7px 14px;border-radius:8px;font-family:var(--font-b);font-size:0.78rem;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--muted);transition:all .15s; }
+    .page-btn:hover:not(:disabled) { border-color:var(--border-hi);color:var(--text); }
+    .page-btn:disabled { opacity:0.35;cursor:default; }
+    .page-info { font-size:0.75rem;color:var(--muted); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+
+    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
+    .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
+    .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
+    .fab2-toggle.open{transform:rotate(45deg) scale(1.08);background:#1f8a48;}
+    .fab2-items{display:flex;flex-direction:column;align-items:flex-end;gap:7px;overflow:hidden;max-height:0;opacity:0;transition:max-height .32s ease,opacity .25s ease;}
+    .fab2-items.open{max-height:400px;opacity:1;}
+    .fab2-item{display:flex;align-items:center;position:relative;}
+    .fab2-label{background:#18181f;color:#c8f0d8;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:6px;white-space:nowrap;border:1px solid #2e2e42;opacity:0;transform:translateX(6px);transition:opacity .15s,transform .15s;pointer-events:none;margin-right:7px;}
+    .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
+    .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
+    .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="play.html">Play</a>
+    <a href="stats.html">Stats</a>
+    <a href="history.html" class="active">History</a>
+    <a href="shop.html">🛒 Shop</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<main>
+  <div id="pageContent">
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+<div class="fab2-wrap">
+  <div class="fab2-items" id="fab2menu">
+    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="../account.html">👤</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
+    <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
+    <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
+    <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
+  </div>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+</div>
+
+<script>
+var CATS_MAP = {
+  9:{n:'General Knowledge',e:'🧠'},10:{n:'Books',e:'📚'},11:{n:'Film',e:'🎬'},
+  12:{n:'Music',e:'🎵'},13:{n:'Musicals & Theatre',e:'🎭'},14:{n:'Television',e:'📺'},
+  15:{n:'Video Games',e:'🎮'},16:{n:'Board Games',e:'♟️'},17:{n:'Science & Nature',e:'🔬'},
+  18:{n:'Computers',e:'💻'},19:{n:'Mathematics',e:'➗'},20:{n:'Mythology',e:'⚡'},
+  21:{n:'Sports',e:'🏆'},22:{n:'Geography',e:'🌍'},23:{n:'History',e:'🏛️'},
+  24:{n:'Politics',e:'🗳️'},25:{n:'Art',e:'🎨'},26:{n:'Celebrities',e:'⭐'},
+  27:{n:'Animals',e:'🦁'},28:{n:'Vehicles',e:'🚗'},29:{n:'Comics',e:'💬'},
+  30:{n:'Gadgets',e:'📱'},31:{n:'Anime & Manga',e:'✏️'},32:{n:'Cartoons & Animation',e:'🎞️'}
+};
+
+var MODE_LABELS = { personal:'Solo', daily:'Daily', guest:'Guest', race:'Race', streak:'Streak', speed:'Speed', live:'Live' };
+
+var allHistory   = [];
+var filterCat    = 'all';
+var filterMode   = 'all';
+var currentPage  = 1;
+var PAGE_SIZE    = 20;
+var openRow      = null;
+
+function fmtDate(str) {
+  if (!str) return '';
+  var d = new Date(str + 'T12:00:00');
+  var today = new Date().toISOString().slice(0,10);
+  var yest  = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (str === today) return 'Today';
+  if (str === yest)  return 'Yesterday';
+  return d.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+}
+
+function fmtDateFull(str) {
+  if (!str) return '';
+  var d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+}
+
+function getFiltered() {
+  return allHistory.filter(function(g) {
+    if (filterCat !== 'all' && String(g.catId) !== filterCat) return false;
+    if (filterMode !== 'all' && g.mode !== filterMode) return false;
+    return true;
+  }).slice().reverse(); // newest first
+}
+
+function render() {
+  var filtered = getFiltered();
+  var totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+  var pageItems = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  if (allHistory.length === 0) {
+    document.getElementById('pageContent').innerHTML =
+      '<div class="page-header"><div class="page-title">📋 History</div></div>' +
+      '<div class="empty-state">' +
+        '<div class="empty-emoji">📋</div>' +
+        '<div class="empty-title">No games yet</div>' +
+        '<div class="empty-sub">Your game history will appear here after you play.</div>' +
+        '<a href="categories.html" class="empty-btn">Start Playing →</a>' +
+      '</div>';
+    return;
+  }
+
+  // Summary stats for filtered set
+  var totalScore   = filtered.reduce(function(a,g){return a+(g.score||0);},0);
+  var totalCorrect = filtered.reduce(function(a,g){return a+(g.correct||0);},0);
+  var totalQs      = filtered.reduce(function(a,g){return a+(g.total||0);},0);
+  var avgAcc       = totalQs > 0 ? Math.round(totalCorrect/totalQs*100) : 0;
+  var totalXP      = filtered.reduce(function(a,g){return a+(g.xp||0);},0);
+
+  // Unique categories for filter
+  var uniqueCats = [];
+  var seenCats = {};
+  allHistory.forEach(function(g){
+    if (g.catId && !seenCats[g.catId]) { seenCats[g.catId]=1; uniqueCats.push(g.catId); }
+  });
+  uniqueCats.sort(function(a,b){ return (CATS_MAP[a]||{n:'z'}).n.localeCompare((CATS_MAP[b]||{n:'z'}).n); });
+
+  var uniqueModes = [];
+  var seenModes = {};
+  allHistory.forEach(function(g){
+    if (g.mode && !seenModes[g.mode]) { seenModes[g.mode]=1; uniqueModes.push(g.mode); }
+  });
+
+  var catOptions = '<option value="all">All Categories</option>' +
+    uniqueCats.map(function(id){
+      var c = CATS_MAP[id] || {n:'Unknown '+id,e:'❓'};
+      return '<option value="'+id+'"'+(filterCat===String(id)?' selected':'')+'>'+c.e+' '+c.n+'</option>';
+    }).join('');
+
+  var modeOptions = '<option value="all">All Modes</option>' +
+    uniqueModes.map(function(m){
+      return '<option value="'+m+'"'+(filterMode===m?' selected':'')+'>'+(MODE_LABELS[m]||m)+'</option>';
+    }).join('');
+
+  var html =
+    '<div class="page-header"><div class="page-title">📋 History</div><div class="page-sub">' + allHistory.length + ' games total</div></div>' +
+    '<div class="toolbar">' +
+      '<select class="filter-select" onchange="setCatFilter(this.value)">' + catOptions + '</select>' +
+      '<select class="filter-select" onchange="setModeFilter(this.value)">' + modeOptions + '</select>' +
+      '<span class="toolbar-right">' + filtered.length + ' game' + (filtered.length===1?'':'s') + '</span>' +
+    '</div>' +
+    '<div class="summary-bar">' +
+      '<div class="summary-item"><div class="summary-val">' + filtered.length + '</div><div class="summary-lbl">Games</div></div>' +
+      '<div class="summary-item"><div class="summary-val accent">' + avgAcc + '%</div><div class="summary-lbl">Avg Accuracy</div></div>' +
+      '<div class="summary-item"><div class="summary-val gold">' + totalXP.toLocaleString() + '</div><div class="summary-lbl">XP Earned</div></div>' +
+      '<div class="summary-item"><div class="summary-val">' + totalScore.toLocaleString() + '</div><div class="summary-lbl">Total Score</div></div>' +
+    '</div>';
+
+  if (pageItems.length === 0) {
+    html += '<div class="empty-state"><div class="empty-emoji">🔍</div><div class="empty-title">No games match</div><div class="empty-sub">Try adjusting your filters.</div></div>';
+  } else {
+    // Group by date
+    var groups = {};
+    var groupOrder = [];
+    pageItems.forEach(function(g) {
+      var k = g.date || 'Unknown';
+      if (!groups[k]) { groups[k] = []; groupOrder.push(k); }
+      groups[k].push(g);
+    });
+
+    html += '<div id="historyList">';
+    groupOrder.forEach(function(dateStr) {
+      html += '<div class="date-group"><div class="date-label">' + fmtDate(dateStr) + ' — ' + fmtDateFull(dateStr) + '</div>';
+      groups[dateStr].forEach(function(g, gi) {
+        var idx = allHistory.indexOf(g); // stable unique key
+        var cat  = CATS_MAP[g.catId] || {n: g.catName || 'Mixed', e:'🎯'};
+        var acc  = g.accuracy !== undefined ? g.accuracy : (g.total > 0 ? Math.round(g.correct/g.total*100) : 0);
+        var isWin = acc >= 70;
+        var modeLabel = MODE_LABELS[g.mode] || g.mode || 'Solo';
+        var scoreColor = isWin ? 'win' : 'loss';
+
+        html +=
+          '<div class="history-row ' + (isWin?'win':'loss') + '" id="hrow-'+idx+'" onclick="toggleRow(' + idx + ')">' +
+            '<div class="row-main">' +
+              '<div class="row-emoji">' + cat.e + '</div>' +
+              '<div class="row-info">' +
+                '<div class="row-cat">' + cat.n + '</div>' +
+                '<div class="row-meta">' +
+                  '<span class="row-mode">' + modeLabel + '</span>' +
+                  '<span>' + g.correct + '/' + g.total + ' correct</span>' +
+                  '<span>' + acc + '%</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="row-score ' + scoreColor + '">' + (g.score||0).toLocaleString() + '</div>' +
+              '<div class="row-chevron">▾</div>' +
+            '</div>' +
+            '<div class="row-detail">' +
+              '<div class="detail-grid">' +
+                '<div class="detail-tile"><div class="detail-val accent">' + acc + '%</div><div class="detail-lbl">Accuracy</div></div>' +
+                '<div class="detail-tile"><div class="detail-val">' + (g.score||0).toLocaleString() + '</div><div class="detail-lbl">Score</div></div>' +
+                '<div class="detail-tile"><div class="detail-val gold">+' + (g.xp||0) + '</div><div class="detail-lbl">XP Earned</div></div>' +
+                '<div class="detail-tile"><div class="detail-val gold">+' + (g.coins||0) + '</div><div class="detail-lbl">Coins</div></div>' +
+                (g.avgTime ? '<div class="detail-tile"><div class="detail-val blue">' + g.avgTime + 's</div><div class="detail-lbl">Avg Time</div></div>' : '') +
+              '</div>' +
+              (g.catId ?
+                '<div class="detail-actions">' +
+                  '<a href="play.html?mode=personal&cat=' + g.catId + '&catname=' + encodeURIComponent(cat.n) + '" class="detail-btn detail-btn-play">▶ Play Again</a>' +
+                  '<a href="categories.html" class="detail-btn detail-btn-ghost">Browse Categories</a>' +
+                '</div>' : '') +
+            '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Pagination
+    if (totalPages > 1) {
+      html += '<div class="pagination">' +
+        '<button class="page-btn" onclick="goPage(' + (currentPage-1) + ')"' + (currentPage<=1?' disabled':'') + '>← Prev</button>' +
+        '<span class="page-info">Page ' + currentPage + ' of ' + totalPages + '</span>' +
+        '<button class="page-btn" onclick="goPage(' + (currentPage+1) + ')"' + (currentPage>=totalPages?' disabled':'') + '>Next →</button>' +
+      '</div>';
+    }
+  }
+
+  document.getElementById('pageContent').innerHTML = html;
+
+  // Restore open row
+  if (openRow !== null) {
+    var el = document.getElementById('hrow-' + openRow);
+    if (el) el.classList.add('open');
+  }
+}
+
+function toggleRow(idx) {
+  var el = document.getElementById('hrow-' + idx);
+  if (!el) return;
+  if (openRow === idx) {
+    el.classList.remove('open');
+    openRow = null;
+  } else {
+    if (openRow !== null) {
+      var old = document.getElementById('hrow-' + openRow);
+      if (old) old.classList.remove('open');
+    }
+    el.classList.add('open');
+    openRow = idx;
+  }
+}
+
+function setCatFilter(v) { filterCat = v; currentPage = 1; openRow = null; render(); }
+function setModeFilter(v) { filterMode = v; currentPage = 1; openRow = null; render(); }
+function goPage(p) { currentPage = p; openRow = null; render(); window.scrollTo(0, 0); }
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  if (!user) { window.location.replace('landing.html'); return; }
+  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+    allHistory = (saved && saved.gameHistory) ? saved.gameHistory : [];
+    render();
+  });
+});
+
+// ── SOUND ──
+var soundOn = localStorage.getItem('dqt_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('dqt_sound', soundOn?'on':'off');
+  document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+}
+document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+
+// ── HAMBURGER ──
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+</script>
+</body>
+</html>
