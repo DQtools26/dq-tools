@@ -11,6 +11,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
+  <script>(function(){var t=localStorage.getItem("dqt_theme")||"dark";if(t!=="dark")document.documentElement.setAttribute("data-theme",t);})();</script>
   <script src="../dq-auth.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -243,9 +244,12 @@
     <a href="stats.html">Stats</a>
     <a href="history.html">History</a>
     <a href="shop.html">🛒 Shop</a>
+    <a href="settings.html">⚙️</a>
+    <a href="lobby.html" style="background:var(--blue);color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;font-size:0.75rem;">Join Game</a>
   </div>
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <span id="navBadge" style="font-size:0.95rem;flex-shrink:0;"></span>
     <button class="btn-icon" id="quitBtn" onclick="confirmQuit()" title="Quit game" style="display:none;">✕</button>
     <span id="equippedBadge" style="font-size:1rem;flex-shrink:0;" title=""></span>
     <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
@@ -298,18 +302,18 @@ var CATS = {
 // ── APPLY EQUIPPED COSMETICS ──
 function applyCosmetics(stats) {
   var equipped = (stats && stats.equippedItems) || {};
-  // Theme
+  // Theme — use data-theme on html element so CSS vars apply instantly everywhere
   var theme = equipped.theme || 'dark';
-  document.body.className = document.body.className.replace(/\btheme-\S+/g, '').trim();
-  if (theme !== 'dark') document.body.classList.add('theme-' + theme);
-  // Badge — show in nav next to auth button
+  localStorage.setItem('dqt_theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
+  // Badge — show in nav
   var badge = equipped.badge || 'rookie';
   var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
-  var badgeEl = document.getElementById('equippedBadge');
-  if (badgeEl) {
-    badgeEl.textContent = BADGE_EMOJIS[badge] || '';
-    badgeEl.title = badge.charAt(0).toUpperCase() + badge.slice(1) + ' badge';
-  }
+  var badgeEmoji = BADGE_EMOJIS[badge] || '';
+  var badgeEl  = document.getElementById('equippedBadge');
+  var navBadge = document.getElementById('navBadge');
+  if (badgeEl)  { badgeEl.textContent = badgeEmoji; badgeEl.title = badge + ' badge'; }
+  if (navBadge) navBadge.textContent = badgeEmoji;
 }
 
 // ── LEVEL THRESHOLDS ──
@@ -404,9 +408,17 @@ function resetToken() {
 // ── FETCH QUESTIONS ──
 function fetchQuestions(token, retries) {
   retries = retries || 0;
-  var url = 'https://opentdb.com/api.php?amount=10&encode=url3986';
-  if (CAT_ID) url += '&category=' + CAT_ID;
-  if (MODE === 'daily') url += '&difficulty=medium';
+  // Read game settings
+  var qcount = MODE === 'daily' ? 10 : (parseInt(localStorage.getItem('dqt_qcount')) || 10);
+  var difficulty = MODE === 'daily' ? 'medium' : MODE === 'speed' ? 'any' : (localStorage.getItem('dqt_difficulty') || 'any');
+  var qtype = localStorage.getItem('dqt_qtype') || 'any';
+  var timerSetting = MODE === 'speed' ? 10 : (parseInt(localStorage.getItem('dqt_timer')) || 20);
+  MAX_TIME = timerSetting === 0 ? 9999 : timerSetting;  // 0 = no timer
+
+  var url = 'https://opentdb.com/api.php?amount=' + qcount + '&encode=url3986';
+  if (CAT_ID && CAT_ID !== 0) url += '&category=' + CAT_ID;
+  if (difficulty && difficulty !== 'any') url += '&difficulty=' + difficulty;
+  if (qtype && qtype !== 'any') url += '&type=' + qtype;
   if (token) url += '&token=' + token;
 
   document.getElementById('loadingSub').textContent = 'Connecting to OpenTDB…';
@@ -552,8 +564,28 @@ function renderQuestion() {
 }
 
 function getModeLabel() {
-  var labels = { personal:'Solo', daily:'Daily', guest:'Guest', race:'Race', streak:'Streak', speed:'Speed', live:'Live' };
+  var labels = { personal:'Solo', daily:'Daily', guest:'Guest', race:'Race', streak:'Streak 💀', speed:'⚡ Speed', live:'Live' };
   return labels[MODE] || 'Solo';
+}
+
+// ── STREAK MODE: wrong answer = immediate game over with penalty screen ──
+function streakGameOver(wasTimeout) {
+  stopTimer();
+  gameStarted = false;
+  document.getElementById('quitBtn').style.display = 'none';
+  var msg = wasTimeout ? 'Time's up! Streak broken.' : 'Wrong answer! Streak broken.';
+  document.getElementById('mainContent').innerHTML =
+    '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">' +
+      '<div style="font-size:3.5rem;margin-bottom:12px;">💀</div>' +
+      '<div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:8px;">Eliminated!</div>' +
+      '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:6px;">' + msg + '</div>' +
+      '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Survived <strong style="color:var(--accent);">' + currentQ + '</strong> question' + (currentQ===1?'':'s') + ' · ' + correctCount + '/' + currentQ + ' correct</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">' +
+        '<button onclick="playAgain()" style="padding:12px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🔄 Try Again</button>' +
+        '<a href="categories.html" style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">Browse Categories</a>' +
+      '</div>' +
+    '</div>';
+  if (!isGuest) saveGameStats(0, 0, 0, 0);
 }
 
 function escapeAttr(s) {
@@ -599,6 +631,14 @@ function timeUp(startTime) {
   gameHistory.push(false);
   playWrong();
   flashFeedback('⏰');
+
+  // Streak mode: timeout = eliminated
+  if (MODE === 'streak') {
+    showCorrectAnswer();
+    setTimeout(function(){ streakGameOver(true); }, 1200);
+    return;
+  }
+
   showCorrectAnswer();
   showNextButton();
 }
@@ -646,6 +686,12 @@ function selectAnswer(btn, chosen) {
     playWrong();
     flashFeedback('✗');
     showCorrectAnswer(btns);
+
+    // Streak mode: wrong = eliminated
+    if (MODE === 'streak') {
+      setTimeout(function(){ streakGameOver(false); }, 1200);
+      return;
+    }
   }
 
   // Update score display
@@ -1004,6 +1050,24 @@ window.addEventListener('dq:authready', function(e) {
     DQAuth.loadData('dqtrivia_stats').then(function(saved) {
       playerStats = saved || {};
       applyCosmetics(playerStats);
+
+      // Daily lock: can't replay today's daily
+      if (MODE === 'daily') {
+        var today = new Date().toISOString().slice(0,10);
+        if (saved && saved.dailyDone && saved.lastPlayedDate === today) {
+          document.getElementById('mainContent').innerHTML =
+            '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">' +
+            '<div style="font-size:3rem;margin-bottom:12px;">✅</div>' +
+            '<div style="font-family:var(--font-d);font-size:1.3rem;font-weight:800;margin-bottom:8px;">Already done today!</div>' +
+            '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Come back tomorrow for a new daily challenge. Resets at midnight.</div>' +
+            '<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">' +
+            '<a href="categories.html" style="padding:11px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:var(--font-b);text-decoration:none;text-align:center;">Play another category</a>' +
+            '<a href="index.html" style="padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">← Home</a>' +
+            '</div></div>';
+          return;
+        }
+      }
+
       getToken().then(function(tok){ fetchQuestions(tok); });
     });
   } else {
