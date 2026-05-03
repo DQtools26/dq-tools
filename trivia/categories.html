@@ -11,6 +11,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
+  <script>(function(){var t=localStorage.getItem("dqt_theme")||"dark";if(t!=="dark")document.documentElement.setAttribute("data-theme",t);})();</script>
   <script src="../dq-auth.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +26,14 @@
       --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
       --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
     }
+
+    [data-theme="ocean"]    { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
+    [data-theme="forest"]   { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --border:rgba(77,232,136,0.1); }
+    [data-theme="sunset"]   { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
+    [data-theme="midnight"] { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
+    [data-theme="candy"]    { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
+    [data-theme="neon"]     { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
+    [data-theme="metro"]    { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
     body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
     .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
     .b1 { width:500px;height:500px;background:rgba(77,232,136,0.06);top:-100px;left:-100px; }
@@ -151,6 +160,20 @@
     .modal-play-btn:hover { background:#65f0a0; }
     .modal-play-btn:active { transform:scale(0.98); }
 
+
+    /* MODE BUTTONS in modal */
+    .modal-modes { display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px; }
+    .mode-card { background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;padding:11px 12px;cursor:pointer;text-decoration:none;transition:all .15s;display:block; }
+    .mode-card:hover { border-color:var(--border-hi);transform:translateY(-1px); }
+    .mode-card .mc-icon { font-size:1.2rem;margin-bottom:4px; }
+    .mode-card .mc-name { font-family:var(--font-d);font-size:0.82rem;font-weight:700;color:var(--text); }
+    .mode-card .mc-desc { font-size:0.63rem;color:var(--muted);margin-top:1px;line-height:1.3; }
+    .mode-card.mc-solo     { border-color:rgba(77,232,136,0.25); }
+    .mode-card.mc-speed    { border-color:rgba(245,200,66,0.25); }
+    .mode-card.mc-streak   { border-color:rgba(255,107,107,0.25); }
+    .mode-card.mc-live     { border-color:rgba(58,127,255,0.25); }
+    .modal-section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px; }
+
     /* EMPTY */
     .empty { text-align:center;padding:48px 20px;color:var(--muted);font-size:0.85rem; }
     .empty .big { font-size:2.2rem;margin-bottom:10px; }
@@ -176,8 +199,22 @@
     .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
     .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
     .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
+
+    /* MODE CARDS in modal */
+    .modal-modes { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px; }
+    .mode-card { background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;padding:12px;cursor:pointer;text-decoration:none;display:block;transition:border-color .15s,transform .15s; }
+    .mode-card:hover { border-color:var(--border-hi);transform:translateY(-1px); }
+    .mc-icon { font-size:1.3rem;margin-bottom:4px; }
+    .mc-name { font-family:var(--font-d);font-size:0.82rem;font-weight:700;color:var(--text); }
+    .mc-desc { font-size:0.63rem;color:var(--muted);margin-top:1px;line-height:1.3; }
+    .mc-solo   { border-color:rgba(77,232,136,0.25); }
+    .mc-speed  { border-color:rgba(245,200,66,0.25); }
+    .mc-streak { border-color:rgba(255,107,107,0.25); }
+    .mc-live   { border-color:rgba(58,127,255,0.25); }
+    .modal-section-lbl { font-size:0.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px; }
   </style>
 </head>
+
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 
@@ -191,16 +228,19 @@
     <a href="stats.html">Stats</a>
     <a href="history.html">History</a>
     <a href="shop.html">🛒 Shop</a>
+    <a href="settings.html">⚙️</a>
+    <a href="lobby.html" style="background:var(--blue);color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;font-size:0.75rem;">Join Game</a>
   </div>
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <span id="navBadge" style="font-size:0.95rem;flex-shrink:0;"></span>
     <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
       <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
     </button>
   </div>
 </nav>
 
-<!-- MODAL -->
+<!-- MODAL OVERLAY -->
 <div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModalDirect()">✕</button>
@@ -216,8 +256,6 @@
       <div class="modal-stat"><strong id="mRank">—</strong><span>Global rank</span></div>
       <div class="modal-stat"><strong id="mQCount">—</strong><span>Questions</span></div>
     </div>
-
-    <!-- RATING SECTION -->
     <div class="modal-rating">
       <div class="modal-rating-title">Did you like this category?</div>
       <div class="rating-bars">
@@ -237,12 +275,17 @@
         <button class="rating-btn" id="rateDownBtn" onclick="submitRating(-1)">👎 Not really</button>
       </div>
     </div>
-
     <div class="modal-pin-share">
       <button class="btn-sm" id="mPinBtn" onclick="modalTogglePin()">📌 Pin</button>
       <button class="btn-sm" onclick="modalShare()">🔗 Share</button>
     </div>
-    <a class="modal-play-btn" id="mPlayBtn" href="#">▶ Play Now</a>
+    <div class="modal-section-lbl">Choose Mode</div>
+    <div class="modal-modes">
+      <a class="mode-card mc-solo"   id="mSolo"   href="#"><div class="mc-icon">🧍</div><div class="mc-name">Solo</div><div class="mc-desc">Practice at your own pace</div></a>
+      <a class="mode-card mc-speed"  id="mSpeed"  href="#"><div class="mc-icon">⚡</div><div class="mc-name">Speed</div><div class="mc-desc">10s per question</div></a>
+      <a class="mode-card mc-streak" id="mStreak" href="#"><div class="mc-icon">💀</div><div class="mc-name">Streak</div><div class="mc-desc">One wrong = game over</div></a>
+      <a class="mode-card mc-live"   id="mLive"   href="lobby.html"><div class="mc-icon">📡</div><div class="mc-name">Live</div><div class="mc-desc">Multiplayer room</div></a>
+    </div>
   </div>
 </div>
 
@@ -274,17 +317,16 @@
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
 <div class="fab2-wrap">
   <div class="fab2-items" id="fab2menu">
-    <div class="fab2-item"><span class="fab2-label">Terms &amp; Policies</span><a class="fab2-icon" href="../termsandpolicies.html">📋</a></div>
+    <div class="fab2-item"><span class="fab2-label">Settings</span><a class="fab2-icon" href="settings.html">⚙️</a></div>
+    <div class="fab2-item"><span class="fab2-label">Shop</span><a class="fab2-icon" href="shop.html">🛒</a></div>
     <div class="fab2-item"><span class="fab2-label">Account</span><a class="fab2-icon" href="account.html">👤</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtools Home</span><a class="fab2-icon" href="../index.html">🏠</a></div>
-    <div class="fab2-item"><span class="fab2-label">DQtrivia</span><a class="fab2-icon" href="index.html">🎮</a></div>
     <div class="fab2-item"><span class="fab2-label">DQtable</span><a class="fab2-icon" href="../dqtable.html">⚗️</a></div>
     <div class="fab2-item"><span class="fab2-label">Course Planner</span><a class="fab2-icon" href="../courseplanner.html">📅</a></div>
     <div class="fab2-item"><span class="fab2-label">GPA Review</span><a class="fab2-icon" href="../gpareview.html">🎓</a></div>
     <div class="fab2-item"><span class="fab2-label">MathCalc</span><a class="fab2-icon" href="../mathcalc.html">🧮</a></div>
   </div>
-  <button class="fab2-toggle" id="fab2btn"
-    onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
+  <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'\u2715':'\u2630';})()">☰</button>
 </div>
 
 <script>
@@ -315,145 +357,28 @@ var CATS = [
   {id:32, name:'Cartoons & Animation', emoji:'🎞️'},
 ];
 
-// ── STATE ──
-var globalStats = {};  // { catId: { plays, up, down } } — from dqtrivia_categories table
-var playerStats = {};  // personal: catRanks, pinnedCats, catRatings (my votes)
+var globalStats = {};
+var playerStats = {};
 var viewMode    = localStorage.getItem('dqt_catview') || 'grid';
 var qCounts     = {};
 var openCat     = null;
-var sb          = null; // Supabase client from DQAuth
+var sb          = null;
 
-function getRanks()     { return playerStats.catRanks   || {}; }
-function getPinned()    { return playerStats.pinnedCats || []; }
+function getPinned()    { return playerStats.pinnedCats  || []; }
 function getMyRatings() { return playerStats.catRatings  || {}; }
 
-// ── COMPOSITE SCORE (global: plays + ratings + question pool size) ──
-// plays × 10 + upvotes × 15 − downvotes × 10 + questionCount ÷ 100
+// Composite score
 function getScore(cat) {
-  var g  = globalStats[cat.id] || { plays:0, up:0, down:0 };
-  var qc = qCounts[cat.id] || 0;
-  return (g.plays * 10) + (g.up * 15) - (g.down * 10) + (qc / 100);
+  var g = globalStats[cat.id] || {plays:0,up:0,down:0};
+  return (g.plays*10) + (g.up*15) - (g.down*10) + ((qCounts[cat.id]||0)/100);
 }
 
-// ── FETCH GLOBAL STATS ──
-async function fetchGlobalStats() {
-  if (!sb) return;
-  var res = await sb.from('dqtrivia_categories').select('id,plays,rating_up,rating_down');
-  if (res.error || !res.data) return;
-  var hadData = Object.keys(globalStats).length > 0;
-  res.data.forEach(function(row) {
-    globalStats[row.id] = { plays: row.plays || 0, up: row.rating_up || 0, down: row.rating_down || 0 };
-  });
-  if (hadData) {
-    // Already rendered — just patch play counts in place
-    CATS.forEach(function(cat) {
-      var g  = globalStats[cat.id] || { plays:0 };
-      var pl = document.getElementById('pl-' + cat.id);
-      if (pl) pl.textContent = g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'Be first!';
-      var rm = document.getElementById('rm-' + cat.id);
-      if (rm) {
-        var qcText = qCounts[cat.id] ? ' · ' + qCounts[cat.id].toLocaleString() + ' Qs' : '';
-        rm.textContent = (g.plays > 0 ? g.plays.toLocaleString() + ' global plays' : 'No plays yet') + qcText;
-      }
-    });
-    var totalGlobal = Object.values(globalStats).reduce(function(s,g){ return s+(g.plays||0); }, 0);
-    var sub = document.getElementById('pageSubtitle');
-    if (sub) sub.textContent = totalGlobal > 0
-      ? '24 topics · ' + totalGlobal.toLocaleString() + ' global plays · tap to explore'
-      : '24 topics · tap a category to explore';
-  } else {
-    render();
-  }
-}
-
-// ── RECORD A PLAY (called when user clicks Play on a category) ──
-// Exposed globally so play.html can call window.dqtRecordPlay(catId) after finishing a game
-async function recordPlay(catId) {
-  catId = parseInt(catId);
-  // Personal stat
-  if (!playerStats.catRanks) playerStats.catRanks = {};
-  playerStats.catRanks[catId] = (playerStats.catRanks[catId] || 0) + 1;
-  doSyncPersonal({ catRanks: playerStats.catRanks });
-  // Global stat via RPC
-  if (sb) {
-    await sb.rpc('increment_category_plays', { cat_id: catId });
-    if (!globalStats[catId]) globalStats[catId] = { plays:0, up:0, down:0 };
-    globalStats[catId].plays++;
-    render();
-  }
-}
-window.dqtRecordPlay = recordPlay;
-
-// ── SUBMIT RATING (yes/no after playing) ──
-// val = 1 (yes / thumbs up) or -1 (no / thumbs down)
-// Exposed globally so play.html can call window.dqtRateCategory(catId, 1)
-async function submitRating(val) {
-  if (openCat === null && arguments.length > 1) openCat = parseInt(arguments[0]);
-  if (openCat === null) return;
-  var catId    = openCat;
-  var myRatings = getMyRatings();
-  var prev     = myRatings[catId] || 0;
-
-  // Toggle off if same vote
-  var newVal = (prev === val) ? 0 : val;
-
-  if (!sb) return;
-
-  // Remove old vote from global
-  if (prev === 1)  await sb.rpc('decrement_category_rating', { cat_id: catId, col: 'rating_up' });
-  if (prev === -1) await sb.rpc('decrement_category_rating', { cat_id: catId, col: 'rating_down' });
-
-  // Apply new vote
-  if (newVal === 1)  await sb.rpc('increment_category_rating', { cat_id: catId, col: 'rating_up' });
-  if (newVal === -1) await sb.rpc('increment_category_rating', { cat_id: catId, col: 'rating_down' });
-
-  // Update local cache
-  if (!globalStats[catId]) globalStats[catId] = { plays:0, up:0, down:0 };
-  if (prev === 1)     globalStats[catId].up   = Math.max(0, globalStats[catId].up - 1);
-  if (prev === -1)    globalStats[catId].down = Math.max(0, globalStats[catId].down - 1);
-  if (newVal === 1)   globalStats[catId].up++;
-  if (newVal === -1)  globalStats[catId].down++;
-
-  // Save my vote to personal stats
-  playerStats.catRatings = getMyRatings();
-  playerStats.catRatings[catId] = newVal;
-  doSyncPersonal({ catRatings: playerStats.catRatings });
-
-  showToast(newVal === 1 ? '👍 Thanks for the rating!' : newVal === -1 ? '👎 Noted!' : 'Rating removed');
-
-  // Update modal UI
-  refreshModalRatings(catId);
-  render();
-}
-// Also expose a 2-arg version for play.html: dqtRateCategory(catId, val)
-window.dqtRateCategory = function(catId, val) {
-  openCat = parseInt(catId);
-  submitRating(val);
-};
-
-function refreshModalRatings(catId) {
-  var g  = globalStats[catId] || { up:0, down:0 };
-  var my = (playerStats.catRatings || {})[catId] || 0;
-  var total = g.up + g.down;
-  document.getElementById('mUpCount').textContent   = g.up;
-  document.getElementById('mDownCount').textContent = g.down;
-  document.getElementById('barUp').style.width   = total > 0 ? Math.round(g.up   / total * 100) + '%' : '0%';
-  document.getElementById('barDown').style.width = total > 0 ? Math.round(g.down / total * 100) + '%' : '0%';
-  document.getElementById('rateUpBtn').className   = 'rating-btn' + (my === 1  ? ' voted-up'   : '');
-  document.getElementById('rateDownBtn').className = 'rating-btn' + (my === -1 ? ' voted-down' : '');
-}
-
-// ── SORTING ──
 function getSorted() {
   var sort = document.getElementById('sortSelect').value;
   var list = CATS.slice();
-  if (sort === 'alpha') {
-    list.sort(function(a,b){ return a.name.localeCompare(b.name); });
-  } else if (sort === 'newest') {
-    list.sort(function(a,b){ return b.id - a.id; });
-  } else {
-    list.sort(function(a,b){ return getScore(b) - getScore(a); });
-  }
+  if (sort === 'alpha')   list.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  else if (sort === 'newest') list.sort(function(a,b){ return b.id - a.id; });
+  else list.sort(function(a,b){ return getScore(b) - getScore(a); });
   return list;
 }
 
@@ -463,20 +388,22 @@ function getFiltered() {
   return getSorted().filter(function(c){ return c.name.toLowerCase().indexOf(q) !== -1; });
 }
 
-// ── BADGE ──
 function getBadge(cat, rank) {
-  var g = globalStats[cat.id] || { plays:0 };
-  if (rank === 0 && g.plays > 0) return { cls:'badge-top', label:'🔥 #1' };
-  if (rank < 3  && g.plays > 0) return { cls:'badge-hot', label:'📈 Top' };
-  if (g.plays === 0)             return { cls:'badge-new', label:'✨ New' };
+  var hasData = Object.keys(globalStats).length > 0 &&
+    Object.values(globalStats).some(function(v){ return v.plays > 0; });
+  if (!hasData) return null;
+  var g = globalStats[cat.id] || {plays:0};
+  if (rank === 0 && g.plays > 0) return {cls:'badge-top', label:'🔥 #1'};
+  if (rank < 3  && g.plays > 0) return {cls:'badge-hot', label:'📈 Top'};
+  if (g.plays === 0)             return {cls:'badge-new', label:'✨ New'};
   return null;
 }
 
 // ── RENDER ──
 function render() {
-  var filtered  = getFiltered();
-  var pinned    = getPinned();
-  var allSorted = getSorted();
+  var filtered   = getFiltered();
+  var pinned     = getPinned();
+  var allSorted  = getSorted();
   var pinnedList   = filtered.filter(function(c){ return pinned.indexOf(c.id) !== -1; });
   var unpinnedList = filtered.filter(function(c){ return pinned.indexOf(c.id) === -1; });
 
@@ -486,16 +413,44 @@ function render() {
     : '24 topics · tap a category to explore';
 
   var html = '';
+  var isSearching = document.getElementById('searchInput').value.trim().length > 0;
+
+  // All Categories card (only when not searching, unpinned section)
+  var allCard = viewMode === 'grid'
+    ? '<div class="cat-card" onclick="window.location.href=\'play.html?mode=personal&cat=0&catname=All+Categories\'">'
+        + '<div class="cat-emoji">🎯</div>'
+        + '<div class="cat-name">All Categories</div>'
+        + '<div class="cat-plays">Random mix</div>'
+        + '<div class="cat-qcount"></div>'
+        + '<div class="card-actions"><a class="card-action-btn" href="play.html?mode=personal&cat=0&catname=All+Categories">▶ Play</a></div>'
+        + '</div>'
+    : '<div class="cat-row" onclick="window.location.href=\'play.html?mode=personal&cat=0&catname=All+Categories\'">'
+        + '<div class="row-emoji">🎯</div>'
+        + '<div class="row-info"><div class="row-name">All Categories</div><div class="row-meta">Random mix — all topics</div></div>'
+        + '<a class="row-play" href="play.html?mode=personal&cat=0&catname=All+Categories" onclick="event.stopPropagation()">Play →</a>'
+        + '</div>';
+
   if (pinnedList.length > 0) {
     html += '<div class="section-lbl">📌 Pinned</div>' + renderSection(pinnedList, allSorted, pinned);
   }
+
   if (unpinnedList.length > 0) {
     if (pinnedList.length > 0) html += '<div class="section-lbl">All Categories</div>';
-    html += renderSection(unpinnedList, allSorted, pinned);
+    var wrapClass = viewMode === 'list' ? 'cat-list' : 'cat-grid';
+    // Build unpinned with All card prepended (when not searching)
+    var unpinnedHTML = unpinnedList.map(function(c) {
+      return viewMode === 'list' ? rowHTML(c, allSorted, pinned) : cardHTML(c, allSorted, pinned);
+    }).join('');
+    html += '<div class="' + wrapClass + '">'
+      + (isSearching ? '' : allCard)
+      + unpinnedHTML
+      + '</div>';
   }
+
   if (filtered.length === 0) {
     html = '<div class="empty"><div class="big">🔍</div>No categories match that search.</div>';
   }
+
   document.getElementById('catContainer').innerHTML = html;
 }
 
@@ -506,7 +461,7 @@ function renderSection(list, allSorted, pinned) {
 }
 
 function cardHTML(cat, allSorted, pinned) {
-  var g        = globalStats[cat.id] || { plays:0 };
+  var g        = globalStats[cat.id] || {plays:0};
   var rank     = allSorted.indexOf(cat);
   var isPinned = pinned.indexOf(cat.id) !== -1;
   var badge    = getBadge(cat, rank);
@@ -516,17 +471,17 @@ function cardHTML(cat, allSorted, pinned) {
     + (badge    ? '<div class="cat-badge ' + badge.cls + '">' + badge.label + '</div>' : '')
     + (showRank ? '<div class="cat-rank">#' + (rank+1) + '</div>' : '')
     + '<div class="cat-emoji">' + cat.emoji + '</div>'
-    + '<div class="cat-name">'  + cat.name  + '</div>'
+    + '<div class="cat-name">' + cat.name + '</div>'
     + '<div class="cat-plays" id="pl-' + cat.id + '">' + (g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'Be first!') + '</div>'
     + '<div class="cat-qcount" id="qc-' + cat.id + '">' + qcText + '</div>'
     + '<div class="card-actions">'
     +   '<button class="card-action-btn' + (isPinned?' pinned-act':'') + '" onclick="quickPin(' + cat.id + ',event)">' + (isPinned?'📌':'🔖') + '</button>'
-    +   '<a class="card-action-btn" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="recordPlay(' + cat.id + ')">▶ Play</a>'
+    +   '<a class="card-action-btn" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="event.stopPropagation()">▶ Play</a>'
     + '</div></div>';
 }
 
 function rowHTML(cat, allSorted, pinned) {
-  var g        = globalStats[cat.id] || { plays:0 };
+  var g        = globalStats[cat.id] || {plays:0};
   var rank     = allSorted.indexOf(cat);
   var isPinned = pinned.indexOf(cat.id) !== -1;
   var badge    = getBadge(cat, rank);
@@ -536,12 +491,12 @@ function rowHTML(cat, allSorted, pinned) {
     + '<div class="row-emoji">' + cat.emoji + '</div>'
     + '<div class="row-info">'
     +   '<div class="row-name">' + cat.name + '</div>'
-    +   '<div class="row-meta" id="rm-' + cat.id + '">' + (g.plays > 0 ? g.plays.toLocaleString() + ' global plays' : 'No plays yet') + (qcText ? ' · ' + qcText : '') + '</div>'
+    +   '<div class="row-meta" id="rm-' + cat.id + '">' + (g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'No plays yet') + (qcText ? ' · ' + qcText : '') + '</div>'
     + '</div>'
     + (badge    ? '<div class="row-badge ' + badge.cls + '">' + badge.label + '</div>' : '')
     + (showRank ? '<div class="row-rank">#' + (rank+1) + '</div>' : '')
     + '<button class="row-pin" onclick="quickPin(' + cat.id + ',event)">' + (isPinned?'📌':'🔖') + '</button>'
-    + '<a class="row-play" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="event.stopPropagation();recordPlay(' + cat.id + ')">Play →</a>'
+    + '<a class="row-play" href="play.html?mode=personal&cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name) + '" onclick="event.stopPropagation()">Play →</a>'
     + '</div>';
 }
 
@@ -551,13 +506,12 @@ function modalTogglePin() { if (openCat !== null) togglePinById(openCat); }
 
 function togglePinById(id) {
   var pinned = getPinned().slice();
-  var idx    = pinned.indexOf(id);
+  var idx = pinned.indexOf(id);
   var nowPinned = idx === -1;
   if (nowPinned) pinned.push(id); else pinned.splice(idx, 1);
   playerStats.pinnedCats = pinned;
-  doSyncPersonal({ pinnedCats: pinned });
+  doSyncPersonal({pinnedCats: pinned});
   showToast(nowPinned ? '📌 Pinned!' : 'Unpinned');
-  // Update modal pin button if open
   if (openCat === id) {
     var btn = document.getElementById('mPinBtn');
     if (btn) { btn.textContent = nowPinned ? '📌 Pinned' : '📌 Pin'; btn.classList.toggle('pinned', nowPinned); }
@@ -568,17 +522,18 @@ function togglePinById(id) {
 // ── MODAL ──
 function openModal(id) {
   openCat = id;
-  var cat      = CATS.find(function(c){ return c.id === id; });
-  var g        = globalStats[id] || { plays:0, up:0, down:0 };
+  var cat = CATS.find(function(c){ return c.id === id; });
+  if (!cat) return;
+  var g = globalStats[id] || {plays:0, up:0, down:0};
   var allSorted = getSorted();
-  var rank     = allSorted.indexOf(cat);
+  var rank = allSorted.indexOf(cat);
   var isPinned = getPinned().indexOf(id) !== -1;
 
   document.getElementById('mEmoji').textContent = cat.emoji;
   document.getElementById('mTitle').textContent = cat.name;
   document.getElementById('mMeta').textContent  = g.plays > 0
-    ? 'Ranked #' + (rank+1) + ' globally'
-    : 'No one has played this yet — be first!';
+    ? 'Ranked #' + (rank+1) + ' globally · ' + g.plays.toLocaleString() + ' plays'
+    : 'No plays yet — be first!';
   document.getElementById('mGlobalPlays').textContent = g.plays > 0 ? g.plays.toLocaleString() : '0';
   document.getElementById('mRank').textContent  = g.plays > 0 ? '#' + (rank+1) : '—';
   document.getElementById('mQCount').textContent = qCounts[id] ? qCounts[id].toLocaleString() : '…';
@@ -589,8 +544,10 @@ function openModal(id) {
   pinBtn.textContent = isPinned ? '📌 Pinned' : '📌 Pin';
   pinBtn.classList.toggle('pinned', isPinned);
 
-  document.getElementById('mPlayBtn').href =
-    'play.html?mode=personal&cat=' + id + '&catname=' + encodeURIComponent(cat.name);
+  var base = 'play.html?cat=' + id + '&catname=' + encodeURIComponent(cat.name);
+  document.getElementById('mSolo').href   = base + '&mode=personal';
+  document.getElementById('mSpeed').href  = base + '&mode=speed';
+  document.getElementById('mStreak').href = base + '&mode=streak';
 
   document.getElementById('modalOverlay').style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -604,15 +561,115 @@ function closeModalDirect() {
 }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModalDirect(); });
 
+function refreshModalRatings(catId) {
+  var g = globalStats[catId] || {up:0, down:0};
+  var my = (playerStats.catRatings || {})[catId] || 0;
+  var total = g.up + g.down;
+  document.getElementById('mUpCount').textContent   = g.up;
+  document.getElementById('mDownCount').textContent = g.down;
+  document.getElementById('barUp').style.width   = total > 0 ? Math.round(g.up/total*100)+'%' : '0%';
+  document.getElementById('barDown').style.width = total > 0 ? Math.round(g.down/total*100)+'%' : '0%';
+  document.getElementById('rateUpBtn').className   = 'rating-btn' + (my === 1  ? ' voted-up' : '');
+  document.getElementById('rateDownBtn').className = 'rating-btn' + (my === -1 ? ' voted-down' : '');
+}
+
 function modalShare() {
   var cat = CATS.find(function(c){ return c.id === openCat; });
   if (!cat) return;
-  var url = window.location.origin + window.location.pathname.replace('categories.html','') + 'play.html?cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name);
-  if (navigator.share) {
-    navigator.share({ title: 'DQtrivia · ' + cat.name, url: url });
-  } else {
-    navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Link copied!'); });
+  var url = location.origin + location.pathname.replace('categories.html','') + 'play.html?cat=' + cat.id + '&catname=' + encodeURIComponent(cat.name);
+  if (navigator.share) navigator.share({title:'DQtrivia · ' + cat.name, url:url});
+  else navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Link copied!'); });
+}
+
+// ── RATING ──
+async function submitRating(val) {
+  if (openCat === null) return;
+  var catId = openCat;
+  var myRatings = getMyRatings();
+  var prev  = myRatings[catId] || 0;
+  var newVal = (prev === val) ? 0 : val;
+  if (!sb) return;
+  if (prev === 1)    await sb.rpc('decrement_category_rating', {cat_id:catId, col:'rating_up'});
+  if (prev === -1)   await sb.rpc('decrement_category_rating', {cat_id:catId, col:'rating_down'});
+  if (newVal === 1)  await sb.rpc('increment_category_rating', {cat_id:catId, col:'rating_up'});
+  if (newVal === -1) await sb.rpc('increment_category_rating', {cat_id:catId, col:'rating_down'});
+  if (!globalStats[catId]) globalStats[catId] = {plays:0, up:0, down:0};
+  if (prev === 1)     globalStats[catId].up   = Math.max(0, globalStats[catId].up - 1);
+  if (prev === -1)    globalStats[catId].down = Math.max(0, globalStats[catId].down - 1);
+  if (newVal === 1)   globalStats[catId].up++;
+  if (newVal === -1)  globalStats[catId].down++;
+  playerStats.catRatings = getMyRatings();
+  playerStats.catRatings[catId] = newVal;
+  doSyncPersonal({catRatings: playerStats.catRatings});
+  showToast(newVal === 1 ? '👍 Thanks!' : newVal === -1 ? '👎 Noted!' : 'Rating removed');
+  refreshModalRatings(catId);
+}
+window.dqtRateCategory = function(catId, val) { openCat = parseInt(catId); submitRating(val); };
+
+// ── RECORD PLAY ──
+async function recordPlay(catId) {
+  catId = parseInt(catId);
+  if (!playerStats.catRanks) playerStats.catRanks = {};
+  playerStats.catRanks[catId] = (playerStats.catRanks[catId] || 0) + 1;
+  doSyncPersonal({catRanks: playerStats.catRanks});
+  if (sb) {
+    await sb.rpc('increment_category_plays', {cat_id: catId});
+    if (!globalStats[catId]) globalStats[catId] = {plays:0, up:0, down:0};
+    globalStats[catId].plays++;
   }
+}
+window.dqtRecordPlay = recordPlay;
+
+// ── FETCH GLOBAL STATS ──
+async function fetchGlobalStats() {
+  if (!sb) return;
+  var res = await sb.from('dqtrivia_categories').select('id,plays,rating_up,rating_down');
+  if (res.error || !res.data) return;
+  var hadData = Object.keys(globalStats).length > 0;
+  res.data.forEach(function(row) {
+    globalStats[row.id] = {plays: row.plays||0, up: row.rating_up||0, down: row.rating_down||0};
+  });
+  if (hadData) {
+    // Update in-place
+    CATS.forEach(function(cat) {
+      var g = globalStats[cat.id] || {plays:0};
+      var pl = document.getElementById('pl-' + cat.id);
+      if (pl) pl.textContent = g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'Be first!';
+      var rm = document.getElementById('rm-' + cat.id);
+      if (rm) {
+        var qcText = qCounts[cat.id] ? ' · ' + qCounts[cat.id].toLocaleString() + ' Qs' : '';
+        rm.textContent = (g.plays > 0 ? g.plays.toLocaleString() + ' plays' : 'No plays yet') + qcText;
+      }
+    });
+    var total = Object.values(globalStats).reduce(function(s,g){ return s+(g.plays||0); }, 0);
+    var sub = document.getElementById('pageSubtitle');
+    if (sub) sub.textContent = total > 0
+      ? '24 topics · ' + total.toLocaleString() + ' global plays · tap to explore'
+      : '24 topics · tap a category to explore';
+  } else {
+    render();
+  }
+}
+
+// ── FETCH Q COUNTS ──
+function fetchQCounts() {
+  CATS.forEach(function(cat, i) {
+    setTimeout(function() {
+      fetch('https://opentdb.com/api_count.php?category=' + cat.id)
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.category_question_count) {
+            qCounts[cat.id] = d.category_question_count.total_question_count || 0;
+            var el = document.getElementById('qc-' + cat.id);
+            if (el) el.textContent = qCounts[cat.id].toLocaleString() + ' Qs';
+            if (openCat === cat.id) {
+              var mq = document.getElementById('mQCount');
+              if (mq) mq.textContent = qCounts[cat.id].toLocaleString();
+            }
+          }
+        }).catch(function(){});
+    }, i * 300);
+  });
 }
 
 // ── VIEW ──
@@ -624,7 +681,7 @@ function setView(v) {
   render();
 }
 
-// ── PERSONAL SYNC (uses DQAuth.saveData) ──
+// ── SYNC ──
 function doSyncPersonal(partial) {
   if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
   Object.assign(playerStats, partial);
@@ -640,42 +697,6 @@ function showToast(msg) {
   t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-// ── AUTH ──
-window.addEventListener('dq:authready', function(e) {
-  var user = e.detail && e.detail.user;
-  if (!user) { window.location.replace('landing.html'); return; }
-  sb = DQAuth.getSupabase(); // get the authenticated Supabase client
-  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
-    playerStats = saved || {};
-    render();
-    fetchGlobalStats();
-    fetchQCounts();
-  });
-});
-
-// ── QUESTION COUNTS ──
-function fetchQCounts() {
-  CATS.forEach(function(cat, i) {
-    setTimeout(function() {
-      fetch('https://opentdb.com/api_count.php?category=' + cat.id)
-        .then(function(r){ return r.json(); })
-        .then(function(d){
-          if (d && d.category_question_count) {
-            qCounts[cat.id] = d.category_question_count.total_question_count || 0;
-            // Update q-count in-place on cards/rows — no full re-render
-            var el = document.getElementById('qc-' + cat.id);
-            if (el) el.textContent = qCounts[cat.id].toLocaleString() + ' Qs';
-            // Update modal if it's open for this cat
-            if (openCat === cat.id) {
-              var mq = document.getElementById('mQCount');
-              if (mq) mq.textContent = qCounts[cat.id].toLocaleString();
-            }
-          }
-        }).catch(function(){});
-    }, i * 300);
-  });
-}
-
 // ── SOUND ──
 var soundOn = localStorage.getItem('dqt_sound') !== 'off';
 function toggleSound() {
@@ -687,6 +708,32 @@ document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
 
 // ── HAMBURGER ──
 function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+// ── AUTH ──
+window.addEventListener('dq:authready', function(e) {
+  var user = e.detail && e.detail.user;
+  if (!user) { window.location.replace('landing.html'); return; }
+  sb = DQAuth.getSupabase();
+  DQAuth.loadData('dqtrivia_stats').then(function(saved) {
+    playerStats = saved || {};
+    // Sync theme from equipped items
+    var eq = (saved && saved.equippedItems) || {};
+    if (eq.theme) {
+      localStorage.setItem('dqt_theme', eq.theme);
+      document.documentElement.setAttribute('data-theme', eq.theme);
+    }
+    // Badge in nav
+    var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+    var nb = document.getElementById('navBadge');
+    if (nb) nb.textContent = BADGE_EMOJIS[(eq.badge || 'rookie')] || '';
+    render();
+    fetchGlobalStats();
+    fetchQCounts();
+    // Check if index.html asked us to open a specific category
+    var openId = parseInt(sessionStorage.getItem('dqt_open_cat') || '0');
+    if (openId) { sessionStorage.removeItem('dqt_open_cat'); openModal(openId); }
+  });
+});
 
 // ── INIT ──
 render();
