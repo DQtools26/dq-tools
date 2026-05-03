@@ -11,6 +11,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
+  <script>(function(){var t=localStorage.getItem("dqt_theme")||"dark";if(t!=="dark")document.documentElement.setAttribute("data-theme",t);})();</script>
   <script src="../dq-auth.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,17 +26,18 @@
       --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
       --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
     }
+    [data-theme="ocean"]    { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
+    [data-theme="forest"]   { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --border:rgba(77,232,136,0.1); }
+    [data-theme="sunset"]   { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
+    [data-theme="midnight"] { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
+    [data-theme="candy"]    { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
+    [data-theme="neon"]     { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
+    [data-theme="metro"]    { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
+
 
     /* ── LIVE THEME OVERRIDES — applied to body via class ── */
-    body.theme-ocean    { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
-    body.theme-forest   { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --accent:#4de888; --border:rgba(77,232,136,0.1); }
-    body.theme-sunset   { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
-    body.theme-midnight { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
-    body.theme-candy    { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
-    body.theme-neon     { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
-    body.theme-metro    { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
 
-    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; transition:background .4s,color .3s; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
     .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
     .b1 { width:500px;height:500px;background:rgba(245,200,66,0.06);top:-100px;right:-100px; }
     .b2 { width:400px;height:400px;background:rgba(77,232,136,0.05);bottom:0;left:-80px; }
@@ -189,6 +191,8 @@
     <a href="stats.html">Stats</a>
     <a href="history.html">History</a>
     <a href="shop.html" class="active">🛒 Shop</a>
+    <a href="settings.html">⚙️</a>
+    <a href="lobby.html" style="background:var(--blue);color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;font-size:0.75rem;">Join Game</a>
   </div>
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
@@ -295,10 +299,9 @@ function getEquipped() { return playerStats.equippedItems || { theme:'dark', bad
 
 // ── APPLY THEME LIVE TO PAGE ──
 function applyThemeLive(themeId) {
-  document.body.className = document.body.className.replace(/\btheme-\S+/g, '').trim();
-  if (themeId && themeId !== 'dark') {
-    document.body.classList.add('theme-' + themeId);
-  }
+  // Write to localStorage so ALL pages pick it up instantly
+  localStorage.setItem('dqt_theme', themeId || 'dark');
+  document.documentElement.setAttribute('data-theme', themeId || 'dark');
 }
 
 // ── APPLY ALL COSMETICS (theme + badge display) ──
