@@ -348,7 +348,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 /* Hero section — same vibe as landing */
 .home-hero-section {
   position: relative; overflow: hidden;
-  padding: 48px 32px 40px;
+  padding: 28px 32px 32px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
@@ -663,6 +663,9 @@ body.exam-mode #view-exam .exam-opt.selected .exam-opt-letter { background: #1a5
 body.exam-mode #view-exam #exam-foot {
   background: #f8f8f8;
   border-top: 1px solid #ddd;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 body.exam-mode #view-exam #exam-flag-btn { font-family: var(--font); color: #888; }
 body.exam-mode #view-exam #exam-prev-btn,
@@ -735,9 +738,10 @@ body.exam-mode #view-exam-review {
   .exam-dot { width: 20px; height: 20px; font-size: .55rem; }
   .exam-q-text { font-size: .95rem; }
   .exam-opt { font-size: .82rem; padding: 12px 12px; }
-  #exam-foot { padding: 10px 12px; gap: 6px; }
+  #exam-foot { padding: 10px 12px; gap: 6px; position: sticky; bottom: 0; z-index: 10; }
   #exam-prev-btn, #exam-next-btn { min-width: 64px; font-size: .72rem; padding: 8px 10px; }
   #exam-flag-btn { min-width: 52px; font-size: .72rem; padding: 8px 10px; }
+  #exam-exit-mobile { display: inline-flex !important; }
 }
 
 /* ═══ TOOLTIPS ═══ */
@@ -822,20 +826,15 @@ body.exam-mode #view-exam-review {
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
-  /* Full-bleed override: escape sidebar margin, cover full viewport */
-  min-height: 100vh;
-  /* no negative margin needed - sidebar is fixed overlay */
+  /* Escape #app's padding-top entirely — like exam mode */
+  position: fixed; inset: 0; z-index: 500;
   align-items: center; justify-content: center;
-  background: var(--bg); position: relative; overflow: hidden;
-  padding: 80px 20px 40px; /* 80px top = gbar(3) + topnav(52) + breathing room */
+  background: var(--bg); overflow: hidden;
+  padding: 55px 20px 40px; /* 55px = gbar(3) + topnav(52), exact nav clearance */
 }
-/* On mobile #main has margin-left:0 so no bleed needed */
 @media (max-width: 768px) {
   #view-landing {
-    margin-left: 0;
-    width: 100%;
-    min-height: 100dvh;
-    padding: 70px 20px 40px;
+    padding: 55px 20px 40px;
   }
 }
 /* When sidebar is collapsed, landing doesn't need to over-bleed */
@@ -909,7 +908,7 @@ body.exam-mode #view-exam-review {
 #view-home { min-height:calc(100vh - 55px); overflow-y:auto; padding-top:0; }
 
 /* Hero */
-.home-hero-section { position:relative; overflow:hidden; padding:32px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
+.home-hero-section { position:relative; overflow:hidden; padding:20px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
 .home-hero-blobs { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
 .home-hero-blob { position:absolute; border-radius:50%; filter:blur(70px); opacity:.1; }
 .hhb1 { width:360px; height:360px; background:var(--accent); top:-120px; right:-80px; animation:blobFloat 12s ease-in-out infinite; }
@@ -1540,7 +1539,7 @@ textarea.finp { resize:vertical; min-height:50px; }
   }
 
   /* ── HOME ── */
-  .home-hero-section { padding: 24px 16px 20px; }
+  .home-hero-section { padding: 16px 16px 20px; }
   .home-hero-inner { gap: 14px; }
   .home-greeting-text { font-size: 1.6rem; }
   .home-greeting-sub { font-size: .78rem; margin-bottom: 14px; }
@@ -2083,6 +2082,7 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div style="flex:1;text-align:center;font-size:.72rem;color:var(--text3);" id="exam-foot-info">Question 1 of 20</div>
         <button class="btn btn-ghost btn-sm" id="exam-flag-btn" onclick="examFlag()" style="min-width:60px;">🚩 Flag</button>
         <button class="btn btn-primary btn-sm" id="exam-next-btn" onclick="examNav(1)" style="min-width:80px;">Next →</button>
+        <button id="exam-exit-mobile" onclick="exitExam()" style="display:none;align-items:center;justify-content:center;padding:8px 10px;background:none;border:1px solid #ccc;border-radius:6px;font-family:var(--font);font-size:.72rem;color:#888;cursor:pointer;white-space:nowrap;">✕ Exit</button>
       </div>
     </div>
 
