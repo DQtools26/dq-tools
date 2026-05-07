@@ -744,6 +744,42 @@ body.exam-mode #view-exam-review {
   #exam-exit-mobile { display: inline-flex !important; }
 }
 
+/* ═══ AI SETTINGS BUTTONS ═══ */
+.ai-mode-btn {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; cursor: pointer; text-align: center; font-family: var(--font);
+  color: var(--text); transition: all var(--transition);
+}
+.ai-mode-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.ai-mode-btn.active { border-color: var(--accent); background: var(--accent-dim); }
+.ai-prov-btn {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 8px 10px; cursor: pointer; text-align: center; font-family: var(--font);
+  color: var(--text); transition: all var(--transition);
+}
+.ai-prov-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.ai-prov-btn.active { border-color: var(--accent); background: var(--accent-dim); }
+
+/* ═══ AI MODAL ═══ */
+.ai-action-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 11px 14px; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; cursor: pointer; font-family: var(--font); color: var(--text);
+  text-align: left; transition: all var(--transition); margin-bottom: 6px;
+}
+.ai-action-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.ai-action-btn.active { border-color: var(--accent); background: var(--accent-dim); }
+.ai-action-icon { font-size: 1.2rem; flex-shrink: 0; }
+.ai-action-label { font-size: .82rem; font-weight: 800; }
+.ai-action-desc { font-size: .68rem; color: var(--text2); margin-top: 1px; line-height: 1.3; }
+.ai-source-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; position: relative; }
+.ai-source-label { font-size: .65rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+.ai-response-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: .82rem; line-height: 1.7; color: var(--text); min-height: 80px; white-space: pre-wrap; word-break: break-word; }
+.ai-streaming { opacity: .7; }
+.ai-rate-bar { display: flex; gap: 4px; align-items: center; margin-bottom: 12px; }
+.ai-rate-pip { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); transition: background .2s; }
+.ai-rate-pip.used { background: var(--border2); }
+
 /* ═══ TOOLTIPS ═══ */
 .tip { position:relative; display:inline-flex; }
 .tip-icon {
@@ -2344,15 +2380,57 @@ textarea.finp { resize:vertical; min-height:50px; }
       </div>
       <div class="settings-section">
         <div class="settings-section-title">🤖 AI Assistant</div>
-        <div class="settings-toggle-row">
-          <div>
-            <div class="settings-toggle-label">Show AI Buttons</div>
-            <div class="settings-toggle-sub">Show "Ask AI" buttons throughout DQstudy</div>
+        <div style="margin-bottom:12px;">
+          <div class="settings-toggle-label" style="margin-bottom:8px;">AI Mode</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="ai-mode-grid">
+            <button class="ai-mode-btn active" data-mode="live" onclick="setAIMode('live',this)">
+              <div style="font-size:1rem;margin-bottom:3px;">✨</div>
+              <div style="font-size:.75rem;font-weight:800;">Live AI</div>
+              <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">Answers appear instantly</div>
+            </button>
+            <button class="ai-mode-btn" data-mode="copypaste" onclick="setAIMode('copypaste',this)">
+              <div style="font-size:1rem;margin-bottom:3px;">📋</div>
+              <div style="font-size:.75rem;font-weight:800;">Copy-Paste</div>
+              <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">Copy prompt, use any AI</div>
+            </button>
+            <button class="ai-mode-btn" data-mode="off" onclick="setAIMode('off',this)">
+              <div style="font-size:1rem;margin-bottom:3px;">🚫</div>
+              <div style="font-size:.75rem;font-weight:800;">Hide AI</div>
+              <div style="font-size:.62rem;color:var(--text2);margin-top:2px;">Remove all AI buttons</div>
+            </button>
           </div>
-          <button class="toggle on" id="ai-toggle" onclick="toggleAISetting()"></button>
         </div>
-        <div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.72rem;color:var(--amber2);line-height:1.6;">
-          ⚠️ AI buttons open prompts you copy into an AI tool like Claude or ChatGPT in a <strong>new tab</strong>. DQstudy does not have built-in AI — it generates the prompt for you.
+        <div id="ai-live-options" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+          <div class="settings-toggle-label" style="margin-bottom:6px;">AI Provider</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px;" id="ai-provider-grid">
+            <button class="ai-prov-btn active" data-prov="gemini" onclick="setAIProvider('gemini',this)" style="flex:1;">
+              <div style="font-size:.75rem;font-weight:800;">Gemini</div>
+              <div style="font-size:.6rem;color:var(--green2);">Free</div>
+            </button>
+            <button class="ai-prov-btn" data-prov="claude" onclick="setAIProvider('claude',this)" style="flex:1;">
+              <div style="font-size:.75rem;font-weight:800;">Claude</div>
+              <div style="font-size:.6rem;color:var(--text2);">Your key</div>
+            </button>
+            <button class="ai-prov-btn" data-prov="openai" onclick="setAIProvider('openai',this)" style="flex:1;">
+              <div style="font-size:.75rem;font-weight:800;">ChatGPT</div>
+              <div style="font-size:.6rem;color:var(--text2);">Your key</div>
+            </button>
+          </div>
+          <div id="ai-key-row" style="display:none;">
+            <div class="settings-toggle-label" style="margin-bottom:4px;">Your API Key <span style="font-weight:400;color:var(--text3);">(optional — overrides default)</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input class="finp" id="ai-user-key-inp" type="password" placeholder="Paste your key here…" style="flex:1;font-family:var(--mono);font-size:.75rem;" oninput="saveUserAIKey(this.value)">
+              <button class="btn btn-ghost btn-sm" onclick="toggleUserKeyVisibility()" style="flex-shrink:0;min-width:52px;" id="ai-key-vis-btn">Show</button>
+            </div>
+            <div id="ai-key-status" style="font-size:.68rem;margin-top:5px;color:var(--text3);">No key — using shared default.</div>
+          </div>
+          <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div class="settings-toggle-label" style="font-size:.75rem;">Daily usage</div>
+              <div class="settings-toggle-sub" id="ai-usage-display">Loading…</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="resetAIUsageDisplay()">Refresh</button>
+          </div>
         </div>
       </div>
       <div class="settings-section">
@@ -2799,31 +2877,60 @@ textarea.finp { resize:vertical; min-height:50px; }
 <div class="modal-overlay" id="ai-modal">
   <div class="modal" style="max-width:620px;">
     <div class="modal-head">
-      <div class="modal-title">🤖 AI Prompt Generator</div>
+      <div class="modal-title" id="ai-modal-title">✨ Ask AI</div>
       <button class="modal-close" onclick="closeModal('ai-modal')">✕</button>
     </div>
-    <div class="modal-body">
-      <div style="padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.75rem;color:var(--amber2);line-height:1.5;margin-bottom:16px;">
-        ⚠️ This generates a prompt for you to paste into an AI tool like <strong>Claude</strong> or <strong>ChatGPT</strong>. You'll need to open that in a <strong>new tab</strong> — DQstudy doesn't have built-in AI.
+    <div class="modal-body" style="padding-top:10px;">
+      <!-- Rate limit bar -->
+      <div id="ai-rate-row" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div class="ai-rate-bar" id="ai-rate-pips"></div>
+        <div style="font-size:.68rem;color:var(--text3);" id="ai-rate-label"></div>
       </div>
-      <div class="field">
-        <label class="flabel">What do you want to do?</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;" id="ai-action-grid"></div>
+      <!-- Copy-paste mode notice -->
+      <div id="ai-copypaste-notice" style="display:none;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.75rem;color:var(--amber2);line-height:1.5;margin-bottom:12px;">
+        📋 Copy-paste mode — pick an action, copy the prompt, then paste it into any AI tool.
       </div>
-      <div class="field" id="ai-custom-field">
-        <label class="flabel">Or describe something custom</label>
-        <textarea class="finp" id="ai-custom-inp" style="min-height:60px;" placeholder="e.g. Turn these into a study guide, make harder questions, translate to Spanish…"></textarea>
+      <!-- Action buttons -->
+      <div id="ai-actions-list" style="margin-bottom:12px;"></div>
+      <!-- Custom question -->
+      <div class="field" style="margin-bottom:10px;">
+        <label class="flabel">Or ask anything about this set</label>
+        <textarea class="finp" id="ai-custom-q" style="min-height:56px;resize:none;" placeholder="e.g. What's the hardest concept here? Give me a summary. What should I focus on?"></textarea>
       </div>
-      <div class="field">
-        <label class="flabel">Generated Prompt</label>
-        <textarea class="finp" id="ai-prompt-out" style="min-height:140px;font-size:.78rem;font-family:var(--mono);" readonly></textarea>
+      <!-- Sources -->
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="flabel" style="margin:0;">📎 Add Sources <span style="font-weight:400;color:var(--text3);font-size:.68rem;">(paste notes, definitions — makes AI way more specific)</span></label>
+          <button class="btn btn-ghost btn-sm" onclick="aiAddSource()" id="ai-add-src-btn" style="font-size:.7rem;">+ Add</button>
+        </div>
+        <div id="ai-sources-list"></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <button class="btn btn-primary" onclick="copyAIPrompt()">📋 Copy Prompt</button>
-        <button class="btn btn-ghost" onclick="openAIInNewTab()">↗ Open Claude</button>
-        <button class="btn btn-ghost" onclick="openChatGPT()">↗ Open ChatGPT</button>
+      <!-- Response area (live mode) -->
+      <div id="ai-response-wrap" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="flabel" style="margin:0;">AI Response</label>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" id="ai-copy-resp-btn" onclick="aiCopyResponse()" style="font-size:.7rem;">📋 Copy</button>
+            <button class="btn btn-ghost btn-sm" id="ai-add-cards-btn" onclick="aiImportCards()" style="display:none;font-size:.7rem;">➕ Add Cards</button>
+          </div>
+        </div>
+        <div class="ai-response-box" id="ai-response-box"></div>
       </div>
-      <div style="font-size:.68rem;color:var(--text3);margin-top:8px;">After the AI responds, you can paste the result back using 📥 Import DQcode or by editing the set.</div>
+      <!-- Prompt area (copy-paste mode) -->
+      <div id="ai-prompt-wrap" style="display:none;margin-bottom:10px;">
+        <label class="flabel">Generated Prompt — copy this</label>
+        <textarea class="finp" id="ai-prompt-out" style="min-height:120px;font-size:.76rem;font-family:var(--mono);" readonly></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-primary btn-sm" onclick="copyAIPrompt()">📋 Copy Prompt</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://claude.ai','_blank')">↗ Claude</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://chat.openai.com','_blank')">↗ ChatGPT</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://gemini.google.com','_blank')">↗ Gemini</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('ai-modal')">Close</button>
+      <button class="btn btn-primary" id="ai-go-btn" onclick="runAI()">✨ Ask AI</button>
     </div>
   </div>
 </div>
@@ -3120,20 +3227,14 @@ textarea.finp { resize:vertical; min-height:50px; }
       <button class="modal-close" onclick="closeModal('ai-build-modal')">✕</button>
     </div>
     <div class="modal-body" id="ai-build-body">
-      <!-- Step 1: Configure -->
-      <div id="ai-build-step1">
-        <div id="ai-build-greeting"></div>
-        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
-          <div style="font-size:.95rem;font-weight:800;margin-bottom:4px;">👋 Hi! I'm DQstudy's AI assistant.</div>
-          <div style="font-size:.8rem;color:var(--text2);line-height:1.6;">Tell me what you want to study and I'll generate a prompt you can paste into any AI (Claude, ChatGPT, etc.). The AI will respond with cards in a format you paste back here — I'll import them automatically.</div>
-        </div>
+      <div id="ai-build-form">
         <div class="field">
           <label class="flabel">What are you studying? *</label>
-          <input class="finp" id="ai-build-topic" placeholder="e.g. Photosynthesis, Spanish vocab chapter 3, Civil War battles…">
+          <input class="finp" id="ai-build-topic" placeholder="e.g. Photosynthesis, Spanish vocab ch. 3, Civil War battles…">
         </div>
         <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div class="field">
-            <label class="flabel">Grade / Level</label>
+            <label class="flabel">Level</label>
             <select class="finp" id="ai-build-level">
               <option value="middle school">Middle School</option>
               <option value="high school" selected>High School</option>
@@ -3154,37 +3255,46 @@ textarea.finp { resize:vertical; min-height:50px; }
           <label class="flabel">How many cards? <span id="ai-build-count-val" style="color:var(--accent2);font-weight:900;">20</span></label>
           <input type="range" class="launcher-range" id="ai-build-count" min="5" max="50" value="20" oninput="document.getElementById('ai-build-count-val').textContent=this.value">
         </div>
+        <!-- Sources -->
+        <div class="field">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="flabel" style="margin:0;">📎 Paste Your Notes <span style="font-weight:400;color:var(--text3);font-size:.68rem;">(optional — AI uses your actual material)</span></label>
+            <button class="btn btn-ghost btn-sm" onclick="aiBuildAddSource()" style="font-size:.7rem;">+ Add</button>
+          </div>
+          <div id="ai-build-sources"></div>
+        </div>
         <div class="field">
           <label class="flabel">Extra instructions (optional)</label>
-          <input class="finp" id="ai-build-extra" placeholder="e.g. Focus on dates, include examples, keep definitions short…">
+          <input class="finp" id="ai-build-extra" placeholder="e.g. Focus on dates, keep definitions short, include examples…">
         </div>
-        <button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="generateAIBuildPrompt()">✨ Generate Prompt</button>
+        <div id="ai-build-status" style="font-size:.75rem;color:var(--text3);margin-bottom:8px;display:none;"></div>
       </div>
-
-      <!-- Step 2: Copy prompt -->
-      <div id="ai-build-step2" style="display:none;">
-        <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.8rem;color:var(--green2);line-height:1.6;">
-          ✓ Prompt ready! Copy it, paste into Claude or ChatGPT, then paste the AI's response in Step 3.
-        </div>
-        <div class="field">
-          <label class="flabel">Your Prompt — copy this</label>
-          <textarea class="finp" id="ai-build-prompt-out" style="min-height:160px;font-size:.75rem;font-family:var(--mono);" readonly></textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;">
-          <button class="btn btn-primary" id="ai-build-copy-btn" onclick="copyAIBuildPrompt()">📋 Copy Prompt</button>
-          <button class="btn btn-ghost" onclick="window.open('https://claude.ai','_blank');copyAIBuildPrompt()">↗ Open Claude</button>
-          <button class="btn btn-ghost" onclick="window.open('https://chat.openai.com','_blank');copyAIBuildPrompt()">↗ Open ChatGPT</button>
-        </div>
-        <div style="border-top:1px solid var(--border);padding-top:14px;">
-          <div style="font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Step 3 — Paste the AI's response here</div>
-          <textarea class="finp" id="ai-build-paste-in" style="min-height:120px;font-size:.78rem;" placeholder="Paste the AI's response here…"></textarea>
-          <div id="ai-build-paste-status" style="font-size:.72rem;color:var(--text3);margin-top:4px;"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn btn-ghost" onclick="document.getElementById('ai-build-step1').style.display='';document.getElementById('ai-build-step2').style.display='none';">← Back</button>
-          <button class="btn btn-primary" style="flex:1;" onclick="importAIBuildResult()">📥 Import as New Set</button>
-        </div>
+      <!-- Result preview -->
+      <div id="ai-build-result" style="display:none;">
+        <div style="background:var(--green-dim);border:1px solid rgba(45,204,111,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.8rem;color:var(--green2);" id="ai-build-result-msg"></div>
+        <div id="ai-build-preview" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--surface2);font-size:.78rem;line-height:1.8;"></div>
       </div>
+      <!-- Copy-paste fallback -->
+      <div id="ai-build-copypaste" style="display:none;">
+        <div style="padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(232,144,32,.2);border-radius:8px;font-size:.75rem;color:var(--amber2);margin-bottom:10px;">
+          📋 Copy-paste mode — copy this prompt and paste it into any AI tool, then paste the response below.
+        </div>
+        <textarea class="finp" id="ai-build-prompt-out" style="min-height:140px;font-size:.75rem;font-family:var(--mono);" readonly></textarea>
+        <div style="display:flex;gap:8px;margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="copyAIBuildPrompt()">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://claude.ai','_blank')">↗ Claude</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://chat.openai.com','_blank')">↗ ChatGPT</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('https://gemini.google.com','_blank')">↗ Gemini</button>
+        </div>
+        <label class="flabel">Paste AI response here</label>
+        <textarea class="finp" id="ai-build-paste-in" style="min-height:100px;" placeholder="Paste the AI's response here…"></textarea>
+        <div id="ai-build-paste-status" style="font-size:.72rem;color:var(--text3);margin-top:4px;"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="ai-build-back-btn" onclick="aiBuildReset()" style="display:none;">← Back</button>
+      <button class="btn btn-ghost" onclick="closeModal('ai-build-modal')">Cancel</button>
+      <button class="btn btn-primary" id="ai-build-go-btn" onclick="runAIBuild()">✨ Generate Set</button>
     </div>
   </div>
 </div>
@@ -3230,15 +3340,18 @@ let fcPairs = [];
 let soundEnabled = true;
 let volume = 0.5;
 let currentTheme = 'dark';
-let aiEnabled = true; // on by default, first-time prompt handled separately
+let aiEnabled = true;
+let aiMode = 'live';        // 'live' | 'copypaste' | 'off'
+let aiProvider = 'gemini';  // 'gemini' | 'claude' | 'openai'
+let aiUserKey = '';         // optional user-supplied key override
+let aiContext = 'set';
 let sharingEnabled = true;
 let cardFontSize = 'medium'; // 'small' | 'medium' | 'large' | 'xlarge'
 let compactMode = false;
-let homeBlobsEnabled = true; // show/hide all sharing & codes features
-let gamEnabled = true; // show/hide gamification (XP, streak, achievements)
-let dailyEnabled = true; // show/hide daily knowledge mode
+let homeBlobsEnabled = true;
+let gamEnabled = true;
+let dailyEnabled = true;
 let aiSeenPrompt = false;
-let aiContext = 'set';
 let bgAnim = 'none';
 let bgAnimFrame = null;
 let shareAccess = 'private';
@@ -3344,13 +3457,15 @@ function loadSettings() {
     if (s.volume !== undefined) { volume = s.volume; const r = document.getElementById('vol-range'); if (r) r.value = volume; }
     if (s.bgAnim && s.bgAnim !== 'none') {
       bgAnim = s.bgAnim;
-      // start after a short delay so canvas is ready
       setTimeout(() => {
         const el = document.querySelector(`#bg-anim-grid [data-bg="${bgAnim}"]`);
         setBgAnim(bgAnim, el);
       }, 300);
     }
     if (s.aiEnabled !== undefined) aiEnabled = s.aiEnabled;
+    if (s.aiMode) aiMode = s.aiMode;
+    if (s.aiProvider) aiProvider = s.aiProvider;
+    if (s.aiUserKey) aiUserKey = s.aiUserKey;
     if (s.sharingEnabled !== undefined) sharingEnabled = s.sharingEnabled;
     if (s.cardFontSize) cardFontSize = s.cardFontSize;
     if (s.compactMode !== undefined) compactMode = s.compactMode;
@@ -3370,11 +3485,11 @@ function loadSettings() {
   applyCompactMode();
   applyHomeBlobsEnabled();
   applyGamVisibility();
+  applyAIModeUI();
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled, dailyEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, aiMode, aiProvider, aiUserKey, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled, dailyEnabled};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
-  // Also push settings up to cloud if logged in
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
     DQAuth.saveData('dqstudy-settings', s);
   }
@@ -5082,7 +5197,8 @@ function renderSetPage(s, readOnly) {
     <div class="set-header-actions">
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm sharing-btn" onclick="openShareModal()">🔗 Share</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">🤖 AI</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">✨ Ask AI</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-addcards-btn" onclick="openAIModal('addcards')" style="display:none">➕ Add Cards</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
       ${readOnly ? `<button class="btn btn-ghost btn-sm" onclick="copySharedSet()">📋 Copy</button>` : `<button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>`}
       ${readOnly ? `<button class="btn btn-danger btn-sm" onclick="removeSharedSet('${currentSharedCode}')">✕ Remove</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>`}
@@ -10219,392 +10335,611 @@ async function confirmImportCode() {
 
 
 // ─────────────────────────────────────────────────
-// AI PROMPTER
+// SETTINGS HELPERS (UI apply + toggle functions)
 // ─────────────────────────────────────────────────
-
-const AI_ACTIONS = {
-  set: [
-    { id:'more-cards',    icon:'➕', label:'Generate more cards',     desc:'Add similar flashcards to this set' },
-    { id:'harder',        icon:'🔥', label:'Make harder questions',   desc:'Turn cards into harder MC questions' },
-    { id:'simplify',      icon:'✂️', label:'Simplify definitions',    desc:'Make definitions shorter and clearer' },
-    { id:'mc-questions',  icon:'❓', label:'Cards → MC Questions',    desc:'Convert flashcards to multiple choice' },
-    { id:'study-guide',   icon:'📖', label:'Create study guide',      desc:'Turn the set into a written guide' },
-    { id:'mnemonics',     icon:'🧠', label:'Add memory tricks',       desc:'Add mnemonics to help remember each card' },
-    { id:'translate',     icon:'🌍', label:'Translate set',           desc:'Translate terms/definitions to another language' },
-    { id:'practice-test', icon:'📝', label:'Write a practice test',   desc:'Generate a full practice test from this set' },
-  ],
-  results: [
-    { id:'explain-wrong', icon:'💡', label:'Explain what I got wrong', desc:'Get explanations for missed questions' },
-    { id:'study-tips',    icon:'📚', label:'Study tips for this topic', desc:'Get targeted advice based on your score' },
-    { id:'more-practice', icon:'🔁', label:'More practice questions',  desc:'Generate extra questions on weak areas' },
-  ],
-  cards: [
-    { id:'more-cards',    icon:'➕', label:'Generate more cards',     desc:'Add similar flashcards' },
-    { id:'mc-questions',  icon:'❓', label:'Cards → MC Questions',    desc:'Convert to multiple choice format' },
-    { id:'study-guide',   icon:'📖', label:'Create study guide',      desc:'Turn cards into a written guide' },
-    { id:'explain',       icon:'💬', label:'Explain these concepts',  desc:'Get plain-language explanations' },
-  ]
-};
 
 function applyCardFontSize() {
   const sizes = {small:'.78rem', medium:'.88rem', large:'1rem', xlarge:'1.15rem'};
-  const sz = sizes[cardFontSize] || sizes.medium;
-  document.documentElement.style.setProperty('--card-font-size', sz);
+  document.documentElement.style.setProperty('--card-font-size', sizes[cardFontSize] || sizes.medium);
   document.querySelectorAll('.settings-fontsize-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.size === cardFontSize));
 }
-
-function setCardFontSize(size) {
-  cardFontSize = size;
-  applyCardFontSize();
-  saveSettings();
-}
+function setCardFontSize(size) { cardFontSize = size; applyCardFontSize(); saveSettings(); }
 
 function applyCompactMode() {
   document.body.classList.toggle('compact', compactMode);
-  const t = document.getElementById('compact-toggle');
-  if (t) t.classList.toggle('on', compactMode);
+  const t = document.getElementById('compact-toggle'); if (t) t.classList.toggle('on', compactMode);
 }
-
-function toggleCompact() {
-  compactMode = !compactMode;
-  applyCompactMode();
-  saveSettings();
-}
+function toggleCompact() { compactMode = !compactMode; applyCompactMode(); saveSettings(); }
 
 function applyHomeBlobsEnabled() {
-  const t = document.getElementById('home-blobs-toggle');
-  if (t) t.classList.toggle('on', homeBlobsEnabled);
-  // re-render home hero if visible
-  const hv = document.getElementById('view-home');
-  if (hv && hv.classList.contains('active')) renderHome();
+  const t = document.getElementById('home-blobs-toggle'); if (t) t.classList.toggle('on', homeBlobsEnabled);
+  if (document.getElementById('view-home')?.classList.contains('active')) renderHome();
 }
-
-function toggleHomeBlobs() {
-  homeBlobsEnabled = !homeBlobsEnabled;
-  applyHomeBlobsEnabled();
-  saveSettings();
-}
+function toggleHomeBlobs() { homeBlobsEnabled = !homeBlobsEnabled; applyHomeBlobsEnabled(); saveSettings(); }
 
 function applySharingVisibility() {
   const show = sharingEnabled;
-  // Hide/show all sharing-related elements by class
   document.querySelectorAll('.sharing-btn').forEach(el => el.style.display = show ? '' : 'none');
-  // Sidebar DQcodes button
   const sbCodes = document.querySelector('.sb-foot-btn[onclick*="showCodesView"]');
   if (sbCodes) sbCodes.style.display = show ? '' : 'none';
-  // Re-render home if visible so action cards update too
-  const homeView = document.getElementById('view-home');
-  if (homeView && homeView.classList.contains('active')) renderHome();
+  if (document.getElementById('view-home')?.classList.contains('active')) renderHome();
 }
-
 function toggleSharingSetting() {
   sharingEnabled = !sharingEnabled;
   const t = document.getElementById('sharing-toggle'); if (t) t.classList.toggle('on', sharingEnabled);
-  applySharingVisibility();
-  saveSettings();
-  if (document.getElementById('view-home').classList.contains('active')) renderHome();
-}
-
-function toggleAISetting() {
-  aiEnabled = !aiEnabled;
-  const t = document.getElementById('ai-toggle');
-  if (t) t.classList.toggle('on', aiEnabled);
-  updateAIButtonVisibility();
-  // renderHome re-renders the action grid which bakes aiEnabled into template literals
-  // Without this the AI card stays visible/hidden until next full render
-  if (document.getElementById('view-home')?.classList.contains('active')) renderHome();
-  saveSettings();
+  applySharingVisibility(); saveSettings();
 }
 
 function applyDailyVisibility() {
   const navLink = document.getElementById('daily-nav-link');
   if (navLink) navLink.style.display = dailyEnabled ? '' : 'none';
-  // If we're on the daily view and it was just disabled, go home
   const active = document.querySelector('.view.active')?.id;
   if (!dailyEnabled && active === 'view-daily') goHome();
 }
-
 function toggleDailySetting() {
   dailyEnabled = !dailyEnabled;
-  const t = document.getElementById('daily-toggle');
-  if (t) t.classList.toggle('on', dailyEnabled);
-  applyDailyVisibility();
-  renderHome(); // refresh teaser
-  saveSettings();
+  const t = document.getElementById('daily-toggle'); if (t) t.classList.toggle('on', dailyEnabled);
+  applyDailyVisibility(); renderHome(); saveSettings();
 }
 
 function applyGamVisibility() {
   const show = gamEnabled;
   const navBtn = document.getElementById('gam-nav-btn');
   if (navBtn) navBtn.style.display = show ? '' : 'none';
-  // Home widget is rendered dynamically in renderHome, so just re-render if on home
-  const homeActive = document.getElementById('view-home')?.classList.contains('active');
-  if (homeActive) renderHome();
+  if (document.getElementById('view-home')?.classList.contains('active')) renderHome();
 }
-
 function toggleGamSetting() {
   gamEnabled = !gamEnabled;
-  const t = document.getElementById('gam-toggle');
-  if (t) t.classList.toggle('on', gamEnabled);
-  applyGamVisibility();
-  saveSettings();
+  const t = document.getElementById('gam-toggle'); if (t) t.classList.toggle('on', gamEnabled);
+  applyGamVisibility(); saveSettings();
 }
 
-function updateAIButtonVisibility() {
-  document.querySelectorAll('.ai-btn, [id$="-ai-btn"], #ai-set-btn, #sb-ai-btn').forEach(el => {
-    el.style.display = aiEnabled ? '' : 'none';
-  });
-}
-
-function openAIModal(context) {
-  if (!aiEnabled) return;
-  aiContext = context;
-  const actions = AI_ACTIONS[context] || AI_ACTIONS.set;
-
-  document.getElementById('ai-action-grid').innerHTML = actions.map(a => `
-    <div class="theme-option" style="text-align:left;padding:10px 12px;cursor:pointer;" onclick="selectAIAction('${a.id}',this)">
-      <div style="font-size:1.1rem;margin-bottom:4px;">${a.icon}</div>
-      <div style="font-size:.78rem;font-weight:800;">${a.label}</div>
-      <div style="font-size:.62rem;color:var(--text2);margin-top:2px;line-height:1.3;">${a.desc}</div>
-    </div>
-  `).join('');
-
-  document.getElementById('ai-prompt-out').value = '';
-  document.getElementById('ai-custom-inp').value = '';
-  openModal('ai-modal');
-  sndClick();
-}
-
-function selectAIAction(id, el) {
-  document.querySelectorAll('#ai-action-grid .theme-option').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('ai-prompt-out').value = buildAIPrompt(id);
-  sndClick();
-}
-
-function buildAIPrompt(actionId) {
-  const s = getSet(currentSetId);
-  if (!s) return '';
-  const cards = allCards(s);
-  const cardList = cards.slice(0,40).map((c,i) => `${i+1}. TERM: ${c.front} | DEFINITION: ${c.back}`).join('\n');
-  const setInfo = `Set: "${s.name}"${s.class?' | Class: '+s.class:''}${s.unit?' | Unit: '+s.unit:''}`;
-  const base = `I have a study set called "${s.name}" with ${cards.length} flashcards.\n\n${setInfo}\n\nCards:\n${cardList}\n\n`;
-
-  const prompts = {
-    'more-cards': base + `Please generate 10 more flashcard pairs in the same style and topic as this set. Format each one as:\nTERM: [term]\nDEFINITION: [definition]\n\nMake sure they're at the same difficulty level and cover related concepts not already in the set.`,
-
-    'harder': base + `Convert these flashcards into harder multiple choice questions. For each card, create a question with 4 options (1 correct, 3 plausible wrong answers). Format:\nQUESTION: [question]\nA) [option]\nB) [option]\nC) [option]\nD) [option]\nANSWER: [correct letter]`,
-
-    'simplify': base + `Rewrite each definition to be shorter, clearer, and easier to remember — like you're explaining to a student who's never seen this before. Keep the same terms but simplify the definitions. Return in the same TERM | DEFINITION format.`,
-
-    'mc-questions': base + `Convert these flashcards into multiple choice questions I can import back into DQstudy. For each card:\nQUESTION: [term as a question like "What is [term]?"]\nCORRECT: [definition]\nWRONG1: [plausible wrong answer]\nWRONG2: [plausible wrong answer]\nWRONG3: [plausible wrong answer]`,
-
-    'study-guide': base + `Turn these flashcards into a well-organized study guide. Group related concepts together, add brief explanations for context, and include any important connections between terms. Write it as clear readable paragraphs, not just a list.`,
-
-    'mnemonics': base + `For each flashcard, suggest a memory trick, acronym, rhyme, or vivid mental image to help remember the definition. Format:\nTERM: [term]\nMEMORY TRICK: [your suggestion]`,
-
-    'translate': base + `Translate this study set to Spanish (or tell me your target language and I'll redo it). Keep the same terms but translate the definitions. If the terms themselves are subject-specific (like scientific terms), keep those in English but translate the definitions. Return as TERM | DEFINITION.`,
-
-    'practice-test': base + `Write a full practice test using all these terms. Include:\n- 5 multiple choice questions\n- 3 true/false questions\n- 3 fill-in-the-blank questions\n- 2 short answer questions\nProvide an answer key at the end.`,
-
-    'explain-wrong': `I just took a quiz and I'm struggling with some of these concepts from the set "${s?.name||''}". Here are the flashcards:\n\n${cardList}\n\nPlease explain the most commonly confused concepts in plain language, give examples, and suggest how to remember each one better.`,
-
-    'study-tips': `I scored on a quiz covering this study set: "${s?.name||''}". Here are the topics:\n\n${cardList}\n\nPlease give me specific study tips and strategies for mastering this material. What are the best ways to remember these types of concepts?`,
-
-    'more-practice': base + `Generate 10 extra practice questions focused on the most difficult or confusing concepts from this set. Mix question types (multiple choice, fill-in-the-blank, short answer). Include answer key.`,
-
-    'explain': base + `Explain each of these concepts in plain, simple language like you're teaching a student. For each term, give:\n1. A simple explanation\n2. A real-world example\n3. Why it matters or how it connects to other concepts`,
-  };
-
-  return prompts[actionId] || base + `Please help me study this material.`;
-}
-
-// Handle custom prompt
+// export-modal close-on-backdrop
 document.addEventListener('DOMContentLoaded', () => {
-  const customInp = document.getElementById('ai-custom-inp');
-  if (customInp) {
-    customInp.addEventListener('input', () => {
-      if (customInp.value.trim()) {
-        const s = getSet(currentSetId);
-        const cards = allCards(s||{});
-        const cardList = cards.slice(0,40).map((c,i) => `${i+1}. ${c.front} | ${c.back}`).join('\n');
-        document.getElementById('ai-prompt-out').value =
-          `I have a study set "${s?.name||''}" with ${cards.length} cards:\n\n${cardList}\n\n${customInp.value.trim()}`;
-        document.querySelectorAll('#ai-action-grid .theme-option').forEach(e => e.classList.remove('active'));
-      }
-    });
-  }
+  const em = document.getElementById('export-modal');
+  if (em) em.addEventListener('click', function(e){ if(e.target===this) closeModal('export-modal'); });
 });
 
-function copyAIPrompt() {
-  const out = document.getElementById('ai-prompt-out');
-  if (!out.value) return;
-  navigator.clipboard.writeText(out.value).then(() => {
-    const btn = document.querySelector('#ai-modal .btn-primary');
-    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Prompt', 2000); }
-  });
-  sndClick();
-}
-
-function openAIInNewTab() {
-  copyAIPrompt();
-  window.open('https://claude.ai', '_blank');
-}
-
-function openChatGPT() {
-  copyAIPrompt();
-  window.open('https://chat.openai.com', '_blank');
-}
-
-document.getElementById('ai-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-modal'); });
-
-
-
 // ─────────────────────────────────────────────────
-// AI BUILD-A-SET
+// AI ENGINE
 // ─────────────────────────────────────────────────
 
-function openAIBuildModal() {
-  const seen = localStorage.getItem('dqstudy-ai-seen');
-  document.getElementById('ai-build-step1').style.display = '';
-  document.getElementById('ai-build-step2').style.display = 'none';
-  document.getElementById('ai-build-topic').value = '';
-  document.getElementById('ai-build-extra').value = '';
-  document.getElementById('ai-build-paste-in').value = '';
-  document.getElementById('ai-build-paste-status').textContent = '';
+const DQ_PROXY = 'https://dqstudy-ai.ekminecraft10.workers.dev/';
+const AI_DAILY_LIMIT = 10;
+const AI_GUEST_LIMIT = 3;
 
-  // First-time tooltip
-  const greeting = document.getElementById('ai-build-greeting');
-  if (!seen && greeting) {
-    greeting.innerHTML = `<div style="background:linear-gradient(135deg,var(--purple-dim),var(--accent-dim));border:1px solid rgba(155,89,182,.3);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
-      <div style="font-size:1rem;font-weight:900;margin-bottom:6px;">✨ Welcome to AI Set Builder!</div>
-      <div style="font-size:.8rem;color:var(--text2);line-height:1.7;">DQstudy can generate flashcard sets for you using AI tools like Claude or ChatGPT. Here's how it works:<br>
-      <strong style="color:var(--text);">1.</strong> Describe your topic below<br>
-      <strong style="color:var(--text);">2.</strong> Copy the generated prompt<br>
-      <strong style="color:var(--text);">3.</strong> Paste it into Claude or ChatGPT<br>
-      <strong style="color:var(--text);">4.</strong> Copy the AI's response back here — we import it automatically!<br><br>
-      <span style="color:var(--amber2);">⚠️ DQstudy doesn't have built-in AI — you'll need a free Claude or ChatGPT account.</span></div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="localStorage.setItem('dqstudy-ai-seen','1');this.closest('[style*=linear-gradient]').remove();">Got it, don't show again</button>
-    </div>`;
-  } else if (seen && greeting) {
-    greeting.innerHTML = '';
-  }
-  if (!seen) localStorage.setItem('dqstudy-ai-seen', '1');
-
-  openModal('ai-build-modal');
-  sndClick();
+// Rate limiting — stored per day in localStorage
+function aiGetUsageKey() {
+  const d = new Date(); return 'dq-ai-usage-' + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+}
+function aiGetUsage() {
+  return parseInt(localStorage.getItem(aiGetUsageKey()) || '0', 10);
+}
+function aiIncrementUsage() {
+  const k = aiGetUsageKey();
+  localStorage.setItem(k, String(aiGetUsage() + 1));
+}
+function aiGetLimit() {
+  return isLoggedIn ? AI_DAILY_LIMIT : AI_GUEST_LIMIT;
+}
+function aiIsOverLimit() {
+  return aiGetUsage() >= aiGetLimit();
 }
 
-function generateAIBuildPrompt() {
-  const topic = document.getElementById('ai-build-topic').value.trim();
-  if (!topic) { document.getElementById('ai-build-topic').focus(); return; }
-  const level = document.getElementById('ai-build-level').value;
-  const style = document.getElementById('ai-build-style').value;
-  const count = document.getElementById('ai-build-count').value;
-  const extra = document.getElementById('ai-build-extra').value.trim();
-
-  // Use real examples so the AI doesn't copy placeholder text
-  const styleExamples = {
-    flashcards: [
-      'TERM: Photosynthesis',
-      'DEFINITION: The process by which plants convert sunlight, water, and CO2 into glucose and oxygen.',
-    ],
-    questions: [
-      'TERM: What is the powerhouse of the cell?',
-      'DEFINITION: The mitochondria — it produces ATP through cellular respiration.',
-    ],
-    fill: [
-      'TERM: The ___ is the process plants use to make food from sunlight.',
-      'DEFINITION: photosynthesis',
-    ]
-  };
-  const ex = styleExamples[style] || styleExamples.flashcards;
-
-  const lines = [
-    'Generate ' + count + ' study flashcards about: "' + topic + '"',
-    'Student level: ' + level,
-    extra ? 'Additional instructions: ' + extra : null,
-    '',
-    'RULES — follow exactly:',
-    '1. Output ONLY the cards. No intro, no explanation, no summary, nothing else.',
-    '2. Number every card with CARD 1, CARD 2, etc.',
-    '3. Every card must have exactly one TERM: line and one DEFINITION: line.',
-    '4. Do not use brackets like [example] — write the real content directly.',
-    '5. Start immediately with CARD 1. Stop after the last card.',
-    '',
-    'Example of correct format:',
-    '',
-    'CARD 1',
-    ex[0],
-    ex[1],
-    '',
-    'CARD 2',
-    ex[0].replace('1','2'),
-    ex[1],
-    '',
-    'Now generate all ' + count + ' cards about "' + topic + '" in that exact format:',
-  ].filter(l => l !== null);
-
-  document.getElementById('ai-build-prompt-out').value = lines.join('\n');
-  document.getElementById('ai-build-step1').style.display = 'none';
-  document.getElementById('ai-build-step2').style.display = '';
-  sndClick();
+function resetAIUsageDisplay() {
+  const el = document.getElementById('ai-usage-display');
+  if (!el) return;
+  const used = aiGetUsage(), lim = aiGetLimit();
+  el.textContent = used + ' of ' + lim + ' AI requests used today' + (isLoggedIn ? '' : ' (sign in for more)');
 }
 
-function copyAIBuildPrompt() {
-  const val = document.getElementById('ai-build-prompt-out').value;
-  navigator.clipboard.writeText(val).then(() => {
-    const btn = document.getElementById('ai-build-copy-btn');
-    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Prompt', 2000); }
+// Call the proxy
+async function aiCallProxy(prompt, systemPrompt) {
+  const providerKey = aiUserKey || '';
+  const body = { prompt, systemPrompt, maxTokens: 2000 };
+  if (providerKey) body.userKey = providerKey;
+  if (aiProvider !== 'gemini') body.provider = aiProvider;
+  const res = await fetch(DQ_PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
-  sndClick();
+  if (!res.ok) throw new Error('AI request failed (' + res.status + ')');
+  const data = await res.json();
+  return data.text || '';
 }
 
-function importAIBuildResult() {
-  const raw = document.getElementById('ai-build-paste-in').value.trim();
-  const status = document.getElementById('ai-build-paste-status');
-  if (!raw) { status.textContent = 'Paste the AI response first.'; status.style.color = 'var(--red2)'; return; }
+// Parse TERM/DEFINITION cards from AI response
+function aiParseCards(raw) {
   const cards = [];
   const blocks = raw.split(/CARD\s+\d+/i).filter(b => b.trim());
   for (const block of blocks) {
     const t = block.match(/TERM:\s*([\s\S]+?)(?=\nDEFINITION:)/i);
     const d = block.match(/DEFINITION:\s*([\s\S]+?)(?=\nCARD\s+\d+|\s*$)/i);
     if (t && d) {
-      const front = t[1].trim();
-      const back = d[1].trim();
-      // Skip if it's obviously placeholder text
-      if (front && back && !front.startsWith('[') && !back.startsWith('[')) {
-        cards.push({front, back, starred: false, mastery: 'unseen'});
-      }
+      const front = t[1].trim(), back = d[1].trim();
+      if (front && back && !front.startsWith('[')) cards.push({front, back, starred:false, mastery:'unseen'});
     }
   }
-  // Fallback: tab or pipe lines
   if (!cards.length) {
-    raw.split('\n').filter(l => l.trim() && !l.startsWith('[') && !l.startsWith('CARD')).forEach(line => {
+    raw.split('\n').filter(l => l.trim() && !l.startsWith('[') && !l.match(/^CARD\s/i)).forEach(line => {
       const sep = line.includes('\t') ? '\t' : line.includes('|') ? '|' : null;
       if (sep) {
         const p = line.split(sep);
-        if (p.length >= 2 && p[0].trim() && p[1].trim()) {
-          cards.push({front: p[0].trim(), back: p[1].trim(), starred: false, mastery: 'unseen'});
-        }
+        if (p.length >= 2 && p[0].trim() && p[1].trim())
+          cards.push({front: p[0].trim(), back: p[1].trim(), starred:false, mastery:'unseen'});
       }
     });
   }
-  if (!cards.length) {
-    status.textContent = '⚠ Could not read cards. Make sure you copied the full AI response including CARD 1, TERM:, DEFINITION: lines.';
-    status.style.color = 'var(--red2)'; return;
+  return cards;
+}
+
+// Settings UI helpers
+function setAIMode(mode, btn) {
+  aiMode = mode;
+  document.querySelectorAll('.ai-mode-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  aiEnabled = mode !== 'off';
+  applyAIModeUI();
+  updateAIButtonVisibility();
+  if (document.getElementById('view-home')?.classList.contains('active')) renderHome();
+  saveSettings();
+}
+function setAIProvider(prov, btn) {
+  aiProvider = prov;
+  document.querySelectorAll('.ai-prov-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const keyRow = document.getElementById('ai-key-row');
+  if (keyRow) keyRow.style.display = prov === 'gemini' ? 'none' : '';
+  saveSettings();
+}
+function saveUserAIKey(val) {
+  aiUserKey = val.trim();
+  const status = document.getElementById('ai-key-status');
+  if (status) status.textContent = aiUserKey ? '✓ Key saved.' : 'No key — using shared default.';
+  saveSettings();
+}
+function toggleUserKeyVisibility() {
+  const inp = document.getElementById('ai-user-key-inp');
+  const btn = document.getElementById('ai-key-vis-btn');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  if (btn) btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+}
+function applyAIModeUI() {
+  const liveOpts = document.getElementById('ai-live-options');
+  if (liveOpts) liveOpts.style.display = aiMode === 'off' ? 'none' : '';
+  // Sync mode buttons
+  document.querySelectorAll('.ai-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === aiMode));
+  document.querySelectorAll('.ai-prov-btn').forEach(b => b.classList.toggle('active', b.dataset.prov === aiProvider));
+  const keyRow = document.getElementById('ai-key-row');
+  if (keyRow) keyRow.style.display = aiProvider === 'gemini' ? 'none' : '';
+  const keyInp = document.getElementById('ai-user-key-inp');
+  if (keyInp && aiUserKey) keyInp.value = aiUserKey;
+  resetAIUsageDisplay();
+}
+
+// Keep old toggle for backward compat (settings ai-toggle hidden now but safe)
+function toggleAISetting() {
+  aiMode = aiMode === 'off' ? 'live' : 'off';
+  aiEnabled = aiMode !== 'off';
+  applyAIModeUI(); updateAIButtonVisibility(); saveSettings();
+}
+
+function updateAIButtonVisibility() {
+  const show = aiEnabled && aiMode !== 'off';
+  document.querySelectorAll('.ai-btn, #ai-set-btn, #ai-addcards-btn, #sb-ai-btn').forEach(el => {
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+// ── AI PROMPTER MODAL ──────────────────────────────
+
+const AI_ACTIONS = {
+  set: [
+    { id:'more-cards',    icon:'➕', label:'Add more cards',          desc:'Generate similar cards to expand this set' },
+    { id:'improve',       icon:'✨', label:'Improve this set',        desc:'Simplify, clarify, and polish definitions' },
+    { id:'harder',        icon:'🔥', label:'Make harder questions',   desc:'Turn cards into tougher MC questions' },
+    { id:'study-guide',   icon:'📖', label:'Create study guide',      desc:'Turn the set into a readable guide' },
+    { id:'mnemonics',     icon:'🧠', label:'Add memory tricks',       desc:'Memory aids for each card' },
+    { id:'translate',     icon:'🌍', label:'Translate set',           desc:'Translate definitions to another language' },
+  ],
+  addcards: [
+    { id:'more-cards',    icon:'➕', label:'Add similar cards',       desc:'More cards matching the style of this set' },
+    { id:'from-sources',  icon:'📎', label:'From my notes',           desc:'Paste notes below — AI extracts the cards' },
+    { id:'harder',        icon:'🔥', label:'Harder questions',        desc:'More challenging versions of existing cards' },
+  ],
+  results: [
+    { id:'explain-wrong', icon:'💡', label:'Explain what I got wrong', desc:'Plain-language explanation of missed concepts' },
+    { id:'study-tips',    icon:'📚', label:'Study tips',               desc:'Targeted advice based on your score' },
+    { id:'more-practice', icon:'🔁', label:'More practice questions',  desc:'Extra questions on your weak areas' },
+  ],
+};
+
+let aiSources = [];      // [{label, text}] — session-only, not saved
+let aiSelectedAction = null;
+let aiLastResponse = '';
+
+function openAIModal(context) {
+  if (aiMode === 'off') return;
+  aiContext = context;
+  aiSources = [];
+  aiSelectedAction = null;
+  aiLastResponse = '';
+
+  // Reset UI
+  document.getElementById('ai-response-wrap').style.display = 'none';
+  document.getElementById('ai-prompt-wrap').style.display = 'none';
+  document.getElementById('ai-response-box').textContent = '';
+  document.getElementById('ai-custom-q').value = '';
+  document.getElementById('ai-sources-list').innerHTML = '';
+  document.getElementById('ai-add-cards-btn').style.display = 'none';
+
+  // Title
+  const titles = { set:'✨ Ask AI', addcards:'➕ Add More Cards', results:'💡 AI Help' };
+  document.getElementById('ai-modal-title').textContent = titles[context] || '✨ Ask AI';
+
+  // Copy-paste notice
+  document.getElementById('ai-copypaste-notice').style.display = aiMode === 'copypaste' ? '' : 'none';
+  document.getElementById('ai-go-btn').textContent = aiMode === 'copypaste' ? '📋 Build Prompt' : '✨ Ask AI';
+
+  // Rate pips
+  renderAIRatePips();
+
+  // Render actions
+  const actions = AI_ACTIONS[context] || AI_ACTIONS.set;
+  document.getElementById('ai-actions-list').innerHTML = actions.map(a => `
+    <button class="ai-action-btn" data-action="${a.id}" onclick="aiSelectAction('${a.id}',this)">
+      <span class="ai-action-icon">${a.icon}</span>
+      <div><div class="ai-action-label">${a.label}</div><div class="ai-action-desc">${a.desc}</div></div>
+    </button>
+  `).join('');
+
+  openModal('ai-modal');
+  sndClick();
+}
+
+function renderAIRatePips() {
+  const used = aiGetUsage(), lim = aiGetLimit();
+  const pips = document.getElementById('ai-rate-pips');
+  const label = document.getElementById('ai-rate-label');
+  if (!pips) return;
+  pips.innerHTML = Array.from({length: lim}, (_,i) =>
+    `<div class="ai-rate-pip${i < used ? ' used' : ''}"></div>`
+  ).join('');
+  if (label) label.textContent = used + '/' + lim + ' today';
+}
+
+function aiSelectAction(id, btn) {
+  document.querySelectorAll('.ai-action-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  aiSelectedAction = id;
+  // Show sources hint for from-sources action
+  const addSrcBtn = document.getElementById('ai-add-src-btn');
+  if (addSrcBtn) addSrcBtn.style.fontWeight = id === 'from-sources' ? '900' : '';
+  sndClick();
+}
+
+function aiAddSource() {
+  if (aiSources.length >= 3) { DQAuth.toast('Max 3 sources per request'); return; }
+  aiSources.push({ label: 'Source ' + (aiSources.length + 1), text: '' });
+  renderAISources();
+}
+
+function renderAISources() {
+  const el = document.getElementById('ai-sources-list');
+  if (!el) return;
+  el.innerHTML = aiSources.map((s, i) => `
+    <div class="ai-source-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="ai-source-label">${s.label}</div>
+        <button onclick="aiRemoveSource(${i})" style="background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--text3);">✕</button>
+      </div>
+      <textarea class="finp" style="min-height:72px;font-size:.75rem;resize:vertical;" placeholder="Paste your notes, a paragraph from a textbook, a definition…" oninput="aiSources[${i}].text=this.value">${esc(s.text)}</textarea>
+    </div>
+  `).join('');
+}
+
+function aiRemoveSource(i) {
+  aiSources.splice(i, 1);
+  aiSources.forEach((s, j) => s.label = 'Source ' + (j + 1));
+  renderAISources();
+}
+
+async function runAI() {
+  if (aiMode === 'off') return;
+
+  // Check rate limit
+  if (aiMode === 'live' && aiIsOverLimit()) {
+    document.getElementById('ai-response-wrap').style.display = '';
+    document.getElementById('ai-response-box').textContent = '⚠ You\'ve used all ' + aiGetLimit() + ' AI requests for today. Resets at midnight.\n\nTip: add your own API key in Settings for more usage, or switch to Copy-Paste mode.';
+    return;
   }
-  status.textContent = '✓ Found ' + cards.length + ' cards — importing…'; status.style.color = 'var(--green2)';
-  const topic = document.getElementById('ai-build-topic').value.trim() || 'AI Set';
-  const newSet = {id: Date.now(), name: topic, class: '', unit: '', icon: '✨', notes: 'Built with AI', cards, history: [], plays: 0, created: Date.now(), updated: Date.now()};
+
+  const customQ = document.getElementById('ai-custom-q').value.trim();
+  const actionId = aiSelectedAction || (customQ ? 'custom' : null);
+  if (!actionId) { DQAuth.toast('Pick an action or type a question'); return; }
+
+  const prompt = buildAIPrompt(actionId, customQ);
+
+  if (aiMode === 'copypaste') {
+    document.getElementById('ai-prompt-out').value = prompt;
+    document.getElementById('ai-prompt-wrap').style.display = '';
+    document.getElementById('ai-response-wrap').style.display = 'none';
+    return;
+  }
+
+  // Live mode
+  const box = document.getElementById('ai-response-box');
+  const wrap = document.getElementById('ai-response-wrap');
+  wrap.style.display = '';
+  box.textContent = '⏳ Thinking…';
+  box.classList.add('ai-streaming');
+  document.getElementById('ai-go-btn').disabled = true;
+  document.getElementById('ai-add-cards-btn').style.display = 'none';
+
+  try {
+    const resp = await aiCallProxy(prompt, 'You are a helpful study assistant for a student flashcard app called DQstudy. Be concise and student-friendly.');
+    aiLastResponse = resp;
+    box.textContent = resp;
+    box.classList.remove('ai-streaming');
+    aiIncrementUsage();
+    renderAIRatePips();
+    // Show "Add Cards" button if response looks like cards
+    if (resp.includes('TERM:') || resp.includes('CARD ')) {
+      document.getElementById('ai-add-cards-btn').style.display = '';
+    }
+  } catch(err) {
+    box.textContent = '⚠ AI request failed: ' + err.message + '\n\nTry switching to Copy-Paste mode in Settings.';
+    box.classList.remove('ai-streaming');
+  }
+  document.getElementById('ai-go-btn').disabled = false;
+}
+
+function aiCopyResponse() {
+  if (!aiLastResponse) return;
+  navigator.clipboard.writeText(aiLastResponse).then(() => {
+    const btn = document.getElementById('ai-copy-resp-btn');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy', 2000); }
+  });
+}
+
+function aiImportCards() {
+  const cards = aiParseCards(aiLastResponse);
+  if (!cards.length) { DQAuth.toast('No cards found in response'); return; }
+  const s = getSet(currentSetId);
+  if (s) {
+    s.cards.push(...cards);
+    s.updated = Date.now();
+    autoSave(); renderSetPage(s);
+    closeModal('ai-modal');
+    DQAuth.toast('✓ Added ' + cards.length + ' cards to your set!');
+    sndComplete();
+  }
+}
+
+function buildAIPrompt(actionId, customQ) {
+  const s = getSet(currentSetId) || getCurrentSet();
+  const cards = s ? allCards(s) : [];
+  const cardList = cards.slice(0,40).map((c,i) => `${i+1}. TERM: ${c.front} | DEFINITION: ${c.back}`).join('\n');
+  const setInfo = s ? `Set: "${s.name}"${s.class?' | Class: '+s.class:''}${s.unit?' | Unit: '+s.unit:''}` : '';
+  const sourceBlock = aiSources.filter(src => src.text.trim()).map((src,i) =>
+    `--- ${src.label} ---\n${src.text.trim()}`
+  ).join('\n\n');
+  const base = s ? `I have a study set called "${s.name}" with ${cards.length} flashcards.\n${setInfo}\n\nCards:\n${cardList}\n\n` : '';
+  const sourceSuffix = sourceBlock ? `\n\nMy notes / source material:\n${sourceBlock}\n\n` : '';
+
+  const cardFormat = `Return ONLY cards in this format, nothing else:\n\nCARD 1\nTERM: [term]\nDEFINITION: [definition]\n\nCARD 2\n...`;
+
+  const prompts = {
+    'more-cards':    base + sourceSuffix + `Generate 10 more flashcard pairs that fit this set. ${cardFormat}`,
+    'from-sources':  (sourceBlock ? `Extract flashcards from my notes below. ${cardFormat}\n\nNotes:\n${sourceBlock}` : base + `Generate 10 more flashcards. ${cardFormat}`),
+    'improve':       base + `Rewrite each definition to be clearer and easier to remember. Keep the same terms. ${cardFormat}`,
+    'harder':        base + sourceSuffix + `Convert these into harder multiple-choice questions. For each, write:\nQUESTION: [question]\nA) [option]\nB) [option]\nC) [option]\nD) [option]\nANSWER: [letter]`,
+    'study-guide':   base + sourceSuffix + `Turn these flashcards into a well-organized study guide. Use clear paragraphs, not just a list. Group related concepts.`,
+    'mnemonics':     base + `For each flashcard, give a memory trick (acronym, rhyme, or vivid image).\nFormat:\nTERM: [term]\nMEMORY TRICK: [trick]`,
+    'translate':     base + `Translate the definitions to Spanish (or tell me your target language and I'll redo it). ${cardFormat}`,
+    'explain-wrong': base + `I just got some of these wrong on a quiz. Explain the most commonly confused concepts in plain language, with examples.`,
+    'study-tips':    base + `Give me specific study tips for mastering this material. What are the best ways to remember these concepts?`,
+    'more-practice': base + `Generate 10 more practice questions on the hardest concepts in this set. Mix question types. Include an answer key.`,
+    'custom':        base + sourceSuffix + (customQ || 'Help me study this material.'),
+  };
+  return prompts[actionId] || base + sourceSuffix + (customQ || 'Help me study this material.');
+}
+
+// Old compat stubs
+function copyAIPrompt() {
+  const out = document.getElementById('ai-prompt-out');
+  if (!out || !out.value) return;
+  navigator.clipboard.writeText(out.value).then(() => {
+    const btn = document.querySelector('#ai-modal .btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Prompt', 2000); }
+  });
+}
+function openAIInNewTab() { copyAIPrompt(); window.open('https://claude.ai', '_blank'); }
+function openChatGPT() { copyAIPrompt(); window.open('https://chat.openai.com', '_blank'); }
+
+document.getElementById('ai-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-modal'); });
+
+// ── AI BUILD-A-SET ─────────────────────────────────
+
+let aiBuildSources = [];
+
+function openAIBuildModal() {
+  aiBuildSources = [];
+  document.getElementById('ai-build-form').style.display = '';
+  document.getElementById('ai-build-result').style.display = 'none';
+  document.getElementById('ai-build-copypaste').style.display = 'none';
+  document.getElementById('ai-build-back-btn').style.display = 'none';
+  document.getElementById('ai-build-go-btn').textContent = aiMode === 'copypaste' ? '📋 Build Prompt' : '✨ Generate Set';
+  document.getElementById('ai-build-go-btn').disabled = false;
+  document.getElementById('ai-build-topic').value = '';
+  document.getElementById('ai-build-extra').value = '';
+  document.getElementById('ai-build-sources').innerHTML = '';
+  const st = document.getElementById('ai-build-status');
+  if (st) { st.style.display = 'none'; st.textContent = ''; }
+  openModal('ai-build-modal');
+  sndClick();
+}
+
+function aiBuildAddSource() {
+  if (aiBuildSources.length >= 3) { DQAuth.toast('Max 3 sources'); return; }
+  aiBuildSources.push({ text: '' });
+  renderAIBuildSources();
+}
+
+function renderAIBuildSources() {
+  const el = document.getElementById('ai-build-sources');
+  if (!el) return;
+  el.innerHTML = aiBuildSources.map((s, i) => `
+    <div class="ai-source-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="ai-source-label">Notes / Source ${i+1}</div>
+        <button onclick="aiBuildRemoveSource(${i})" style="background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--text3);">✕</button>
+      </div>
+      <textarea class="finp" style="min-height:72px;font-size:.75rem;resize:vertical;" placeholder="Paste your notes, a textbook paragraph, a vocabulary list…" oninput="aiBuildSources[${i}].text=this.value">${esc(s.text)}</textarea>
+    </div>
+  `).join('');
+}
+
+function aiBuildRemoveSource(i) {
+  aiBuildSources.splice(i, 1);
+  renderAIBuildSources();
+}
+
+function aiBuildReset() {
+  document.getElementById('ai-build-form').style.display = '';
+  document.getElementById('ai-build-result').style.display = 'none';
+  document.getElementById('ai-build-copypaste').style.display = 'none';
+  document.getElementById('ai-build-back-btn').style.display = 'none';
+  document.getElementById('ai-build-go-btn').style.display = '';
+  document.getElementById('ai-build-go-btn').disabled = false;
+}
+
+async function runAIBuild() {
+  const topic = document.getElementById('ai-build-topic').value.trim();
+  if (!topic) { document.getElementById('ai-build-topic').focus(); return; }
+
+  if (aiMode === 'live' && aiIsOverLimit()) {
+    DQAuth.toast('Daily AI limit reached — switch to Copy-Paste mode in Settings');
+    return;
+  }
+
+  const level = document.getElementById('ai-build-level').value;
+  const style = document.getElementById('ai-build-style').value;
+  const count = document.getElementById('ai-build-count').value;
+  const extra = document.getElementById('ai-build-extra').value.trim();
+  const sourceBlock = aiBuildSources.filter(s => s.text.trim()).map((s,i) => `--- Notes ${i+1} ---\n${s.text.trim()}`).join('\n\n');
+
+  const ex = style === 'questions'
+    ? ['TERM: What is the powerhouse of the cell?', 'DEFINITION: The mitochondria — it produces ATP through cellular respiration.']
+    : style === 'fill'
+    ? ['TERM: The ___ is the process plants use to make food from sunlight.', 'DEFINITION: photosynthesis']
+    : ['TERM: Photosynthesis', 'DEFINITION: The process by which plants convert sunlight, water, and CO2 into glucose and oxygen.'];
+
+  const prompt = [
+    'Generate ' + count + ' study flashcards about: "' + topic + '"',
+    'Student level: ' + level,
+    extra ? 'Extra instructions: ' + extra : null,
+    sourceBlock ? '\nUse my notes as the primary source:\n' + sourceBlock : null,
+    '',
+    'RULES — follow exactly:',
+    '1. Output ONLY the cards. No intro, no explanation, nothing else.',
+    '2. Number every card with CARD 1, CARD 2, etc.',
+    '3. Every card must have exactly one TERM: line and one DEFINITION: line.',
+    '4. Do not use brackets like [example] — write the real content.',
+    '5. Start immediately with CARD 1.',
+    '',
+    'Example format:',
+    'CARD 1', ex[0], ex[1], '',
+    'Now generate all ' + count + ' cards about "' + topic + '":',
+  ].filter(l => l !== null).join('\n');
+
+  if (aiMode === 'copypaste') {
+    document.getElementById('ai-build-prompt-out').value = prompt;
+    document.getElementById('ai-build-form').style.display = 'none';
+    document.getElementById('ai-build-copypaste').style.display = '';
+    document.getElementById('ai-build-back-btn').style.display = '';
+    document.getElementById('ai-build-go-btn').style.display = 'none';
+    return;
+  }
+
+  // Live mode
+  const goBtn = document.getElementById('ai-build-go-btn');
+  const st = document.getElementById('ai-build-status');
+  goBtn.disabled = true;
+  goBtn.textContent = '⏳ Generating…';
+  st.textContent = 'Asking AI for ' + count + ' cards about "' + topic + '"…';
+  st.style.display = '';
+  st.style.color = 'var(--text2)';
+
+  try {
+    const resp = await aiCallProxy(prompt, 'You are a flashcard generator. Output only cards in the requested format, nothing else.');
+    const cards = aiParseCards(resp);
+    aiIncrementUsage();
+
+    if (!cards.length) {
+      st.textContent = '⚠ Couldn\'t parse cards from AI response. Try again or use Copy-Paste mode.';
+      st.style.color = 'var(--red2)';
+      goBtn.disabled = false; goBtn.textContent = '✨ Generate Set';
+      return;
+    }
+
+    // Show preview
+    document.getElementById('ai-build-form').style.display = 'none';
+    document.getElementById('ai-build-result').style.display = '';
+    document.getElementById('ai-build-result-msg').textContent = '✓ Generated ' + cards.length + ' cards about "' + topic + '"';
+    document.getElementById('ai-build-preview').innerHTML = cards.slice(0,8).map(c =>
+      `<div style="padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">${esc(c.front)}</strong> <span style="color:var(--text2);">→ ${esc(c.back)}</span></div>`
+    ).join('') + (cards.length > 8 ? `<div style="padding:4px 0;color:var(--text3);font-size:.72rem;">…and ${cards.length - 8} more</div>` : '');
+    document.getElementById('ai-build-back-btn').style.display = '';
+    goBtn.textContent = '📥 Save as New Set';
+    goBtn.disabled = false;
+    goBtn.onclick = () => aiBuildSave(topic, cards);
+
+  } catch(err) {
+    st.textContent = '⚠ AI error: ' + err.message;
+    st.style.color = 'var(--red2)';
+    goBtn.disabled = false; goBtn.textContent = '✨ Generate Set';
+  }
+}
+
+function aiBuildSave(topic, cards) {
+  const newSet = {
+    id: Date.now(), name: topic, class: '', unit: '', icon: '✨',
+    notes: 'Built with AI', cards, history: [], plays: 0,
+    created: Date.now(), updated: Date.now()
+  };
   sets.push(newSet);
   autoSave(); renderSidebar();
-  setTimeout(() => { closeModal('ai-build-modal'); openSet(newSet.id); sndComplete(); }, 600);
+  closeModal('ai-build-modal');
+  openSet(newSet.id);
+  sndComplete();
+  DQAuth.toast('✓ Set created with ' + cards.length + ' cards!');
+}
+
+function copyAIBuildPrompt() {
+  const val = document.getElementById('ai-build-prompt-out').value;
+  navigator.clipboard.writeText(val).then(() => {
+    DQAuth.toast('Prompt copied!');
+  });
+}
+
+function importAIBuildResult() {
+  const raw = document.getElementById('ai-build-paste-in').value.trim();
+  const status = document.getElementById('ai-build-paste-status');
+  if (!raw) { status.textContent = 'Paste the AI response first.'; status.style.color = 'var(--red2)'; return; }
+  const cards = aiParseCards(raw);
+  if (!cards.length) {
+    status.textContent = '⚠ Could not read cards — make sure you copied the full AI response.';
+    status.style.color = 'var(--red2)'; return;
+  }
+  const topic = document.getElementById('ai-build-topic').value.trim() || 'AI Set';
+  aiBuildSave(topic, cards);
 }
 
 document.getElementById('ai-build-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-build-modal'); });
-document.getElementById('export-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('export-modal'); });
 
 
 // ═══════════════════════════════════════════════════════════════
