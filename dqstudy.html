@@ -862,18 +862,23 @@ body.exam-mode #view-exam-review {
 
 /* ═══════════════ LANDING (pre-login) ═══════════════ */
 #view-landing {
-  /* Escape #app's padding-top entirely — like exam mode */
   position: fixed; inset: 0; z-index: 500;
-  align-items: center; justify-content: center;
-  background: var(--bg); overflow: hidden;
-  padding: 55px 20px 40px; /* 55px = gbar(3) + topnav(52), exact nav clearance */
+  align-items: center; justify-content: flex-start;
+  background: var(--bg); overflow-y: auto; overflow-x: hidden;
+  padding: 55px 20px 40px;
+}
+#view-landing .landing-content {
+  margin-top: max(5vh, 20px);
 }
 @media (max-width: 768px) {
   #view-landing {
-    padding: 55px 20px 40px;
+    padding: 55px 16px 80px;
+    justify-content: flex-start;
+  }
+  #view-landing .landing-content {
+    margin-top: max(4vh, 16px);
   }
 }
-/* When sidebar is collapsed, landing doesn't need to over-bleed */
 
 .landing-bg {
   position:absolute; inset:0; pointer-events:none; overflow:hidden;
@@ -941,7 +946,7 @@ body.exam-mode #view-exam-review {
 .landing-feat-sub { font-size:.72rem; color:var(--text2); line-height:1.5; }
 
 /* ═══════════════ HOME (logged in) ═══════════════ */
-#view-home { min-height:calc(100vh - 55px); overflow-y:auto; padding-top:0; }
+#view-home { min-height:calc(100vh - 55px); overflow-y:auto; padding-top:0; margin-top:0; }
 
 /* Hero */
 .home-hero-section { position:relative; overflow:hidden; padding:20px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
@@ -1701,16 +1706,17 @@ textarea.finp { resize:vertical; min-height:50px; }
   }
   .modal {
     border-radius: 22px 22px 0 0;
-    max-height: 88vh;
+    max-height: 90dvh;
     width: 100%;
     max-width: 100%;
+    overflow-y: auto;
     animation: modalSlideUp .28s cubic-bezier(.25,.46,.45,.94);
   }
   @keyframes modalSlideUp {
     from { transform: translateY(100%); opacity: .6; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  .modal-head { padding: 16px 18px 12px; }
+  .modal-head { padding: 16px 18px 12px; position: sticky; top: 0; z-index: 2; background: var(--bg2); }
   /* drag handle */
   .modal-head::before {
     content: '';
@@ -1720,10 +1726,10 @@ textarea.finp { resize:vertical; min-height:50px; }
     border-radius: 2px;
     margin: 0 auto 12px;
   }
-  .modal-body { padding: 16px 18px; }
-  .modal-foot { padding: 12px 18px; }
+  .modal-body { padding: 14px 16px; }
+  .modal-foot { padding: 12px 16px; position: sticky; bottom: 0; background: var(--bg2); border-top: 1px solid var(--border); z-index: 2; }
   /* Study opts modal */
-  #study-opts-modal .modal { max-height: 85vh; }
+  #study-opts-modal .modal { max-height: 85dvh; }
 
   /* ── MISC ── */
   .dq-watermark { display: none; }
@@ -1742,6 +1748,47 @@ textarea.finp { resize:vertical; min-height:50px; }
   #elim-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); padding: 12px; gap: 8px; }
   /* Smart review */
   #view-smart .study-nav { background: rgba(155,89,182,.06); }
+
+  /* ── STUDY VIEW SCROLL FIX ── */
+  /* All study views: flex column, fill viewport, scroll internally */
+  #view-flashcard, #view-quiz, #view-learn, #view-matching,
+  #view-blitz, #view-streak, #view-speed, #view-gravity,
+  #view-fillin, #view-spelling, #view-smart, #view-elimination,
+  #view-results {
+    display: flex !important;
+    flex-direction: column;
+    height: calc(100dvh - 55px);
+    overflow: hidden;
+    padding-bottom: 0 !important;
+  }
+  /* Study nav: fixed height, never wraps */
+  .study-nav {
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+  /* Study body scrolls */
+  .fc-body, .quiz-body, .learn-body, .results-body,
+  .match-body, .blitz-body, .streak-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* FC card: bigger on mobile */
+  .fc-card { min-height: 240px; }
+  /* Quiz answer options: easier to tap */
+  .quiz-opt { min-height: 52px; }
+  /* Results: scroll properly */
+  #view-results { padding-bottom: 80px !important; }
+
+  /* ── GAP FIXES ── */
+  /* Make sure no view has extra top gap beyond what #app already provides */
+  .view.active {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  /* Home hero: no extra top spacing on mobile */
+  .home-hero-section { margin-top: 0; padding-top: 14px; }
 }
 
 /* ── Landing mobile fixes ── */
@@ -3341,12 +3388,19 @@ let soundEnabled = true;
 let volume = 0.5;
 let currentTheme = 'dark';
 let aiEnabled = true;
-let aiMode = 'live';        // 'live' | 'copypaste' | 'off'
-let aiProvider = 'gemini';  // 'gemini' | 'claude' | 'openai'
-let aiUserKey = '';         // optional user-supplied key override
+let aiMode = 'live';
+let aiProvider = 'gemini';
+let aiUserKey = '';
 let aiContext = 'set';
+let aiSources = [];
+let aiBuildSources = [];
+let aiSelectedAction = null;
+let aiLastResponse = '';
+const DQ_PROXY = 'https://dqstudy-ai.ekminecraft10.workers.dev/';
+const AI_DAILY_LIMIT = 10;
+const AI_GUEST_LIMIT = 3;
 let sharingEnabled = true;
-let cardFontSize = 'medium'; // 'small' | 'medium' | 'large' | 'xlarge'
+let cardFontSize = 'medium';
 let compactMode = false;
 let homeBlobsEnabled = true;
 let gamEnabled = true;
@@ -10405,10 +10459,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // AI ENGINE
 // ─────────────────────────────────────────────────
 
-const DQ_PROXY = 'https://dqstudy-ai.ekminecraft10.workers.dev/';
-const AI_DAILY_LIMIT = 10;
-const AI_GUEST_LIMIT = 3;
-
 // Rate limiting — stored per day in localStorage
 function aiGetUsageKey() {
   const d = new Date(); return 'dq-ai-usage-' + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
@@ -10536,7 +10586,7 @@ function updateAIButtonVisibility() {
 
 // ── AI PROMPTER MODAL ──────────────────────────────
 
-const AI_ACTIONS = {
+var AI_ACTIONS = {
   set: [
     { id:'more-cards',    icon:'➕', label:'Add more cards',          desc:'Generate similar cards to expand this set' },
     { id:'improve',       icon:'✨', label:'Improve this set',        desc:'Simplify, clarify, and polish definitions' },
@@ -10557,9 +10607,7 @@ const AI_ACTIONS = {
   ],
 };
 
-let aiSources = [];      // [{label, text}] — session-only, not saved
-let aiSelectedAction = null;
-let aiLastResponse = '';
+// ── AI PROMPTER MODAL ──────────────────────────────
 
 function openAIModal(context) {
   if (aiMode === 'off') return;
@@ -10764,7 +10812,6 @@ document.getElementById('ai-modal').addEventListener('click', function(e){ if(e.
 
 // ── AI BUILD-A-SET ─────────────────────────────────
 
-let aiBuildSources = [];
 
 function openAIBuildModal() {
   aiBuildSources = [];
