@@ -10495,9 +10495,12 @@ async function aiCallProxy(prompt, systemPrompt) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error('AI request failed (' + res.status + ')');
   const data = await res.json();
-  return data.text || '';
+  // Surface any error detail from the worker
+  if (data.error) throw new Error(data.error + (data.detail ? ' — ' + JSON.stringify(data.detail) : ''));
+  if (!res.ok) throw new Error('AI request failed (' + res.status + ')');
+  if (!data.text) throw new Error('AI returned an empty response. Check your API key in Settings.');
+  return data.text;
 }
 
 // Parse TERM/DEFINITION cards from AI response
@@ -10734,14 +10737,15 @@ async function runAI() {
     box.classList.remove('ai-streaming');
     aiIncrementUsage();
     renderAIRatePips();
-    // Show "Add Cards" button if response looks like cards
     if (resp.includes('TERM:') || resp.includes('CARD ')) {
       document.getElementById('ai-add-cards-btn').style.display = '';
     }
   } catch(err) {
-    box.textContent = '⚠ AI request failed: ' + err.message + '\n\nTry switching to Copy-Paste mode in Settings.';
+    box.textContent = '⚠ ' + err.message;
     box.classList.remove('ai-streaming');
+    box.style.color = 'var(--red2)';
   }
+  setTimeout(() => { if (box) box.style.color = ''; }, 100);
   document.getElementById('ai-go-btn').disabled = false;
 }
 
