@@ -495,7 +495,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 #main { transition: margin-left .25s ease; }
 
 /* ═══════════════ MAIN ═══════════════ */
-#main { margin-left:0; flex:1; min-height:calc(100vh - 55px); position:relative; }
+#main { margin-left:0; flex:1; position:relative; }
 
 /* ═══════════════ VIEWS (all hidden by default) ═══════════════ */
 .view { display:none; }
@@ -945,19 +945,19 @@ body.exam-mode #view-exam-review {
 /* Gam widget bounce on first render */
 .gam-home-widget { animation: floatUp .4s .3s ease both; }
 .landing-content { position:relative; z-index:1; text-align:center; max-width:600px; }
-.landing-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(58,127,255,.3); border-radius:100px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:20px; animation:fadeIn .5s ease; }
-.landing-title { font-size:clamp(2.5rem,6vw,4rem); font-weight:900; letter-spacing:-.05em; line-height:.95; margin-bottom:14px; animation:fadeInUp .5s .1s both; }
+.landing-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(58,127,255,.3); border-radius:100px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:20px; }
+.landing-title { font-size:clamp(2.5rem,6vw,4rem); font-weight:900; letter-spacing:-.05em; line-height:.95; margin-bottom:14px; }
 .landing-title .hl { background:linear-gradient(135deg,var(--accent2),var(--green2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.landing-sub { font-size:1.05rem; color:var(--text2); line-height:1.7; margin-bottom:30px; animation:fadeInUp .5s .2s both; }
-.landing-cta { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; animation:fadeInUp .5s .3s both; }
-.landing-features { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:40px; animation:fadeInUp .5s .4s both; }
+.landing-sub { font-size:1.05rem; color:var(--text2); line-height:1.7; margin-bottom:30px; }
+.landing-cta { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.landing-features { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:40px; }
 .landing-feat { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:left; }
 .landing-feat-icon { font-size:1.5rem; margin-bottom:8px; }
 .landing-feat-title { font-size:.85rem; font-weight:800; margin-bottom:3px; }
 .landing-feat-sub { font-size:.72rem; color:var(--text2); line-height:1.5; }
 
 /* ═══════════════ HOME (logged in) ═══════════════ */
-#view-home { min-height:calc(100vh - 55px); overflow-y:auto; padding-top:0; margin-top:0; }
+#view-home { padding-top:0; margin-top:0; }
 
 /* Hero */
 .home-hero-section { position:relative; overflow:hidden; padding:20px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
@@ -1189,8 +1189,6 @@ body.compact #view-set { padding:14px; }
 .streak-btn.wrong { border-color:var(--red); background:var(--red-dim); color:var(--red2); animation:shake .3s ease; }
 
 /* ═══════════════ STUDY VIEWS ═══════════════ */
-#view-flashcard, #view-quiz, #view-results, #view-learn, #view-matching { min-height:calc(100vh - 55px); }
-
 /* Study topbar */
 .study-nav { display:flex; align-items:center; gap:12px; padding:14px 24px; border-bottom:1px solid var(--border); background:var(--bg2); position:sticky; top:0; z-index:10; }
 .study-back { background:none; border:1px solid var(--border); border-radius:8px; padding:6px 12px; color:var(--text2); font-family:inherit; font-size:.75rem; font-weight:700; cursor:pointer; transition:all var(--transition); }
@@ -1338,7 +1336,7 @@ body.compact #view-set { padding:14px; }
 .learn-hint-box.show { display:block; }
 
 /* ── RESULTS ── */
-#view-results { flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 55px); padding:40px 20px; text-align:center; position:relative; overflow:hidden; }
+#view-results { flex-direction:column; align-items:center; justify-content:flex-start; padding:40px 20px; text-align:center; position:relative; min-height:calc(100dvh - 55px); }
 .results-emoji { font-size:4rem; margin-bottom:10px; animation:popIn .4s ease; }
 .results-pct { font-size:5.5rem; font-weight:900; letter-spacing:-.06em; line-height:1; margin-bottom:6px; animation:popIn .4s .1s both; }
 .results-pct.great { background:linear-gradient(135deg,var(--green2),var(--teal2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
@@ -1357,6 +1355,9 @@ body.compact #view-set { padding:14px; }
 #confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
 
 /* ═══════════════ TRACKING ═══════════════ */
+#view-allsets { padding:28px; }
+#view-folders { padding:28px; }
+#view-codes   { padding:28px 28px 60px; }
 #view-tracking { padding:24px; }
 .track-section-head { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; margin-top:20px; }
 .track-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:4px; }
@@ -1376,7 +1377,7 @@ body.compact #view-set { padding:14px; }
 .track-pct { font-size:.75rem; font-weight:900; min-width:38px; text-align:right; }
 
 /* ═══════════════ SETTINGS ═══════════════ */
-#view-settings { padding:0; max-width:none; margin:0; overflow-y:auto; height:calc(100vh - 55px); }
+#view-settings { padding:0; max-width:none; margin:0; overflow-y:auto; height:calc(100dvh - 55px); }
 .settings-inner { padding:24px; max-width:680px; margin:0 auto; padding-bottom:60px; }
 .settings-title { font-size:1.3rem; font-weight:900; margin-bottom:18px; }
 .settings-section { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:12px; }
@@ -1630,13 +1631,13 @@ textarea.finp { resize:vertical; min-height:50px; }
   #view-set { padding: 14px 14px 80px; }
   .set-header { flex-wrap: wrap; gap: 12px; }
   .set-big-icon { width: 56px; height: 56px; font-size: 1.7rem; border-radius: 14px; }
-  .set-title { font-size: 1.4rem; }
-  .set-header-actions { gap: 6px; flex-wrap: wrap; }
-  .set-header-actions .btn { font-size: .68rem; padding: 7px 10px; }
-  /* Mode picker: horizontal scroll on mobile */
-  .mode-group-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; gap: 6px; }
+  .set-title { font-size: 1.2rem; }
+  .set-header-actions { gap: 5px; flex-wrap: wrap; width: 100%; }
+  .set-header-actions .btn { font-size: .68rem; padding: 6px 9px; flex-shrink: 0; }
+  /* Mode picker: horizontal scroll rows on mobile */
+  .mode-group-row { flex-wrap: nowrap; overflow-x: scroll; overflow-y: visible; padding-bottom: 6px; gap: 6px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
   .mode-group-row::-webkit-scrollbar { height: 0; }
-  .mode-btn { min-width: 110px; max-width: 110px; flex-shrink: 0; padding: 8px 10px; }
+  .mode-btn { min-width: 108px; max-width: 108px; flex-shrink: 0; padding: 8px 10px; scroll-snap-align: start; }
   .mode-btn-name { font-size: .72rem; }
   .mode-btn-desc { display: none; } /* hide desc on mobile — too small */
   /* Start bar */
@@ -1762,10 +1763,10 @@ textarea.finp { resize:vertical; min-height:50px; }
 
   /* ── STUDY VIEW SCROLL FIX ── */
   /* All study views: flex column, fill viewport, scroll internally */
-  #view-flashcard, #view-quiz, #view-learn, #view-matching,
-  #view-blitz, #view-streak, #view-speed, #view-gravity,
-  #view-fillin, #view-spelling, #view-smart, #view-elimination,
-  #view-results {
+  #view-flashcard.active, #view-quiz.active, #view-learn.active, #view-matching.active,
+  #view-blitz.active, #view-streak.active, #view-speed.active, #view-gravity.active,
+  #view-fillin.active, #view-spelling.active, #view-smart.active, #view-elimination.active,
+  #view-results.active {
     display: flex !important;
     flex-direction: column;
     height: calc(100dvh - 55px);
@@ -1789,12 +1790,14 @@ textarea.finp { resize:vertical; min-height:50px; }
   .fc-card { min-height: 240px; }
   /* Quiz answer options: easier to tap */
   .quiz-opt { min-height: 52px; }
-  /* Results: scroll properly */
-  #view-results { padding-bottom: 80px !important; }
+  /* Results: scrollable on mobile */
+  #view-results.active { overflow-y: auto !important; overflow-x: hidden; height: calc(100dvh - 55px) !important; padding-bottom: 80px !important; }
 
   /* ── GAP FIXES ── */
-  /* Make sure no view has extra top gap beyond what #app already provides */
-  .view.active {
+  /* Study views handle their own layout — no extra top gap */
+  #view-flashcard.active, #view-quiz.active, #view-learn.active, #view-matching.active,
+  #view-blitz.active, #view-streak.active, #view-speed.active, #view-gravity.active,
+  #view-fillin.active, #view-spelling.active, #view-smart.active, #view-elimination.active {
     margin-top: 0;
     padding-top: 0;
   }
@@ -2051,7 +2054,8 @@ textarea.finp { resize:vertical; min-height:50px; }
         <div class="landing-title">Study Smarter.<br><span class="hl">Remember More.</span></div>
         <p class="landing-sub">Flashcards, quizzes, speed rounds, and AI-powered set building — all synced to your DQ Account so your progress follows you everywhere.</p>
         <div class="landing-cta" id="landing-cta">
-          <!-- filled by updateLandingCTA() -->
+          <button class="btn btn-primary btn-lg" onclick="if(typeof DQAuth!=='undefined')DQAuth.openModal()">🚀 Create a Free Account</button>
+          <button class="btn btn-ghost btn-lg" onclick="continueWithout()">Continue Without Signing In</button>
         </div>
         <div class="landing-features">
           <div class="landing-feat"><div class="landing-feat-icon">📇</div><div class="landing-feat-title">Flashcards</div><div class="landing-feat-sub">Flip, track mastery, and star cards for later review.</div></div>
@@ -2070,7 +2074,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ SET PAGE ═══ -->
-    <div class="view" id="view-set" style="padding:24px;">
+    <div class="view" id="view-set">
       <div class="set-header" id="set-header"></div>
       <div id="sr-due-badge"></div>
       <!-- First-time hint banner -->
@@ -2237,7 +2241,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ RESULTS VIEW ═══ -->
-    <div class="view" id="view-results" style="flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 55px);padding:40px 20px;text-align:center;">
+    <div class="view" id="view-results">
       <div class="results-emoji" id="results-emoji">🎉</div>
       <div class="results-pct great" id="results-pct">—</div>
       <div class="results-msg" id="results-msg">—</div>
@@ -2290,7 +2294,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ DQCODES VIEW ═══ -->
-    <div class="view" id="view-codes" style="padding:28px 28px 60px;">
+    <div class="view" id="view-codes">
 
       <!-- Header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap;">
@@ -2325,7 +2329,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ TRACKING VIEW ═══ -->
-    <div class="view" id="view-tracking" style="padding:28px;overflow-y:auto;height:calc(100vh - 55px);">
+    <div class="view" id="view-tracking">
       <div style="font-size:1.5rem;font-weight:900;margin-bottom:6px;">📊 Progress Tracker</div>
       <div style="color:var(--text2);font-size:.85rem;margin-bottom:20px;">Track your mastery across all study sets.</div>
       <div class="track-stats-grid" id="track-stats-grid"></div>
@@ -2338,7 +2342,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ ALL SETS VIEW ═══ -->
-    <div class="view" id="view-allsets" style="padding:28px;">
+    <div class="view" id="view-allsets">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
         <div style="font-size:1.5rem;font-weight:900;">📚 All Sets</div>
         <button class="btn btn-primary btn-sm" onclick="openCreateModal()">＋ New Set</button>
@@ -2349,7 +2353,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     </div>
 
     <!-- ═══ FOLDERS VIEW ═══ -->
-    <div class="view" id="view-folders" style="padding:28px;">
+    <div class="view" id="view-folders">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
         <div style="font-size:1.5rem;font-weight:900;">📁 Folders</div>
         <button class="btn btn-primary btn-sm" onclick="createFolder()">＋ New Folder</button>
@@ -3669,12 +3673,9 @@ async function handleURLCode(code) {
   }
 }
 
-// Always load local data synchronously — it's ready before anything else
-const localTimestamp = loadLocal();
-loadGam();
-
 // ─────────────────────────────────────────────────
-// GAMIFICATION
+// GAMIFICATION — constants and state declared here
+// so loadGam() below can reference them safely
 // ─────────────────────────────────────────────────
 
 const GAM_LEVELS = [
@@ -3715,6 +3716,14 @@ let gam = {
   xp: 0, level: 1, streak: 0, lastStudyDate: null,
   totalSessions: 0, achievements: {},
 };
+
+// Always load local data synchronously — it's ready before anything else
+const localTimestamp = loadLocal();
+loadGam();
+
+// ─────────────────────────────────────────────────
+// GAMIFICATION
+// ─────────────────────────────────────────────────
 
 function loadGam() {
   try {
@@ -3867,7 +3876,7 @@ function gamRenderResultsWidget(result) {
             <span style="font-size:.7rem;font-weight:700;color:var(--accent2);">+${xpEarned} XP</span>
           </div>
           <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;">
-            <div style="height:100%;width:${pct}%;background:${newLevel.color};border-radius:3px;transition:width .6s ease;"></div>
+            <div class="gam-xp-fill-anim" data-pct="${pct}" style="height:100%;width:0%;background:${newLevel.color};border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1);"></div>
           </div>
           <div style="font-size:.6rem;color:var(--text3);margin-top:3px;">${newXP} XP${next ? ` · ${next.min - newXP} to ${next.name}` : ' · Max level!'}</div>
         </div>
@@ -4755,7 +4764,11 @@ function showView(id) {
   if (el) {
     el.classList.add('active', 'view-nav-anim');
     el.scrollTop = 0;
-    if (id === 'settings') renderThemeGrid();
+    // Also reset page-level scroll so new view always starts at top
+    const main = document.getElementById('main');
+    if (main) main.scrollTop = 0;
+    window.scrollTo(0, 0);
+    if (id === 'settings') { renderThemeGrid(); resetAIUsageDisplay(); }
     // Remove animation class after it fires so re-renders don't re-animate
     el.addEventListener('animationend', () => el.classList.remove('view-nav-anim'), { once: true });
     // Fallback removal in case view has no animation (e.g. landing)
@@ -7950,7 +7963,14 @@ function showResults(score, total, mode, gamExtra = {}) {
   const gamWidget = document.getElementById('results-gam-widget');
   if (gamEnabled) {
     const gamResult = gamAwardSession(score, total, mode, gamExtra);
-    if (gamWidget) gamWidget.innerHTML = gamRenderResultsWidget(gamResult);
+    if (gamWidget) {
+      gamWidget.innerHTML = gamRenderResultsWidget(gamResult);
+      // Animate XP bar after a short delay so CSS transition fires
+      setTimeout(() => {
+        const bar = gamWidget.querySelector('.gam-xp-fill-anim');
+        if (bar) bar.style.width = bar.dataset.pct + '%';
+      }, 80);
+    }
     // Streak celebration toast — shown after a short delay so results screen is visible first
     if (gamResult.streakExtended) {
       setTimeout(() => gamShowStreakToast(gamResult.currentStreak), 600);
@@ -10764,13 +10784,22 @@ async function runAI() {
   const prompt = buildAIPromptV2(aiSelectedAction, notes, askQ);
 
   if (aiMode === 'copypaste') {
+    const action = (AI_ACTIONS[aiContext] || AI_ACTIONS.set).find(a => a.id === aiSelectedAction);
+    const isCardAction = action && (action.type === 'cards');
     aiShowResult('📋 Your Prompt',
-      `<textarea class="finp" style="min-height:140px;font-size:.74rem;font-family:var(--mono);resize:none;" readonly>${esc(prompt)}</textarea>
+      `<div style="font-size:.75rem;color:var(--text2);margin-bottom:6px;">Copy this and paste into any AI tool:</div>
+       <textarea class="finp" id="ai-cp-prompt-out" style="min-height:120px;font-size:.74rem;font-family:var(--mono);resize:none;" readonly>${esc(prompt)}</textarea>
        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-         <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.querySelector('#ai-screen-result textarea').value).then(()=>DQAuth.toast('Copied!'))">📋 Copy</button>
+         <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ai-cp-prompt-out').value).then(()=>DQAuth.toast('Copied!'))">📋 Copy prompt</button>
          <button class="btn btn-ghost btn-sm" onclick="window.open('https://claude.ai','_blank')">↗ Claude</button>
          <button class="btn btn-ghost btn-sm" onclick="window.open('https://chat.openai.com','_blank')">↗ ChatGPT</button>
-       </div>`,
+       </div>
+       ${isCardAction ? `
+       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+         <div style="font-size:.75rem;font-weight:800;margin-bottom:6px;">Got a response? Paste it here to import cards:</div>
+         <textarea class="finp" id="ai-cp-paste-back" style="min-height:80px;font-size:.74rem;font-family:var(--mono);resize:none;" placeholder="Paste the AI's response here…"></textarea>
+         <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="aiImportCopyPasteResult()">➕ Import cards</button>
+       </div>` : ''}`,
       []);
     return;
   }
@@ -10834,7 +10863,10 @@ function aiRenderResult(actionId, action, raw) {
         </div>`).join('')}`;
     aiShowResult(`➕ ${cards.length} new cards ready`,
       bodyHtml,
-      [{ label: `Add selected to set`, primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` }]);
+      [
+        { label: `➕ Add to this set`, primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` },
+        { label: `📦 Save as new set`, onclick: `aiSaveAsNewSet(${JSON.stringify(cards).replace(/"/g,"'")})` },
+      ]);
 
   } else if (actionId === 'merge') {
     if (!cards.length) {
@@ -10852,24 +10884,52 @@ function aiRenderResult(actionId, action, raw) {
     aiShowResult(`🔀 Merged — ${cards.length} cards`,
       bodyHtml,
       [
-        { label: 'Add to this set', primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` },
-        { label: 'Save as new set', onclick: `aiSaveAsNewSet(${JSON.stringify(cards).replace(/"/g,"'")})` },
+        { label: '➕ Add to this set', primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` },
+        { label: '📦 Save as new set', onclick: `aiSaveAsNewSet(${JSON.stringify(cards).replace(/"/g,"'")})` },
       ]);
 
+  } else if (actionId === 'improve') {
+    // Prose improvement suggestions — offer to apply as card replacements if we can parse them
+    const improvedCards = aiParseCards(raw);
+    const btns = [
+      { label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` },
+    ];
+    if (improvedCards.length) {
+      btns.unshift(
+        { label: `✅ Replace set cards (${improvedCards.length})`, primary: true, onclick: `aiConfirmReplaceCards(${JSON.stringify(improvedCards).replace(/"/g,"'")})` },
+        { label: `📦 Save as new set`, onclick: `aiSaveAsNewSet(${JSON.stringify(improvedCards).replace(/"/g,"'")})` },
+      );
+    }
+    aiShowResult('💎 Improvements', `<div class="ai-prose">${esc(raw)}</div>`, btns);
+
   } else if (actionId === 'explain') {
-    // Per-card explanations
-    const lines = raw.split('\n').filter(l => l.trim());
-    const bodyHtml = `<div class="ai-prose">${esc(raw)}</div>`;
-    aiShowResult('💡 Here\'s what went wrong', bodyHtml, []);
+    aiShowResult('💡 Here\'s what went wrong',
+      `<div class="ai-prose">${esc(raw)}</div>`,
+      [{ label: '📋 Copy explanation', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+
+  } else if (actionId === 'study-guide') {
+    aiShowResult('📖 Study Guide',
+      `<div class="ai-prose">${esc(raw)}</div>`,
+      [
+        { label: '📋 Copy', primary: true, onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` },
+        { label: '💾 Download .txt', onclick: `aiDownloadText(${JSON.stringify(raw)}, 'study-guide.txt')` },
+      ]);
+
+  } else if (actionId === 'mnemonics') {
+    aiShowResult('🧠 Memory Tricks',
+      `<div class="ai-prose">${esc(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+
+  } else if (actionId === 'study-tips') {
+    aiShowResult('📚 Study Tips',
+      `<div class="ai-prose">${esc(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
 
   } else {
-    // Prose response (study guide, mnemonics, tips, ask)
-    const btns = [];
-    if (actionId === 'study-guide') {
-      btns.push({ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` });
-    }
+    // Prose response (ask anything, anything else)
     aiShowResult(action ? action.icon + ' ' + action.label : 'AI Response',
-      `<div class="ai-prose">${esc(raw)}</div>`, btns);
+      `<div class="ai-prose">${esc(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
   }
 }
 
@@ -10936,9 +10996,9 @@ function aiSaveAsNewSet(cards) {
   if (!toAdd.length) { DQAuth.toast('No cards selected'); return; }
   const s = getSet(currentSetId);
   const newSet = {
-    id: Date.now(), name: (s ? s.name + ' — Merged' : 'Merged Set'),
-    class: s?.class || '', unit: s?.unit || '', icon: '🔀',
-    notes: 'Created by AI merge', cards: toAdd,
+    id: Date.now(), name: (s ? s.name + ' — AI' : 'AI Set'),
+    class: s?.class || '', unit: s?.unit || '', icon: '🤖',
+    notes: 'Created by AI', cards: toAdd,
     history: [], plays: 0, created: Date.now(), updated: Date.now()
   };
   sets.push(newSet);
@@ -10947,6 +11007,32 @@ function aiSaveAsNewSet(cards) {
   openSet(newSet.id);
   sndComplete();
   DQAuth.toast('✓ New set created with ' + toAdd.length + ' cards!');
+}
+
+function aiConfirmReplaceCards(cards) {
+  const s = getSet(currentSetId);
+  if (!s) { DQAuth.toast('No set open'); return; }
+  const sel = aiSelectedCards.map(i => cards[i]).filter(Boolean);
+  if (!sel.length) { DQAuth.toast('No cards selected'); return; }
+  const ok = confirm(`Replace all ${allCards(s).length} cards in "${s.name}" with ${sel.length} improved cards?\n\nThis cannot be undone.`);
+  if (!ok) return;
+  s.cards = sel.map(c => ({front: c.front, back: c.back, starred: false, mastery: 'unseen'}));
+  s.updated = Date.now();
+  autoSave();
+  closeModal('ai-modal');
+  openSet(s.id);
+  sndComplete();
+  DQAuth.toast('✓ Set updated with ' + sel.length + ' improved cards!');
+}
+
+function aiDownloadText(text, filename) {
+  const blob = new Blob([text], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename || 'dqstudy-export.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  DQAuth.toast('📥 Downloaded!');
 }
 
 function buildAIPromptV2(actionId, notes, askQ) {
@@ -10988,6 +11074,16 @@ function aiImportCards() {
   const cards = aiParseCards(aiLastResponse);
   if (!cards.length) { DQAuth.toast('No cards found'); return; }
   aiAddSelectedCards(cards);
+}
+
+function aiImportCopyPasteResult() {
+  const raw = (document.getElementById('ai-cp-paste-back')?.value || '').trim();
+  if (!raw) { DQAuth.toast('Paste the AI response first'); return; }
+  const cards = aiParseCards(raw);
+  if (!cards.length) { DQAuth.toast('⚠ Could not read cards — copy the full AI response'); return; }
+  // Show the card preview so user can pick which to add
+  aiLastResponse = raw;
+  aiRenderResult(aiSelectedAction, (AI_ACTIONS[aiContext]||AI_ACTIONS.set).find(a=>a.id===aiSelectedAction), raw);
 }
 
 document.getElementById('ai-modal').addEventListener('click', function(e){ if(e.target===this) closeModal('ai-modal'); });
@@ -11282,6 +11378,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isMobile()) mbNavSync(id);
   };
 
+  // Sync FAB and tab bar for whatever view is already active on load
+  if (isMobile()) {
+    var _activeView = document.querySelector('.view.active');
+    if (_activeView) {
+      var _activeId = _activeView.id.replace('view-', '');
+      mbNavSync(_activeId);
+    }
+  }
+
   // Patch goHome
   var _ghOrig = goHome;
   goHome = function() {
@@ -11296,6 +11401,14 @@ document.addEventListener('DOMContentLoaded', function() {
     _saOrig();
     if (isMobile()) mbNavSync('allsets');
   };
+
+  // Delayed sync — catches the view that bootApp() navigated to before patches ran
+  if (isMobile()) {
+    setTimeout(function() {
+      var _av = document.querySelector('.view.active');
+      if (_av) mbNavSync(_av.id.replace('view-', ''));
+    }, 200);
+  }
 
 });
 
