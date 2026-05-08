@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TNYF9DN593');</script>
+  <script>(function(){var t=localStorage.getItem('dqt_theme')||'dark';if(t!=='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
+  <script src="../dq-auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <title>Host — DQtrivia</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#0b0c10;--bg2:#13141a;--bg3:#1a1b23;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.15);--text:#f0f0f4;--muted:#7b7c8a;--accent:#4de888;--blue:#3a7fff;--gold:#f5c842;--red:#ff6b6b;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
+    [data-theme="ocean"]   {--bg:#040e1c;--bg2:#071629;--bg3:#0a1e38;--accent:#3ae8ff;--border:rgba(58,232,255,0.1);}
+    [data-theme="forest"]  {--bg:#030e05;--bg2:#061809;--bg3:#09210d;--border:rgba(77,232,136,0.1);}
+    [data-theme="sunset"]  {--bg:#12060a;--bg2:#1e0b10;--bg3:#2a1018;--accent:#ff8c5a;--blue:#ff5a8c;--border:rgba(255,140,90,0.1);}
+    [data-theme="midnight"]{--bg:#05050f;--bg2:#09091e;--bg3:#0e0e2d;--accent:#a78bfa;--blue:#818cf8;--border:rgba(167,139,250,0.1);}
+    [data-theme="candy"]   {--bg:#100514;--bg2:#1c0924;--bg3:#260e30;--accent:#f472b6;--blue:#c084fc;--border:rgba(244,114,182,0.1);}
+    [data-theme="neon"]    {--bg:#020208;--bg2:#050510;--bg3:#080818;--accent:#39ff14;--blue:#00f5ff;--border:rgba(57,255,20,0.12);}
+    [data-theme="metro"]   {--bg:#0d0d14;--bg2:#141420;--bg3:#1b1b2c;--accent:#60a5fa;--blue:#3b82f6;--border:rgba(96,165,250,0.1);}
+
+    body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+    .blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+    .b1{width:500px;height:500px;background:rgba(77,232,136,0.05);top:-100px;left:-100px;}
+    .b2{width:400px;height:400px;background:rgba(58,127,255,0.04);bottom:0;right:-80px;}
+
+    nav{position:sticky;top:0;z-index:100;background:rgba(11,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;}
+    .nav-logo{font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .nav-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
+    .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .nav-room-code{font-family:var(--font-d);font-size:0.85rem;font-weight:800;letter-spacing:.12em;color:var(--accent);background:rgba(77,232,136,0.08);border:1px solid rgba(77,232,136,0.2);border-radius:8px;padding:4px 12px;}
+    .btn-icon{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all .15s;}
+    .btn-icon:hover{border-color:var(--border-hi);color:var(--text);}
+    #dq-auth-btn{display:flex;align-items:center;gap:6px;background:rgba(14,19,32,0.8);border:1px solid #2a4468;border-radius:100px;padding:4px 10px 4px 5px;font-family:var(--font-b);font-size:.68rem;font-weight:500;color:#7a9abf;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    #dq-auth-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0;}
+    #dq-auth-avatar img{width:100%;height:100%;object-fit:cover;}
+
+    main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+
+    /* CONNECTING */
+    .connecting{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* GAME LAYOUT */
+    .game-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;}
+    @media(max-width:860px){.game-layout{grid-template-columns:1fr;}}
+
+    /* QUESTION STAGE */
+    .stage{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 24px;animation:fadeUp .3s ease both;}
+    .stage-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+    .stage-qnum{font-size:0.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+    .diff-pill{display:inline-flex;align-items:center;font-size:0.63rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
+    .diff-easy{background:rgba(77,232,136,0.12);color:var(--accent);}
+    .diff-medium{background:rgba(245,200,66,0.12);color:var(--gold);}
+    .diff-hard{background:rgba(255,107,107,0.12);color:var(--red);}
+
+    .progress-bar{height:4px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:22px;}
+    .progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .5s ease;}
+
+    .question-text{font-family:var(--font-d);font-size:clamp(1.1rem,2.5vw,1.55rem);font-weight:800;letter-spacing:-0.02em;line-height:1.3;margin-bottom:24px;}
+
+    .answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media(max-width:500px){.answers-grid{grid-template-columns:1fr;}}
+    .answer-tile{background:var(--bg3);border:1.5px solid var(--border);border-radius:13px;padding:13px 16px;display:flex;align-items:center;gap:10px;transition:border-color .3s,background .3s;position:relative;overflow:hidden;}
+    .answer-tile.reveal-correct{background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.45);}
+    .answer-tile.reveal-wrong{opacity:0.55;}
+    .answer-letter{width:26px;height:26px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;transition:all .3s;}
+    .reveal-correct .answer-letter{background:rgba(77,232,136,0.2);border-color:rgba(77,232,136,0.4);}
+    .answer-text{font-size:0.85rem;font-weight:500;flex:1;line-height:1.3;}
+    .answer-pct{margin-left:auto;font-family:var(--font-d);font-size:0.78rem;font-weight:700;color:var(--muted);flex-shrink:0;}
+    .answer-bar-bg{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--bg2);}
+    .answer-bar-fill{height:100%;background:var(--accent);transition:width .8s ease;}
+    .reveal-wrong .answer-bar-fill{background:var(--muted);}
+
+    /* TIMER */
+    .timer-row{display:flex;align-items:center;gap:12px;margin-top:22px;}
+    .timer-bar-bg{flex:1;height:7px;background:var(--bg3);border-radius:100px;overflow:hidden;}
+    .timer-bar-fill{height:100%;border-radius:100px;transition:width .15s linear,background .4s;}
+    .timer-bar-fill.green{background:var(--accent);}
+    .timer-bar-fill.yellow{background:var(--gold);}
+    .timer-bar-fill.red{background:var(--red);}
+    .timer-num{font-family:var(--font-d);font-size:1rem;font-weight:800;min-width:26px;text-align:right;transition:color .3s;}
+    .timer-num.red{color:var(--red);}
+
+    /* RESPONSE TRACKER */
+    .resp-track{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:16px;}
+    .resp-label{font-size:0.73rem;color:var(--muted);flex:1;}
+    .resp-count{font-family:var(--font-d);font-size:1rem;font-weight:800;}
+    .resp-bar-bg{width:80px;height:5px;background:var(--bg2);border-radius:100px;overflow:hidden;}
+    .resp-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease;}
+
+    /* DIST PANEL */
+    .dist-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:12px;animation:fadeUp .25s ease both;}
+    .dist-label{font-size:0.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+    .dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .dist-item{display:flex;flex-direction:column;gap:3px;}
+    .dist-name{font-size:0.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .dist-bar-bg{height:5px;background:var(--bg3);border-radius:100px;overflow:hidden;}
+    .dist-bar-fill{height:100%;border-radius:100px;transition:width .8s ease;}
+    .dist-bar-fill.correct{background:var(--accent);}
+    .dist-bar-fill.wrong{background:var(--muted);}
+    .dist-pct{font-size:0.62rem;color:var(--muted);}
+
+    /* RIGHT PANEL */
+    .right-panel{display:flex;flex-direction:column;gap:12px;}
+    .panel-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;}
+    .panel-label{font-size:0.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+
+    /* HOST CONTROLS */
+    .ctrl-btns{display:flex;flex-direction:column;gap:7px;}
+    .btn{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;font-family:var(--font-b);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all .15s;border:none;padding:9px 14px;width:100%;}
+    .btn:active{transform:scale(0.97);}
+    .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+    .btn-g{background:var(--accent);color:#071209;}
+    .btn-g:hover:not(:disabled){filter:brightness(1.1);}
+    .btn-b{background:var(--blue);color:#fff;}
+    .btn-b:hover:not(:disabled){filter:brightness(1.1);}
+    .btn-gh{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border);}
+    .btn-gh:hover:not(:disabled){background:rgba(255,255,255,0.09);}
+    .btn-red{background:var(--red);color:#fff;}
+    .btn-red:hover:not(:disabled){filter:brightness(1.1);}
+
+    /* LEADERBOARD */
+    .lb-list{display:flex;flex-direction:column;gap:5px;}
+    .lb-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all .3s;}
+    .lb-rank{font-family:var(--font-d);font-size:0.72rem;font-weight:800;width:18px;text-align:center;flex-shrink:0;}
+    .lb-rank.gold{color:var(--gold);}
+    .lb-rank.silver{color:#a8b0c0;}
+    .lb-rank.bronze{color:#cd7f32;}
+    .lb-name{font-size:0.78rem;font-weight:500;flex:1;}
+    .lb-score{font-family:var(--font-d);font-size:0.78rem;font-weight:800;color:var(--accent);}
+    .lb-delta{font-size:0.62rem;color:var(--accent);min-width:26px;text-align:right;}
+
+    /* END SCREEN */
+    .end-layout{display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:start;}
+    @media(max-width:720px){.end-layout{grid-template-columns:1fr;}}
+    .end-main{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 24px;text-align:center;animation:fadeUp .4s ease both;}
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:20px 0;}
+    .podium-place{display:flex;flex-direction:column;align-items:center;gap:5px;}
+    .podium-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b0c10;border:2px solid var(--border);}
+    .p1 .podium-avatar{width:58px;height:58px;font-size:1.2rem;border-color:rgba(245,200,66,0.5);}
+    .p2 .podium-avatar,.p3 .podium-avatar{width:46px;height:46px;font-size:0.95rem;}
+    .podium-name{font-size:0.72rem;font-weight:600;}
+    .podium-score{font-family:var(--font-d);font-size:0.8rem;font-weight:800;color:var(--accent);}
+    .podium-block{border-radius:7px 7px 0 0;width:58px;}
+    .pb1{height:55px;background:linear-gradient(180deg,rgba(245,200,66,0.3),rgba(245,200,66,0.08));border:1px solid rgba(245,200,66,0.25);}
+    .pb2{height:38px;background:linear-gradient(180deg,rgba(168,176,192,0.2),rgba(168,176,192,0.05));border:1px solid rgba(168,176,192,0.15);}
+    .pb3{height:25px;background:linear-gradient(180deg,rgba(205,127,50,0.2),rgba(205,127,50,0.05));border:1px solid rgba(205,127,50,0.15);}
+    .end-side{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px;animation:fadeUp .4s ease .06s both;}
+    .end-lb-list{display:flex;flex-direction:column;gap:5px;text-align:left;}
+
+    /* CONFETTI */
+    .confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden;}
+    .cp{position:absolute;border-radius:2px;animation:cfFall linear forwards;}
+    @keyframes cfFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:7px 16px;font-size:0.78rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+    .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;}
+  </style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="confetti-wrap" id="confettiWrap"></div>
+<div class="toast" id="toast"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
+  <div class="nav-right">
+    <div class="nav-room-code" id="navRoomCode">——</div>
+    <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
+    <span id="navBadge" style="font-size:0.95rem;flex-shrink:0;"></span>
+    <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
+      <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
+    </button>
+  </div>
+</nav>
+
+<main id="mainContent">
+  <div class="connecting"><div class="spinner"></div><div style="font-size:0.85rem;color:var(--muted);">Loading room…</div></div>
+</main>
+
+<div class="dq-watermark">© 2026 DQtools by E. S.</div>
+
+<script>
+var BADGE_EMOJIS={rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+var COLORS=['#4de888','#3a7fff','#f5c842','#ff8c5a','#a78bfa','#f472b6','#3ae8ff','#39ff14'];
+var LETTERS=['A','B','C','D'];
+
+// ── STATE ──
+var sb=null, currentUser=null, playerStats={};
+var roomCode='', roomData=null, questions=[], players=[];
+var currentQ=0, revealed=false, timerInterval=null, timeLeft=0, MAX_TIME=20;
+var roomChannel=null, playersChannel=null;
+var soundOn=localStorage.getItem('dqt_sound')!=='off';
+
+var urlParams=new URLSearchParams(window.location.search);
+roomCode=(urlParams.get('room')||'').toUpperCase();
+
+// ── AUTH ──
+window.addEventListener('dq:authready',function(e){
+  var user=e.detail&&e.detail.user;
+  if(!user){window.location.replace('landing.html');return;}
+  currentUser=user;
+  sb=DQAuth.getSupabase();
+  DQAuth.loadData('dqtrivia_stats').then(function(saved){
+    playerStats=saved||{};
+    var eq=playerStats.equippedItems||{};
+    if(eq.theme){localStorage.setItem('dqt_theme',eq.theme);document.documentElement.setAttribute('data-theme',eq.theme);}
+    var nb=document.getElementById('navBadge');
+    if(nb)nb.textContent=BADGE_EMOJIS[eq.badge||'rookie']||'';
+    document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';
+    if(!roomCode){window.location.href='lobby.html';return;}
+    loadRoom();
+  });
+});
+
+// ── LOAD ROOM ──
+function loadRoom(){
+  document.getElementById('navRoomCode').textContent=roomCode;
+  sb.from('dqtrivia_rooms').select('*').eq('id',roomCode).single().then(function(res){
+    if(res.error||!res.data){showError('Room not found: '+roomCode);return;}
+    roomData=res.data;
+    // Verify host
+    if(res.data.host_id!==currentUser.id){
+      // Not host — redirect to play as player
+      window.location.href='play.html?mode=live&room='+roomCode+'&cat='+res.data.cat_id+'&catname='+encodeURIComponent(res.data.cat_name)+'&skip=1';
+      return;
+    }
+    questions=res.data.questions||[];
+    MAX_TIME=res.data.timer||20;
+    if(MAX_TIME===0)MAX_TIME=99999;
+    currentQ=res.data.question_index||0;
+    loadPlayers().then(function(){
+      subscribeToRoom();
+      if(roomData.status==='playing'){
+        renderQuestion();
+      } else {
+        // Room not started yet — shouldn't happen from lobby flow but handle gracefully
+        startGameFromRoom();
+      }
+    });
+  });
+}
+
+// ── LOAD PLAYERS ──
+function loadPlayers(){
+  return sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+    .order('joined_at',{ascending:true}).then(function(res){
+      if(res.data)players=res.data;
+    });
+}
+
+// ── REALTIME: subscribe to player answer updates ──
+function subscribeToRoom(){
+  if(roomChannel){try{sb.removeChannel(roomChannel);}catch(e){}}
+  roomChannel=sb.channel('host:'+roomCode)
+    .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+roomCode},function(payload){
+      if(payload.eventType==='INSERT'){
+        var exists=players.some(function(p){return p.id===payload.new.id;});
+        if(!exists){players.push(payload.new);showToast('👋 '+payload.new.display_name+' joined');}
+      }
+      if(payload.eventType==='UPDATE'){
+        players=players.map(function(p){return p.id===payload.new.id?payload.new:p;});
+        // Update response tracker and leaderboard live
+        updateResponseTracker();
+        renderLeaderboard();
+      }
+    })
+    .subscribe();
+}
+
+// ── RENDER QUESTION ──
+function renderQuestion(){
+  if(currentQ>=questions.length){endGame();return;}
+  revealed=false;
+  timeLeft=MAX_TIME<99999?MAX_TIME:0;
+  var q=questions[currentQ];
+  var total=questions.length;
+  var pct=(currentQ/total)*100;
+
+  var diffClass='diff-'+q.difficulty;
+  var answersHTML=q.answers.map(function(a,i){
+    return '<div class="answer-tile" id="ans'+i+'">'+
+      '<div class="answer-letter">'+LETTERS[i]+'</div>'+
+      '<div class="answer-text">'+escHtml(a)+'</div>'+
+      '<div class="answer-pct" id="pct'+i+'" style="display:none"></div>'+
+      '<div class="answer-bar-bg"><div class="answer-bar-fill" id="bar'+i+'" style="width:0%"></div></div>'+
+    '</div>';
+  }).join('');
+
+  var timerHTML=MAX_TIME<99999
+    ? '<div class="timer-row"><div class="timer-bar-bg"><div class="timer-bar-fill green" id="timerFill" style="width:100%"></div></div><div class="timer-num" id="timerNum">'+MAX_TIME+'</div></div>'
+    : '';
+
+  document.getElementById('mainContent').innerHTML=
+    '<div class="game-layout">'+
+    '<div>'+
+      '<div class="stage">'+
+        '<div class="stage-top">'+
+          '<span class="stage-qnum">Q'+( currentQ+1)+' / '+total+'</span>'+
+          '<span class="diff-pill '+diffClass+'">'+q.difficulty+'</span>'+
+        '</div>'+
+        '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'+
+        '<div class="question-text">'+escHtml(q.question)+'</div>'+
+        '<div class="answers-grid" id="answersGrid">'+answersHTML+'</div>'+
+        timerHTML+
+        '<div class="resp-track" id="respTrack">'+
+          '<span class="resp-label">Players answered</span>'+
+          '<span class="resp-count" id="respCount">0 / '+players.length+'</span>'+
+          '<div class="resp-bar-bg"><div class="resp-bar-fill" id="respBarFill" style="width:0%"></div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div id="distPanelWrap"></div>'+
+    '</div>'+
+    '<div class="right-panel">'+
+      '<div class="panel-card">'+
+        '<div class="panel-label">Host Controls</div>'+
+        '<div class="ctrl-btns">'+
+          '<button class="btn btn-g" id="revealBtn" onclick="revealAnswer()">👁 Reveal Answer</button>'+
+          '<button class="btn btn-b" id="nextBtn" onclick="nextQuestion()" style="display:none">'+(currentQ>=questions.length-1?'🏆 Show Results':'Next Question →')+'</button>'+
+          '<button class="btn btn-red" onclick="confirmEnd()">✕ End Game</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="panel-card">'+
+        '<div class="panel-label">Live Leaderboard</div>'+
+        '<div class="lb-list" id="lbList"><div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:8px;">Waiting for answers…</div></div>'+
+      '</div>'+
+    '</div>'+
+    '</div>';
+
+  renderLeaderboard();
+  if(MAX_TIME<99999)startTimer();
+}
+
+// ── TIMER ──
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft=MAX_TIME;
+  timerInterval=setInterval(function(){
+    timeLeft-=0.1;
+    var pct=Math.max(0,(timeLeft/MAX_TIME)*100);
+    var fill=document.getElementById('timerFill');
+    var num=document.getElementById('timerNum');
+    if(!fill){clearInterval(timerInterval);return;}
+    fill.style.width=pct+'%';
+    fill.className='timer-bar-fill '+(pct>50?'green':pct>25?'yellow':'red');
+    num.textContent=Math.ceil(timeLeft);
+    num.className='timer-num'+(pct<25?' red':'');
+    if(timeLeft<=0){clearInterval(timerInterval);if(!revealed)revealAnswer();}
+  },100);
+}
+
+// ── RESPONSE TRACKER ──
+function updateResponseTracker(){
+  var answered=players.filter(function(p){
+    var ans=p.answers||[];
+    return Array.isArray(ans)&&ans.length>currentQ;
+  }).length;
+  var total=players.length;
+  var ct=document.getElementById('respCount');
+  var bar=document.getElementById('respBarFill');
+  if(ct)ct.textContent=answered+' / '+total;
+  if(bar)bar.style.width=(total>0?(answered/total*100):0)+'%';
+}
+
+// ── REVEAL ANSWER ──
+function revealAnswer(){
+  if(revealed)return;
+  revealed=true;
+  clearInterval(timerInterval);
+  var q=questions[currentQ];
+
+  // Tally votes from player answer records
+  var tally=q.answers.map(function(){return 0;});
+  players.forEach(function(p){
+    var ans=Array.isArray(p.answers)?p.answers[currentQ]:null;
+    if(ans&&typeof ans.answerIdx==='number'&&ans.answerIdx>=0&&ans.answerIdx<tally.length){
+      tally[ans.answerIdx]++;
+    }
+  });
+  var totalVotes=tally.reduce(function(a,b){return a+b;},0)||1;
+
+  // Update answer tiles
+  q.answers.forEach(function(a,i){
+    var tile=document.getElementById('ans'+i);
+    var pctEl=document.getElementById('pct'+i);
+    var barEl=document.getElementById('bar'+i);
+    if(!tile)return;
+    var isCorrect=a===q.correct;
+    tile.classList.add(isCorrect?'reveal-correct':'reveal-wrong');
+    var pct=Math.round(tally[i]/totalVotes*100);
+    if(pctEl){pctEl.style.display='';pctEl.textContent=pct+'%';}
+    if(barEl){barEl.style.width=pct+'%';if(!isCorrect)barEl.style.background='var(--muted)';}
+  });
+
+  // Distribution panel
+  var distWrap=document.getElementById('distPanelWrap');
+  if(distWrap){
+    var distItems=q.answers.map(function(a,i){
+      var isCorrect=a===q.correct;
+      var pct=Math.round(tally[i]/totalVotes*100);
+      return '<div class="dist-item">'+
+        '<div class="dist-name">'+LETTERS[i]+': '+escHtml(a.substr(0,22)+(a.length>22?'…':''))+'</div>'+
+        '<div class="dist-bar-bg"><div class="dist-bar-fill '+(isCorrect?'correct':'wrong')+'" style="width:'+pct+'%"></div></div>'+
+        '<div class="dist-pct">'+pct+'% ('+tally[i]+')</div>'+
+      '</div>';
+    }).join('');
+    distWrap.innerHTML='<div class="dist-panel"><div class="dist-label">Answer distribution</div><div class="dist-grid">'+distItems+'</div></div>';
+  }
+
+  // Show next/results button
+  var revBtn=document.getElementById('revealBtn');
+  var nxtBtn=document.getElementById('nextBtn');
+  if(revBtn)revBtn.style.display='none';
+  if(nxtBtn)nxtBtn.style.display='';
+
+  renderLeaderboard();
+  playBeep(392,0.15);
+}
+
+// ── NEXT QUESTION ──
+function nextQuestion(){
+  currentQ++;
+  // Update room question_index in Supabase — players subscribe to this
+  sb.from('dqtrivia_rooms').update({question_index:currentQ}).eq('id',roomCode).then(function(){
+    if(currentQ>=questions.length){endGame();return;}
+    renderQuestion();
+  });
+}
+
+// ── LEADERBOARD ──
+function renderLeaderboard(){
+  var lb=document.getElementById('lbList');
+  if(!lb)return;
+  var sorted=players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  if(sorted.length===0){lb.innerHTML='<div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:8px;">No players yet</div>';return;}
+  var medals=['🥇','🥈','🥉'];
+  var classes=['gold','silver','bronze'];
+  lb.innerHTML='';
+  sorted.slice(0,8).forEach(function(p,i){
+    var row=document.createElement('div');
+    row.className='lb-row';
+    row.innerHTML=
+      '<div class="lb-rank '+(classes[i]||'')+'">'+( medals[i]||(i+1))+'</div>'+
+      '<div class="lb-name">'+escHtml(p.display_name)+'</div>'+
+      '<div class="lb-score">'+(p.score||0)+'</div>';
+    lb.appendChild(row);
+  });
+}
+
+// ── END GAME ──
+function endGame(){
+  clearInterval(timerInterval);
+  // Mark room ended
+  sb.from('dqtrivia_rooms').update({status:'ended'}).eq('id',roomCode);
+  if(roomChannel)sb.removeChannel(roomChannel);
+
+  var sorted=players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  var medals=['🥇','🥈','🥉'];
+  var podiumOrder=[1,0,2]; // 2nd,1st,3rd for visual height
+  var blockClasses=['pb2','pb1','pb3'];
+  var podiumHTML=podiumOrder.map(function(idx){
+    var p=sorted[idx];
+    if(!p)return'';
+    var color=COLORS[idx%COLORS.length];
+    var init=(p.display_name||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().substr(0,2);
+    return '<div class="podium-place p'+(idx+1)+'" style="animation-delay:'+(idx*0.1)+'s">'+
+      '<span style="font-size:1.3rem">'+(medals[idx]||'')+'</span>'+
+      '<div class="podium-avatar" style="background:'+color+'">'+escHtml(init)+'</div>'+
+      '<div class="podium-name">'+escHtml(p.display_name)+'</div>'+
+      '<div class="podium-score">'+(p.score||0)+'</div>'+
+      '<div class="podium-block '+blockClasses[idx]+'"></div>'+
+    '</div>';
+  }).join('');
+
+  var fullLbHTML=sorted.map(function(p,i){
+    return '<div class="lb-row">'+
+      '<div class="lb-rank '+(i<3?['gold','silver','bronze'][i]:'')+'">'+( medals[i]||(i+1))+'</div>'+
+      '<div class="lb-name">'+escHtml(p.display_name)+'</div>'+
+      '<div class="lb-score">'+(p.score||0)+'</div>'+
+    '</div>';
+  }).join('');
+
+  var totalAnswers=players.reduce(function(acc,p){return acc+(Array.isArray(p.answers)?p.answers.length:0);},0);
+  var correctTotal=players.reduce(function(acc,p){return acc+(Array.isArray(p.answers)?p.answers.filter(function(a){return a&&a.correct;}).length:0);},0);
+  var accuracy=totalAnswers>0?Math.round(correctTotal/totalAnswers*100):0;
+
+  document.getElementById('mainContent').innerHTML=
+    '<div class="end-layout">'+
+    '<div class="end-main">'+
+      '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">🏆 Game Over</div>'+
+      '<div style="font-family:var(--font-d);font-size:clamp(1.4rem,4vw,2rem);font-weight:800;letter-spacing:-0.03em;">'+(sorted[0]?escHtml(sorted[0].display_name)+' wins!':'Game Over')+'</div>'+
+      '<div class="podium">'+podiumHTML+'</div>'+
+      '<div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">'+
+        '<button class="btn btn-g" style="width:auto;padding:10px 20px" onclick="window.location.href=\'lobby.html\'">New Game</button>'+
+        '<a href="index.html" class="btn btn-gh" style="width:auto;padding:10px 20px;text-decoration:none">Home</a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="end-side">'+
+      '<div class="panel-label">Final Standings</div>'+
+      '<div class="end-lb-list">'+fullLbHTML+'</div>'+
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Players</span><strong style="color:var(--text)">'+players.length+'</strong></div>'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Questions</span><strong style="color:var(--text)">'+questions.length+'</strong></div>'+
+        '<div style="display:flex;justify-content:space-between;"><span>Overall accuracy</span><strong style="color:var(--accent)">'+accuracy+'%</strong></div>'+
+      '</div>'+
+    '</div>'+
+    '</div>';
+
+  launchConfetti();
+}
+
+// ── CONFIRM END ──
+function confirmEnd(){
+  if(!confirm('End the game for all players?'))return;
+  endGame();
+}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  var wrap=document.getElementById('confettiWrap');
+  wrap.innerHTML='';
+  var cols=['#4de888','#3a7fff','#f5c842','#ff8c5a','#a78bfa','#f472b6'];
+  for(var i=0;i<70;i++){
+    var d=document.createElement('div');
+    d.className='cp';
+    d.style.cssText='left:'+Math.random()*100+'%;background:'+cols[Math.floor(Math.random()*cols.length)]+';width:'+(6+Math.random()*6)+'px;height:'+(6+Math.random()*6)+'px;animation-duration:'+(1.5+Math.random()*2)+'s;animation-delay:'+Math.random()+'s';
+    wrap.appendChild(d);
+    setTimeout(function(){d.remove();},4500);
+  }
+}
+
+// ── SOUND ──
+function toggleSound(){soundOn=!soundOn;localStorage.setItem('dqt_sound',soundOn?'on':'off');document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';}
+var _actx=null;
+function playBeep(freq,dur){
+  if(!soundOn)return;
+  try{
+    if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();
+    var o=_actx.createOscillator(),g=_actx.createGain();
+    o.connect(g);g.connect(_actx.destination);
+    o.frequency.value=freq;g.gain.setValueAtTime(0.12,_actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,_actx.currentTime+dur);
+    o.start();o.stop(_actx.currentTime+dur);
+  }catch(e){}
+}
+
+// ── HELPERS ──
+function showError(msg){
+  document.getElementById('mainContent').innerHTML=
+    '<div class="connecting"><div style="font-size:2rem">⚠️</div><div style="font-size:0.9rem;color:var(--muted)">'+escHtml(msg)+'</div>'+
+    '<a href="lobby.html" style="margin-top:8px;font-size:0.8rem;color:var(--blue);text-decoration:none;">← Back to Lobby</a></div>';
+}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
+</script>
+</body>
+</html>
