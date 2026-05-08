@@ -11,7 +11,8 @@
     gtag('js', new Date());
     gtag('config', 'G-TNYF9DN593');
   </script>
-  <script>(function(){var t=localStorage.getItem("dqt_theme")||"dark";if(t!=="dark")document.documentElement.setAttribute("data-theme",t);})();</script>
+  <!-- Theme before auth to prevent flash -->
+  <script>(function(){var t=localStorage.getItem('dqt_theme')||'dark';if(t!=='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
   <script src="../dq-auth.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,14 +27,15 @@
       --accent:#4de888; --blue:#3a7fff; --gold:#f5c842; --red:#ff6b6b;
       --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
     }
-    /* ── THEME OVERRIDES (applied when user has equipped a theme) ── */
-    body.theme-ocean  { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
-    body.theme-forest { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --accent:#4de888; --border:rgba(77,232,136,0.1); }
-    body.theme-sunset { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
-    body.theme-midnight { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
-    body.theme-candy  { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
-    body.theme-neon   { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
-    body.theme-metro  { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
+    /* ── THEME OVERRIDES — data-theme on <html>, NOT body classes ── */
+    [data-theme="ocean"]    { --bg:#040e1c; --bg2:#071629; --bg3:#0a1e38; --accent:#3ae8ff; --border:rgba(58,232,255,0.1); }
+    [data-theme="forest"]   { --bg:#030e05; --bg2:#061809; --bg3:#09210d; --border:rgba(77,232,136,0.1); }
+    [data-theme="sunset"]   { --bg:#12060a; --bg2:#1e0b10; --bg3:#2a1018; --accent:#ff8c5a; --blue:#ff5a8c; --border:rgba(255,140,90,0.1); }
+    [data-theme="midnight"] { --bg:#05050f; --bg2:#09091e; --bg3:#0e0e2d; --accent:#a78bfa; --blue:#818cf8; --border:rgba(167,139,250,0.1); }
+    [data-theme="candy"]    { --bg:#100514; --bg2:#1c0924; --bg3:#260e30; --accent:#f472b6; --blue:#c084fc; --border:rgba(244,114,182,0.1); }
+    [data-theme="neon"]     { --bg:#020208; --bg2:#050510; --bg3:#080818; --accent:#39ff14; --blue:#00f5ff; --border:rgba(57,255,20,0.12); }
+    [data-theme="metro"]    { --bg:#0d0d14; --bg2:#141420; --bg3:#1b1b2c; --accent:#60a5fa; --blue:#3b82f6; --border:rgba(96,165,250,0.1); }
+
     body { background:var(--bg); color:var(--text); font-family:var(--font-b); font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
     .blob { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
     .b1 { width:500px;height:500px;background:rgba(77,232,136,0.06);top:-100px;left:-100px; }
@@ -63,24 +65,66 @@
     #dq-auth-avatar { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0; }
     #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
 
-    /* MAIN */
     main { position:relative;z-index:1;max-width:700px;margin:0 auto;padding:36px 20px 100px; }
 
-    /* LOADING STATE */
+    /* ── PRE-GAME CONFIG ── */
+    .pregame-card { background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 24px;animation:fadeUp .4s ease both; }
+    .pg-eyebrow { font-size:0.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px; }
+    .pg-title { font-family:var(--font-d);font-size:clamp(1.3rem,4vw,1.8rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:4px; }
+    .pg-sub { font-size:0.8rem;color:var(--muted);margin-bottom:22px; }
+    .pg-divider { height:1px;background:var(--border);margin:18px 0; }
+
+    .pg-field { margin-bottom:16px; }
+    .pg-label { font-size:0.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px; }
+    .chip-row { display:flex;gap:6px;flex-wrap:wrap; }
+    .chip { background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 13px;font-size:0.78rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none; }
+    .chip:hover { border-color:var(--border-hi);color:var(--text); }
+    .chip.active { background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.4);color:var(--accent); }
+    .chip.active-blue { background:rgba(58,127,255,0.1);border-color:rgba(58,127,255,0.4);color:var(--blue); }
+
+    .pg-footer { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap; }
+    .pg-remember { display:flex;align-items:center;gap:7px;font-size:0.76rem;color:var(--muted);cursor:pointer; }
+    .pg-remember input { accent-color:var(--accent);width:14px;height:14px;cursor:pointer; }
+
+    .btn-start { background:var(--accent);color:#071209;border:none;border-radius:11px;padding:12px 28px;font-family:var(--font-b);font-size:0.9rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px; }
+    .btn-start:hover { filter:brightness(1.1); }
+    .btn-start:active { transform:scale(0.97); }
+
+    /* mode pills on config */
+    .mode-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px; }
+    .mode-chip { background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;cursor:pointer;transition:all .15s;text-align:center; }
+    .mode-chip:hover { border-color:var(--border-hi); }
+    .mode-chip.active { border-color:rgba(77,232,136,0.5);background:rgba(77,232,136,0.07); }
+    .mode-chip-icon { font-size:1.2rem;margin-bottom:3px; }
+    .mode-chip-name { font-size:0.78rem;font-weight:600;color:var(--text); }
+    .mode-chip-desc { font-size:0.62rem;color:var(--muted);margin-top:2px;line-height:1.3; }
+
+    /* live mode notice */
+    .live-notice { background:rgba(58,127,255,0.08);border:1px solid rgba(58,127,255,0.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:16px; }
+    .live-notice-icon { font-size:1.3rem;flex-shrink:0; }
+    .live-notice-text { font-size:0.78rem;color:var(--muted);line-height:1.4; }
+    .live-notice-text strong { color:var(--blue); }
+    .live-notice-text a { color:var(--blue);text-decoration:none;font-weight:600; }
+
+    /* ── LOADING ── */
     .loading-screen { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center; }
     .loading-spinner { width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
     .loading-title { font-family:var(--font-d);font-size:1.1rem;font-weight:800; }
     .loading-sub { font-size:0.8rem;color:var(--muted); }
 
-    /* GAME HEADER */
+    /* ── GAME HEADER ── */
     .game-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;animation:fadeUp .3s ease both; }
     .game-cat { display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--muted); }
     .game-cat-emoji { font-size:1.1rem; }
     .game-cat-name { font-weight:500; }
     .game-mode-badge { background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:3px 10px;font-size:0.68rem;font-weight:600;color:var(--muted); }
+    .game-mode-badge.badge-speed    { border-color:rgba(245,200,66,0.4);color:var(--gold); }
+    .game-mode-badge.badge-streak   { border-color:rgba(255,107,107,0.4);color:var(--red); }
+    .game-mode-badge.badge-live     { border-color:rgba(58,127,255,0.4);color:var(--blue); }
+    .game-mode-badge.badge-daily    { border-color:rgba(77,232,136,0.4);color:var(--accent); }
 
-    /* PROGRESS BAR */
+    /* ── PROGRESS BAR ── */
     .progress-wrap { margin-bottom:22px;animation:fadeUp .35s ease .05s both; }
     .progress-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:7px; }
     .progress-label { font-size:0.72rem;color:var(--muted); }
@@ -88,7 +132,7 @@
     .progress-bar-bg { height:5px;background:var(--bg3);border-radius:100px;overflow:hidden; }
     .progress-bar-fill { height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease; }
 
-    /* TIMER */
+    /* ── TIMER ── */
     .timer-wrap { display:flex;align-items:center;gap:12px;margin-bottom:24px;animation:fadeUp .35s ease .08s both; }
     .timer-bar-bg { flex:1;height:8px;background:var(--bg3);border-radius:100px;overflow:hidden; }
     .timer-bar-fill { height:100%;border-radius:100px;transition:width .1s linear,background .3s; }
@@ -98,7 +142,11 @@
     .timer-num { font-family:var(--font-d);font-size:1rem;font-weight:800;min-width:26px;text-align:right;transition:color .3s; }
     .timer-num.red { color:var(--red); }
 
-    /* QUESTION CARD */
+    /* Speed mode penalty flash */
+    .speed-penalty { position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(255,107,107,0.9);color:#fff;border-radius:100px;padding:4px 14px;font-size:0.78rem;font-weight:700;opacity:0;pointer-events:none;z-index:60;transition:opacity .2s; }
+    .speed-penalty.show { opacity:1; }
+
+    /* ── QUESTION CARD ── */
     .question-card { background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:24px 22px;margin-bottom:18px;animation:fadeUp .35s ease .1s both; }
     .question-difficulty { display:inline-flex;align-items:center;gap:5px;font-size:0.63rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:100px;margin-bottom:12px; }
     .diff-easy   { background:rgba(77,232,136,0.12);color:var(--accent); }
@@ -106,14 +154,9 @@
     .diff-hard   { background:rgba(255,107,107,0.12);color:var(--red); }
     .question-text { font-family:var(--font-d);font-size:clamp(1rem,2.5vw,1.25rem);font-weight:700;line-height:1.35;letter-spacing:-0.01em; }
 
-    /* ANSWERS */
+    /* ── ANSWERS ── */
     .answers { display:flex;flex-direction:column;gap:10px;animation:fadeUp .35s ease .13s both; }
-    .answer-btn {
-      background:var(--bg2);border:1.5px solid var(--border);border-radius:13px;
-      padding:14px 18px;font-family:var(--font-b);font-size:0.88rem;font-weight:500;
-      color:var(--text);cursor:pointer;text-align:left;transition:border-color .15s,background .15s,transform .1s;
-      display:flex;align-items:center;gap:12px;
-    }
+    .answer-btn { background:var(--bg2);border:1.5px solid var(--border);border-radius:13px;padding:14px 18px;font-family:var(--font-b);font-size:0.88rem;font-weight:500;color:var(--text);cursor:pointer;text-align:left;transition:border-color .15s,background .15s,transform .1s;display:flex;align-items:center;gap:12px; }
     .answer-btn:hover:not(:disabled) { border-color:var(--border-hi);background:rgba(255,255,255,0.04);transform:translateX(3px); }
     .answer-btn:active:not(:disabled) { transform:scale(0.98); }
     .answer-btn:disabled { cursor:default; }
@@ -125,24 +168,49 @@
     .answer-btn.wrong   .answer-letter { background:rgba(255,107,107,0.15);border-color:rgba(255,107,107,0.35); }
     .answer-result-icon { margin-left:auto;font-size:1.1rem;flex-shrink:0; }
 
-    /* STREAK INDICATOR */
+    /* ── STREAK DOTS ── */
     .streak-indicator { display:flex;align-items:center;gap:8px;margin-bottom:18px;height:24px;animation:fadeUp .35s ease .06s both; }
-    .streak-dot { width:8px;height:8px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);transition:all .2s; }
+    .streak-dot { width:8px;height:8px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);transition:all .2s;flex-shrink:0; }
     .streak-dot.correct { background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(77,232,136,0.5); }
     .streak-dot.wrong   { background:var(--red);border-color:var(--red); }
+    .streak-dot.current { border-color:var(--muted); }
     .streak-label { font-size:0.7rem;color:var(--muted);margin-left:4px; }
     .streak-fire  { font-size:0.85rem;animation:bounce .4s ease; }
     @keyframes bounce { 0%,100%{transform:scale(1);}50%{transform:scale(1.4);} }
 
-    /* NEXT BUTTON */
+    /* ── NEXT BUTTON ── */
     .next-btn { width:100%;padding:13px;background:var(--accent);color:#071209;border:none;border-radius:12px;font-family:var(--font-b);font-size:0.9rem;font-weight:700;cursor:pointer;transition:all .15s;margin-top:14px;display:none;animation:fadeUp .2s ease both; }
-    .next-btn:hover { background:#65f0a0; }
+    .next-btn:hover { filter:brightness(1.1); }
     .next-btn:active { transform:scale(0.98); }
 
-    /* FEEDBACK FLASH */
+    /* ── FEEDBACK FLASH ── */
     .feedback-flash { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.5);font-size:3rem;opacity:0;pointer-events:none;z-index:50;transition:none; }
     .feedback-flash.pop { animation:popFlash .5s ease forwards; }
     @keyframes popFlash { 0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}30%{opacity:1;transform:translate(-50%,-55%) scale(1.3);}60%{opacity:0.8;transform:translate(-50%,-60%) scale(1.1);}100%{opacity:0;transform:translate(-50%,-70%) scale(0.9);} }
+
+    /* ── LIVE MODE ── */
+    .live-header { background:rgba(58,127,255,0.08);border:1px solid rgba(58,127,255,0.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;animation:fadeUp .3s ease both; }
+    .live-room-code { font-family:var(--font-d);font-size:0.8rem;font-weight:800;letter-spacing:.1em;color:var(--blue); }
+    .live-players { font-size:0.72rem;color:var(--muted); }
+    .live-players strong { color:var(--text); }
+
+    /* Live scoreboard sidebar (shown beside question on wider screens) */
+    .live-layout { display:grid;grid-template-columns:1fr 200px;gap:14px;align-items:start; }
+    @media(max-width:700px){ .live-layout { grid-template-columns:1fr; } }
+    .live-scoreboard { background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px; }
+    .live-sb-title { font-size:0.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px; }
+    .live-sb-row { display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;margin-bottom:4px;transition:background .2s; }
+    .live-sb-row.me { background:rgba(77,232,136,0.07);border:1px solid rgba(77,232,136,0.15); }
+    .live-sb-rank { font-size:0.68rem;font-weight:700;width:16px;text-align:center;color:var(--muted); }
+    .live-sb-name { font-size:0.76rem;font-weight:500;flex:1; }
+    .live-sb-score { font-family:var(--font-d);font-size:0.76rem;font-weight:700;color:var(--accent); }
+
+    /* Waiting for host screen */
+    .waiting-screen { text-align:center;padding:60px 20px;animation:fadeUp .4s ease both; }
+    .waiting-dots span { width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block;margin:0 2px;animation:dotPulse 1.4s ease infinite; }
+    .waiting-dots span:nth-child(2){animation-delay:.2s;}
+    .waiting-dots span:nth-child(3){animation-delay:.4s;}
+    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8);}50%{opacity:1;transform:scale(1.2);}}
 
     /* ── END SCREEN ── */
     .end-screen { animation:fadeUp .4s ease both; }
@@ -157,14 +225,10 @@
     .end-stat  { background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 8px;text-align:center; }
     .end-stat strong { display:block;font-family:var(--font-d);font-size:1.1rem;font-weight:800;margin-bottom:2px; }
     .end-stat span   { font-size:0.62rem;color:var(--muted); }
-
-    /* EARNED PILLS */
     .end-earned { display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0; }
     .earned-pill { display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:0.78rem;font-weight:600; }
     .earned-pill.xp    { border-color:rgba(58,127,255,0.3);color:var(--blue); }
     .earned-pill.coins { border-color:rgba(245,200,66,0.3);color:var(--gold); }
-
-    /* RATING PROMPT */
     .rating-prompt { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:12px;text-align:center; }
     .rating-prompt-title { font-size:0.82rem;color:var(--muted);margin-bottom:12px; }
     .rating-btns { display:flex;gap:10px;justify-content:center; }
@@ -175,30 +239,45 @@
     .rate-btn.selected-up   { border-color:var(--accent);background:rgba(77,232,136,0.15); }
     .rate-btn.selected-down { border-color:var(--red);background:rgba(255,107,107,0.12); }
     .rating-done { font-size:0.8rem;color:var(--muted);text-align:center;padding:12px; }
-
-    /* END ACTIONS */
     .end-actions { display:flex;flex-direction:column;gap:10px; }
     .end-btn { padding:13px;border-radius:12px;font-family:var(--font-b);font-size:0.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;text-align:center;text-decoration:none;display:block; }
     .end-btn:active { transform:scale(0.98); }
     .end-btn-primary { background:var(--accent);color:#071209; }
-    .end-btn-primary:hover { background:#65f0a0; }
+    .end-btn-primary:hover { filter:brightness(1.1); }
     .end-btn-secondary { background:var(--bg2);border:1px solid var(--border);color:var(--text); }
     .end-btn-secondary:hover { border-color:var(--border-hi); }
 
-    /* WIN EFFECTS */
+    /* ── GUEST BANNER ── */
+    .guest-banner { background:rgba(58,127,255,0.08);border:1px solid rgba(58,127,255,0.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:0.78rem;color:var(--muted); }
+    .guest-banner strong { color:var(--blue); }
+    .guest-banner a { color:var(--blue);text-decoration:none;font-weight:600; }
+
+    /* ── WIN EFFECTS ── */
     .effect-overlay { position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden; }
     .confetti-piece { position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards; }
-    @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1;} 100%{transform:translateY(110vh) rotate(720deg);opacity:0;} }
+    @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;} }
     .star-piece { position:absolute;font-size:1.2rem;animation:starFloat ease forwards; }
     @keyframes starFloat { 0%{opacity:1;transform:scale(0) rotate(0deg);}50%{opacity:1;transform:scale(1.2) rotate(180deg);}100%{opacity:0;transform:scale(0.8) rotate(360deg) translateY(-60px);} }
 
-    /* TOAST */
+    /* ── TOAST ── */
     .toast { position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap; }
     .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
 
+    /* ── QUIT OVERLAY ── */
+    .quit-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px; }
+    .quit-box { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center; }
+    .quit-title { font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:6px; }
+    .quit-sub   { font-size:0.8rem;color:var(--muted);margin-bottom:18px; }
+    .quit-btns  { display:flex;gap:8px; }
+    .quit-btn   { flex:1;padding:10px;border-radius:9px;font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;border:none;transition:all .15s; }
+    .quit-btn-cancel { background:var(--bg3);color:var(--muted);border:1px solid var(--border); }
+    .quit-btn-cancel:hover { color:var(--text); }
+    .quit-btn-quit { background:var(--red);color:#fff; }
+    .quit-btn-quit:hover { filter:brightness(1.1); }
+
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
 
-    .dq-watermark { position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998; }
+    .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;}
     .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
     .fab2-toggle{width:34px;height:34px;border-radius:50%;background:#28a45a;border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(40,164,90,0.4);transition:transform .18s,background .18s;flex-shrink:0;}
     .fab2-toggle:hover{background:#2ea85a;transform:scale(1.08);}
@@ -210,29 +289,13 @@
     .fab2-item:hover .fab2-label{opacity:1;transform:translateX(0);}
     .fab2-icon{width:30px;height:30px;border-radius:50%;background:#28a45a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;text-decoration:none;box-shadow:0 2px 8px rgba(40,164,90,0.3);transition:background .15s,transform .15s;flex-shrink:0;}
     .fab2-icon:hover{background:#1f8a48;transform:scale(1.12);}
-
-    /* QUIT CONFIRM */
-    .quit-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px; }
-    .quit-box { background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center; }
-    .quit-title { font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:6px; }
-    .quit-sub   { font-size:0.8rem;color:var(--muted);margin-bottom:18px; }
-    .quit-btns  { display:flex;gap:8px; }
-    .quit-btn   { flex:1;padding:10px;border-radius:9px;font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;border:none;transition:all .15s; }
-    .quit-btn-cancel { background:var(--bg3);color:var(--muted);border:1px solid var(--border); }
-    .quit-btn-cancel:hover { color:var(--text); }
-    .quit-btn-quit { background:var(--red);color:#fff; }
-    .quit-btn-quit:hover { background:#ff8585; }
-
-    /* GUEST BANNER */
-    .guest-banner { background:rgba(58,127,255,0.08);border:1px solid rgba(58,127,255,0.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:0.78rem;color:var(--muted); }
-    .guest-banner strong { color:var(--blue); }
-    .guest-banner a { color:var(--blue);text-decoration:none;font-weight:600; }
   </style>
 </head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="feedback-flash" id="feedbackFlash"></div>
 <div class="effect-overlay" id="effectOverlay"></div>
+<div class="speed-penalty" id="speedPenalty">−5s penalty!</div>
 
 <nav>
   <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
@@ -250,8 +313,7 @@
   <div class="nav-right">
     <button class="btn-icon" id="soundBtn" onclick="toggleSound()">🔊</button>
     <span id="navBadge" style="font-size:0.95rem;flex-shrink:0;"></span>
-    <button class="btn-icon" id="quitBtn" onclick="confirmQuit()" title="Quit game" style="display:none;">✕</button>
-    <span id="equippedBadge" style="font-size:1rem;flex-shrink:0;" title=""></span>
+    <button class="btn-icon" id="quitBtn" onclick="confirmQuit()" title="Quit" style="display:none;">✕</button>
     <button id="dq-auth-btn" onclick="(function(e){e.stopPropagation();if(typeof DQAuth!=='undefined')DQAuth._toggleDropdown();})(event)">
       <div id="dq-auth-avatar">👤</div><span id="dq-auth-label">Sign In</span>
     </button>
@@ -262,10 +324,10 @@
 <div id="quitOverlay" style="display:none"></div>
 
 <main id="mainContent">
-  <div class="loading-screen" id="loadingScreen">
+  <div class="loading-screen">
     <div class="loading-spinner"></div>
-    <div class="loading-title">Loading questions…</div>
-    <div class="loading-sub" id="loadingSub">Fetching from OpenTDB</div>
+    <div class="loading-title">Loading…</div>
+    <div class="loading-sub">Just a moment</div>
   </div>
 </main>
 
@@ -285,794 +347,831 @@
 </div>
 
 <script>
-// ── URL PARAMS ──
+// ══════════════════════════════════════════════
+// URL PARAMS
+// ══════════════════════════════════════════════
 var params   = new URLSearchParams(window.location.search);
 var MODE     = params.get('mode')    || 'personal';
 var CAT_ID   = parseInt(params.get('cat')) || 0;
 var CAT_NAME = params.get('catname') ? decodeURIComponent(params.get('catname')) : 'Mixed';
 var ROOM     = params.get('room')    || '';
+var SKIP_PRE = params.get('skip') === '1';
 
-// ── CATEGORIES MAP ──
-var CATS = {
-  9:'🧠',10:'📚',11:'🎬',12:'🎵',13:'🎭',14:'📺',15:'🎮',16:'♟️',
-  17:'🔬',18:'💻',19:'➗',20:'⚡',21:'🏆',22:'🌍',23:'🏛️',24:'🗳️',
-  25:'🎨',26:'⭐',27:'🦁',28:'🚗',29:'💬',30:'📱',31:'✏️',32:'🎞️'
-};
+var CATS = {0:'🎯',9:'🧠',10:'📚',11:'🎬',12:'🎵',13:'🎭',14:'📺',15:'🎮',16:'♟️',17:'🔬',18:'💻',19:'➗',20:'⚡',21:'🏆',22:'🌍',23:'🏛️',24:'🗳️',25:'🎨',26:'⭐',27:'🦁',28:'🚗',29:'💬',30:'📱',31:'✏️',32:'🎞️'};
+var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
+var LEVELS = [{name:'Rookie',min:0},{name:'Challenger',min:500},{name:'Pro',min:1500},{name:'Master',min:3500},{name:'Legend',min:7000}];
+function getLevel(xp){for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min)return i;}return 0;}
+function getLevelMult(xp){return[1,1.2,1.5,1.8,2.0][getLevel(xp)];}
 
-// ── APPLY EQUIPPED COSMETICS ──
-function applyCosmetics(stats) {
-  var equipped = (stats && stats.equippedItems) || {};
-  // Theme — use data-theme on html element so CSS vars apply instantly everywhere
-  var theme = equipped.theme || 'dark';
-  localStorage.setItem('dqt_theme', theme);
-  document.documentElement.setAttribute('data-theme', theme);
-  // Badge — show in nav
-  var badge = equipped.badge || 'rookie';
-  var BADGE_EMOJIS = {rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
-  var badgeEmoji = BADGE_EMOJIS[badge] || '';
-  var badgeEl  = document.getElementById('equippedBadge');
-  var navBadge = document.getElementById('navBadge');
-  if (badgeEl)  { badgeEl.textContent = badgeEmoji; badgeEl.title = badge + ' badge'; }
-  if (navBadge) navBadge.textContent = badgeEmoji;
+// ══════════════════════════════════════════════
+// GAME STATE
+// ══════════════════════════════════════════════
+var playerStats={},questions=[],currentQ=0,score=0,correctCount=0;
+var inGameStreak=0,maxStreak=0,answerTimes=[],answered=false;
+var timerInterval=null,timeLeft=20,MAX_TIME=20;
+var isGuest=MODE==='guest',gameStarted=false,ratingGiven=null,gameHistory=[];
+var pregameConfig=null;
+
+// Supabase live mode state
+var sb=null,currentUser=null,myUserId='',myPlayerId=null;
+var liveChannel=null,liveAllPlayers=[];
+
+// ══════════════════════════════════════════════
+// SOUND
+// ══════════════════════════════════════════════
+var soundOn=localStorage.getItem('dqt_sound')!=='off';
+function toggleSound(){soundOn=!soundOn;localStorage.setItem('dqt_sound',soundOn?'on':'off');document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';}
+document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';
+var audioCtx=null;
+function beep(freq,dur,vol,type){
+  if(!soundOn)return;
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.frequency.value=freq;o.type=type||'sine';
+    g.gain.setValueAtTime(vol||0.15,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+(dur||0.15));
+    o.start();o.stop(audioCtx.currentTime+(dur||0.15));
+  }catch(e){}
 }
+function playCorrect(){beep(523,0.1,0.12);setTimeout(function(){beep(659,0.1,0.12);},80);}
+function playWrong(){beep(220,0.15,0.12,'sawtooth');}
+function playTick(){beep(880,0.04,0.05);}
+function playWin(){[523,659,784,1047].forEach(function(f,i){setTimeout(function(){beep(f,0.15,0.1);},i*100);});}
 
-// ── LEVEL THRESHOLDS ──
-var LEVELS = [
-  { name:'Rookie',     min:0    },
-  { name:'Challenger', min:500  },
-  { name:'Pro',        min:1500 },
-  { name:'Master',     min:3500 },
-  { name:'Legend',     min:7000 }
-];
-
-function getLevel(xp) {
-  for (var i = LEVELS.length - 1; i >= 0; i--) {
-    if (xp >= LEVELS[i].min) return LEVELS[i];
-  }
-  return LEVELS[0];
-}
-
-// ── GAME STATE ──
-var playerStats  = {};
-var questions    = [];
-var currentQ     = 0;
-var score        = 0;
-var correctCount = 0;
-var streak       = 0;       // current answer streak in this game
-var maxStreak    = 0;
-var answerTimes  = [];      // ms per question
-var answered     = false;
-var timerInterval= null;
-var timeLeft     = 20;
-var MAX_TIME     = 20;
-var isGuest      = MODE === 'guest';
-var gameStarted  = false;
-var ratingGiven  = null;
-var gameHistory  = [];      // per-question result dots
-
-// ── SOUND ──
-var soundOn = localStorage.getItem('dqt_sound') !== 'off';
-function toggleSound() {
-  soundOn = !soundOn;
-  localStorage.setItem('dqt_sound', soundOn ? 'on' : 'off');
-  document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
-}
-document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
-
-// Simple beep using Web Audio API
-var audioCtx = null;
-function beep(freq, dur, vol, type) {
-  if (!soundOn) return;
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var o = audioCtx.createOscillator();
-    var g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.frequency.value = freq;
-    o.type = type || 'sine';
-    g.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (dur || 0.15));
-    o.start(); o.stop(audioCtx.currentTime + (dur || 0.15));
-  } catch(e) {}
-}
-function playCorrect() { beep(523, 0.1, 0.12); setTimeout(function(){beep(659, 0.1, 0.12);}, 80); }
-function playWrong()   { beep(220, 0.15, 0.12, 'sawtooth'); }
-function playTick()    { beep(880, 0.04, 0.05); }
-function playWin()     { [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){beep(f,0.15,0.1);},i*100); }); }
-
-// ── SESSION TOKEN ──
-function getToken() {
-  return new Promise(function(resolve) {
-    var tok = localStorage.getItem('dqt_session_token');
-    if (tok) { resolve(tok); return; }
+// ══════════════════════════════════════════════
+// SESSION TOKEN
+// ══════════════════════════════════════════════
+function getToken(){
+  return new Promise(function(resolve){
+    var tok=localStorage.getItem('dqt_session_token');
+    if(tok){resolve(tok);return;}
     fetch('https://opentdb.com/api_token.php?command=request')
       .then(function(r){return r.json();})
-      .then(function(d){
-        localStorage.setItem('dqt_session_token', d.token);
-        resolve(d.token);
-      }).catch(function(){ resolve(''); });
+      .then(function(d){localStorage.setItem('dqt_session_token',d.token);resolve(d.token);})
+      .catch(function(){resolve('');});
+  });
+}
+function resetToken(){
+  return new Promise(function(resolve){
+    var tok=localStorage.getItem('dqt_session_token');
+    if(!tok){getToken().then(resolve);return;}
+    fetch('https://opentdb.com/api_token.php?command=reset&token='+tok).then(function(){resolve(tok);}).catch(function(){resolve(tok);});
   });
 }
 
-function resetToken() {
-  return new Promise(function(resolve) {
-    var tok = localStorage.getItem('dqt_session_token');
-    if (!tok) { getToken().then(resolve); return; }
-    fetch('https://opentdb.com/api_token.php?command=reset&token=' + tok)
-      .then(function(r){return r.json();})
-      .then(function(){ resolve(tok); })
-      .catch(function(){ resolve(tok); });
-  });
+// ══════════════════════════════════════════════
+// COSMETICS
+// ══════════════════════════════════════════════
+function applyCosmetics(stats){
+  var eq=(stats&&stats.equippedItems)||{};
+  var theme=eq.theme||'dark';
+  localStorage.setItem('dqt_theme',theme);
+  document.documentElement.setAttribute('data-theme',theme);
+  var nb=document.getElementById('navBadge');
+  if(nb)nb.textContent=BADGE_EMOJIS[eq.badge||'rookie']||'';
 }
 
-// ── FETCH QUESTIONS ──
-function fetchQuestions(token, retries) {
-  retries = retries || 0;
-  // Read game settings
-  var qcount = MODE === 'daily' ? 10 : (parseInt(localStorage.getItem('dqt_qcount')) || 10);
-  var difficulty = MODE === 'daily' ? 'medium' : MODE === 'speed' ? 'any' : (localStorage.getItem('dqt_difficulty') || 'any');
-  var qtype = localStorage.getItem('dqt_qtype') || 'any';
-  var timerSetting = MODE === 'speed' ? 10 : (parseInt(localStorage.getItem('dqt_timer')) || 20);
-  MAX_TIME = timerSetting === 0 ? 9999 : timerSetting;  // 0 = no timer
+// ══════════════════════════════════════════════
+// PRE-GAME CONFIG
+// ══════════════════════════════════════════════
+var pgConfig={
+  mode:MODE,
+  qcount:parseInt(localStorage.getItem('dqt_qcount')||'10'),
+  diff:localStorage.getItem('dqt_difficulty')||'any',
+  qtype:localStorage.getItem('dqt_qtype')||'any',
+  timer:parseInt(localStorage.getItem('dqt_timer')||'20')
+};
 
-  var url = 'https://opentdb.com/api.php?amount=' + qcount + '&encode=url3986';
-  if (CAT_ID && CAT_ID !== 0) url += '&category=' + CAT_ID;
-  if (difficulty && difficulty !== 'any') url += '&difficulty=' + difficulty;
-  if (qtype && qtype !== 'any') url += '&type=' + qtype;
-  if (token) url += '&token=' + token;
+var MODES=[
+  {id:'personal',icon:'🎮',name:'Solo',desc:'Standard game, full scoring'},
+  {id:'daily',icon:'📅',name:'Daily',desc:'Same cat daily, one shot'},
+  {id:'speed',icon:'⚡',name:'Speed',desc:'10s timer, wrong = −5s'},
+  {id:'streak',icon:'💀',name:'Streak',desc:'One wrong and it\'s over'},
+  {id:'live',icon:'📡',name:'Live',desc:'Multiplayer room'}
+];
 
-  document.getElementById('loadingSub').textContent = 'Connecting to OpenTDB…';
-
-  fetch(url)
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if (d.response_code === 5) {
-        // Rate limited — wait and retry
-        document.getElementById('loadingSub').textContent = 'Rate limited, retrying in 5s…';
-        setTimeout(function(){ fetchQuestions(token, retries); }, 5500);
-        return;
-      }
-      if (d.response_code === 3) {
-        // Token not found — get new one
-        localStorage.removeItem('dqt_session_token');
-        getToken().then(function(tok){ fetchQuestions(tok, retries); });
-        return;
-      }
-      if (d.response_code === 4) {
-        // Token exhausted — reset
-        resetToken().then(function(tok){ fetchQuestions(tok, retries); });
-        return;
-      }
-      if (d.response_code !== 0 || !d.results || d.results.length === 0) {
-        if (retries < 2) {
-          setTimeout(function(){ fetchQuestions(token, retries + 1); }, 2000);
-        } else {
-          showError('Could not load questions. Please try again.');
-        }
-        return;
-      }
-      // Decode questions
-      questions = d.results.map(function(q) {
-        var dec = decodeURIComponent;
-        var answers = q.incorrect_answers.map(dec);
-        var correct = dec(q.correct_answer);
-        // Shuffle answers
-        answers.push(correct);
-        answers.sort(function(){ return Math.random() - 0.5; });
-        return {
-          question:  dec(q.question),
-          correct:   correct,
-          answers:   answers,
-          category:  dec(q.category),
-          difficulty:dec(q.difficulty),
-          type:      q.type
-        };
-      });
-      startGame();
-    })
-    .catch(function() {
-      if (retries < 2) {
-        document.getElementById('loadingSub').textContent = 'Retrying…';
-        setTimeout(function(){ fetchQuestions(token, retries + 1); }, 2000);
-      } else {
-        showError('Network error. Check your connection and try again.');
-      }
-    });
-}
-
-function showError(msg) {
-  document.getElementById('mainContent').innerHTML =
-    '<div class="loading-screen"><div style="font-size:2rem">⚠️</div>' +
-    '<div class="loading-title">Oops!</div>' +
-    '<div class="loading-sub">' + msg + '</div>' +
-    '<button onclick="window.location.reload()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-family:var(--font-b);font-size:0.9rem;font-weight:700;cursor:pointer;">Try Again</button>' +
-    '<a href="categories.html" style="margin-top:8px;font-size:0.78rem;color:var(--muted);text-decoration:none;">← Back to Categories</a>' +
+function showPreGame(){
+  var catEmoji=CATS[CAT_ID]||'🎯';
+  var modesHTML=MODES.map(function(m){
+    return '<div class="mode-chip'+(m.id===pgConfig.mode?' active':'')+'" onclick="selectMode(\''+m.id+'\',this)">'+
+      '<div class="mode-chip-icon">'+m.icon+'</div>'+
+      '<div class="mode-chip-name">'+m.name+'</div>'+
+      '<div class="mode-chip-desc">'+m.desc+'</div>'+
     '</div>';
+  }).join('');
+
+  function chipRow(id,values,current){
+    return values.map(function(v){
+      return '<div class="chip'+(current==v.val?' active':'')+'" onclick="setPgChip(\''+id+'\','+JSON.stringify(v.val)+',this)">'+(v.label||v.val)+'</div>';
+    }).join('');
+  }
+
+  document.getElementById('mainContent').innerHTML=
+    '<div class="pregame-card">'+
+    '<div class="pg-eyebrow" style="color:var(--accent)">'+catEmoji+' '+(CAT_ID?CAT_NAME:'All Categories')+'</div>'+
+    '<div class="pg-title">Quick start</div>'+
+    '<div class="pg-sub">Adjust settings for this game, or jump right in.</div>'+
+    '<div class="pg-field"><div class="pg-label">Game Mode</div><div class="mode-grid" id="modeGrid">'+modesHTML+'</div></div>'+
+    '<div class="pg-divider"></div>'+
+    '<div class="pg-field"><div class="pg-label">Questions</div><div class="chip-row">'+chipRow('qcount',[{val:5},{val:10},{val:15},{val:20}],pgConfig.qcount)+'</div></div>'+
+    '<div class="pg-field"><div class="pg-label">Difficulty</div><div class="chip-row">'+chipRow('diff',[{val:'any',label:'Any'},{val:'easy',label:'Easy'},{val:'medium',label:'Medium'},{val:'hard',label:'Hard'}],pgConfig.diff)+'</div></div>'+
+    '<div class="pg-field"><div class="pg-label">Question Type</div><div class="chip-row">'+chipRow('qtype',[{val:'any',label:'Any'},{val:'multiple',label:'Multiple choice'},{val:'boolean',label:'True / False'}],pgConfig.qtype)+'</div></div>'+
+    '<div class="pg-field" id="timerField"><div class="pg-label">Timer</div><div class="chip-row">'+chipRow('timer',[{val:0,label:'None'},{val:10,label:'10s'},{val:20,label:'20s'},{val:30,label:'30s'}],pgConfig.timer)+'</div></div>'+
+    '<div class="pg-footer">'+
+      '<label class="pg-remember"><input type="checkbox" id="rememberCheck"> Remember these settings</label>'+
+      '<button class="btn-start" id="startBtn" onclick="startFromPreGame()">Start game →</button>'+
+    '</div>'+
+    '</div>';
+  updatePreGameForMode(pgConfig.mode);
 }
 
-// ── START GAME ──
-function startGame() {
-  currentQ     = 0;
-  score        = 0;
-  correctCount = 0;
-  streak       = 0;
-  maxStreak    = 0;
-  answerTimes  = [];
-  gameHistory  = [];
-  gameStarted  = true;
-  document.getElementById('quitBtn').style.display = 'flex';
+function selectMode(modeId,el){
+  pgConfig.mode=modeId;
+  document.querySelectorAll('.mode-chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  updatePreGameForMode(modeId);
+}
+
+function updatePreGameForMode(modeId){
+  var startBtn=document.getElementById('startBtn');
+  var existingNotice=document.querySelector('.live-notice');
+  if(existingNotice)existingNotice.remove();
+  if(modeId==='live'){
+    var modeGrid=document.getElementById('modeGrid');
+    if(modeGrid){
+      var notice=document.createElement('div');
+      notice.className='live-notice';
+      notice.innerHTML='<div class="live-notice-icon">📡</div><div class="live-notice-text"><strong>Live mode</strong> needs a lobby room. <a href="lobby.html">Go to Lobby</a> to host or join.</div>';
+      modeGrid.parentNode.insertBefore(notice,modeGrid.nextSibling);
+    }
+    if(startBtn)startBtn.style.display='none';
+  }else{
+    if(startBtn)startBtn.style.display='';
+  }
+  var tf=document.getElementById('timerField');
+  if(tf)tf.style.opacity=modeId==='speed'?'0.4':'1';
+}
+
+function setPgChip(type,val,el){
+  el.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  pgConfig[type]=val;
+}
+
+function startFromPreGame(){
+  var remember=document.getElementById('rememberCheck');
+  if(remember&&remember.checked){
+    localStorage.setItem('dqt_qcount',pgConfig.qcount);
+    localStorage.setItem('dqt_difficulty',pgConfig.diff);
+    localStorage.setItem('dqt_qtype',pgConfig.qtype);
+    localStorage.setItem('dqt_timer',pgConfig.timer);
+    localStorage.setItem('dqt_defmode',pgConfig.mode);
+  }
+  MODE=pgConfig.mode;
+  pregameConfig=pgConfig;
+  showLoading();
+  getToken().then(function(tok){fetchQuestions(tok);});
+}
+
+// ══════════════════════════════════════════════
+// LOADING / ERROR
+// ══════════════════════════════════════════════
+function showLoading(msg){
+  document.getElementById('mainContent').innerHTML=
+    '<div class="loading-screen"><div class="loading-spinner"></div>'+
+    '<div class="loading-title">Loading questions…</div>'+
+    '<div class="loading-sub" id="loadingSub">'+(msg||'Fetching from OpenTDB')+'</div></div>';
+}
+
+function showError(msg){
+  document.getElementById('mainContent').innerHTML=
+    '<div class="loading-screen"><div style="font-size:2rem">⚠️</div>'+
+    '<div class="loading-title">Oops!</div>'+
+    '<div class="loading-sub">'+msg+'</div>'+
+    '<button onclick="window.location.reload()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-family:var(--font-b);font-size:0.9rem;font-weight:700;cursor:pointer;">Try Again</button>'+
+    '<a href="categories.html" style="margin-top:8px;font-size:0.78rem;color:var(--muted);text-decoration:none;">← Back to Categories</a></div>';
+}
+
+// ══════════════════════════════════════════════
+// LIVE MODE — SUPABASE WIRING
+// ══════════════════════════════════════════════
+function initLiveMode(){
+  // Load room data + questions from Supabase
+  showLoading('Connecting to room '+ROOM+'…');
+  if(!sb){showError('Not connected to database');return;}
+  sb.from('dqtrivia_rooms').select('*').eq('id',ROOM).single().then(function(res){
+    if(res.error||!res.data){showError('Room "'+ROOM+'" not found. <a href="lobby.html">Back to Lobby</a>');return;}
+    var room=res.data;
+    if(room.status==='ended'){showError('This game has already ended. <a href="lobby.html">Back to Lobby</a>');return;}
+    questions=room.questions||[];
+    MAX_TIME=room.timer||20;
+    if(MAX_TIME===0)MAX_TIME=99999;
+    currentQ=room.question_index||0;
+    pgConfig.qcount=questions.length;
+
+    // Load all players for scoreboard
+    sb.from('dqtrivia_room_players').select('*').eq('room_id',ROOM)
+      .order('joined_at',{ascending:true}).then(function(pres){
+        liveAllPlayers=pres.data||[];
+        // Find my player row
+        var myRow=liveAllPlayers.find(function(p){return p.user_id===myUserId;});
+        if(myRow)myPlayerId=myRow.id;
+
+        subscribeLiveRoom();
+        startGame();
+      });
+  });
+}
+
+function subscribeLiveRoom(){
+  if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
+  liveChannel=sb.channel('play:'+ROOM)
+    // Watch room for question_index advances from host
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms',filter:'id=eq.'+ROOM},function(payload){
+      var newRoom=payload.new;
+      if(newRoom.status==='ended'){
+        showToast('Host ended the game');
+        setTimeout(function(){window.location.href='index.html';},2000);
+        return;
+      }
+      // Host advanced to next question
+      if(typeof newRoom.question_index==='number'&&newRoom.question_index!==currentQ){
+        currentQ=newRoom.question_index;
+        if(currentQ<questions.length){
+          renderQuestion();
+        }else{
+          endGame();
+        }
+      }
+    })
+    // Watch other players' scores for live scoreboard updates
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+ROOM},function(payload){
+      liveAllPlayers=liveAllPlayers.map(function(p){return p.id===payload.new.id?payload.new:p;});
+      updateLiveScoreboard();
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+ROOM},function(payload){
+      var exists=liveAllPlayers.some(function(p){return p.id===payload.new.id;});
+      if(!exists)liveAllPlayers.push(payload.new);
+      updateLiveScoreboard();
+    })
+    .subscribe();
+}
+
+// Write my answer back to Supabase after answering
+function submitLiveAnswer(answerIdx,isCorrect,pointsEarned){
+  if(!myPlayerId||!sb)return;
+  var myRow=liveAllPlayers.find(function(p){return p.id===myPlayerId;});
+  if(!myRow)return;
+  var answers=Array.isArray(myRow.answers)?myRow.answers.slice():[];
+  // Pad if needed
+  while(answers.length<currentQ)answers.push(null);
+  answers[currentQ]={answerIdx:answerIdx,correct:isCorrect,qIdx:currentQ};
+  var newScore=(myRow.score||0)+pointsEarned;
+  sb.from('dqtrivia_room_players').update({
+    score:newScore,
+    answers:answers
+  }).eq('id',myPlayerId);
+  // Update local copy
+  liveAllPlayers=liveAllPlayers.map(function(p){
+    return p.id===myPlayerId?Object.assign({},p,{score:newScore,answers:answers}):p;
+  });
+}
+
+function updateLiveScoreboard(){
+  var sbEl=document.querySelector('.live-scoreboard');
+  if(!sbEl)return;
+  var sorted=liveAllPlayers.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  sbEl.innerHTML='<div class="live-sb-title">Live Scores</div>'+
+    sorted.map(function(p,i){
+      var isMe=p.user_id===myUserId;
+      return '<div class="live-sb-row'+(isMe?' me':'')+'">'+
+        '<div class="live-sb-rank">'+(i+1)+'</div>'+
+        '<div class="live-sb-name">'+(isMe?'You':escAttr(p.display_name))+'</div>'+
+        '<div class="live-sb-score">'+(p.score||0)+'</div>'+
+      '</div>';
+    }).join('');
+}
+
+// ══════════════════════════════════════════════
+// FETCH QUESTIONS (non-live modes)
+// ══════════════════════════════════════════════
+function fetchQuestions(token,retries){
+  retries=retries||0;
+  var cfg=pregameConfig||pgConfig;
+  var qcount=(MODE==='daily')?10:cfg.qcount;
+  var diff=(MODE==='daily')?'medium':(MODE==='speed'?'any':cfg.diff);
+  var qtype=cfg.qtype;
+  var timer=(MODE==='speed')?10:(MODE==='daily'?20:cfg.timer);
+  MAX_TIME=timer===0?99999:timer;
+
+  var url='https://opentdb.com/api.php?amount='+qcount+'&encode=url3986';
+  if(CAT_ID&&CAT_ID!==0)url+='&category='+CAT_ID;
+  if(diff&&diff!=='any')url+='&difficulty='+diff;
+  if(qtype&&qtype!=='any')url+='&type='+qtype;
+  if(token)url+='&token='+token;
+
+  var sub=document.getElementById('loadingSub');
+  if(sub)sub.textContent='Connecting to OpenTDB…';
+
+  fetch(url).then(function(r){return r.json();}).then(function(d){
+    if(d.response_code===5){var s=document.getElementById('loadingSub');if(s)s.textContent='Rate limited — retrying in 5s…';setTimeout(function(){fetchQuestions(token,retries);},5500);return;}
+    if(d.response_code===3){localStorage.removeItem('dqt_session_token');getToken().then(function(tok){fetchQuestions(tok,retries);});return;}
+    if(d.response_code===4){resetToken().then(function(tok){fetchQuestions(tok,retries);});return;}
+    if(d.response_code!==0||!d.results||!d.results.length){
+      if(retries<2){setTimeout(function(){fetchQuestions(token,retries+1);},2000);}
+      else{showError('Could not load questions — try a different category or difficulty.');}
+      return;
+    }
+    questions=d.results.map(function(q){
+      var dec=decodeURIComponent;
+      var answers=q.incorrect_answers.map(dec);
+      var correct=dec(q.correct_answer);
+      answers.push(correct);
+      for(var i=answers.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=answers[i];answers[i]=answers[j];answers[j]=t;}
+      return{question:dec(q.question),correct:correct,answers:answers,difficulty:dec(q.difficulty),type:q.type};
+    });
+    startGame();
+  }).catch(function(){
+    if(retries<2){setTimeout(function(){fetchQuestions(token,retries+1);},2000);}
+    else{showError('Network error. Check your connection and try again.');}
+  });
+}
+
+// ══════════════════════════════════════════════
+// START GAME
+// ══════════════════════════════════════════════
+function startGame(){
+  currentQ=0;score=0;correctCount=0;inGameStreak=0;maxStreak=0;
+  answerTimes=[];gameHistory=[];ratingGiven=null;gameStarted=true;
+  document.getElementById('quitBtn').style.display='flex';
   renderQuestion();
 }
 
-// ── RENDER QUESTION ──
-function renderQuestion() {
-  if (currentQ >= questions.length) { endGame(); return; }
-  answered = false;
-  timeLeft = MAX_TIME;
+// ══════════════════════════════════════════════
+// RENDER QUESTION
+// ══════════════════════════════════════════════
+function renderQuestion(){
+  if(currentQ>=questions.length){endGame();return;}
+  answered=false;
+  timeLeft=MAX_TIME<99999?MAX_TIME:0;
 
-  var q    = questions[currentQ];
-  var LETTERS = ['A','B','C','D'];
+  var q=questions[currentQ];
+  var LETTERS=['A','B','C','D'];
+  var catEmoji=CATS[CAT_ID]||'🎯';
+  var modeBadgeClass={speed:'badge-speed',streak:'badge-streak',live:'badge-live',daily:'badge-daily'}[MODE]||'';
 
-  var diffCls  = 'diff-' + q.difficulty;
-  var diffEmoji= q.difficulty === 'easy' ? '🟢' : q.difficulty === 'medium' ? '🟡' : '🔴';
-
-  var streakDots = '';
-  for (var i = 0; i < questions.length; i++) {
-    var cls = i < gameHistory.length
-      ? (gameHistory[i] ? 'correct' : 'wrong')
-      : (i === currentQ ? 'current' : '');
-    streakDots += '<div class="streak-dot ' + cls + '"></div>';
+  var dotsHTML='';
+  for(var i=0;i<questions.length;i++){
+    var cls=i<gameHistory.length?(gameHistory[i]?'correct':'wrong'):(i===currentQ?'current':'');
+    dotsHTML+='<div class="streak-dot '+cls+'"></div>';
   }
-  var streakLabel = streak >= 3 ? '<span class="streak-fire">🔥</span><span class="streak-label">' + streak + ' streak!</span>' : '<span class="streak-label">Q' + (currentQ+1) + ' of ' + questions.length + '</span>';
+  var streakLabelHTML=inGameStreak>=3
+    ?'<span class="streak-fire">🔥</span><span class="streak-label">'+inGameStreak+' streak!</span>'
+    :'<span class="streak-label">Q'+(currentQ+1)+' of '+questions.length+'</span>';
 
-  var answersHTML = q.answers.map(function(ans, i) {
-    return '<button class="answer-btn" onclick="selectAnswer(this, \'' + escapeAttr(ans) + '\')">' +
-      '<div class="answer-letter">' + LETTERS[i] + '</div>' +
-      '<span>' + ans + '</span>' +
-      '</button>';
+  var answersHTML=q.answers.map(function(ans,i){
+    return '<button class="answer-btn" onclick="selectAnswer(this,\''+escAttr(ans)+'\')">'+
+      '<div class="answer-letter">'+LETTERS[i]+'</div>'+
+      '<span>'+ans+'</span>'+
+    '</button>';
   }).join('');
 
-  var pct = (currentQ / questions.length) * 100;
+  var pct=(currentQ/questions.length)*100;
+  var timerHTML=MAX_TIME<99999
+    ?'<div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill green" id="timerFill" style="width:100%"></div></div><div class="timer-num" id="timerNum">'+MAX_TIME+'</div></div>'
+    :'';
 
-  var guestBanner = isGuest
-    ? '<div class="guest-banner">👤 <span>Playing as <strong>Guest</strong> — <a href="landing.html">Sign in</a> to save progress</span></div>'
-    : '';
+  var guestBanner=isGuest
+    ?'<div class="guest-banner">👤 <span>Playing as <strong>Guest</strong> — <a href="landing.html">Sign in</a> to save progress</span></div>'
+    :'';
 
-  document.getElementById('mainContent').innerHTML =
-    guestBanner +
-    '<div class="game-header">' +
-      '<div class="game-cat"><span class="game-cat-emoji">' + (CATS[CAT_ID] || '🎯') + '</span><span class="game-cat-name">' + CAT_NAME + '</span></div>' +
-      '<div class="game-mode-badge">' + getModeLabel() + '</div>' +
-    '</div>' +
-    '<div class="progress-wrap">' +
-      '<div class="progress-row"><span class="progress-label">Progress</span><span class="progress-qnum">' + score.toLocaleString() + ' pts</span></div>' +
-      '<div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:' + pct + '%"></div></div>' +
-    '</div>' +
-    '<div class="timer-wrap">' +
-      '<div class="timer-bar-bg"><div class="timer-bar-fill green" id="timerFill" style="width:100%"></div></div>' +
-      '<div class="timer-num" id="timerNum">' + MAX_TIME + '</div>' +
-    '</div>' +
-    '<div class="streak-indicator">' + streakDots + streakLabel + '</div>' +
-    '<div class="question-card">' +
-      '<div class="question-difficulty ' + diffCls + '">' + diffEmoji + ' ' + q.difficulty + '</div>' +
-      '<div class="question-text">' + q.question + '</div>' +
-    '</div>' +
-    '<div class="answers" id="answersWrap">' + answersHTML + '</div>' +
+  // Live scoreboard panel
+  var livePanel='';
+  if(MODE==='live'){
+    var sorted=liveAllPlayers.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+    livePanel='<div class="live-scoreboard">'+
+      '<div class="live-sb-title">Live Scores</div>'+
+      sorted.map(function(p,i){
+        var isMe=p.user_id===myUserId;
+        return '<div class="live-sb-row'+(isMe?' me':'')+'">'+
+          '<div class="live-sb-rank">'+(i+1)+'</div>'+
+          '<div class="live-sb-name">'+(isMe?'You':escAttr(p.display_name))+'</div>'+
+          '<div class="live-sb-score">'+(p.score||0)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }
+
+  var questionContent=
+    guestBanner+
+    '<div class="game-header">'+
+      '<div class="game-cat"><span class="game-cat-emoji">'+catEmoji+'</span><span class="game-cat-name">'+CAT_NAME+'</span></div>'+
+      '<div class="game-mode-badge '+modeBadgeClass+'">'+getModeLabel()+'</div>'+
+    '</div>'+
+    '<div class="progress-wrap">'+
+      '<div class="progress-row"><span class="progress-label">Progress</span><span class="progress-qnum" id="scoreDisplay">'+score.toLocaleString()+' pts</span></div>'+
+      '<div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:'+pct+'%"></div></div>'+
+    '</div>'+
+    timerHTML+
+    '<div class="streak-indicator">'+dotsHTML+streakLabelHTML+'</div>'+
+    '<div class="question-card">'+
+      (localStorage.getItem('dqt_show_diff')!=='false'?'<div class="question-difficulty diff-'+q.difficulty+'">'+(q.difficulty==='easy'?'🟢':q.difficulty==='medium'?'🟡':'🔴')+' '+q.difficulty+'</div>':'')+
+      '<div class="question-text">'+q.question+'</div>'+
+    '</div>'+
+    '<div class="answers" id="answersWrap">'+answersHTML+'</div>'+
     '<button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>';
+
+  if(MODE==='live'){
+    document.getElementById('mainContent').innerHTML=
+      '<div class="live-header">'+
+        '<div class="live-room-code">📡 Room: '+ROOM+'</div>'+
+        '<div class="live-players">'+liveAllPlayers.length+' players</div>'+
+      '</div>'+
+      '<div class="live-layout"><div>'+questionContent+'</div>'+livePanel+'</div>';
+  }else{
+    document.getElementById('mainContent').innerHTML=questionContent;
+  }
 
   startTimer();
 }
 
-function getModeLabel() {
-  var labels = { personal:'Solo', daily:'Daily', guest:'Guest', race:'Race', streak:'Streak 💀', speed:'⚡ Speed', live:'Live' };
-  return labels[MODE] || 'Solo';
+function getModeLabel(){
+  return{personal:'Solo',daily:'📅 Daily',guest:'Guest',speed:'⚡ Speed',streak:'💀 Streak',live:'📡 Live'}[MODE]||'Solo';
 }
 
-// ── STREAK MODE: wrong answer = immediate game over with penalty screen ──
-function streakGameOver(wasTimeout) {
-  stopTimer();
-  gameStarted = false;
-  document.getElementById('quitBtn').style.display = 'none';
-  var msg = wasTimeout ? 'Time's up! Streak broken.' : 'Wrong answer! Streak broken.';
-  document.getElementById('mainContent').innerHTML =
-    '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">' +
-      '<div style="font-size:3.5rem;margin-bottom:12px;">💀</div>' +
-      '<div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:8px;">Eliminated!</div>' +
-      '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:6px;">' + msg + '</div>' +
-      '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Survived <strong style="color:var(--accent);">' + currentQ + '</strong> question' + (currentQ===1?'':'s') + ' · ' + correctCount + '/' + currentQ + ' correct</div>' +
-      '<div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">' +
-        '<button onclick="playAgain()" style="padding:12px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🔄 Try Again</button>' +
-        '<a href="categories.html" style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">Browse Categories</a>' +
-      '</div>' +
-    '</div>';
-  if (!isGuest) saveGameStats(0, 0, 0, 0);
-}
-
-function escapeAttr(s) {
-  return s.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-}
-
-// ── TIMER ──
-function startTimer() {
+// ══════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════
+function startTimer(){
   clearInterval(timerInterval);
-  var questionStartTime = Date.now();
-
-  timerInterval = setInterval(function() {
-    timeLeft -= 0.1;
-    var pct = (timeLeft / MAX_TIME) * 100;
-    var fill = document.getElementById('timerFill');
-    var num  = document.getElementById('timerNum');
-    if (!fill) { clearInterval(timerInterval); return; }
-
-    fill.style.width = Math.max(0, pct) + '%';
-    fill.className = 'timer-bar-fill ' + (pct > 50 ? 'green' : pct > 25 ? 'yellow' : 'red');
-    num.textContent = Math.ceil(timeLeft);
-    num.className = 'timer-num' + (pct < 25 ? ' red' : '');
-
-    if (timeLeft <= 5 && timeLeft > 0 && Math.ceil(timeLeft) !== Math.ceil(timeLeft + 0.1)) {
-      playTick();
-    }
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      timeUp(questionStartTime);
-    }
-  }, 100);
+  if(MAX_TIME>=99999)return;
+  timerInterval=setInterval(function(){
+    timeLeft-=0.1;
+    var pct=(timeLeft/MAX_TIME)*100;
+    var fill=document.getElementById('timerFill');
+    var num=document.getElementById('timerNum');
+    if(!fill){clearInterval(timerInterval);return;}
+    fill.style.width=Math.max(0,pct)+'%';
+    fill.className='timer-bar-fill '+(pct>50?'green':pct>25?'yellow':'red');
+    num.textContent=Math.ceil(timeLeft);
+    num.className='timer-num'+(pct<25?' red':'');
+    if(timeLeft<=5&&timeLeft>0&&Math.ceil(timeLeft)!==Math.ceil(timeLeft+0.1))playTick();
+    if(timeLeft<=0){clearInterval(timerInterval);timeUp();}
+  },100);
 }
+function stopTimer(){clearInterval(timerInterval);}
 
-function stopTimer() { clearInterval(timerInterval); }
-
-function timeUp(startTime) {
-  if (answered) return;
-  answered = true;
-  var elapsed = Date.now() - startTime;
-  answerTimes.push(Math.min(elapsed, MAX_TIME * 1000));
-  streak = 0;
+function timeUp(){
+  if(answered)return;
+  answered=true;
+  inGameStreak=0;
   gameHistory.push(false);
   playWrong();
   flashFeedback('⏰');
-
-  // Streak mode: timeout = eliminated
-  if (MODE === 'streak') {
-    showCorrectAnswer();
-    setTimeout(function(){ streakGameOver(true); }, 1200);
-    return;
-  }
-
-  showCorrectAnswer();
+  if(MODE==='streak'){showCorrectAnswerHighlight();setTimeout(function(){streakGameOver(true);},1200);return;}
+  if(MODE==='live'){submitLiveAnswer(-1,false,0);}
+  showCorrectAnswerHighlight();
   showNextButton();
 }
 
-// ── SELECT ANSWER ──
-function selectAnswer(btn, chosen) {
-  if (answered) return;
-  answered = true;
+// ══════════════════════════════════════════════
+// SELECT ANSWER
+// ══════════════════════════════════════════════
+function selectAnswer(btn,chosen){
+  if(answered)return;
+  answered=true;
   stopTimer();
 
-  var q = questions[currentQ];
-  var isCorrect = chosen === q.correct;
-  var elapsed = MAX_TIME * 1000 - (timeLeft / MAX_TIME * MAX_TIME * 1000);
-  // Actually track time remaining
-  var timeRemaining = timeLeft;
-  answerTimes.push((MAX_TIME - timeRemaining) * 1000);
+  var q=questions[currentQ];
+  var isCorrect=chosen===q.correct;
+  var timeRemaining=Math.max(0,timeLeft);
+  var answerIdx=q.answers.indexOf(chosen);
 
-  var btns = document.querySelectorAll('.answer-btn');
-  btns.forEach(function(b) { b.disabled = true; });
+  document.querySelectorAll('.answer-btn').forEach(function(b){b.disabled=true;});
 
-  if (isCorrect) {
+  if(isCorrect){
     btn.classList.add('correct');
-    btn.querySelector('.answer-letter').style.background = 'rgba(77,232,136,0.2)';
-    btn.innerHTML += '<span class="answer-result-icon">✓</span>';
-
-    // Score calculation
-    var baseScore = 100;
-    var speedBonus = Math.round((timeRemaining / MAX_TIME) * 50);
-    streak++;
-    maxStreak = Math.max(maxStreak, streak);
-    var streakMult = Math.min(1 + (streak - 1) * 0.1, 2.0);
-    var gained = Math.round((baseScore + speedBonus) * streakMult);
-    score += gained;
+    btn.innerHTML+='<span class="answer-result-icon">✓</span>';
+    var base=100;
+    var speedBonus=MAX_TIME<99999?Math.round((timeRemaining/MAX_TIME)*50):0;
+    inGameStreak++;
+    maxStreak=Math.max(maxStreak,inGameStreak);
+    var mult=Math.min(1+(inGameStreak-1)*0.1,2.0);
+    var gained=Math.round((base+speedBonus)*mult);
+    score+=gained;
     correctCount++;
     gameHistory.push(true);
-
     playCorrect();
-    flashFeedback(streak >= 3 ? '🔥' : '✓');
-    showToast('+' + gained + ' pts' + (streak >= 2 ? ' · ' + streak + '× streak!' : ''));
-  } else {
+    flashFeedback(inGameStreak>=3?'🔥':'✓');
+    showToast('+'+gained+' pts'+(inGameStreak>=2?' · '+inGameStreak+'× streak!':''));
+    var sd=document.getElementById('scoreDisplay');
+    if(sd)sd.textContent=score.toLocaleString()+' pts';
+    if(MODE==='live')submitLiveAnswer(answerIdx,true,gained);
+  }else{
     btn.classList.add('wrong');
-    btn.innerHTML += '<span class="answer-result-icon">✗</span>';
-    streak = 0;
+    btn.innerHTML+='<span class="answer-result-icon">✗</span>';
+    inGameStreak=0;
     gameHistory.push(false);
     playWrong();
     flashFeedback('✗');
-    showCorrectAnswer(btns);
-
-    // Streak mode: wrong = eliminated
-    if (MODE === 'streak') {
-      setTimeout(function(){ streakGameOver(false); }, 1200);
-      return;
+    showCorrectAnswerHighlight();
+    if(MODE==='live')submitLiveAnswer(answerIdx,false,0);
+    if(MODE==='streak'){setTimeout(function(){streakGameOver(false);},1200);return;}
+    if(MODE==='speed'){
+      timeLeft=Math.max(0,timeLeft-5);
+      var pen=document.getElementById('speedPenalty');
+      if(pen){pen.classList.add('show');setTimeout(function(){pen.classList.remove('show');},1200);}
     }
   }
 
-  // Update score display
-  var scoreEl = document.querySelector('.progress-qnum');
-  if (scoreEl) scoreEl.textContent = score.toLocaleString() + ' pts';
-
+  var pf=document.getElementById('progressFill');
+  if(pf)pf.style.width=((currentQ+1)/questions.length*100)+'%';
   showNextButton();
 }
 
-function showCorrectAnswer(btns) {
-  var q = questions[currentQ];
-  if (!btns) btns = document.querySelectorAll('.answer-btn');
-  btns.forEach(function(b) {
-    var span = b.querySelector('span:not(.answer-result-icon)');
-    if (span && span.textContent === q.correct) {
+function showCorrectAnswerHighlight(){
+  var q=questions[currentQ];
+  document.querySelectorAll('.answer-btn').forEach(function(b){
+    var span=b.querySelector('span:not(.answer-result-icon)');
+    if(span&&span.textContent===q.correct&&!b.classList.contains('correct')){
       b.classList.add('missed');
-      b.innerHTML += '<span class="answer-result-icon">✓</span>';
+      b.innerHTML+='<span class="answer-result-icon">✓</span>';
     }
   });
 }
 
-function showNextButton() {
-  var btn = document.getElementById('nextBtn');
-  if (btn) {
-    btn.style.display = 'block';
-    if (currentQ === questions.length - 1) {
-      btn.textContent = 'See Results →';
-    }
-  }
+function showNextButton(){
+  var btn=document.getElementById('nextBtn');
+  if(!btn)return;
+  btn.style.display='block';
+  if(currentQ>=questions.length-1)btn.textContent='See Results →';
+  // Live mode: next is driven by host advancing question_index, but player can still tap to see results locally
+  if(MODE==='live')btn.textContent='Waiting for host…';
 }
 
-function flashFeedback(emoji) {
-  var el = document.getElementById('feedbackFlash');
-  el.textContent = emoji;
-  el.classList.remove('pop');
-  void el.offsetWidth; // force reflow
-  el.classList.add('pop');
-}
-
-function nextQuestion() {
+function nextQuestion(){
+  // In live mode the host drives question_index — this just skips waiting screen
   currentQ++;
   renderQuestion();
 }
 
-// ── END GAME ──
-function endGame() {
+function flashFeedback(emoji){
+  var el=document.getElementById('feedbackFlash');
+  el.textContent=emoji;
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+// ══════════════════════════════════════════════
+// STREAK GAME OVER
+// ══════════════════════════════════════════════
+function streakGameOver(wasTimeout){
   stopTimer();
-  gameStarted = false;
-  document.getElementById('quitBtn').style.display = 'none';
+  gameStarted=false;
+  document.getElementById('quitBtn').style.display='none';
+  document.getElementById('mainContent').innerHTML=
+    '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">'+
+    '<div style="font-size:3.5rem;margin-bottom:12px;">💀</div>'+
+    '<div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:8px;">Eliminated!</div>'+
+    '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:6px;">'+(wasTimeout?"Time's up!":"Wrong answer!")+'</div>'+
+    '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Survived <strong style="color:var(--accent)">'+currentQ+'</strong> question'+(currentQ===1?'':'s')+' · '+correctCount+'/'+currentQ+' correct</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">'+
+      '<button onclick="playAgain()" style="padding:12px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🔄 Try Again</button>'+
+      '<a href="categories.html" style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">Browse Categories</a>'+
+    '</div></div>';
+  if(!isGuest)saveGameStats(0,0,0,0);
+}
 
-  var accuracy     = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
-  var avgTime      = answerTimes.length > 0 ? Math.round(answerTimes.reduce(function(a,b){return a+b;},0) / answerTimes.length / 1000) : 0;
+// ══════════════════════════════════════════════
+// END GAME
+// ══════════════════════════════════════════════
+function endGame(){
+  stopTimer();
+  gameStarted=false;
+  if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
+  document.getElementById('quitBtn').style.display='none';
 
-  // XP & Coins
-  var xpEarned     = correctCount * 10;
-  var coinsEarned  = correctCount * 5;
-  var isWin        = correctCount >= Math.ceil(questions.length * 0.7);
-  if (isWin)       { xpEarned += 50; coinsEarned += 25; }
-  if (MODE === 'daily') { xpEarned += 100; coinsEarned += 50; }
-  if (answerTimes.some(function(t){ return t < 5000; })) { xpEarned += 5; }
-  if (maxStreak >= 7) coinsEarned += 100;
+  var accuracy=questions.length>0?Math.round((correctCount/questions.length)*100):0;
+  var avgTime=answerTimes.length>0?Math.round(answerTimes.reduce(function(a,b){return a+b;},0)/answerTimes.length/1000):0;
+  var lvlMult=getLevelMult((playerStats&&playerStats.xp)||0);
+  var xpEarned=Math.round(correctCount*10*lvlMult);
+  var coinsEarned=correctCount*5;
+  var isWin=correctCount>=Math.ceil(questions.length*0.7);
+  if(isWin){xpEarned+=50;coinsEarned+=25;}
+  if(MODE==='daily'){xpEarned+=100;coinsEarned+=50;}
+  if(maxStreak>=7)coinsEarned+=100;
 
-  var resultIcon  = accuracy === 100 ? '🏆' : accuracy >= 70 ? '🎉' : accuracy >= 40 ? '👍' : '💪';
-  var resultTitle = accuracy === 100 ? 'Perfect!' : accuracy >= 70 ? 'Great job!' : accuracy >= 40 ? 'Good effort!' : 'Keep practicing!';
+  var threshold=accuracy===100?100:accuracy>=70?70:accuracy>=40?40:0;
+  var icons={100:'🏆',70:'🎉',40:'👍',0:'💪'};
+  var titles={100:'Perfect!',70:'Great job!',40:'Good effort!',0:'Keep practicing!'};
 
-  var guestNotice = isGuest ? '<div class="guest-banner" style="margin-bottom:12px;">👤 <span>Progress not saved. <a href="landing.html">Sign in</a> to track your stats!</span></div>' : '';
+  // Live: final scoreboard
+  var liveEndSection='';
+  if(MODE==='live'&&liveAllPlayers.length>0){
+    var sorted=liveAllPlayers.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+    var myRank=sorted.findIndex(function(p){return p.user_id===myUserId;})+1;
+    var medals=['🥇','🥈','🥉'];
+    liveEndSection='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">'+
+      '<div style="font-size:0.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Final Scoreboard</div>'+
+      sorted.map(function(p,i){
+        var isMe=p.user_id===myUserId;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;margin-bottom:4px;'+(isMe?'background:rgba(77,232,136,0.07);border:1px solid rgba(77,232,136,0.15);':'')+'">' +
+          '<span style="font-size:0.85rem;width:20px">'+(medals[i]||(i+1))+'</span>'+
+          '<span style="flex:1;font-size:0.82rem;">'+(isMe?'You ('+escAttr(p.display_name)+')':escAttr(p.display_name))+'</span>'+
+          '<span style="font-family:var(--font-d);font-weight:700;color:var(--accent);">'+(p.score||0)+'</span>'+
+        '</div>';
+      }).join('')+
+      '<div style="margin-top:8px;text-align:center;font-size:0.75rem;color:var(--muted);">Your rank: <strong style="color:var(--text)">#'+myRank+'</strong> of '+sorted.length+'</div>'+
+    '</div>';
+  }
 
-  var html =
-    guestNotice +
-    '<div class="end-screen">' +
-    '<div class="end-hero">' +
-      '<div class="end-hero-bg">' + (CATS[CAT_ID] || '🎯') + '</div>' +
-      '<span class="end-result-icon">' + resultIcon + '</span>' +
-      '<div class="end-title">' + resultTitle + '</div>' +
-      '<div class="end-sub">' + CAT_NAME + ' · ' + getModeLabel() + '</div>' +
-      '<div class="end-score-big">' + score.toLocaleString() + '</div>' +
-      '<div class="end-score-label">points</div>' +
-      '<div class="end-stats">' +
-        '<div class="end-stat"><strong>' + correctCount + '/' + questions.length + '</strong><span>Correct</span></div>' +
-        '<div class="end-stat"><strong>' + accuracy + '%</strong><span>Accuracy</span></div>' +
-        '<div class="end-stat"><strong>' + avgTime + 's</strong><span>Avg time</span></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="end-earned">' +
-      '<div class="earned-pill xp">⚡ +' + xpEarned + ' XP</div>' +
-      '<div class="earned-pill coins">🪙 +' + coinsEarned + ' coins</div>' +
+  var guestNotice=isGuest?'<div class="guest-banner" style="margin-bottom:12px;">👤 <span>Progress not saved. <a href="landing.html">Sign in</a> to track stats!</span></div>':'';
+
+  document.getElementById('mainContent').innerHTML=
+    guestNotice+
+    '<div class="end-screen">'+
+    '<div class="end-hero">'+
+      '<div class="end-hero-bg">'+(CATS[CAT_ID]||'🎯')+'</div>'+
+      '<span class="end-result-icon">'+icons[threshold]+'</span>'+
+      '<div class="end-title">'+titles[threshold]+'</div>'+
+      '<div class="end-sub">'+CAT_NAME+' · '+getModeLabel()+'</div>'+
+      '<div class="end-score-big">'+score.toLocaleString()+'</div>'+
+      '<div class="end-score-label">points</div>'+
+      '<div class="end-stats">'+
+        '<div class="end-stat"><strong>'+correctCount+'/'+questions.length+'</strong><span>Correct</span></div>'+
+        '<div class="end-stat"><strong>'+accuracy+'%</strong><span>Accuracy</span></div>'+
+        '<div class="end-stat"><strong>'+(avgTime>0?avgTime+'s':'—')+'</strong><span>Avg time</span></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="end-earned">'+
+      '<div class="earned-pill xp">⚡ +'+xpEarned+' XP</div>'+
+      '<div class="earned-pill coins">🪙 +'+coinsEarned+' coins</div>'+
+    '</div>'+
+    liveEndSection+
+    (CAT_ID&&!isGuest&&MODE!=='live'
+      ?'<div class="rating-prompt" id="ratingPrompt">'+
+          '<div class="rating-prompt-title">How was '+CAT_NAME+'?</div>'+
+          '<div class="rating-btns">'+
+            '<button class="rate-btn up" onclick="giveRating(1)">👍</button>'+
+            '<button class="rate-btn down" onclick="giveRating(-1)">👎</button>'+
+          '</div></div>'
+      :'')+
+    '<div class="end-actions">'+
+      '<button class="end-btn end-btn-primary" onclick="playAgain()">🔄 Play Again</button>'+
+      (MODE==='live'?'<a href="lobby.html" class="end-btn end-btn-secondary">📡 Back to Lobby</a>':'')+
+      '<a href="categories.html" class="end-btn end-btn-secondary">Browse Categories</a>'+
+      '<a href="index.html" class="end-btn end-btn-secondary">🏠 Home</a>'+
+    '</div>'+
     '</div>';
 
-  // Rating prompt (only for categorized games, not guest)
-  if (CAT_ID && !isGuest) {
-    html += '<div class="rating-prompt" id="ratingPrompt">' +
-      '<div class="rating-prompt-title">How was ' + CAT_NAME + '?</div>' +
-      '<div class="rating-btns">' +
-        '<button class="rate-btn up" onclick="giveRating(1)">👍</button>' +
-        '<button class="rate-btn down" onclick="giveRating(-1)">👎</button>' +
-      '</div>' +
-    '</div>';
-  }
+  if(!isGuest)saveGameStats(xpEarned,coinsEarned,accuracy,avgTime);
+  if(isWin){playWin();triggerWinEffect();}
+}
 
-  html +=
-    '<div class="end-actions">' +
-      '<button class="end-btn end-btn-primary" onclick="playAgain()">🔄 Play Again</button>' +
-      '<a href="categories.html" class="end-btn end-btn-secondary">Browse Categories</a>' +
-      '<a href="index.html" class="end-btn end-btn-secondary">🏠 Home</a>' +
-    '</div>' +
-    '</div>';
+// ══════════════════════════════════════════════
+// SAVE STATS
+// ══════════════════════════════════════════════
+function saveGameStats(xpEarned,coinsEarned,accuracy,avgTime){
+  if(typeof DQAuth==='undefined'||!DQAuth.getUser())return;
+  var stats=playerStats||{};
+  var today=new Date().toISOString().slice(0,10);
+  var yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  var prevDate=stats.lastPlayedDate||'';
+  var newStreak=prevDate===yesterday?(stats.streak||0)+1:prevDate===today?(stats.streak||0):1;
+  stats.xp=(stats.xp||0)+xpEarned;
+  stats.coins=(stats.coins||0)+coinsEarned;
+  stats.streak=newStreak;
+  stats.lastPlayedDate=today;
+  stats.totalGames=(stats.totalGames||0)+1;
+  stats.totalCorrect=(stats.totalCorrect||0)+correctCount;
+  stats.totalQuestions=(stats.totalQuestions||0)+questions.length;
+  stats.lastCat=CAT_ID?{id:CAT_ID,name:CAT_NAME}:stats.lastCat;
+  stats.level=getLevel(stats.xp)+1;
+  if(MODE==='daily'){stats.dailyDone=true;stats.dailyPct=100;}
+  if(CAT_ID){if(!stats.catRanks)stats.catRanks={};stats.catRanks[CAT_ID]=(stats.catRanks[CAT_ID]||0)+1;}
+  if(!stats.gameHistory)stats.gameHistory=[];
+  stats.gameHistory.push({date:today,catId:CAT_ID||0,catName:CAT_NAME,mode:MODE,score:score,correct:correctCount,total:questions.length,accuracy:accuracy,avgTime:avgTime,xp:xpEarned,coins:coinsEarned});
+  if(stats.gameHistory.length>100)stats.gameHistory=stats.gameHistory.slice(-100);
+  playerStats=stats;
+  DQAuth.saveData('dqtrivia_stats',stats);
+  if(CAT_ID){try{var s=DQAuth.getSupabase();if(s)s.rpc('increment_category_plays',{cat_id:CAT_ID});}catch(e){}}
+}
 
-  document.getElementById('mainContent').innerHTML = html;
-
-  // Save stats
-  if (!isGuest) {
-    saveGameStats(xpEarned, coinsEarned, accuracy, avgTime);
-  }
-
-  // Play win effect
-  if (isWin) {
-    playWin();
-    triggerWinEffect();
+function giveRating(val){
+  if(ratingGiven!==null)return;
+  ratingGiven=val;
+  var prompt=document.getElementById('ratingPrompt');
+  if(prompt)prompt.innerHTML='<div class="rating-done">'+(val===1?'👍 Thanks!':'👎 Noted!')+'</div>';
+  if(!isGuest){
+    if(!playerStats.catRatings)playerStats.catRatings={};
+    var prev=playerStats.catRatings[CAT_ID]||0;
+    playerStats.catRatings[CAT_ID]=val;
+    DQAuth.saveData('dqtrivia_stats',playerStats);
+    try{var s=DQAuth.getSupabase();if(s){if(prev!==0&&prev!==val)s.rpc('decrement_category_rating',{cat_id:CAT_ID,col:prev===1?'rating_up':'rating_down'});s.rpc('increment_category_rating',{cat_id:CAT_ID,col:val===1?'rating_up':'rating_down'});}}catch(e){}
   }
 }
 
-// ── SAVE STATS ──
-function saveGameStats(xpEarned, coinsEarned, accuracy, avgTime) {
-  if (typeof DQAuth === 'undefined' || !DQAuth.getUser()) return;
-
-  var stats = playerStats || {};
-  var today = new Date().toISOString().slice(0, 10);
-  var prevDate = stats.lastPlayedDate || '';
-
-  // Streak logic
-  var prevStreak = stats.streak || 0;
-  var yesterday  = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  var newStreak  = prevDate === yesterday ? prevStreak + 1 : prevDate === today ? prevStreak : 1;
-
-  stats.xp             = (stats.xp || 0) + xpEarned;
-  stats.coins          = (stats.coins || 0) + coinsEarned;
-  stats.streak         = newStreak;
-  stats.lastPlayedDate = today;
-  stats.totalGames     = (stats.totalGames || 0) + 1;
-  stats.totalCorrect   = (stats.totalCorrect || 0) + correctCount;
-  stats.totalQuestions = (stats.totalQuestions || 0) + questions.length;
-  stats.lastCat        = CAT_ID ? { id: CAT_ID, name: CAT_NAME } : stats.lastCat;
-
-  // Level
-  var lvlObj = getLevel(stats.xp);
-  stats.level = LEVELS.indexOf(lvlObj) + 1;
-
-  // Daily
-  if (MODE === 'daily') {
-    stats.dailyDone = true;
-    stats.dailyPct  = 100;
-  }
-
-  // Category ranks
-  if (CAT_ID) {
-    if (!stats.catRanks) stats.catRanks = {};
-    stats.catRanks[CAT_ID] = (stats.catRanks[CAT_ID] || 0) + 1;
-  }
-
-  // History entry
-  if (!stats.gameHistory) stats.gameHistory = [];
-  stats.gameHistory.push({
-    date:     today,
-    catId:    CAT_ID || 0,
-    catName:  CAT_NAME,
-    mode:     MODE,
-    score:    score,
-    correct:  correctCount,
-    total:    questions.length,
-    accuracy: accuracy,
-    avgTime:  avgTime,
-    xp:       xpEarned,
-    coins:    coinsEarned
-  });
-  // Keep last 100 entries
-  if (stats.gameHistory.length > 100) stats.gameHistory = stats.gameHistory.slice(-100);
-
-  playerStats = stats;
-  DQAuth.saveData('dqtrivia_stats', stats);
-
-  // Increment global plays
-  if (CAT_ID && typeof window.dqtRecordPlay === 'function') {
-    window.dqtRecordPlay(CAT_ID);
-  } else if (CAT_ID) {
-    recordPlayDirect(CAT_ID);
+// ══════════════════════════════════════════════
+// WIN EFFECT
+// ══════════════════════════════════════════════
+function triggerWinEffect(){
+  var effect=(playerStats&&playerStats.equippedItems&&playerStats.equippedItems.effect)||'none';
+  var overlay=document.getElementById('effectOverlay');
+  overlay.innerHTML='';
+  var colors=['#4de888','#3a7fff','#f5c842','#ff6b6b','#c084fc','#ffffff'];
+  if(effect==='confetti'){
+    for(var i=0;i<60;i++)(function(i){var p=document.createElement('div');p.className='confetti-piece';p.style.cssText='left:'+Math.random()*100+'%;top:-20px;background:'+colors[Math.floor(Math.random()*colors.length)]+';animation-duration:'+(1.5+Math.random()*2)+'s;animation-delay:'+Math.random()*0.8+'s;transform:rotate('+Math.random()*360+'deg)';overlay.appendChild(p);setTimeout(function(){p.remove();},4000);})(i);
+  }else if(effect==='stars'||effect==='matrix'){
+    for(var j=0;j<20;j++)(function(j){var s=document.createElement('div');s.className='star-piece';s.textContent=effect==='matrix'?String.fromCharCode(0x30A0+Math.random()*96):'⭐';s.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*80+'%;animation-duration:'+(0.6+Math.random()*0.8)+'s;animation-delay:'+(j*0.07)+'s'+(effect==='matrix'?';font-family:monospace;color:var(--accent)':'');overlay.appendChild(s);setTimeout(function(){s.remove();},3000);})(j);
+  }else if(effect==='fire'){
+    for(var k=0;k<15;k++)(function(k){var f=document.createElement('div');f.className='star-piece';f.textContent='🔥';f.style.cssText='left:'+(10+Math.random()*80)+'%;top:'+(20+Math.random()*60)+'%;font-size:1.8rem;animation-duration:'+(0.5+Math.random()*0.6)+'s;animation-delay:'+(k*0.1)+'s';overlay.appendChild(f);setTimeout(function(){f.remove();},3000);})(k);
+  }else if(effect==='lightning'){
+    for(var l=0;l<8;l++)(function(l){var b=document.createElement('div');b.className='star-piece';b.textContent='⚡';b.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*80+'%;font-size:2rem;animation-duration:'+(0.4+Math.random()*0.5)+'s;animation-delay:'+(l*0.15)+'s';overlay.appendChild(b);setTimeout(function(){b.remove();},2500);})(l);
   }
 }
 
-function recordPlayDirect(catId) {
-  try {
-    var sb = DQAuth.getSupabase();
-    if (!sb) return;
-    sb.rpc('increment_category_plays', { cat_id: catId }).then(function(){});
-  } catch(e) {}
+// ══════════════════════════════════════════════
+// PLAY AGAIN / QUIT
+// ══════════════════════════════════════════════
+function playAgain(){
+  if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}liveChannel=null;}
+  showLoading();
+  document.getElementById('quitBtn').style.display='flex';
+  getToken().then(function(tok){fetchQuestions(tok);});
 }
 
-// ── RATING ──
-function giveRating(val) {
-  if (ratingGiven !== null) return;
-  ratingGiven = val;
-
-  var prompt = document.getElementById('ratingPrompt');
-  if (prompt) {
-    prompt.innerHTML = '<div class="rating-done">' + (val === 1 ? '👍 Thanks for the feedback!' : '👎 Noted — we\'ll improve!') + '</div>';
-  }
-
-  // Save personal rating
-  if (!isGuest) {
-    if (!playerStats.catRatings) playerStats.catRatings = {};
-    var prevRating = playerStats.catRatings[CAT_ID] || 0;
-    playerStats.catRatings[CAT_ID] = val;
-    DQAuth.saveData('dqtrivia_stats', playerStats);
-
-    // Update global ratings
-    try {
-      var sb = DQAuth.getSupabase();
-      if (sb) {
-        // Decrement old rating if different
-        if (prevRating !== 0 && prevRating !== val) {
-          var decCol = prevRating === 1 ? 'rating_up' : 'rating_down';
-          sb.rpc('decrement_category_rating', { cat_id: CAT_ID, col: decCol });
-        }
-        // Increment new rating
-        var incCol = val === 1 ? 'rating_up' : 'rating_down';
-        sb.rpc('increment_category_rating', { cat_id: CAT_ID, col: incCol });
-      }
-    } catch(e) {}
-  }
-
-  // Also call window.dqtRateCategory if categories page exposed it
-  if (typeof window.dqtRateCategory === 'function') {
-    window.dqtRateCategory(CAT_ID, val);
-  }
-}
-
-// ── WIN EFFECT ──
-function triggerWinEffect() {
-  var effect = (playerStats && playerStats.equippedItems && playerStats.equippedItems.effect) || 'none';
-  var overlay = document.getElementById('effectOverlay');
-  overlay.innerHTML = '';
-
-  if (effect === 'confetti') {
-    var colors = ['#4de888','#3a7fff','#f5c842','#ff6b6b','#c084fc','#ffffff'];
-    for (var i = 0; i < 60; i++) {
-      (function(i) {
-        var piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.cssText = [
-          'left:' + Math.random() * 100 + '%',
-          'top:-20px',
-          'background:' + colors[Math.floor(Math.random() * colors.length)],
-          'animation-duration:' + (1.5 + Math.random() * 2) + 's',
-          'animation-delay:' + (Math.random() * 0.8) + 's',
-          'transform:rotate(' + Math.random() * 360 + 'deg)'
-        ].join(';');
-        overlay.appendChild(piece);
-        setTimeout(function(){ piece.remove(); }, 4000);
-      })(i);
-    }
-  } else if (effect === 'stars') {
-    for (var j = 0; j < 20; j++) {
-      (function(j) {
-        var star = document.createElement('div');
-        star.className = 'star-piece';
-        star.textContent = '⭐';
-        star.style.cssText = 'left:' + Math.random()*100 + '%;top:' + Math.random()*80 + '%;animation-duration:' + (0.6+Math.random()*0.8) + 's;animation-delay:' + (j*0.07) + 's';
-        overlay.appendChild(star);
-        setTimeout(function(){ star.remove(); }, 3000);
-      })(j);
-    }
-  } else if (effect === 'fire') {
-    for (var k = 0; k < 15; k++) {
-      (function(k) {
-        var fire = document.createElement('div');
-        fire.className = 'star-piece';
-        fire.textContent = '🔥';
-        fire.style.cssText = 'left:' + (10 + Math.random()*80) + '%;top:' + (20 + Math.random()*60) + '%;font-size:1.8rem;animation-duration:' + (0.5+Math.random()*0.6) + 's;animation-delay:' + (k*0.1) + 's';
-        overlay.appendChild(fire);
-        setTimeout(function(){ fire.remove(); }, 3000);
-      })(k);
-    }
-  } else if (effect === 'lightning') {
-    for (var l = 0; l < 8; l++) {
-      (function(l) {
-        var bolt = document.createElement('div');
-        bolt.className = 'star-piece';
-        bolt.textContent = '⚡';
-        bolt.style.cssText = 'left:' + Math.random()*100 + '%;top:' + Math.random()*80 + '%;font-size:2rem;animation-duration:' + (0.4+Math.random()*0.5) + 's;animation-delay:' + (l*0.15) + 's';
-        overlay.appendChild(bolt);
-        setTimeout(function(){ bolt.remove(); }, 2500);
-      })(l);
-    }
-  }
-  // matrix rain is complex; skip for brevity and use stars instead
-  else if (effect === 'matrix') {
-    for (var m = 0; m < 25; m++) {
-      (function(m) {
-        var char = document.createElement('div');
-        char.className = 'confetti-piece';
-        char.style.cssText = 'left:' + Math.random()*100 + '%;top:-10px;background:transparent;color:#4de888;font-family:monospace;font-size:1rem;animation-duration:' + (1+Math.random()) + 's;animation-delay:' + (m*0.05) + 's;width:auto;height:auto;border-radius:0';
-        char.textContent = String.fromCharCode(0x30A0 + Math.random() * 96);
-        overlay.appendChild(char);
-        setTimeout(function(){ char.remove(); }, 3000);
-      })(m);
-    }
-  }
-}
-
-// ── PLAY AGAIN ──
-function playAgain() {
-  currentQ = 0; score = 0; correctCount = 0; streak = 0; maxStreak = 0;
-  answerTimes = []; gameHistory = []; ratingGiven = null;
-  document.getElementById('mainContent').innerHTML =
-    '<div class="loading-screen"><div class="loading-spinner"></div>' +
-    '<div class="loading-title">Loading questions…</div>' +
-    '<div class="loading-sub" id="loadingSub">Fetching new questions</div></div>';
-  document.getElementById('quitBtn').style.display = 'flex';
-  getToken().then(function(tok){ fetchQuestions(tok); });
-}
-
-// ── QUIT ──
-function confirmQuit() {
-  if (!gameStarted) return;
-  var overlay = document.getElementById('quitOverlay');
-  overlay.style.display = 'flex';
-  overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML = '<div class="quit-box">' +
-    '<div class="quit-title">Quit game?</div>' +
-    '<div class="quit-sub">Your progress for this game won\'t be saved.</div>' +
-    '<div class="quit-btns">' +
-      '<button class="quit-btn quit-btn-cancel" onclick="document.getElementById(\'quitOverlay\').style.display=\'none\'">Keep playing</button>' +
-      '<button class="quit-btn quit-btn-quit" onclick="window.location.href=\'index.html\'">Quit</button>' +
+function confirmQuit(){
+  if(!gameStarted)return;
+  var overlay=document.getElementById('quitOverlay');
+  overlay.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML='<div class="quit-box">'+
+    '<div class="quit-title">Quit game?</div>'+
+    '<div class="quit-sub">Progress for this game won\'t be saved.</div>'+
+    '<div class="quit-btns">'+
+      '<button class="quit-btn quit-btn-cancel" onclick="document.getElementById(\'quitOverlay\').style.display=\'none\'">Keep playing</button>'+
+      '<button class="quit-btn quit-btn-quit" onclick="window.location.href=\'index.html\'">Quit</button>'+
     '</div></div>';
 }
 
-// ── TOAST ──
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(function(){ t.classList.remove('show'); }, 1800);
-}
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function escAttr(s){return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},1800);}
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
 
-// ── HAMBURGER ──
-function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
-
-// ── AUTH & INIT ──
-window.addEventListener('dq:authready', function(e) {
-  var user = e.detail && e.detail.user;
-  if (!user && MODE !== 'guest') {
-    window.location.replace('landing.html');
-    return;
-  }
-  if (user) {
-    DQAuth.loadData('dqtrivia_stats').then(function(saved) {
-      playerStats = saved || {};
+// ══════════════════════════════════════════════
+// AUTH & INIT
+// ══════════════════════════════════════════════
+window.addEventListener('dq:authready',function(e){
+  var user=e.detail&&e.detail.user;
+  if(!user&&MODE!=='guest'){window.location.replace('landing.html');return;}
+  if(user){
+    currentUser=user;
+    myUserId=user.id;
+    sb=DQAuth.getSupabase();
+    DQAuth.loadData('dqtrivia_stats').then(function(saved){
+      playerStats=saved||{};
       applyCosmetics(playerStats);
+      pgConfig.qcount=parseInt(localStorage.getItem('dqt_qcount')||'10');
+      pgConfig.diff=localStorage.getItem('dqt_difficulty')||'any';
+      pgConfig.qtype=localStorage.getItem('dqt_qtype')||'any';
+      pgConfig.timer=parseInt(localStorage.getItem('dqt_timer')||'20');
+      pgConfig.mode=MODE;
 
-      // Daily lock: can't replay today's daily
-      if (MODE === 'daily') {
-        var today = new Date().toISOString().slice(0,10);
-        if (saved && saved.dailyDone && saved.lastPlayedDate === today) {
-          document.getElementById('mainContent').innerHTML =
-            '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">' +
-            '<div style="font-size:3rem;margin-bottom:12px;">✅</div>' +
-            '<div style="font-family:var(--font-d);font-size:1.3rem;font-weight:800;margin-bottom:8px;">Already done today!</div>' +
-            '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Come back tomorrow for a new daily challenge. Resets at midnight.</div>' +
-            '<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">' +
-            '<a href="categories.html" style="padding:11px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:var(--font-b);text-decoration:none;text-align:center;">Play another category</a>' +
-            '<a href="index.html" style="padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">← Home</a>' +
+      if(MODE==='daily'){
+        var today=new Date().toISOString().slice(0,10);
+        if(saved&&saved.dailyDone&&saved.lastPlayedDate===today){
+          document.getElementById('mainContent').innerHTML=
+            '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">'+
+            '<div style="font-size:3rem;margin-bottom:12px;">✅</div>'+
+            '<div style="font-family:var(--font-d);font-size:1.3rem;font-weight:800;margin-bottom:8px;">Already done today!</div>'+
+            '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:24px;">Come back tomorrow for a new challenge.</div>'+
+            '<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">'+
+              '<a href="categories.html" style="padding:11px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-weight:700;text-decoration:none;text-align:center;">Play another category</a>'+
+              '<a href="index.html" style="padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.85rem;text-align:center;">← Home</a>'+
             '</div></div>';
           return;
         }
       }
 
-      getToken().then(function(tok){ fetchQuestions(tok); });
+      // Live mode: load questions from Supabase room
+      if(MODE==='live'&&ROOM){
+        initLiveMode();
+        return;
+      }
+
+      if(SKIP_PRE){showLoading();getToken().then(function(tok){fetchQuestions(tok);});}
+      else{showPreGame();}
     });
-  } else {
-    // Guest mode — no stats needed
-    getToken().then(function(tok){ fetchQuestions(tok); });
+  }else{
+    // Guest
+    pgConfig.mode='guest';
+    if(SKIP_PRE){showLoading();getToken().then(function(tok){fetchQuestions(tok);});}
+    else{showPreGame();}
   }
 });
 </script>
