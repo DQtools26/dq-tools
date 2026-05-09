@@ -616,22 +616,33 @@ function subscribeLiveRoom(){
 
 // Write my answer back to Supabase after answering
 function submitLiveAnswer(answerIdx,isCorrect,pointsEarned){
-  if(!myPlayerId||!sb)return;
+  if(!sb)return;
+  // Guests can't write to Supabase (not authenticated) — skip silently
+  if(!currentUser)return;
+  if(!myPlayerId){
+    // Try to find player row again in case it wasn't found at load time
+    var myRow2=liveAllPlayers.find(function(p){return p.user_id===myUserId;});
+    if(myRow2)myPlayerId=myRow2.id;
+    else{console.warn('submitLiveAnswer: no player row found for',myUserId);return;}
+  }
   var myRow=liveAllPlayers.find(function(p){return p.id===myPlayerId;});
-  if(!myRow)return;
+  if(!myRow){console.warn('submitLiveAnswer: myRow not found');return;}
   var answers=Array.isArray(myRow.answers)?myRow.answers.slice():[];
-  // Pad if needed
-  while(answers.length<currentQ)answers.push(null);
+  // Ensure array is long enough and store by index
+  while(answers.length<=currentQ)answers.push(null);
   answers[currentQ]={answerIdx:answerIdx,correct:isCorrect,qIdx:currentQ};
   var newScore=(myRow.score||0)+pointsEarned;
-  sb.from('dqtrivia_room_players').update({
-    score:newScore,
-    answers:answers
-  }).eq('id',myPlayerId);
-  // Update local copy
+  sb.from('dqtrivia_room_players')
+    .update({score:newScore,answers:answers})
+    .eq('id',myPlayerId)
+    .then(function(res){
+      if(res.error)console.error('submitLiveAnswer error:',res.error);
+    });
+  // Update local copy immediately
   liveAllPlayers=liveAllPlayers.map(function(p){
     return p.id===myPlayerId?Object.assign({},p,{score:newScore,answers:answers}):p;
   });
+  updateLiveScoreboard();
 }
 
 function updateLiveScoreboard(){
@@ -781,8 +792,11 @@ function renderQuestion(){
   if(MODE==='live'){
     document.getElementById('mainContent').innerHTML=
       '<div class="live-header">'+
-        '<div class="live-room-code">📡 Room: '+ROOM+'</div>'+
-        '<div class="live-players">'+liveAllPlayers.length+' players</div>'+
+        '<div class="live-room-code">📡 Live Room: '+ROOM+'</div>'+
+        '<div class="live-players"><strong>'+liveAllPlayers.length+'</strong> players · host controls pace</div>'+
+      '</div>'+
+      '<div style="background:rgba(58,127,255,0.06);border:1px solid rgba(58,127,255,0.15);border-radius:10px;padding:9px 14px;margin-bottom:12px;font-size:0.74rem;color:var(--muted);">'+
+        'Answer on your device. The host will reveal and advance — you\'ll auto-move to the next question.'+
       '</div>'+
       '<div class="live-layout"><div>'+questionContent+'</div>'+livePanel+'</div>';
   }else{
@@ -901,9 +915,15 @@ function showNextButton(){
   var btn=document.getElementById('nextBtn');
   if(!btn)return;
   btn.style.display='block';
-  if(currentQ>=questions.length-1)btn.textContent='See Results →';
-  // Live mode: next is driven by host advancing question_index, but player can still tap to see results locally
-  if(MODE==='live')btn.textContent='Waiting for host…';
+  if(MODE==='live'){
+    btn.textContent='Waiting for host to continue...';
+    btn.style.cssText='background:var(--bg3);color:var(--muted);cursor:default;';
+    btn.onclick=null;
+    return;
+  }
+  btn.style.cssText='';
+  btn.onclick=nextQuestion;
+  btn.textContent=currentQ>=questions.length-1?'See Results →':'Next Question →';
 }
 
 function nextQuestion(){
