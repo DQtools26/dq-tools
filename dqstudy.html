@@ -342,101 +342,6 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .code-badge-expired { background: rgba(255,107,74,.12); color: var(--red2); border: 1px solid rgba(255,107,74,.25); border-radius: 20px; font-size: .62rem; font-weight: 800; padding: 2px 8px; }
 .code-by { font-size: .65rem; color: var(--text3); }
 
-/* ═══ HOME REDESIGN ═══ */
-/* #view-home base is defined in HOME section below */
-
-/* Hero section — same vibe as landing */
-.home-hero-section {
-  position: relative; overflow: hidden;
-  padding: 28px 32px 32px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-.home-hero-blobs { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.home-hero-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .13; }
-.hhb1 { width: 500px; height: 500px; background: var(--accent); top: -180px; right: -100px; animation: blobFloat 12s ease-in-out infinite; }
-.hhb2 { width: 350px; height: 350px; background: var(--green); bottom: -120px; left: -60px; animation: blobFloat 9s ease-in-out infinite reverse; }
-.hhb3 { width: 250px; height: 250px; background: var(--purple); top: 40%; left: 40%; animation: blobFloat 7s ease-in-out infinite 1s; }
-.home-hero-inner { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-.home-greeting-text { font-size: clamp(1.6rem,3.5vw,2.4rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.1; margin-bottom: 6px; }
-.home-greeting-text .hl { background: linear-gradient(135deg,var(--accent2),var(--green2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.home-greeting-sub { font-size: .85rem; color: var(--text2); margin-bottom: 20px; }
-.home-quick { display: flex; gap: 8px; flex-wrap: wrap; }
-.home-quick-btn { display: flex; align-items: center; gap: 7px; padding: 9px 16px; background: rgba(255,255,255,.05); border: 1px solid var(--border2); border-radius: 12px; font-family: var(--font); font-size: .8rem; font-weight: 700; color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap; backdrop-filter: blur(8px); }
-.home-quick-btn:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
-.home-quick-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 16px rgba(58,127,255,.3); }
-.home-quick-btn.primary:hover { opacity: .9; transform: translateY(-1px); }
-.home-hero-stats { display: flex; gap: 10px; flex-shrink: 0; }
-.home-stat { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; text-align: center; min-width: 80px; backdrop-filter: blur(8px); }
-.home-stat-n { font-size: 1.6rem; font-weight: 900; color: var(--text); line-height: 1; }
-.home-stat-label { font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-top: 4px; }
-
-/* Body section */
-.home-body { max-width: 960px; margin: 0 auto; padding: 28px 24px 80px; }
-
-/* Section headers */
-.home-sec { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.home-sec-title { font-size: .65rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); }
-.home-sec-link { font-size: .75rem; font-weight: 700; color: var(--accent2); cursor: pointer; background: none; border: none; font-family: var(--font); }
-.home-sec-link:hover { text-decoration: underline; }
-
-/* Pinned chips */
-.home-pinned-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 28px; }
-.home-pinned-row::-webkit-scrollbar { height: 3px; }
-.home-pinned-chip { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--surface); border: 1px solid rgba(255,179,71,.25); border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0; }
-.home-pinned-chip:hover { border-color: rgba(255,179,71,.6); transform: translateY(-1px); background: var(--surface2); }
-.home-pinned-chip-name { font-size: .8rem; font-weight: 700; }
-.home-pinned-chip-count { font-size: .62rem; color: var(--text3); }
-
-/* Tabs */
-.home-set-tabs { display: flex; gap: 5px; margin-bottom: 14px; }
-.home-tab { padding: 5px 13px; border-radius: 20px; font-size: .73rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--text3); cursor: pointer; transition: all .15s; font-family: var(--font); }
-.home-tab:hover { color: var(--text); border-color: var(--border2); }
-.home-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-/* Set cards */
-.home-sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
-.home-set-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; cursor: pointer; transition: all .18s; position: relative; overflow: hidden; }
-.home-set-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--green)); opacity: .3; transition: opacity .18s; }
-.home-set-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
-.home-set-card:hover::before { opacity: .7; }
-.home-set-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
-.home-set-card-name { font-size: .9rem; font-weight: 800; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.home-set-card-meta { font-size: .65rem; color: var(--text3); margin-bottom: 10px; }
-.home-set-card-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.home-set-card-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green2)); border-radius: 2px; transition: width .5s; }
-.home-set-card-badge { position: absolute; top: 12px; right: 12px; font-size: .58rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; }
-.home-set-card.shared::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-.home-add-card { background: transparent; border: 1.5px dashed var(--border2); border-radius: 16px; padding: 18px; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px; color: var(--text3); font-size: .82rem; font-weight: 700; }
-.home-add-card:hover { border-color: var(--accent); color: var(--accent2); background: rgba(58,127,255,.04); transform: translateY(-1px); }
-
-/* Continue studying banner */
-.home-continue { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all .18s; position: relative; overflow: hidden; }
-.home-continue::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--green2)); }
-.home-continue:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
-.home-continue-icon { font-size: 2.2rem; flex-shrink: 0; }
-.home-continue-label { font-size: .6rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 3px; }
-.home-continue-title { font-size: .95rem; font-weight: 800; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
-.home-continue-sub { font-size: .7rem; color: var(--text2); }
-.home-continue-arrow { font-size: .78rem; font-weight: 800; color: var(--accent2); background: rgba(58,127,255,.12); border: 1px solid rgba(58,127,255,.25); padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
-
-/* Action cards grid */
-.home-actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 8px; }
-.home-action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; cursor: pointer; transition: all .18s; }
-.home-action-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.2); }
-.home-action-card.accent { border-color: rgba(58,127,255,.3); background: rgba(58,127,255,.06); }
-.home-action-card.accent:hover { border-color: var(--accent); background: rgba(58,127,255,.1); }
-.home-action-card.ai { border-color: rgba(161,100,255,.3); background: rgba(161,100,255,.06); }
-.home-action-card.ai:hover { border-color: #a855f7; background: rgba(161,100,255,.1); }
-.home-action-icon { font-size: 1.6rem; margin-bottom: 10px; }
-.home-action-title { font-size: .9rem; font-weight: 800; margin-bottom: 4px; }
-.home-action-sub { font-size: .68rem; color: var(--text2); line-height: 1.4; }
-
-/* Empty state */
-.home-empty { text-align: center; padding: 48px 20px; color: var(--text3); }
-.home-empty-icon { font-size: 2.8rem; margin-bottom: 12px; }
-.home-empty-title { font-size: .95rem; font-weight: 800; margin-bottom: 6px; color: var(--text2); }
-.home-empty-sub { font-size: .8rem; line-height: 1.6; margin-bottom: 18px; }
 
 /* DQ auth btn */
 #dq-auth-btn { display:flex;align-items:center;gap:6px; background:var(--surface);border:1px solid var(--border2); border-radius:100px;padding:4px 12px 4px 5px; font-family:var(--font);font-size:.68rem;font-weight:700; color:var(--text2);cursor:pointer;transition:all var(--transition); white-space:nowrap;flex-shrink:0; }
@@ -446,7 +351,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 #dq-auth-avatar img { width:100%;height:100%;object-fit:cover; }
 
 /* ═══════════════ LAYOUT ═══════════════ */
-#app { display:flex; min-height:100vh; padding-top:55px; overflow-x:hidden; }
+#app { display:flex; flex-direction:row; align-items:flex-start; min-height:100vh; padding-top:55px; overflow-x:hidden; }
 
 /* ═══════════════ SIDEBAR ═══════════════ */
 #sidebar {
@@ -495,7 +400,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 #main { transition: margin-left .25s ease; }
 
 /* ═══════════════ MAIN ═══════════════ */
-#main { margin-left:0; flex:1; position:relative; }
+#main { margin-left:0; flex:1; min-width:0; position:relative; }
 
 /* ═══════════════ VIEWS (all hidden by default) ═══════════════ */
 .view { display:none; }
@@ -877,23 +782,17 @@ body.exam-mode #view-exam-review {
   align-items: center; justify-content: flex-start;
   background: var(--bg); overflow-y: auto; overflow-x: hidden;
   padding: 55px 20px 40px;
+  min-height: 100dvh;
 }
 #view-landing .landing-content {
   margin-top: max(5vh, 20px);
+  padding-bottom: 40px;
+  width: 100%;
 }
-@media (max-width: 768px) {
-  #view-landing {
-    padding: 55px 16px 80px;
-    justify-content: flex-start;
-  }
-  #view-landing .landing-content {
-    margin-top: max(4vh, 16px);
-  }
+.landing-bg {
+  position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
 }
 
-.landing-bg {
-  position:absolute; inset:0; pointer-events:none; overflow:hidden;
-}
 .landing-bg-blob {
   position:absolute; border-radius:50%; filter:blur(80px); opacity:.18;
 }
@@ -960,7 +859,7 @@ body.exam-mode #view-exam-review {
 #view-home { padding-top:0; margin-top:0; }
 
 /* Hero */
-.home-hero-section { position:relative; overflow:hidden; padding:20px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg2); }
+.home-hero-section { position:relative; overflow:hidden; padding:20px 32px 24px; border-bottom:1px solid var(--border); background:var(--bg); }
 .home-hero-blobs { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
 .home-hero-blob { position:absolute; border-radius:50%; filter:blur(70px); opacity:.1; }
 .hhb1 { width:360px; height:360px; background:var(--accent); top:-120px; right:-80px; animation:blobFloat 12s ease-in-out infinite; }
@@ -1357,6 +1256,11 @@ body.compact #view-set { padding:14px; }
 /* ═══════════════ TRACKING ═══════════════ */
 #view-allsets { padding:28px; }
 #view-folders { padding:28px; }
+.folder-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 18px; cursor:pointer; transition:all var(--transition); }
+.folder-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.folder-card-icon { font-size:2.2rem; margin-bottom:10px; }
+.folder-card-name { font-size:.92rem; font-weight:800; margin-bottom:3px; }
+.folder-card-meta { font-size:.68rem; color:var(--text2); }
 #view-codes   { padding:28px 28px 60px; }
 #view-tracking { padding:24px; }
 .track-section-head { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; margin-top:20px; }
@@ -1807,6 +1711,8 @@ textarea.finp { resize:vertical; min-height:50px; }
 
 /* ── Landing mobile fixes ── */
 @media (max-width: 768px) {
+  #view-landing { padding: 55px 16px 80px; }
+  #view-landing .landing-content { margin-top: max(4vh, 16px); }
   .landing-features { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; margin-top: 24px; }
   .landing-title { font-size: clamp(2rem, 8vw, 2.8rem); }
   .landing-sub { font-size: .9rem; }
@@ -1937,6 +1843,10 @@ textarea.finp { resize:vertical; min-height:50px; }
   .results-actions { flex-direction: column; align-items: stretch; }
   .results-actions .btn { justify-content: center; }
   .results-breakdown { max-width: 100%; }
+
+  /* AI chips: 2-col grid on narrow screens */
+  #ai-action-chips { display: grid !important; grid-template-columns: 1fr 1fr; gap: 6px !important; }
+  .ai-chip { border-radius: 10px; justify-content: flex-start; white-space: normal; text-align: left; font-size: .76rem; padding: 8px 11px; }
 
   /* All sets: single column list on mobile */
   #view-allsets .sets-grid,
@@ -2354,26 +2264,25 @@ textarea.finp { resize:vertical; min-height:50px; }
 
     <!-- ═══ FOLDERS VIEW ═══ -->
     <div class="view" id="view-folders">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-        <div style="font-size:1.5rem;font-weight:900;">📁 Folders</div>
-        <button class="btn btn-primary btn-sm" onclick="createFolder()">＋ New Folder</button>
+      <!-- ── Folder list header ── -->
+      <div id="folders-list-panel">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <div style="font-size:1.4rem;font-weight:900;flex:1;">📁 Folders</div>
+          <button class="btn btn-primary btn-sm" onclick="openFolderCreateModal()">＋ New Folder</button>
+        </div>
+        <div id="folders-grid"></div>
       </div>
-      <div id="folders-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;"></div>
-      <!-- Folder open view -->
-      <div id="folder-open" style="display:none;margin-top:24px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <button class="btn btn-ghost btn-sm" onclick="closeFolderOpen()">← Back</button>
-          <div style="font-size:1.1rem;font-weight:900;" id="folder-open-title"></div>
-          <button class="btn btn-ghost btn-sm" onclick="renameFolderCurrent()">✏️</button>
+
+      <!-- ── Single folder open panel ── -->
+      <div id="folder-open-panel" style="display:none;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="closeFolderOpen()">← All Folders</button>
+          <div style="font-size:1.15rem;font-weight:900;flex:1;" id="folder-open-title"></div>
+          <button class="btn btn-ghost btn-sm" onclick="openFolderEditModal()">✏️ Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="openFolderAddSets()">＋ Add Sets</button>
           <button class="btn btn-danger btn-sm" onclick="deleteFolderCurrent()">🗑</button>
         </div>
-        <div style="margin-bottom:12px;">
-          <div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Add a set to this folder</div>
-          <select class="finp" id="folder-add-select" style="max-width:320px;">
-            <option value="">— pick a set —</option>
-          </select>
-          <button class="btn btn-primary btn-sm" style="margin-left:8px;" onclick="addSetToFolder()">Add</button>
-        </div>
+        <div id="folder-open-meta" style="margin-bottom:14px;"></div>
         <div id="folder-sets-list"></div>
       </div>
     </div>
@@ -3281,6 +3190,82 @@ textarea.finp { resize:vertical; min-height:50px; }
   </div>
 </div>
 
+<!-- ═══ FOLDER CREATE/EDIT MODAL ═══ -->
+<div class="modal-overlay" id="folder-modal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-head">
+      <div class="modal-title" id="folder-modal-title">📁 New Folder</div>
+      <button class="modal-close" onclick="closeModal('folder-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="margin-bottom:14px;">
+        <div class="flabel" style="margin-bottom:6px;">Folder Name</div>
+        <input class="finp" id="folder-inp-name" placeholder="e.g. Biology, Exam Prep…" style="width:100%;" oninput="folderIconPreview()">
+      </div>
+      <div style="margin-bottom:18px;">
+        <div class="flabel" style="margin-bottom:8px;">Icon</div>
+        <div id="folder-icon-grid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="saveFolderModal()">Save</button>
+        <button class="btn btn-ghost" onclick="closeModal('folder-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOLDER ADD SETS MODAL ═══ -->
+<div class="modal-overlay" id="folder-addsets-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-head">
+      <div class="modal-title">＋ Add Sets to Folder</div>
+      <button class="modal-close" onclick="closeModal('folder-addsets-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <input class="finp" id="folder-addsets-search" placeholder="Search sets…" style="width:100%;margin-bottom:12px;" oninput="renderFolderSetPicker()">
+      <div id="folder-addsets-list" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="confirmAddSetsToFolder()">Done</button>
+        <button class="btn btn-ghost" onclick="closeModal('folder-addsets-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MERGE SETS MODAL ═══ -->
+<div class="modal-overlay" id="merge-modal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-head">
+      <div class="modal-title">🔀 Merge Sets</div>
+      <button class="modal-close" onclick="closeModal('merge-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:14px;">Combine two sets into one. Duplicate cards (same front text) are removed automatically.</div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Set A (current)</div>
+        <div id="merge-set-a" style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.85rem;font-weight:700;"></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Set B (pick one to merge with)</div>
+        <select id="merge-set-b" class="finp" style="width:100%;" onchange="mergePreview()">
+          <option value="">— choose a set —</option>
+        </select>
+      </div>
+
+      <div id="merge-preview" style="display:none;margin-bottom:16px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.82rem;"></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="doMerge('replace')" id="merge-btn-replace" style="display:none;">✅ Replace Set A</button>
+        <button class="btn btn-ghost" onclick="doMerge('new')" id="merge-btn-new" style="display:none;">📦 Save as New Set</button>
+        <button class="btn btn-ghost" onclick="closeModal('merge-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ AI BUILD-A-SET MODAL ═══ -->
 <div class="modal-overlay" id="ai-build-modal">
   <div class="modal" style="max-width:600px;">
@@ -3357,6 +3342,62 @@ textarea.finp { resize:vertical; min-height:50px; }
       <button class="btn btn-ghost" id="ai-build-back-btn" onclick="aiBuildReset()" style="display:none;">← Back</button>
       <button class="btn btn-ghost" onclick="closeModal('ai-build-modal')">Cancel</button>
       <button class="btn btn-primary" id="ai-build-go-btn" onclick="runAIBuild()">✨ Generate Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ONBOARDING MODAL ═══ -->
+<div class="modal-overlay" id="onboard-modal" style="z-index:600;display:none;align-items:center;justify-content:center;">
+  <div class="modal-box" style="max-width:440px;width:90%;padding:0;overflow:hidden;">
+    <!-- Step indicator -->
+    <div id="ob-progress" style="display:flex;height:3px;background:var(--border);">
+      <div id="ob-prog-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;transition:width .3s ease;width:33%;"></div>
+    </div>
+    <div style="padding:28px 28px 24px;">
+      <!-- Step 1: Welcome -->
+      <div id="ob-step-1">
+        <div style="font-size:2.8rem;margin-bottom:12px;">👋</div>
+        <div style="font-size:1.4rem;font-weight:900;letter-spacing:-.03em;margin-bottom:8px;">Welcome to DQstudy!</div>
+        <div style="font-size:.88rem;color:var(--text2);line-height:1.6;margin-bottom:24px;">Your personal study toolkit. Flashcards, games, AI — all in one place. Let's set things up real quick.</div>
+        <button class="btn btn-primary" style="width:100%;" onclick="obNext(2)">Let's go →</button>
+        <button class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:.75rem;opacity:.6;" onclick="obFinish()">Skip setup</button>
+      </div>
+      <!-- Step 2: Pick theme -->
+      <div id="ob-step-2" style="display:none;">
+        <div style="font-size:1.1rem;font-weight:900;margin-bottom:4px;">Pick your vibe</div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:16px;">You can always change this in Settings.</div>
+        <div id="ob-theme-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;"></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="obNext(3)">Next →</button>
+      </div>
+      <!-- Step 3: Features -->
+      <div id="ob-step-3" style="display:none;">
+        <div style="font-size:1.1rem;font-weight:900;margin-bottom:4px;">Customize features</div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:16px;">All of these can be changed in Settings anytime.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-size:.85rem;font-weight:800;">✨ AI Assistant</div>
+              <div style="font-size:.72rem;color:var(--text2);">Build sets, get study help, explain mistakes</div>
+            </div>
+            <input type="checkbox" id="ob-ai" checked style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-size:.85rem;font-weight:800;">🔗 Set Sharing</div>
+              <div style="font-size:.72rem;color:var(--text2);">Share sets with others via DQcodes</div>
+            </div>
+            <input type="checkbox" id="ob-share" checked style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-size:.85rem;font-weight:800;">🏆 XP & Streaks</div>
+              <div style="font-size:.72rem;color:var(--text2);">Earn XP, level up, build study streaks</div>
+            </div>
+            <input type="checkbox" id="ob-gam" checked style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+          </label>
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="obFinish()">Let's study! 🚀</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3623,7 +3664,6 @@ function bootApp() {
   applyDailyVisibility();
   // Check for ?code= URL param — auto-import shared set
   const _urlCode = new URLSearchParams(window.location.search).get('code');
-  // Note: DQS1 codes are too long for URLs in practice — only DQ-XXXX codes work as links
   if (_urlCode) {
     goHome();
     updateLandingCTA();
@@ -3631,7 +3671,15 @@ function bootApp() {
   } else {
     goHome();
     updateLandingCTA();
+    setTimeout(checkOnboarding, 400);
   }
+  // Sync FAB for initial view — runs after all patches fire
+  setTimeout(function() {
+    if (typeof mbSyncFab === 'function') {
+      var av = document.querySelector('.view.active');
+      if (av) mbSyncFab(av.id.replace('view-', ''));
+    }
+  }, 50);
 }
 
 async function handleURLCode(code) {
@@ -5284,6 +5332,8 @@ function renderSetPage(s, readOnly) {
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">✨ Ask AI</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-addcards-btn" onclick="openAIModal('addcards')" style="display:none">➕ Add Cards</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openMergeModal()">🔀 Merge</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openAddToFolderFromSet()">📁 Folder</button>`}
       ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
       ${readOnly ? `<button class="btn btn-ghost btn-sm" onclick="copySharedSet()">📋 Copy</button>` : `<button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>`}
       ${readOnly ? `<button class="btn btn-danger btn-sm" onclick="removeSharedSet('${currentSharedCode}')">✕ Remove</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>`}
@@ -7955,8 +8005,8 @@ function showResults(score, total, mode, gamExtra = {}) {
   document.getElementById('results-actions').innerHTML = `
     <button class="btn btn-primary" onclick="retryStudy()">🔁 Try Again</button>
     <button class="btn btn-ghost" onclick="openSet('${currentSetId}')">← Back to Set</button>
-    <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
     ${pct < 100 && aiEnabled ? `<button class="btn btn-ghost ai-btn" onclick="openAIModal('results')" style="color:var(--accent2);">✨ AI Help</button>` : ''}
+    <button class="btn btn-ghost" style="opacity:.6;font-size:.75rem;" onclick="goHome()">🏠 Home</button>
   `;
 
   // Award XP and show gamification widget
@@ -8811,147 +8861,357 @@ let currentFolderId = null;
 function showFolders() {
   renderFoldersGrid();
   closeFolderOpen();
-  // Activate view directly (don't call showView to avoid recursion)
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const el = document.getElementById('view-folders');
   if (el) el.classList.add('active');
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (typeof mbNavSync === 'function' && isMobile()) mbNavSync('folders');
   sndClick();
 }
+
+const FOLDER_ICONS = ['📁','📂','🗂','📚','🎒','💼','🗃','📋','🏫','🔬','🎨','🎵','💻','🌍','⚗️','📐','🏆','⭐','💡','🧠'];
 
 function renderFoldersGrid() {
   const grid = document.getElementById('folders-grid');
+  if (!grid) return;
   if (!folders.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">📁</div><div class="empty-title">No folders yet</div><div class="empty-sub">Create a folder to group your sets by class or subject.</div><button class="btn btn-primary" onclick="createFolder()">＋ Create Folder</button></div>`;
+    grid.innerHTML = `
+      <div class="home-empty" style="padding:48px 20px;">
+        <div class="home-empty-icon">📁</div>
+        <div class="home-empty-title">No folders yet</div>
+        <div class="home-empty-sub">Group your sets by class, subject, or exam.</div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="openFolderCreateModal()">＋ Create Folder</button>
+      </div>`;
     return;
   }
-  const FOLDER_ICONS = ['📁','📂','🗂','📚','🎒','💼','🗃','📋'];
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(200px,1fr))';
+  grid.style.gap = '12px';
   grid.innerHTML = folders.map(f => {
     const setCount = (f.setIds||[]).length;
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all var(--transition);" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''" onclick="openFolder('${f.id}')">
-      <div style="font-size:2rem;margin-bottom:8px;">${f.icon||'📁'}</div>
-      <div style="font-size:.9rem;font-weight:800;margin-bottom:3px;">${esc(f.name)}</div>
-      <div style="font-size:.68rem;color:var(--text2);">${setCount} set${setCount!==1?'s':''}</div>
-    </div>`;
+    // Compute average mastery across all sets in folder
+    const folderSets = (f.setIds||[]).map(id => sets.find(s => String(s.id) === String(id))).filter(Boolean);
+    const allFolderCards = folderSets.flatMap(s => allCards(s));
+    const mastery = allFolderCards.length ? Math.round(allFolderCards.filter(c => c.mastery === 'know').length / allFolderCards.length * 100) : 0;
+    const masteryColor = mastery >= 80 ? 'var(--green2)' : mastery >= 50 ? 'var(--amber2)' : 'var(--text3)';
+    return `
+      <div class="folder-card" onclick="openFolder('${f.id}')">
+        <div class="folder-card-icon">${f.icon||'📁'}</div>
+        <div class="folder-card-name">${esc(f.name)}</div>
+        <div class="folder-card-meta">${setCount} set${setCount!==1?'s':''}</div>
+        ${allFolderCards.length ? `
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--text3);margin-bottom:4px;">
+              <span>Mastery</span><span style="color:${masteryColor};font-weight:800;">${mastery}%</span>
+            </div>
+            <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${mastery}%;background:${masteryColor};border-radius:2px;transition:width .4s;"></div>
+            </div>
+          </div>` : ''}
+      </div>`;
   }).join('');
 }
 
-function createFolder() {
-  const name = prompt('Folder name:');
-  if (!name || !name.trim()) return;
-  const icons = ['📁','📂','🗂','📚','🎒','💼','🗃','📋'];
-  folders.push({ id: Date.now(), name: name.trim(), icon: icons[Math.floor(Math.random()*icons.length)], setIds: [] });
+// ── Folder Create / Edit Modal ──
+
+let _folderEditingId = null;
+let _folderSelectedIcon = '📁';
+
+function openFolderCreateModal() {
+  _folderEditingId = null;
+  _folderSelectedIcon = '📁';
+  document.getElementById('folder-modal-title').textContent = '📁 New Folder';
+  document.getElementById('folder-inp-name').value = '';
+  renderFolderIconGrid();
+  openModal('folder-modal');
+  setTimeout(() => document.getElementById('folder-inp-name').focus(), 100);
+}
+
+function openFolderEditModal() {
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!f) return;
+  _folderEditingId = f.id;
+  _folderSelectedIcon = f.icon || '📁';
+  document.getElementById('folder-modal-title').textContent = '✏️ Edit Folder';
+  document.getElementById('folder-inp-name').value = f.name;
+  renderFolderIconGrid();
+  openModal('folder-modal');
+  setTimeout(() => document.getElementById('folder-inp-name').focus(), 100);
+}
+
+function renderFolderIconGrid() {
+  const grid = document.getElementById('folder-icon-grid');
+  if (!grid) return;
+  grid.innerHTML = FOLDER_ICONS.map(icon => `
+    <button onclick="selectFolderIcon('${icon}',this)"
+      style="font-size:1.3rem;padding:6px;border-radius:8px;border:2px solid ${icon===_folderSelectedIcon?'var(--accent)':'var(--border)'};background:${icon===_folderSelectedIcon?'var(--accent-dim)':'var(--surface)'};cursor:pointer;transition:all .15s;aspect-ratio:1;">
+      ${icon}
+    </button>`).join('');
+}
+
+function selectFolderIcon(icon, btn) {
+  _folderSelectedIcon = icon;
+  document.querySelectorAll('#folder-icon-grid button').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.background = 'var(--surface)';
+  });
+  if (btn) { btn.style.borderColor = 'var(--accent)'; btn.style.background = 'var(--accent-dim)'; }
+}
+
+function saveFolderModal() {
+  const name = document.getElementById('folder-inp-name').value.trim();
+  if (!name) { document.getElementById('folder-inp-name').focus(); return; }
+  if (_folderEditingId) {
+    const f = folders.find(fl => fl.id == _folderEditingId);
+    if (f) { f.name = name; f.icon = _folderSelectedIcon; }
+  } else {
+    folders.push({ id: Date.now(), name, icon: _folderSelectedIcon, setIds: [] });
+  }
   autoSave();
   renderFoldersGrid();
   renderSidebar();
+  closeModal('folder-modal');
+  if (_folderEditingId) openFolder(_folderEditingId);
   sndClick();
 }
+
+// ── Folder Open ──
 
 function openFolder(id) {
   currentFolderId = id;
   const f = folders.find(fl => fl.id == id);
   if (!f) return;
   document.getElementById('folder-open-title').textContent = (f.icon||'📁') + ' ' + f.name;
-  // Populate add-set dropdown with sets not already in this folder
-  const sel = document.getElementById('folder-add-select');
-  const alreadyIn = f.setIds||[];
-  const ownedOpts = sets.filter(s => !alreadyIn.includes(s.id))
-    .map(s => `<option value="owned:${s.id}">${esc(s.icon||'📖')} ${esc(s.name)}</option>`).join('');
-  const sharedOpts = sharedWithMe.filter(e => !alreadyIn.includes('shared:'+e.code))
-    .map(e => `<option value="shared:${e.code}">${esc(e.icon||'🔗')} ${esc(e.name)} (shared)</option>`).join('');
-  sel.innerHTML = '<option value="">— pick a set —</option>' + ownedOpts + sharedOpts;
   renderFolderSets(f);
-  document.getElementById('folders-grid').style.display = 'none';
-  document.getElementById('folder-open').style.display = '';
-}
-
-function renderFolderSets(f) {
-  const el = document.getElementById('folder-sets-list');
-  if (!(f.setIds||[]).length) {
-    el.innerHTML = '<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No sets in this folder yet. Add one above!</div>';
-    return;
-  }
-  const items = (f.setIds||[]).map(id => {
-    const strId = String(id);
-    // Check owned sets first
-    const owned = sets.find(s => String(s.id) == strId);
-    if (owned) return { s: owned, isShared: false, removeId: owned.id };
-    // Check shared sets (stored as DQ-XXXX code)
-    const shared = sharedWithMe.find(e => e.code === strId);
-    if (shared && shared.cachedData) return { s: shared.cachedData, isShared: true, code: shared.code, removeId: strId };
-    return null;
-  }).filter(Boolean);
-  if (!items.length) {
-    el.innerHTML = '<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No sets in this folder yet. Add one above!</div>';
-    return;
-  }
-  el.innerHTML = items.map(({ s, isShared, code, removeId }) => {
-    const cards = allCards(s);
-    const mastery = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
-    const openFn = isShared ? `openSharedSet('${code}')` : `openSet('${s.id}')`;
-    const badge = isShared ? `<span style="font-size:.6rem;background:var(--accent-dim);color:var(--accent2);border-radius:6px;padding:1px 6px;font-weight:800;">🔗 SHARED</span>` : '';
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;">
-      <div style="font-size:1.4rem;">${s.icon||'📖'}</div>
-      <div style="flex:1;cursor:pointer;" onclick="${openFn}">
-        <div style="font-size:.88rem;font-weight:800;">${esc(s.name)} ${badge}</div>
-        <div style="font-size:.65rem;color:var(--text2);">${cards.length} cards · ${mastery}% mastered</div>
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="${openFn}">Open →</button>
-      <button class="btn btn-danger btn-sm" onclick="removeFromFolder('${removeId}')">✕</button>
-    </div>`;
-  }).join('');
-}
-
-function addSetToFolder() {
-  const sel = document.getElementById('folder-add-select');
-  const val = sel.value;
-  if (!val) return;
-  const f = folders.find(fl => fl.id == currentFolderId);
-  if (!f) return;
-  f.setIds = f.setIds || [];
-  // val is either "owned:123456" or "shared:DQ-XXXX"
-  const entryId = val.startsWith('owned:') ? parseInt(val.replace('owned:','')) : val.replace('owned:','');
-  const storeId = val.startsWith('shared:') ? val.replace('owned:','') : parseInt(val.replace('owned:',''));
-  const finalId = val.startsWith('shared:') ? val.slice(7) : parseInt(val.slice(6));
-  if (!f.setIds.some(x => String(x) === String(finalId))) f.setIds.push(finalId);
-  autoSave();
-  openFolder(currentFolderId);
-  sndClick();
-}
-
-function removeFromFolder(setId) {
-  const f = folders.find(fl => fl.id == currentFolderId);
-  if (!f) return;
-  f.setIds = (f.setIds||[]).filter(id => id != setId);
-  autoSave();
-  renderFolderSets(f);
+  document.getElementById('folders-list-panel').style.display = 'none';
+  document.getElementById('folder-open-panel').style.display = '';
 }
 
 function closeFolderOpen() {
   currentFolderId = null;
-  document.getElementById('folders-grid').style.display = '';
-  document.getElementById('folder-open').style.display = 'none';
+  const lp = document.getElementById('folders-list-panel');
+  const op = document.getElementById('folder-open-panel');
+  if (lp) lp.style.display = '';
+  if (op) op.style.display = 'none';
 }
 
-function renameFolderCurrent() {
+function renderFolderSets(f) {
+  const el = document.getElementById('folder-sets-list');
+  const meta = document.getElementById('folder-open-meta');
+  const ids = f.setIds || [];
+  if (!ids.length) {
+    if (meta) meta.innerHTML = '';
+    el.innerHTML = `
+      <div class="home-empty" style="padding:32px 16px;">
+        <div class="home-empty-icon">📭</div>
+        <div class="home-empty-title">Empty folder</div>
+        <div class="home-empty-sub">Tap "＋ Add Sets" to put some sets in here.</div>
+      </div>`;
+    return;
+  }
+  const items = ids.map(id => {
+    const owned = sets.find(s => String(s.id) === String(id));
+    if (owned) return { s: owned, isShared: false, removeId: id };
+    const shared = sharedWithMe.find(e => e.code === String(id));
+    if (shared && shared.cachedData) return { s: shared.cachedData, isShared: true, code: shared.code, removeId: id };
+    return null;
+  }).filter(Boolean);
+
+  if (!items.length) {
+    el.innerHTML = `<div style="padding:20px;font-size:.82rem;color:var(--text3);text-align:center;">No valid sets found — they may have been deleted.</div>`;
+    return;
+  }
+
+  // Meta bar
+  const allCards2 = items.flatMap(({s}) => allCards(s));
+  const mastery = allCards2.length ? Math.round(allCards2.filter(c=>c.mastery==='know').length/allCards2.length*100) : 0;
+  if (meta) meta.innerHTML = `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.75rem;color:var(--text2);margin-bottom:4px;">
+      <span>📇 ${allCards2.length} total cards</span>
+      <span>🏆 ${mastery}% mastered</span>
+      <span>📚 ${items.length} set${items.length!==1?'s':''}</span>
+    </div>`;
+
+  el.innerHTML = items.map(({ s, isShared, code, removeId }) => {
+    const cards = allCards(s);
+    const m = cards.length ? Math.round(cards.filter(c=>c.mastery==='know').length/cards.length*100) : 0;
+    const mColor = m >= 80 ? 'var(--green2)' : m >= 50 ? 'var(--amber2)' : 'var(--text3)';
+    const openFn = isShared ? `openSharedSet('${code}')` : `openSet('${s.id}')`;
+    const badge = isShared ? `<span style="font-size:.58rem;background:var(--accent-dim);color:var(--accent2);border-radius:6px;padding:1px 6px;font-weight:800;margin-left:4px;">SHARED</span>` : '';
+    return `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all var(--transition);"
+        onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'"
+        onclick="${openFn}">
+        <div style="font-size:1.5rem;flex-shrink:0;">${s.icon||'📖'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.88rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(s.name)}${badge}</div>
+          <div style="font-size:.65rem;color:var(--text2);margin-top:2px;">${cards.length} cards</div>
+          ${cards.length ? `
+            <div style="margin-top:6px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${m}%;background:${mColor};border-radius:2px;"></div>
+            </div>` : ''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          ${cards.length ? `<div style="font-size:.75rem;font-weight:800;color:${mColor};">${m}%</div>` : ''}
+          <button class="btn btn-danger btn-sm" style="margin-top:4px;font-size:.65rem;padding:3px 8px;" onclick="event.stopPropagation();removeFromFolder('${removeId}')">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Add Sets to Folder (checklist modal) ──
+
+let _folderAddPending = new Set();
+
+function openFolderAddSets() {
+  _folderAddPending = new Set();
+  document.getElementById('folder-addsets-search').value = '';
+  renderFolderSetPicker();
+  openModal('folder-addsets-modal');
+}
+
+function renderFolderSetPicker() {
   const f = folders.find(fl => fl.id == currentFolderId);
   if (!f) return;
-  const name = prompt('Rename folder:', f.name);
-  if (!name || !name.trim()) return;
-  f.name = name.trim();
-  autoSave();
-  openFolder(currentFolderId);
-  renderFoldersGrid();
+  const q = (document.getElementById('folder-addsets-search')?.value || '').toLowerCase();
+  const alreadyIn = new Set((f.setIds||[]).map(String));
+  const list = document.getElementById('folder-addsets-list');
+  const allOptions = [
+    ...sets.filter(s => !s.isSnapshot).map(s => ({ id: String(s.id), name: s.name, icon: s.icon||'📖', cards: allCards(s).length, isShared: false })),
+    ...sharedWithMe.map(e => ({ id: e.code, name: e.name, icon: e.icon||'🔗', cards: (e.cachedData ? allCards(e.cachedData) : []).length, isShared: true }))
+  ].filter(o => !q || o.name.toLowerCase().includes(q));
+
+  if (!allOptions.length) {
+    list.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:.8rem;">No sets found.</div>`;
+    return;
+  }
+
+  list.innerHTML = allOptions.map(o => {
+    const inFolder = alreadyIn.has(o.id);
+    const pending = _folderAddPending.has(o.id);
+    const checked = inFolder || pending;
+    return `
+      <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid ${checked?'var(--accent)':'var(--border)'};border-radius:10px;cursor:${inFolder?'default':'pointer'};opacity:${inFolder?.6:1};transition:all .15s;"
+        ${inFolder ? '' : `onclick="toggleFolderPick('${o.id}',this)"`}>
+        <div style="font-size:1.2rem;">${o.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:.85rem;font-weight:700;">${esc(o.name)}${o.isShared?` <span style="font-size:.6rem;color:var(--accent2);">SHARED</span>`:''}</div>
+          <div style="font-size:.65rem;color:var(--text3);">${o.cards} cards${inFolder?' · already in folder':''}</div>
+        </div>
+        <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${checked?'var(--accent)':'var(--border2)'};background:${checked?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;">
+          ${checked ? '<span style="color:#fff;font-size:.7rem;font-weight:900;">✓</span>' : ''}
+        </div>
+      </label>`;
+  }).join('');
 }
 
+function toggleFolderPick(id, label) {
+  if (_folderAddPending.has(id)) {
+    _folderAddPending.delete(id);
+  } else {
+    _folderAddPending.add(id);
+  }
+  renderFolderSetPicker();
+}
+
+function confirmAddSetsToFolder() {
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!f) return;
+  f.setIds = f.setIds || [];
+  let added = 0;
+  _folderAddPending.forEach(id => {
+    const finalId = isNaN(id) ? id : parseInt(id);
+    if (!f.setIds.some(x => String(x) === String(id))) {
+      f.setIds.push(finalId);
+      added++;
+    }
+  });
+  autoSave();
+  closeModal('folder-addsets-modal');
+  renderFolderSets(f);
+  if (added) DQAuth.toast(`✓ Added ${added} set${added!==1?'s':''} to folder`);
+  sndClick();
+}
+
+// ── Add to folder from set page ──
+
+function openAddToFolderFromSet() {
+  if (!folders.length) {
+    if (confirm('No folders yet. Create one now?')) openFolderCreateModal();
+    return;
+  }
+  const s = getSet(currentSetId);
+  if (!s) return;
+  const setIdStr = String(s.id);
+  // Show a quick picker: which folders to add/remove this set from
+  const lines = folders.map(f => {
+    const inIt = (f.setIds||[]).some(x => String(x) === setIdStr);
+    return `<label style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid ${inIt?'var(--accent)':'var(--border)'};border-radius:10px;cursor:pointer;transition:all .15s;" onclick="toggleSetInFolder('${f.id}','${setIdStr}',this)">
+      <div style="font-size:1.2rem;">${f.icon||'📁'}</div>
+      <div style="flex:1;font-size:.85rem;font-weight:700;">${esc(f.name)} <span style="font-weight:400;color:var(--text2);font-size:.72rem;">(${(f.setIds||[]).length} sets)</span></div>
+      <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${inIt?'var(--accent)':'var(--border2)'};background:${inIt?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        ${inIt?'<span style="color:#fff;font-size:.7rem;font-weight:900;">✓</span>':''}
+      </div>
+    </label>`;
+  }).join('');
+
+  // Inline quick-modal: reuse confirm pattern via a temp overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;z-index:999;';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-head">
+        <div class="modal-title">📁 Add "${esc(s.name)}" to…</div>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+      </div>
+      <div class="modal-body" style="padding:16px;display:flex;flex-direction:column;gap:7px;">
+        ${lines}
+        <button class="btn btn-primary" style="margin-top:10px;" onclick="this.closest('.modal-overlay').remove();DQAuth.toast('Folders updated!')">Done</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function toggleSetInFolder(folderId, setIdStr, label) {
+  const f = folders.find(fl => String(fl.id) === String(folderId));
+  if (!f) return;
+  f.setIds = f.setIds || [];
+  const inIt = f.setIds.some(x => String(x) === setIdStr);
+  if (inIt) {
+    f.setIds = f.setIds.filter(x => String(x) !== setIdStr);
+    label.style.borderColor = 'var(--border)';
+    label.querySelector('div:last-child').style.background = 'transparent';
+    label.querySelector('div:last-child').style.borderColor = 'var(--border2)';
+    label.querySelector('div:last-child').innerHTML = '';
+  } else {
+    const finalId = isNaN(setIdStr) ? setIdStr : parseInt(setIdStr);
+    f.setIds.push(finalId);
+    label.style.borderColor = 'var(--accent)';
+    label.querySelector('div:last-child').style.background = 'var(--accent)';
+    label.querySelector('div:last-child').style.borderColor = 'var(--accent)';
+    label.querySelector('div:last-child').innerHTML = '<span style="color:#fff;font-size:.7rem;font-weight:900;">✓</span>';
+  }
+  autoSave();
+  renderSidebar();
+}
+
+function addSetToFolder() {} // legacy stub — no longer used
+
+function renameFolderCurrent() { openFolderEditModal(); }
+
 function deleteFolderCurrent() {
-  if (!confirm('Delete this folder? Sets inside won\'t be deleted.')) return;
+  const f = folders.find(fl => fl.id == currentFolderId);
+  if (!confirm(`Delete "${f?.name || 'this folder'}"? Sets inside won't be deleted.`)) return;
   folders = folders.filter(f => f.id != currentFolderId);
   autoSave();
   closeFolderOpen();
   renderFoldersGrid();
   renderSidebar();
 }
+
+function createFolder() { openFolderCreateModal(); } // legacy compat
 
 // ─────────────────────────────────────────────────
 // CREATE / EDIT SET MODAL
@@ -10303,6 +10563,93 @@ function mailtoShare() {
   sndClick();
 }
 
+// ─────────────────────────────────────────────────
+// MERGE SETS (no AI)
+// ─────────────────────────────────────────────────
+
+function openMergeModal() {
+  const s = getSet(currentSetId);
+  if (!s) return;
+  const aEl = document.getElementById('merge-set-a');
+  if (aEl) aEl.textContent = (s.icon || '📖') + ' ' + s.name + ' (' + allCards(s).length + ' cards)';
+  const sel = document.getElementById('merge-set-b');
+  if (sel) {
+    const others = sets.filter(x => !x.isSnapshot && x.id != currentSetId);
+    sel.innerHTML = '<option value="">— choose a set —</option>' +
+      others.map(x => '<option value="' + x.id + '">' + (x.icon||'📖') + ' ' + esc(x.name) + ' (' + allCards(x).length + ' cards)</option>').join('');
+  }
+  const prev = document.getElementById('merge-preview');
+  if (prev) prev.style.display = 'none';
+  const rb = document.getElementById('merge-btn-replace');
+  const nb = document.getElementById('merge-btn-new');
+  if (rb) rb.style.display = 'none';
+  if (nb) nb.style.display = 'none';
+  openModal('merge-modal');
+}
+
+function mergePreview() {
+  const sel = document.getElementById('merge-set-b');
+  const bId = sel && sel.value;
+  const prev = document.getElementById('merge-preview');
+  if (!bId || !prev) { if (prev) prev.style.display = 'none'; return; }
+  const a = getSet(currentSetId);
+  const b = getSet(parseInt(bId));
+  if (!a || !b) return;
+  const aCards = allCards(a);
+  const bCards = allCards(b);
+  const aFronts = new Set(aCards.map(c => c.front.trim().toLowerCase()));
+  const newFromB = bCards.filter(c => !aFronts.has(c.front.trim().toLowerCase()));
+  const dupes = bCards.length - newFromB.length;
+  const total = aCards.length + newFromB.length;
+  prev.innerHTML = '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
+    '<span>📇 <strong>' + aCards.length + '</strong> from ' + esc(a.name) + '</span>' +
+    '<span>➕ <strong>' + newFromB.length + '</strong> new from ' + esc(b.name) + '</span>' +
+    (dupes ? '<span style="color:var(--text3);">🗑 ' + dupes + ' duplicate' + (dupes>1?'s':'') + ' skipped</span>' : '') +
+    '</div><div style="margin-top:6px;font-weight:800;">= <strong>' + total + '</strong> total cards</div>';
+  prev.style.display = 'block';
+  var rb = document.getElementById('merge-btn-replace');
+  var nb = document.getElementById('merge-btn-new');
+  if (rb) rb.style.display = '';
+  if (nb) nb.style.display = '';
+}
+
+function doMerge(mode) {
+  const sel = document.getElementById('merge-set-b');
+  const bId = sel && sel.value;
+  if (!bId) { DQAuth.toast('Pick a set to merge with'); return; }
+  const a = getSet(currentSetId);
+  const b = getSet(parseInt(bId));
+  if (!a || !b) return;
+  const aCards = allCards(a);
+  const bCards = allCards(b);
+  const aFronts = new Set(aCards.map(c => c.front.trim().toLowerCase()));
+  const newFromB = bCards.filter(c => !aFronts.has(c.front.trim().toLowerCase()))
+    .map(c => ({ front: c.front, back: c.back, starred: false, mastery: 'unseen' }));
+  const merged = aCards.map(c => ({ front: c.front, back: c.back, starred: c.starred||false, mastery: c.mastery||'unseen' })).concat(newFromB);
+  if (mode === 'replace') {
+    a.cards = merged;
+    a.updated = Date.now();
+    autoSave();
+    closeModal('merge-modal');
+    openSet(a.id);
+    DQAuth.toast('✓ Merged! ' + merged.length + ' cards total');
+  } else {
+    const newSet = {
+      id: Date.now(), name: a.name + ' + ' + b.name,
+      icon: '🔀', class: a.class||'', unit: a.unit||'',
+      notes: 'Merged from "' + a.name + '" and "' + b.name + '"',
+      cards: merged, history: [], plays: 0,
+      created: Date.now(), updated: Date.now()
+    };
+    sets.push(newSet);
+    autoSave(); renderSidebar();
+    closeModal('merge-modal');
+    openSet(newSet.id);
+    DQAuth.toast('✓ New set created with ' + merged.length + ' cards');
+  }
+}
+
+
 function openExportModal() {
   const s = getSet(currentSetId); if (!s) return;
   document.getElementById('export-set-name').textContent = (s.icon||'📖') + ' ' + s.name + ' — ' + allCards(s).length + ' cards';
@@ -10543,26 +10890,70 @@ async function aiCallProxy(prompt, systemPrompt) {
 
 // Parse TERM/DEFINITION cards from AI response
 function aiParseCards(raw) {
+  if (!raw || !raw.trim()) return [];
   const cards = [];
+
+  // 1. Try JSON array first: [{"front":"...","back":"..."}, ...]
+  //    Also handles {"term":"...","definition":"..."} variants
+  try {
+    const jsonStr = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(jsonStr);
+    const arr = Array.isArray(parsed) ? parsed : (parsed.cards || parsed.flashcards || []);
+    if (arr.length) {
+      arr.forEach(c => {
+        const front = c.front || c.term || c.question || c.q || '';
+        const back  = c.back  || c.definition || c.answer || c.a || '';
+        if (front.trim() && back.trim() && !front.startsWith('['))
+          cards.push({ front: front.trim(), back: back.trim(), starred: false, mastery: 'unseen' });
+      });
+      if (cards.length) return cards;
+    }
+  } catch(_) {}
+
+  // 2. CARD N / TERM: / DEFINITION: blocks (our standard prompt format)
   const blocks = raw.split(/CARD\s+\d+/i).filter(b => b.trim());
   for (const block of blocks) {
     const t = block.match(/TERM:\s*([\s\S]+?)(?=\nDEFINITION:)/i);
     const d = block.match(/DEFINITION:\s*([\s\S]+?)(?=\nCARD\s+\d+|\s*$)/i);
     if (t && d) {
       const front = t[1].trim(), back = d[1].trim();
-      if (front && back && !front.startsWith('[')) cards.push({front, back, starred:false, mastery:'unseen'});
+      if (front && back && !front.startsWith('[')) cards.push({ front, back, starred: false, mastery: 'unseen' });
     }
   }
-  if (!cards.length) {
-    raw.split('\n').filter(l => l.trim() && !l.startsWith('[') && !l.match(/^CARD\s/i)).forEach(line => {
-      const sep = line.includes('\t') ? '\t' : line.includes('|') ? '|' : null;
-      if (sep) {
-        const p = line.split(sep);
-        if (p.length >= 2 && p[0].trim() && p[1].trim())
-          cards.push({front: p[0].trim(), back: p[1].trim(), starred:false, mastery:'unseen'});
-      }
-    });
+  if (cards.length) return cards;
+
+  // 3. Q: / A: pairs
+  const qaPairs = raw.matchAll(/Q:\s*(.+?)\s*\nA:\s*(.+?)(?=\nQ:|\s*$)/gis);
+  for (const m of qaPairs) {
+    if (m[1].trim() && m[2].trim())
+      cards.push({ front: m[1].trim(), back: m[2].trim(), starred: false, mastery: 'unseen' });
   }
+  if (cards.length) return cards;
+
+  // 4. Numbered list: "1. Term — Definition" or "1. Term: Definition"
+  const numLines = raw.split('\n').filter(l => /^\d+[\.\)]/.test(l.trim()));
+  for (const line of numLines) {
+    const clean = line.replace(/^\d+[\.\)]\s*/, '').trim();
+    const sep = clean.includes(' — ') ? ' — ' : clean.includes(': ') ? ': ' : null;
+    if (sep) {
+      const [front, ...rest] = clean.split(sep);
+      const back = rest.join(sep);
+      if (front.trim() && back.trim() && !front.startsWith('['))
+        cards.push({ front: front.trim(), back: back.trim(), starred: false, mastery: 'unseen' });
+    }
+  }
+  if (cards.length) return cards;
+
+  // 5. Tab or pipe separated lines (last resort)
+  raw.split('\n').filter(l => l.trim() && !l.startsWith('[') && !l.match(/^CARD\s/i)).forEach(line => {
+    const sep = line.includes('\t') ? '\t' : line.includes('|') ? '|' : null;
+    if (sep) {
+      const p = line.split(sep);
+      if (p.length >= 2 && p[0].trim() && p[1].trim())
+        cards.push({ front: p[0].trim(), back: p[1].trim(), starred: false, mastery: 'unseen' });
+    }
+  });
+
   return cards;
 }
 
@@ -11037,15 +11428,16 @@ function aiDownloadText(text, filename) {
 
 function buildAIPromptV2(actionId, notes, askQ) {
   const s = getSet(currentSetId) || getCurrentSet();
-  const cards = s ? allCards(s).slice(0, 20) : []; // max 20 cards to keep prompts short
+  const cards = s ? allCards(s).slice(0, 20) : [];
   const cardList = cards.map((c, i) => `CARD ${i+1}\nTERM: ${c.front}\nDEFINITION: ${c.back}`).join('\n\n');
   const setInfo = s ? `Set: "${s.name}"${s.class ? ' | ' + s.class : ''}` : '';
   const noteBlock = notes ? `\n\nMy notes (use these as your primary source):\n${notes}` : '';
-  const cardFmt = `Return ONLY cards. No intro. Format:\nCARD 1\nTERM: [term]\nDEFINITION: [definition]\n\nCARD 2\n...`;
+  // JSON format is more reliable for parsing
+  const cardFmt = `Return ONLY a JSON array, no other text:\n[{"front":"term here","back":"definition here"}, ...]`;
 
-  if (actionId === 'add-cards') return `${setInfo}\n\nExisting cards:\n${cardList}${noteBlock}\n\nGenerate 10 more flashcards that fit this set. Different from existing ones. ${cardFmt}`;
-  if (actionId === 'improve') return `${setInfo}\n\nCards:\n${cardList}\n\nRewrite each definition to be shorter and clearer. Student-friendly. Keep same terms. ${cardFmt}`;
-  if (actionId === 'harder') return `${setInfo}\n\nCards:\n${cardList}\n\nMake harder versions — turn each into a harder question that requires deeper understanding. ${cardFmt}`;
+  if (actionId === 'add-cards') return `${setInfo}\n\nExisting cards:\n${cardList}${noteBlock}\n\nGenerate 10 more flashcards that fit this set. Different from existing ones.\n${cardFmt}`;
+  if (actionId === 'improve') return `${setInfo}\n\nCards:\n${cardList}\n\nRewrite each definition to be shorter and clearer. Student-friendly. Keep same terms.\n${cardFmt}`;
+  if (actionId === 'harder') return `${setInfo}\n\nCards:\n${cardList}\n\nMake harder versions — turn each into a harder question requiring deeper understanding.\n${cardFmt}`;
   if (actionId === 'study-guide') return `${setInfo}\n\nCards:\n${cardList}${noteBlock}\n\nWrite a clear, organized study guide covering all these concepts. Use plain paragraphs. Group related ideas. No bullet spam.`;
   if (actionId === 'mnemonics') return `${setInfo}\n\nCards:\n${cardList}\n\nFor each term give one memorable trick (acronym, rhyme, or vivid image).\nFormat each as: TERM: [term]\nTRICK: [memory trick]`;
   if (actionId === 'merge') {
@@ -11053,15 +11445,15 @@ function buildAIPromptV2(actionId, notes, askQ) {
     const mergeSet = mergeId ? getSet(parseInt(mergeId)) : null;
     const mergeCards = mergeSet ? allCards(mergeSet).slice(0, 20) : [];
     const mergeList = mergeCards.map((c, i) => `CARD ${i+1}\nTERM: ${c.front}\nDEFINITION: ${c.back}`).join('\n\n');
-    return `Merge these two flashcard sets into one clean set. Remove duplicates. Keep the best version of overlapping cards.\n\nSET A — ${s?.name || 'Set A'}:\n${cardList}\n\nSET B — ${mergeSet?.name || 'Set B'}:\n${mergeList}\n\n${cardFmt}`;
+    return `Merge these two flashcard sets. Remove duplicates. Keep the best version of overlapping cards.\n\nSET A — ${s?.name || 'Set A'}:\n${cardList}\n\nSET B — ${mergeSet?.name || 'Set B'}:\n${mergeList}\n\n${cardFmt}`;
   }
   if (actionId === 'ask') return `${setInfo}\n\nCards:\n${cardList}${noteBlock}\n\nQuestion: ${askQ}`;
   if (actionId === 'explain') {
     const wrong = aiLastWrongCards.slice(0, 10).map(c => `- ${c.front}: student answered "${c.userAnswer || '?'}", correct is "${c.back}"`).join('\n');
-    return `A student got these wrong on a quiz:\n${wrong || cardList}\n\nExplain each concept clearly in plain language. For each, say what the concept actually means and why the student might have gotten confused. Be encouraging and concise.`;
+    return `A student got these wrong on a quiz:\n${wrong || cardList}\n\nExplain each concept clearly. Say what it means and why the student might have gotten confused. Be encouraging and concise.`;
   }
-  if (actionId === 'study-tips') return `${setInfo}\n\nA student just scored ${aiLastWrongCards.length ? 'with some mistakes' : 'on a quiz'} on these cards:\n${cardList}\n\nGive 4-5 specific study tips for this material. What to focus on, how to remember it.`;
-  if (actionId === 'more-cards') return `${setInfo}\n\nWeak areas from quiz:\n${cardList}\n\nGenerate 8 more practice questions focused on these concepts. ${cardFmt}`;
+  if (actionId === 'study-tips') return `${setInfo}\n\nA student just studied these cards:\n${cardList}\n\nGive 4-5 specific study tips for this material. What to focus on, how to remember it.`;
+  if (actionId === 'more-cards') return `${setInfo}\n\nWeak areas from quiz:\n${cardList}\n\nGenerate 8 more practice questions focused on these concepts.\n${cardFmt}`;
   return `${setInfo}\n\nCards:\n${cardList}${noteBlock}\n\n${askQ || 'Help me study this material.'}`;
 }
 
@@ -11169,16 +11561,11 @@ async function runAIBuild() {
     extra ? 'Extra instructions: ' + extra : null,
     sourceBlock ? '\nUse my notes as the primary source:\n' + sourceBlock : null,
     '',
-    'RULES — follow exactly:',
-    '1. Output ONLY the cards. No intro, no explanation, nothing else.',
-    '2. Number every card with CARD 1, CARD 2, etc.',
-    '3. Every card must have exactly one TERM: line and one DEFINITION: line.',
-    '4. Do not use brackets like [example] — write the real content.',
-    '5. Start immediately with CARD 1.',
+    'Return ONLY a JSON array — no other text, no markdown, no explanation:',
+    '[{"front":"term or question here","back":"definition or answer here"}, ...]',
     '',
-    'Example format:',
-    'CARD 1', ex[0], ex[1], '',
-    'Now generate all ' + count + ' cards about "' + topic + '":',
+    'Style: ' + (style === 'questions' ? 'phrase fronts as questions' : style === 'fill' ? 'use fill-in-the-blank format for fronts' : 'standard term/definition pairs'),
+    'Generate all ' + count + ' cards about "' + topic + '" now:',
   ].filter(l => l !== null).join('\n');
 
   if (aiMode === 'copypaste') {
@@ -11251,6 +11638,71 @@ function copyAIBuildPrompt() {
   });
 }
 
+// ─────────────────────────────────────────────────
+// ONBOARDING
+// ─────────────────────────────────────────────────
+
+function checkOnboarding() {
+  if (localStorage.getItem('dqstudy-onboarded')) return;
+  const el = document.getElementById('onboard-modal');
+  if (el) { el.style.display = 'flex'; obRenderThemes(); }
+}
+
+function obRenderThemes() {
+  const themes = [
+    { id:'dark',     label:'Dark',     dot:'#1e2130' },
+    { id:'light',    label:'Light',    dot:'#f8fafc' },
+    { id:'ocean',    label:'Ocean',    dot:'#0a1628' },
+    { id:'forest',   label:'Forest',   dot:'#0d1f0d' },
+    { id:'sunset',   label:'Sunset',   dot:'#1a0a00' },
+    { id:'midnight', label:'Mid',      dot:'#0d0d1a' },
+    { id:'candy',    label:'Candy',    dot:'#fff0f5' },
+    { id:'neon',     label:'Neon',     dot:'#050505' },
+  ];
+  const grid = document.getElementById('ob-theme-grid');
+  if (!grid) return;
+  grid.innerHTML = themes.map(t => `
+    <button onclick="setTheme('${t.id}');obMarkTheme('${t.id}')" id="ob-th-${t.id}"
+      style="padding:10px 6px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font-size:.7rem;font-weight:700;color:var(--text2);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:5px;">
+      <span style="width:24px;height:24px;border-radius:50%;background:${t.dot};border:2px solid var(--border2);display:block;"></span>
+      ${t.label}
+    </button>`).join('');
+  // Mark current theme
+  obMarkTheme(currentTheme);
+}
+
+function obMarkTheme(id) {
+  document.querySelectorAll('[id^="ob-th-"]').forEach(b => {
+    b.style.borderColor = b.id === 'ob-th-' + id ? 'var(--accent)' : 'var(--border)';
+    b.style.color = b.id === 'ob-th-' + id ? 'var(--accent2)' : 'var(--text2)';
+  });
+}
+
+function obNext(step) {
+  document.querySelectorAll('[id^="ob-step-"]').forEach(s => s.style.display = 'none');
+  const el = document.getElementById('ob-step-' + step);
+  if (el) el.style.display = '';
+  const fill = document.getElementById('ob-prog-fill');
+  if (fill) fill.style.width = (step === 1 ? 33 : step === 2 ? 66 : 100) + '%';
+  if (step === 2) obRenderThemes();
+}
+
+function obFinish() {
+  // Apply feature choices
+  const aiOn = document.getElementById('ob-ai')?.checked ?? true;
+  const shareOn = document.getElementById('ob-share')?.checked ?? true;
+  const gamOn = document.getElementById('ob-gam')?.checked ?? true;
+  if (!aiOn) { aiEnabled = false; aiMode = 'off'; }
+  if (!shareOn) { sharingEnabled = false; }
+  if (!gamOn) { gamEnabled = false; }
+  saveSettings();
+  renderHome();
+  localStorage.setItem('dqstudy-onboarded', '1');
+  const el = document.getElementById('onboard-modal');
+  if (el) el.style.display = 'none';
+  DQAuth.toast('All set! Happy studying 🎉');
+}
+
 function importAIBuildResult() {
   const raw = document.getElementById('ai-build-paste-in').value.trim();
   const status = document.getElementById('ai-build-paste-status');
@@ -11316,8 +11768,10 @@ function mbSyncTabBar(viewId) {
 function mbSyncFab(viewId) {
   var fab = document.getElementById('mobile-fab');
   if (!fab) return;
-  var showOn = ['home','allsets','folders'];
-  if (isMobile() && showOn.indexOf(viewId) !== -1) {
+  var showOn = ['home','allsets','folders','codes'];
+  // Always hide on desktop (FAB CSS only shows at ≤768px anyway, but be explicit)
+  if (window.innerWidth > 768) { fab.classList.add('fab-hidden'); return; }
+  if (showOn.indexOf(viewId) !== -1) {
     fab.classList.remove('fab-hidden');
   } else {
     fab.classList.add('fab-hidden');
