@@ -226,15 +226,16 @@ window.addEventListener('dq:authready',function(e){
 // ── LOAD ROOM ──
 function loadRoom(){
   document.getElementById('navRoomCode').textContent=roomCode;
-  sb.from('dqtrivia_rooms').select('*').eq('id',roomCode).single().then(function(res){
-    if(res.error||!res.data){showError('Room not found: '+roomCode);return;}
+  sb.from('dqtrivia_rooms').select('*').eq('id',roomCode).maybeSingle().then(function(res){
+    if(res.error){showError('Database error: '+res.error.message);return;}
+    if(!res.data){showError('Room "'+roomCode+'" not found. <a href="lobby.html" style="color:var(--blue)">Back to Lobby</a>');return;}
     roomData=res.data;
-    // Verify host
+    // Not host — redirect to play as player
     if(res.data.host_id!==currentUser.id){
-      // Not host — redirect to play as player
       window.location.href='play.html?mode=live&room='+roomCode+'&cat='+res.data.cat_id+'&catname='+encodeURIComponent(res.data.cat_name)+'&skip=1';
       return;
     }
+    if(res.data.status==='ended'){showError('This room has ended. <a href="lobby.html" style="color:var(--blue)">Back to Lobby</a>');return;}
     questions=res.data.questions||[];
     MAX_TIME=res.data.timer||20;
     if(MAX_TIME===0)MAX_TIME=99999;
@@ -244,11 +245,47 @@ function loadRoom(){
       if(roomData.status==='playing'){
         renderQuestion();
       } else {
-        // Room not started yet — shouldn't happen from lobby flow but handle gracefully
-        startGameFromRoom();
+        // Status is 'waiting' — questions not fetched yet, need to start
+        showWaitingToStart();
       }
     });
   });
+}
+
+// ── WAITING TO START (host opened TV mode before starting from lobby) ──
+function showWaitingToStart(){
+  document.getElementById('mainContent').innerHTML=
+    '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">'+
+    '<div style="font-size:2.5rem;margin-bottom:14px;">🎙️</div>'+
+    '<div style="font-family:var(--font-d);font-size:1.4rem;font-weight:800;margin-bottom:8px;">Room '+roomCode+'</div>'+
+    '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:24px;">'+players.length+' player'+(players.length===1?'':'s')+' in the lobby</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">'+
+      '<button onclick="fetchAndStart()" style="padding:13px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:0.9rem;" id="fetchStartBtn">▶ Fetch Questions &amp; Start</button>'+
+      '<a href="lobby.html?code='+roomCode+'" style="padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.83rem;text-align:center;">← Back to Lobby</a>'+
+    '</div></div>';
+}
+
+function fetchAndStart(){
+  var btn=document.getElementById('fetchStartBtn');
+  if(btn){btn.disabled=true;btn.textContent='Fetching questions…';}
+  var url='https://opentdb.com/api.php?amount='+(roomData.qcount||10)+'&encode=url3986';
+  if(roomData.cat_id&&roomData.cat_id!==0)url+='&category='+roomData.cat_id;
+  if(roomData.difficulty&&roomData.difficulty!=='any')url+='&difficulty='+roomData.difficulty;
+  fetch(url).then(function(r){return r.json();}).then(function(d){
+    if(d.response_code!==0||!d.results){if(btn){btn.disabled=false;btn.textContent='▶ Fetch Questions & Start';}showToast('Failed to load questions');return;}
+    var qs=d.results.map(function(q){
+      var dec=decodeURIComponent;
+      var answers=q.incorrect_answers.map(dec);var correct=dec(q.correct_answer);
+      answers.push(correct);
+      for(var i=answers.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=answers[i];answers[i]=answers[j];answers[j]=t;}
+      return{question:dec(q.question),correct:correct,answers:answers,difficulty:dec(q.difficulty),type:q.type};
+    });
+    sb.from('dqtrivia_rooms').update({status:'playing',question_index:0,questions:qs}).eq('id',roomCode).then(function(res){
+      if(res.error){showToast('Error: '+res.error.message);if(btn){btn.disabled=false;btn.textContent='▶ Fetch Questions & Start';}return;}
+      questions=qs;currentQ=0;
+      renderQuestion();
+    });
+  }).catch(function(){if(btn){btn.disabled=false;btn.textContent='▶ Fetch Questions & Start';}showToast('Network error');});
 }
 
 // ── LOAD PLAYERS ──
@@ -262,20 +299,24 @@ function loadPlayers(){
 // ── REALTIME: subscribe to player answer updates ──
 function subscribeToRoom(){
   if(roomChannel){try{sb.removeChannel(roomChannel);}catch(e){}}
-  roomChannel=sb.channel('host:'+roomCode)
-    .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+roomCode},function(payload){
+  roomChannel=sb.channel('host-room-'+roomCode)
+    .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players'},function(payload){
+      // Client-side filter — only care about our room
+      var row=payload.new||payload.old||{};
+      if(row.room_id!==roomCode)return;
       if(payload.eventType==='INSERT'){
-        var exists=players.some(function(p){return p.id===payload.new.id;});
+        var exists=players.some(function(p){return p.id===row.id;});
         if(!exists){players.push(payload.new);showToast('👋 '+payload.new.display_name+' joined');}
       }
       if(payload.eventType==='UPDATE'){
         players=players.map(function(p){return p.id===payload.new.id?payload.new:p;});
-        // Update response tracker and leaderboard live
         updateResponseTracker();
         renderLeaderboard();
       }
     })
-    .subscribe();
+    .subscribe(function(status,err){
+      if(err)console.warn('Realtime error:',err);
+    });
 }
 
 // ── RENDER QUESTION ──
