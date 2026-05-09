@@ -558,11 +558,11 @@ function showError(msg){
 // LIVE MODE — SUPABASE WIRING
 // ══════════════════════════════════════════════
 function initLiveMode(){
-  // Load room data + questions from Supabase
-  showLoading('Connecting to room '+ROOM+'…');
+  showLoading('Connecting to room '+ROOM+'...');
   if(!sb){showError('Not connected to database');return;}
-  sb.from('dqtrivia_rooms').select('*').eq('id',ROOM).single().then(function(res){
-    if(res.error||!res.data){showError('Room "'+ROOM+'" not found. <a href="lobby.html">Back to Lobby</a>');return;}
+  sb.from('dqtrivia_rooms').select('*').eq('id',ROOM).maybeSingle().then(function(res){
+    if(res.error){showError('Database error: '+res.error.message);return;}
+    if(!res.data){showError('Room not found. <a href="lobby.html">Back to Lobby</a>');return;}
     var room=res.data;
     if(room.status==='ended'){showError('This game has already ended. <a href="lobby.html">Back to Lobby</a>');return;}
     questions=room.questions||[];
@@ -570,15 +570,11 @@ function initLiveMode(){
     if(MAX_TIME===0)MAX_TIME=99999;
     currentQ=room.question_index||0;
     pgConfig.qcount=questions.length;
-
-    // Load all players for scoreboard
     sb.from('dqtrivia_room_players').select('*').eq('room_id',ROOM)
       .order('joined_at',{ascending:true}).then(function(pres){
         liveAllPlayers=pres.data||[];
-        // Find my player row
         var myRow=liveAllPlayers.find(function(p){return p.user_id===myUserId;});
         if(myRow)myPlayerId=myRow.id;
-
         subscribeLiveRoom();
         startGame();
       });
@@ -587,36 +583,35 @@ function initLiveMode(){
 
 function subscribeLiveRoom(){
   if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
-  liveChannel=sb.channel('play:'+ROOM)
-    // Watch room for question_index advances from host
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms',filter:'id=eq.'+ROOM},function(payload){
+  liveChannel=sb.channel('play-room-'+ROOM)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms'},function(payload){
+      if(payload.new.id!==ROOM)return;
       var newRoom=payload.new;
       if(newRoom.status==='ended'){
         showToast('Host ended the game');
         setTimeout(function(){window.location.href='index.html';},2000);
         return;
       }
-      // Host advanced to next question
       if(typeof newRoom.question_index==='number'&&newRoom.question_index!==currentQ){
         currentQ=newRoom.question_index;
-        if(currentQ<questions.length){
-          renderQuestion();
-        }else{
-          endGame();
-        }
+        answered=false;
+        if(currentQ<questions.length){renderQuestion();}else{endGame();}
       }
     })
-    // Watch other players' scores for live scoreboard updates
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+ROOM},function(payload){
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_room_players'},function(payload){
+      if(payload.new.room_id!==ROOM)return;
       liveAllPlayers=liveAllPlayers.map(function(p){return p.id===payload.new.id?payload.new:p;});
       updateLiveScoreboard();
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'dqtrivia_room_players',filter:'room_id=eq.'+ROOM},function(payload){
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'dqtrivia_room_players'},function(payload){
+      if(payload.new.room_id!==ROOM)return;
       var exists=liveAllPlayers.some(function(p){return p.id===payload.new.id;});
       if(!exists)liveAllPlayers.push(payload.new);
       updateLiveScoreboard();
     })
-    .subscribe();
+    .subscribe(function(status,err){
+      if(err)console.warn('Live realtime error:',err);
+    });
 }
 
 // Write my answer back to Supabase after answering
