@@ -255,14 +255,23 @@ function loadRoom(){
 // ── WAITING TO START (host opened TV mode before starting from lobby) ──
 function showWaitingToStart(){
   document.getElementById('mainContent').innerHTML=
-    '<div style="text-align:center;padding:60px 20px;animation:fadeUp .4s ease both;">'+
-    '<div style="font-size:2.5rem;margin-bottom:14px;">🎙️</div>'+
-    '<div style="font-family:var(--font-d);font-size:1.4rem;font-weight:800;margin-bottom:8px;">Room '+roomCode+'</div>'+
-    '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:24px;">'+players.length+' player'+(players.length===1?'':'s')+' in the lobby</div>'+
-    '<div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">'+
-      '<button onclick="fetchAndStart()" style="padding:13px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:0.9rem;" id="fetchStartBtn">▶ Fetch Questions &amp; Start</button>'+
-      '<a href="lobby.html?code='+roomCode+'" style="padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.83rem;text-align:center;">← Back to Lobby</a>'+
-    '</div></div>';
+    '<div style="max-width:600px;margin:0 auto;padding:40px 20px;animation:fadeUp .4s ease both;">'+
+    '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:14px;">'+
+      '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">📺 TV / Presenter Mode</div>'+
+      '<div style="font-family:var(--font-d);font-size:1.3rem;font-weight:800;margin-bottom:8px;">Room '+roomCode+'</div>'+
+      '<div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">'+
+        '<strong style="color:var(--text)">This screen is the TV.</strong> Point it at a projector or big screen. '+
+        'Players join on their phones at <span style="color:var(--blue)">lobby.html</span> and enter code <strong style="color:var(--accent)">'+roomCode+'</strong>. '+
+        'You control the pace — reveal answers and advance questions from here. Players only see the question and answer buttons on their devices.'+
+      '</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;">'+
+        '<div style="font-size:1.2rem">👥</div>'+
+        '<div style="font-size:0.8rem;color:var(--muted);">'+players.length+' player'+(players.length===1?'':'s')+' currently in the lobby. More can join after the game starts too.</div>'+
+      '</div>'+
+      '<button onclick="fetchAndStart()" style="width:100%;padding:13px;background:var(--accent);color:#071209;border:none;border-radius:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:0.9rem;" id="fetchStartBtn">▶ Start Game — Fetch Questions</button>'+
+    '</div>'+
+    '<a href="lobby.html?code='+roomCode+'" style="display:block;text-align:center;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--muted);text-decoration:none;font-size:0.8rem;">← Back to Lobby (room stays open)</a>'+
+    '</div>';
 }
 
 function fetchAndStart(){
@@ -343,11 +352,15 @@ function renderQuestion(){
     : '';
 
   document.getElementById('mainContent').innerHTML=
+    '<div style="background:rgba(77,232,136,0.07);border:1px solid rgba(77,232,136,0.15);border-radius:11px;padding:9px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">'+
+      '<div style="font-size:0.75rem;color:var(--muted);">📺 <strong style="color:var(--accent)">TV Mode</strong> — this screen is what the room sees. Players answer on their own devices.</div>'+
+      '<div style="font-size:0.72rem;color:var(--muted);">Room: <strong style="color:var(--accent);letter-spacing:.08em;">'+roomCode+'</strong> · '+players.length+' players</div>'+
+    '</div>'+
     '<div class="game-layout">'+
     '<div>'+
       '<div class="stage">'+
         '<div class="stage-top">'+
-          '<span class="stage-qnum">Q'+( currentQ+1)+' / '+total+'</span>'+
+          '<span class="stage-qnum">Q'+(currentQ+1)+' / '+total+'</span>'+
           '<span class="diff-pill '+diffClass+'">'+q.difficulty+'</span>'+
         '</div>'+
         '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'+
@@ -364,7 +377,8 @@ function renderQuestion(){
     '</div>'+
     '<div class="right-panel">'+
       '<div class="panel-card">'+
-        '<div class="panel-label">Host Controls</div>'+
+        '<div class="panel-label">Your Controls (host only)</div>'+
+        '<div style="font-size:0.7rem;color:var(--muted);margin-bottom:10px;">Players can\'t see this panel. Reveal when ready, then advance.</div>'+
         '<div class="ctrl-btns">'+
           '<button class="btn btn-g" id="revealBtn" onclick="revealAnswer()">👁 Reveal Answer</button>'+
           '<button class="btn btn-b" id="nextBtn" onclick="nextQuestion()" style="display:none">'+(currentQ>=questions.length-1?'🏆 Show Results':'Next Question →')+'</button>'+
@@ -373,7 +387,7 @@ function renderQuestion(){
       '</div>'+
       '<div class="panel-card">'+
         '<div class="panel-label">Live Leaderboard</div>'+
-        '<div class="lb-list" id="lbList"><div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:8px;">Waiting for answers…</div></div>'+
+        '<div class="lb-list" id="lbList"><div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:8px;">Waiting for answers...</div></div>'+
       '</div>'+
     '</div>'+
     '</div>';
@@ -403,8 +417,12 @@ function startTimer(){
 // ── RESPONSE TRACKER ──
 function updateResponseTracker(){
   var answered=players.filter(function(p){
-    var ans=p.answers||[];
-    return Array.isArray(ans)&&ans.length>currentQ;
+    var raw=p.answers;
+    if(!raw||!Array.isArray(raw))return false;
+    // Check if there's an answer for currentQ (by index or by qIdx property)
+    var byIndex=raw[currentQ];
+    if(byIndex&&typeof byIndex==='object')return true;
+    return raw.some(function(a){return a&&a.qIdx===currentQ;});
   }).length;
   var total=players.length;
   var ct=document.getElementById('respCount');
@@ -420,10 +438,22 @@ function revealAnswer(){
   clearInterval(timerInterval);
   var q=questions[currentQ];
 
-  // Tally votes from player answer records
+  // Tally votes — players store answers as array indexed by question number
+  // But JSONB from Supabase can return as array or object — handle both
   var tally=q.answers.map(function(){return 0;});
   players.forEach(function(p){
-    var ans=Array.isArray(p.answers)?p.answers[currentQ]:null;
+    var rawAnswers=p.answers;
+    if(!rawAnswers)return;
+    // answers is array: [{answerIdx, correct, qIdx}, ...]
+    var ans=null;
+    if(Array.isArray(rawAnswers)){
+      // Try direct index first
+      ans=rawAnswers[currentQ];
+      // If that's null/undefined, search by qIdx
+      if(!ans||typeof ans!=='object'){
+        ans=rawAnswers.find(function(a){return a&&a.qIdx===currentQ;});
+      }
+    }
     if(ans&&typeof ans.answerIdx==='number'&&ans.answerIdx>=0&&ans.answerIdx<tally.length){
       tally[ans.answerIdx]++;
     }
