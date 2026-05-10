@@ -358,6 +358,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
   width:250px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border);
   position:fixed; top:55px; bottom:0; left:0; overflow-y:auto; z-index:100;
   display:flex; flex-direction:column; transition:transform .25s ease;
+  -webkit-overflow-scrolling:touch;
 }
 #sidebar.hidden { transform:translateX(-100%); }
 #sb-head { padding:14px 12px 10px; }
@@ -1004,6 +1005,10 @@ body.exam-mode #view-exam-review {
 .chip-amber { color:var(--amber2); border-color:rgba(232,144,32,.3); background:var(--amber-dim); }
 .chip-red { color:var(--red2); border-color:rgba(224,48,48,.3); background:var(--red-dim); }
 .set-header-actions { display:flex; gap:8px; align-items:flex-start; }
+.set-overflow-menu-wrap { position:relative; display:none; }
+.set-overflow-menu { position:absolute; top:calc(100% + 4px); right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px; display:flex; flex-direction:column; gap:4px; z-index:200; min-width:140px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+.set-overflow-menu .btn { justify-content:flex-start; font-size:.72rem; padding:7px 10px; border-radius:8px; width:100%; }
+.set-overflow-menu.hidden { display:none !important; }
 
 /* Study mode picker */
 .mode-picker { display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
@@ -1314,6 +1319,9 @@ body.compact #view-set { padding:14px; }
 .modal-close:hover { background:var(--surface3); color:var(--text); }
 .modal-body { padding:20px 22px; overflow-y:auto; flex:1; }
 .modal-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+#ai-build-loading.active { display:flex !important; }
+.ai-build-spinner { width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:dqspin .7s linear infinite; }
+@keyframes dqspin { to { transform:rotate(360deg); } }
 
 /* Create set modal tabs */
 .modal-tabs { display:flex; gap:4px; background:var(--surface); border-radius:10px; padding:4px; margin-bottom:18px; }
@@ -1538,6 +1546,10 @@ textarea.finp { resize:vertical; min-height:50px; }
   .set-title { font-size: 1.2rem; }
   .set-header-actions { gap: 5px; flex-wrap: wrap; width: 100%; }
   .set-header-actions .btn { font-size: .68rem; padding: 6px 9px; flex-shrink: 0; }
+  @media (max-width: 420px) {
+    .set-overflow-collapsible { display: none !important; }
+    .set-overflow-menu-wrap { display: block; }
+  }
   /* Mode picker: horizontal scroll rows on mobile */
   .mode-group-row { flex-wrap: nowrap; overflow-x: scroll; overflow-y: visible; padding-bottom: 6px; gap: 6px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
   .mode-group-row::-webkit-scrollbar { height: 0; }
@@ -3273,7 +3285,14 @@ textarea.finp { resize:vertical; min-height:50px; }
       <div class="modal-title">✨ Build a Set with AI</div>
       <button class="modal-close" onclick="closeModal('ai-build-modal')">✕</button>
     </div>
-    <div class="modal-body" id="ai-build-body">
+    <div class="modal-body" id="ai-build-body" style="position:relative;">
+      <!-- Loading overlay -->
+      <div id="ai-build-loading" style="display:none;position:absolute;inset:0;background:var(--surface);border-radius:0 0 16px 16px;z-index:10;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+        <div class="ai-build-spinner"></div>
+        <div id="ai-build-loading-msg" style="font-size:.85rem;color:var(--text2);font-weight:600;"></div>
+        <div id="ai-build-loading-sub" style="font-size:.75rem;color:var(--text3);">This can take a few seconds…</div>
+        <button class="btn btn-ghost btn-sm" id="ai-build-cancel-btn" style="margin-top:4px;">✕ Cancel</button>
+      </div>
       <div id="ai-build-form">
         <div class="field">
           <label class="flabel">What are you studying? *</label>
@@ -3403,6 +3422,22 @@ textarea.finp { resize:vertical; min-height:50px; }
 </div>
 
 <!-- Watermark + FAB -->
+
+<!-- ═══ CONFIRM MODAL ═══ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-head">
+      <div class="modal-title" id="confirm-modal-title">Are you sure?</div>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-modal-msg" style="font-size:.88rem;color:var(--text2);margin:0 0 4px;line-height:1.5;"></p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="confirm-modal-cancel">Cancel</button>
+      <button class="btn btn-danger" id="confirm-modal-ok">Confirm</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ STUDY OPTIONS MODAL ═══ -->
 <div class="modal-overlay" id="study-opts-modal">
@@ -5328,15 +5363,28 @@ function renderSetPage(s, readOnly) {
       ${isSnapshot ? `<div style="font-size:.72rem;color:var(--text3);margin-top:4px;">Snapshot import · <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:.68rem;" onclick="copySnapshotSet('${s.id}')">📋 Make It Mine</button> to edit</div>` : ''}
     </div>
     <div class="set-header-actions">
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm sharing-btn" onclick="openShareModal()">🔗 Share</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openExportModal()">📤 Export</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">✨ Ask AI</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" id="ai-addcards-btn" onclick="openAIModal('addcards')" style="display:none">➕ Add Cards</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openMergeModal()">🔀 Merge</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="openAddToFolderFromSet()">📁 Folder</button>`}
-      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible sharing-btn" onclick="openShareModal()">🔗 Share</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" onclick="openExportModal()">📤 Export</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" id="ai-set-btn" onclick="openAIModal('set')" style="display:none">✨ Ask AI</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" id="ai-addcards-btn" onclick="openAIModal('addcards')" style="display:none">➕ Add Cards</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" onclick="openMergeModal()">🔀 Merge</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" onclick="openAddToFolderFromSet()">📁 Folder</button>`}
+      ${readOnly ? '' : `<button class="btn btn-ghost btn-sm set-overflow-collapsible" onclick="togglePin()" id="pin-btn">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>`}
       ${readOnly ? `<button class="btn btn-ghost btn-sm" onclick="copySharedSet()">📋 Copy</button>` : `<button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏️ Edit</button>`}
       ${readOnly ? `<button class="btn btn-danger btn-sm" onclick="removeSharedSet('${currentSharedCode}')">✕ Remove</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteSet()">🗑</button>`}
+      ${!readOnly ? `
+      <div class="set-overflow-menu-wrap">
+        <button class="btn btn-ghost btn-sm" onclick="toggleSetOverflowMenu(event)">⋯</button>
+        <div class="set-overflow-menu hidden" id="set-overflow-menu">
+          <button class="btn btn-ghost btn-sm sharing-btn" onclick="closeSetOverflowMenu();openShareModal()">🔗 Share</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeSetOverflowMenu();openExportModal()">📤 Export</button>
+          <button class="btn btn-ghost btn-sm" id="ai-set-btn-mob" onclick="closeSetOverflowMenu();openAIModal('set')" style="display:none">✨ Ask AI</button>
+          <button class="btn btn-ghost btn-sm" id="ai-addcards-btn-mob" onclick="closeSetOverflowMenu();openAIModal('addcards')" style="display:none">➕ Add Cards</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeSetOverflowMenu();openMergeModal()">🔀 Merge</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeSetOverflowMenu();openAddToFolderFromSet()">📁 Folder</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeSetOverflowMenu();togglePin()" id="pin-btn-mob">${s.pinned ? '📌 Pinned' : '📌 Pin'}</button>
+        </div>
+      </div>` : ''}
     </div>
   `;
 
@@ -5850,19 +5898,21 @@ function copySnapshotSet(id) {
 
 // Remove a shared-with-me entry
 function removeSharedSet(code) {
-  if (!confirm('Remove this shared set from your library?')) return;
-  sharedWithMe = sharedWithMe.filter(x => x.code !== code);
-  autoSave(); renderSidebar();
-  currentSharedCode = null;
-  showView('home');
-  sndClick();
+  showConfirm('Remove this shared set from your library?', () => {
+    sharedWithMe = sharedWithMe.filter(x => x.code !== code);
+    autoSave(); renderSidebar();
+    currentSharedCode = null;
+    showView('home');
+    sndClick();
+  }, { title: 'Remove Shared Set', okLabel: 'Remove' });
 }
 
 function deleteSet() {
-  if (!confirm('Delete this study set? This cannot be undone.')) return;
-  sets = sets.filter(s => s.id != currentSetId); // loose != handles number/string mismatch
-  currentSetId = null;
-  autoSave(); renderSidebar(); goHome();
+  showConfirm('Delete this study set? This cannot be undone.', () => {
+    sets = sets.filter(s => s.id != currentSetId);
+    currentSetId = null;
+    autoSave(); renderSidebar(); goHome();
+  }, { title: 'Delete Set' });
 }
 
 // ─────────────────────────────────────────────────
@@ -6423,7 +6473,7 @@ function examNav(dir) {
 ⚠ ${unanswered} question${unanswered > 1 ? 's' : ''} unanswered.`;
     if (flagged > 0) msg += `
 🚩 ${flagged} question${flagged > 1 ? 's' : ''} flagged.`;
-    if (confirm(msg)) submitExam(false);
+    showConfirm(msg, () => submitExam(false), { title: 'Submit Exam?', okLabel: 'Submit', okClass: 'btn-primary' });
     return;
   }
 
@@ -6433,10 +6483,11 @@ function examNav(dir) {
 }
 
 function exitExam() {
-  if (!confirm('Exit exam? Your progress will be lost.')) return;
-  if (examTimerInt) { clearInterval(examTimerInt); examTimerInt = null; }
-  document.body.classList.remove('exam-mode');
-  exitStudy();
+  showConfirm('Exit exam? Your progress will be lost.', () => {
+    if (examTimerInt) { clearInterval(examTimerInt); examTimerInt = null; }
+    document.body.classList.remove('exam-mode');
+    exitStudy();
+  }, { title: 'Exit Exam', okLabel: 'Exit' });
 }
 
 function submitExam(timedOut) {
@@ -7788,7 +7839,16 @@ function startSmartReview() {
         return br - ar;
       })
       .slice(0, 20);
-    const ok = confirm('All caught up — no cards due today!\n\nReview your ' + weakest.length + ' weakest cards instead?');
+    showConfirm('All caught up! No cards due today. Review your ' + weakest.length + ' weakest cards instead?', () => {
+      const limit = studyOpts.cardCount || weakest.length;
+      smartCards = shuffle(weakest).slice(0, limit);
+      smartIdx=0; smartCorrect=0; smartWrong=0;
+      smartFlipped=false; smartMissedIds=new Set();
+      smartUseDifficulty = studyOpts.smartDifficulty || false;
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById('view-smart').classList.add('active');
+      renderSmartCard();
+    }, { title: 'All Caught Up!', okLabel: 'Review Weakest', okClass: 'btn-primary' }); return;
     if (!ok) return;
     due = weakest;
   }
@@ -9137,7 +9197,7 @@ function confirmAddSetsToFolder() {
 
 function openAddToFolderFromSet() {
   if (!folders.length) {
-    if (confirm('No folders yet. Create one now?')) openFolderCreateModal();
+    showConfirm('No folders yet. Create one now?', openFolderCreateModal, { title: 'No Folders', okLabel: 'Create Folder', okClass: 'btn-primary' }); return;
     return;
   }
   const s = getSet(currentSetId);
@@ -9203,12 +9263,13 @@ function renameFolderCurrent() { openFolderEditModal(); }
 
 function deleteFolderCurrent() {
   const f = folders.find(fl => fl.id == currentFolderId);
-  if (!confirm(`Delete "${f?.name || 'this folder'}"? Sets inside won't be deleted.`)) return;
-  folders = folders.filter(f => f.id != currentFolderId);
-  autoSave();
-  closeFolderOpen();
-  renderFoldersGrid();
-  renderSidebar();
+  showConfirm(`Delete "${f?.name || 'this folder'}"? Sets inside won't be deleted.`, () => {
+    folders = folders.filter(f => f.id != currentFolderId);
+    autoSave();
+    closeFolderOpen();
+    renderFoldersGrid();
+    renderSidebar();
+  }, { title: 'Delete Folder' });
 }
 
 function createFolder() { openFolderCreateModal(); } // legacy compat
@@ -9217,7 +9278,13 @@ function createFolder() { openFolderCreateModal(); } // legacy compat
 // CREATE / EDIT SET MODAL
 // ─────────────────────────────────────────────────
 function openCreateModal() {
-  if (!isLoggedIn) { const ok = confirm('You\'re not signed in. Data will only be saved locally. Continue?'); if (!ok) return; }
+  if (!isLoggedIn) {
+    showConfirm("You're not signed in. Data will only be saved locally. Continue?", () => _openCreateModalDo(), { title: 'Not Signed In', okLabel: 'Continue', okClass: 'btn-primary' });
+    return;
+  }
+  _openCreateModalDo();
+}
+function _openCreateModalDo() {
   editingId = null;
   document.getElementById('create-modal-title').textContent = '✨ New Study Set';
   document.getElementById('inp-name').value = '';
@@ -9352,9 +9419,10 @@ function exportAllData() {
 }
 
 function clearAllData() {
-  if (!confirm('Clear ALL study data? This cannot be undone.')) return;
-  sets=[]; folders=[]; currentSetId=null;
-  autoSave(); renderSidebar(); goHome();
+  showConfirm('Clear ALL study data? This cannot be undone.', () => {
+    sets=[]; folders=[]; currentSetId=null;
+    autoSave(); renderSidebar(); goHome();
+  }, { title: 'Clear All Data' });
 }
 
 function togglePin() {
@@ -9362,8 +9430,32 @@ function togglePin() {
   s.pinned = !s.pinned;
   const btn = document.getElementById('pin-btn');
   if (btn) btn.textContent = s.pinned ? '📌 Pinned' : '📌 Pin';
+  const btnMob = document.getElementById('pin-btn-mob');
+  if (btnMob) btnMob.textContent = s.pinned ? '📌 Pinned' : '📌 Pin';
   autoSave(); renderSidebar(); sndClick();
 }
+
+function toggleSetOverflowMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('set-overflow-menu');
+  if (!menu) return;
+  menu.classList.toggle('hidden');
+  // sync AI button visibility inside menu
+  const aiMain = document.getElementById('ai-set-btn');
+  const aiMob = document.getElementById('ai-set-btn-mob');
+  if (aiMain && aiMob) aiMob.style.display = aiMain.style.display;
+  const addMain = document.getElementById('ai-addcards-btn');
+  const addMob = document.getElementById('ai-addcards-btn-mob');
+  if (addMain && addMob) addMob.style.display = addMain.style.display;
+}
+function closeSetOverflowMenu() {
+  const menu = document.getElementById('set-overflow-menu');
+  if (menu) menu.classList.add('hidden');
+}
+// Close overflow menu when clicking elsewhere
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.set-overflow-menu-wrap')) closeSetOverflowMenu();
+});
 
 function showAllSets() {
   renderAllSetsGrid();
@@ -9575,6 +9667,26 @@ document.addEventListener('keydown', e => {
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── Reusable confirm modal ──
+function showConfirm(msg, onOk, opts) {
+  opts = opts || {};
+  document.getElementById('confirm-modal-title').textContent = opts.title || 'Are you sure?';
+  document.getElementById('confirm-modal-msg').textContent = msg;
+  const okBtn = document.getElementById('confirm-modal-ok');
+  const cancelBtn = document.getElementById('confirm-modal-cancel');
+  okBtn.textContent = opts.okLabel || 'Confirm';
+  okBtn.className = 'btn ' + (opts.okClass || 'btn-danger');
+  const finish = (result) => {
+    closeModal('confirm-modal');
+    okBtn.onclick = null; cancelBtn.onclick = null;
+    if (result && onOk) onOk();
+  };
+  okBtn.onclick = () => finish(true);
+  cancelBtn.onclick = () => finish(false);
+  openModal('confirm-modal');
+}
+
 
 // tracking is handled inside showView directly
 
@@ -10079,10 +10191,11 @@ function copyCodeToast(code) {
 function copyCode(code) { copyCodeToast(code); }
 
 async function revokeCode(setId) {
-  if (!confirm('Revoke this code? Anyone with it will lose access.')) return;
-  await revokeShortCode(setId);
-  renderCodesView();
-  sndClick();
+  showConfirm('Revoke this code? Anyone with it will lose access.', async () => {
+    await revokeShortCode(setId);
+    renderCodesView();
+    sndClick();
+  }, { title: 'Revoke Code', okLabel: 'Revoke' });
 }
 
 async function toggleCodeAccess(setId, code, currentAccess) {
@@ -10243,35 +10356,37 @@ async function refreshShortCode() {
 
 async function regenerateCode() {
   const s = getSet(currentSetId); if (!s) return;
-  if (!confirm('Generate a new code? The old code will stop working.')) return;
-  await revokeShortCode(s.id);
-  document.getElementById('share-existing-notice').style.display = 'none';
-  const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
-  const code = await generateShortCode(s, shareAccess, days);
-  if (code) {
-    _updateShareFields(code);
-    const statusEl = document.getElementById('share-status');
-    if (statusEl) statusEl.textContent = '✓ New code generated';
-  }
-  sndClick();
+  showConfirm('Generate a new code? The old code will stop working.', async () => {
+    await revokeShortCode(s.id);
+    document.getElementById('share-existing-notice').style.display = 'none';
+    const days = parseInt(document.getElementById('share-expiry-sel')?.value || '0');
+    const code = await generateShortCode(s, shareAccess, days);
+    if (code) {
+      _updateShareFields(code);
+      const statusEl = document.getElementById('share-status');
+      if (statusEl) statusEl.textContent = '✓ New code generated';
+    }
+    sndClick();
+  }, { title: 'Regenerate Code', okLabel: 'Regenerate', okClass: 'btn-primary' });
 }
 
 async function revokeCurrentCode() {
   const s = getSet(currentSetId); if (!s) return;
-  if (!confirm('Revoke this code? Anyone with it will lose access.')) return;
-  await revokeShortCode(s.id);
-  const hiddenInp = document.getElementById('share-code-inp');
-  if (hiddenInp) hiddenInp.value = '';
-  const linkInp = document.getElementById('share-link-inp');
-  if (linkInp) linkInp.value = '';
-  const codeOnlyInp = document.getElementById('share-code-only-inp');
-  if (codeOnlyInp) codeOnlyInp.value = '';
-  const statusEl = document.getElementById('share-status');
-  if (statusEl) statusEl.textContent = 'Code revoked.';
-  const rBtn = document.getElementById('share-revoke-btn');
-  if (rBtn) rBtn.style.display = 'none';
-  currentShareCode = '';
-  sndClick();
+  showConfirm('Revoke this code? Anyone with it will lose access.', async () => {
+    await revokeShortCode(s.id);
+    const hiddenInp = document.getElementById('share-code-inp');
+    if (hiddenInp) hiddenInp.value = '';
+    const linkInp = document.getElementById('share-link-inp');
+    if (linkInp) linkInp.value = '';
+    const codeOnlyInp = document.getElementById('share-code-only-inp');
+    if (codeOnlyInp) codeOnlyInp.value = '';
+    const statusEl = document.getElementById('share-status');
+    if (statusEl) statusEl.textContent = 'Code revoked.';
+    const rBtn = document.getElementById('share-revoke-btn');
+    if (rBtn) rBtn.style.display = 'none';
+    currentShareCode = '';
+    sndClick();
+  }, { title: 'Revoke Code', okLabel: 'Revoke' });
 }
 
 // Open share modal
@@ -11405,15 +11520,15 @@ function aiConfirmReplaceCards(cards) {
   if (!s) { DQAuth.toast('No set open'); return; }
   const sel = aiSelectedCards.map(i => cards[i]).filter(Boolean);
   if (!sel.length) { DQAuth.toast('No cards selected'); return; }
-  const ok = confirm(`Replace all ${allCards(s).length} cards in "${s.name}" with ${sel.length} improved cards?\n\nThis cannot be undone.`);
-  if (!ok) return;
-  s.cards = sel.map(c => ({front: c.front, back: c.back, starred: false, mastery: 'unseen'}));
-  s.updated = Date.now();
-  autoSave();
-  closeModal('ai-modal');
-  openSet(s.id);
-  sndComplete();
-  DQAuth.toast('✓ Set updated with ' + sel.length + ' improved cards!');
+  showConfirm(`Replace all ${allCards(s).length} cards in "${s.name}" with ${sel.length} improved cards? This cannot be undone.`, () => {
+    s.cards = sel.map(c => ({front: c.front, back: c.back, starred: false, mastery: 'unseen'}));
+    s.updated = Date.now();
+    autoSave();
+    closeModal('ai-modal');
+    openSet(s.id);
+    sndComplete();
+    DQAuth.toast('✓ Set updated with ' + sel.length + ' improved cards!');
+  }, { title: 'Replace Cards' });
 }
 
 function aiDownloadText(text, filename) {
@@ -11525,6 +11640,8 @@ function aiBuildRemoveSource(i) {
   renderAIBuildSources();
 }
 
+var _aiBuildAbortCtrl = null;
+
 function aiBuildReset() {
   document.getElementById('ai-build-form').style.display = '';
   document.getElementById('ai-build-result').style.display = 'none';
@@ -11532,6 +11649,26 @@ function aiBuildReset() {
   document.getElementById('ai-build-back-btn').style.display = 'none';
   document.getElementById('ai-build-go-btn').style.display = '';
   document.getElementById('ai-build-go-btn').disabled = false;
+  document.getElementById('ai-build-loading').classList.remove('active');
+  document.getElementById('ai-build-go-btn').onclick = runAIBuild;
+}
+
+function _aiBuildShowLoading(topic, count) {
+  const ld = document.getElementById('ai-build-loading');
+  document.getElementById('ai-build-loading-msg').textContent = 'Generating ' + count + ' cards about "' + topic + '"…';
+  document.getElementById('ai-build-form').style.display = 'none';
+  ld.classList.add('active');
+  _aiBuildAbortCtrl = new AbortController();
+  document.getElementById('ai-build-cancel-btn').onclick = () => {
+    if (_aiBuildAbortCtrl) _aiBuildAbortCtrl.abort();
+    aiBuildReset();
+    DQAuth.toast('Generation cancelled');
+  };
+}
+
+function _aiBuildHideLoading() {
+  document.getElementById('ai-build-loading').classList.remove('active');
+  _aiBuildAbortCtrl = null;
 }
 
 async function runAIBuild() {
@@ -11579,27 +11716,23 @@ async function runAIBuild() {
 
   // Live mode
   const goBtn = document.getElementById('ai-build-go-btn');
-  const st = document.getElementById('ai-build-status');
-  goBtn.disabled = true;
-  goBtn.textContent = '⏳ Generating…';
-  st.textContent = 'Asking AI for ' + count + ' cards about "' + topic + '"…';
-  st.style.display = '';
-  st.style.color = 'var(--text2)';
+  _aiBuildShowLoading(topic, count);
 
   try {
     const resp = await aiCallProxy(prompt, 'You are a flashcard generator. Output only cards in the requested format, nothing else.');
+    _aiBuildHideLoading();
+    if (!resp) { aiBuildReset(); DQAuth.toast('No response from AI — try again'); return; }
     const cards = aiParseCards(resp);
     aiIncrementUsage();
 
     if (!cards.length) {
-      st.textContent = '⚠ Couldn\'t parse cards from AI response. Try again or use Copy-Paste mode.';
-      st.style.color = 'var(--red2)';
-      goBtn.disabled = false; goBtn.textContent = '✨ Generate Set';
+      aiBuildReset();
+      document.getElementById('ai-build-status').textContent = '⚠ Couldn\'t parse cards from AI response. Try again or use Copy-Paste mode.';
+      document.getElementById('ai-build-status').style.cssText = 'display:block;color:var(--red2);font-size:.75rem;margin-bottom:8px;';
       return;
     }
 
     // Show preview
-    document.getElementById('ai-build-form').style.display = 'none';
     document.getElementById('ai-build-result').style.display = '';
     document.getElementById('ai-build-result-msg').textContent = '✓ Generated ' + cards.length + ' cards about "' + topic + '"';
     document.getElementById('ai-build-preview').innerHTML = cards.slice(0,8).map(c =>
@@ -11608,12 +11741,15 @@ async function runAIBuild() {
     document.getElementById('ai-build-back-btn').style.display = '';
     goBtn.textContent = '📥 Save as New Set';
     goBtn.disabled = false;
+    goBtn.style.display = '';
     goBtn.onclick = () => aiBuildSave(topic, cards);
 
   } catch(err) {
-    st.textContent = '⚠ AI error: ' + err.message;
-    st.style.color = 'var(--red2)';
-    goBtn.disabled = false; goBtn.textContent = '✨ Generate Set';
+    _aiBuildHideLoading();
+    if (err.name === 'AbortError') return; // user cancelled
+    aiBuildReset();
+    document.getElementById('ai-build-status').textContent = '⚠ AI error: ' + err.message;
+    document.getElementById('ai-build-status').style.cssText = 'display:block;color:var(--red2);font-size:.75rem;margin-bottom:8px;';
   }
 }
 
