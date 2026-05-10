@@ -298,6 +298,8 @@ function fetchAndStart(){
 }
 
 // ── LOAD PLAYERS ──
+var hostPollTmr=null;
+
 function loadPlayers(){
   return sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
     .order('joined_at',{ascending:true}).then(function(res){
@@ -305,27 +307,40 @@ function loadPlayers(){
     });
 }
 
-// ── REALTIME: subscribe to player answer updates ──
-function subscribeToRoom(){
-  if(roomChannel){try{sb.removeChannel(roomChannel);}catch(e){}}
-  roomChannel=sb.channel('host-room-'+roomCode)
-    .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players'},function(payload){
-      // Client-side filter — only care about our room
-      var row=payload.new||payload.old||{};
-      if(row.room_id!==roomCode)return;
-      if(payload.eventType==='INSERT'){
-        var exists=players.some(function(p){return p.id===row.id;});
-        if(!exists){players.push(payload.new);showToast('👋 '+payload.new.display_name+' joined');}
-      }
-      if(payload.eventType==='UPDATE'){
-        players=players.map(function(p){return p.id===payload.new.id?payload.new:p;});
+// Polling-first sync — polls every 2s for fresh player scores
+function startHostPoll(){
+  stopHostPoll();
+  hostPollTmr=setInterval(function(){
+    if(!sb||!roomCode)return;
+    sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+      .order('joined_at',{ascending:true}).then(function(res){
+        if(res.error)return;
+        players=res.data||[];
         updateResponseTracker();
         renderLeaderboard();
-      }
-    })
-    .subscribe(function(status,err){
-      if(err)console.warn('Realtime error:',err);
-    });
+      });
+  },2000);
+}
+function stopHostPoll(){if(hostPollTmr)clearInterval(hostPollTmr);hostPollTmr=null;}
+
+// Realtime as bonus layer on top of polling
+function subscribeToRoom(){
+  if(roomChannel){try{sb.removeChannel(roomChannel);}catch(e){}}
+  try{
+    roomChannel=sb.channel('host-'+roomCode+'-'+Date.now())
+      .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players'},function(payload){
+        var row=payload.new||payload.old||{};
+        if(row.room_id!==roomCode)return;
+        // Just refresh via poll — more reliable than trusting payload
+        sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+          .order('joined_at',{ascending:true}).then(function(res){
+            if(!res.error){players=res.data||[];updateResponseTracker();renderLeaderboard();}
+          });
+      })
+      .subscribe(function(status,err){
+        if(err)console.warn('Host RT:',status,err);
+      });
+  }catch(e){console.warn('Host RT setup:',e);}
 }
 
 // ── RENDER QUESTION ──
