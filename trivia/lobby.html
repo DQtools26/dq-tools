@@ -5,18 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="../favicon.png">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNYF9DN593"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-TNYF9DN593');
-  </script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TNYF9DN593');</script>
   <script>(function(){var t=localStorage.getItem('dqt_theme')||'dark';if(t!=='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
   <script src="../dq-auth.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <title>Lobby — DQtrivia</title>
+  <title>Multiplayer — DQtrivia</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{--bg:#0b0c10;--bg2:#13141a;--bg3:#1a1b23;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.15);--text:#f0f0f4;--muted:#7b7c8a;--accent:#4de888;--blue:#3a7fff;--gold:#f5c842;--red:#ff6b6b;--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
@@ -47,103 +43,133 @@
     #dq-auth-btn.logged-in{border-color:rgba(77,232,136,.35);color:#e8eef8;}
     #dq-auth-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2dcc6f,#3a7fff);display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden;flex-shrink:0;}
     #dq-auth-avatar img{width:100%;height:100%;object-fit:cover;}
-    main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:32px 20px 100px;}
+    main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:28px 20px 100px;}
 
-    /* ENTRY */
-    .entry-hero{text-align:center;margin-bottom:32px;animation:fadeUp .4s ease both;}
-    .entry-eyebrow{font-size:0.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
-    .entry-title{font-family:var(--font-d);font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:8px;}
-    .entry-sub{font-size:0.88rem;color:var(--muted);}
-    .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    @media(max-width:620px){.entry-grid{grid-template-columns:1fr;}}
-    .entry-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;animation:fadeUp .4s ease both;}
-    .entry-card:nth-child(2){animation-delay:.06s;}
-    .ec-icon{font-size:1.6rem;margin-bottom:8px;}
-    .ec-title{font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:4px;}
-    .ec-sub{font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.4;}
-    .field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
-    .field-label{font-size:0.67rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-    .field-input{background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.88rem;padding:9px 12px;outline:none;transition:border-color .15s;width:100%;}
-    .field-input:focus{border-color:var(--accent);}
-    .field-input::placeholder{color:var(--muted);}
-    select.field-input{cursor:pointer;}
-    .chip-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
-    .chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:4px 11px;font-size:0.74rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;}
-    .chip:hover{border-color:var(--border-hi);color:var(--text);}
-    .chip.active{background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.4);color:var(--accent);}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .15s;border:none;padding:11px 18px;width:100%;margin-top:6px;}
-    .btn:active{transform:scale(0.97);}
-    .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+    /* TABS */
+    .tabs{display:flex;gap:6px;margin-bottom:22px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:5px;}
+    .tab{flex:1;padding:9px 6px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-family:var(--font-b);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all .18s;text-align:center;line-height:1.3;}
+    .tab:hover{color:var(--text);}
+    .tab.on{background:var(--bg3);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+    .tab .ti{display:block;font-size:1.1rem;margin-bottom:2px;}
+    .tab .tn{display:block;font-size:0.72rem;font-weight:700;}
+    .tab .td{display:block;font-size:0.6rem;color:var(--muted);margin-top:1px;}
+    .tab.on .td{color:var(--muted);}
+
+    /* PANELS */
+    .panel{display:none;animation:fadeUp .2s ease both;}
+    .panel.on{display:block;}
+
+    /* CARD */
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 22px;}
+    .card-title{font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:4px;}
+    .card-sub{font-size:0.76rem;color:var(--muted);margin-bottom:16px;line-height:1.45;}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:640px){.two-col{grid-template-columns:1fr;}}
+
+    /* FIELDS */
+    .fl{margin-bottom:11px;}
+    .fl label{display:block;font-size:0.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+    .fi{background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.88rem;padding:9px 12px;outline:none;transition:border-color .15s;width:100%;}
+    .fi:focus{border-color:var(--accent);}
+    .fi::placeholder{color:var(--muted);}
+    select.fi{cursor:pointer;}
+    .cr{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
+    .ch{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:4px 11px;font-size:0.73rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;}
+    .ch:hover{border-color:var(--border-hi);color:var(--text);}
+    .ch.on{background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.4);color:var(--accent);}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .15s;border:none;padding:10px 16px;width:100%;}
+    .btn+.btn{margin-top:6px;}
+    .btn:active:not(:disabled){transform:scale(0.97);}
+    .btn:disabled{opacity:0.4;cursor:not-allowed;}
     .btn-g{background:var(--accent);color:#071209;}
-    .btn-g:hover:not(:disabled){filter:brightness(1.1);}
+    .btn-g:hover:not(:disabled){filter:brightness(1.08);}
     .btn-b{background:var(--blue);color:#fff;}
-    .btn-b:hover:not(:disabled){filter:brightness(1.1);}
+    .btn-b:hover:not(:disabled){filter:brightness(1.08);}
     .btn-gh{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border);}
-    .btn-gh:hover:not(:disabled){background:rgba(255,255,255,0.09);}
+    .btn-gh:hover:not(:disabled){background:rgba(255,255,255,0.08);}
     .btn-red{background:var(--red);color:#fff;}
-    .btn-red:hover:not(:disabled){filter:brightness(1.1);}
+
+    /* JOIN PANEL */
+    .join-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;}
+    .join-title{font-family:var(--font-d);font-size:1.2rem;font-weight:800;margin-bottom:4px;}
+    .join-sub{font-size:0.78rem;color:var(--muted);margin-bottom:18px;line-height:1.45;}
+    .code-inp{background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;color:var(--text);font-family:var(--font-d);font-size:1.6rem;font-weight:800;letter-spacing:.22em;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;text-align:center;text-transform:uppercase;}
+    .code-inp:focus{border-color:var(--accent);}
+    .code-inp::placeholder{color:var(--muted);font-size:1rem;letter-spacing:.05em;font-family:var(--font-b);font-weight:400;}
+    .name-inp{background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:0.9rem;padding:10px 13px;outline:none;transition:border-color .15s;width:100%;margin-top:9px;}
+    .name-inp:focus{border-color:var(--accent);}
+    .name-inp::placeholder{color:var(--muted);}
+
+    /* HOW IT WORKS */
+    .how-list{display:flex;flex-direction:column;gap:10px;}
+    .how-step{display:flex;gap:10px;align-items:flex-start;}
+    .how-n{width:20px;height:20px;border-radius:50%;background:rgba(77,232,136,0.12);border:1px solid rgba(77,232,136,0.3);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:var(--accent);flex-shrink:0;margin-top:2px;}
+    .how-t{font-size:0.77rem;color:var(--muted);line-height:1.45;}
 
     /* LOBBY */
-    .lobby-layout{display:grid;grid-template-columns:1fr 270px;gap:16px;align-items:start;}
-    @media(max-width:720px){.lobby-layout{grid-template-columns:1fr;}}
-    .lobby-main{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;animation:fadeUp .3s ease both;}
-    .lobby-code-wrap{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--border);margin-bottom:18px;}
-    .lobby-code-label{font-size:0.63rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-    .lobby-code-big{font-family:var(--font-d);font-size:clamp(2rem,7vw,3.2rem);font-weight:800;letter-spacing:.3em;color:var(--accent);line-height:1;cursor:pointer;transition:opacity .15s;}
-    .lobby-code-big:hover{opacity:0.75;}
-    .lobby-code-hint{font-size:0.68rem;color:var(--muted);margin-top:7px;}
-    .lobby-code-hint span{color:var(--blue);}
-    .lobby-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-    .meta-pill{background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:3px 10px;font-size:0.68rem;color:var(--muted);}
-    .meta-pill strong{color:var(--text);}
-    .status-badge{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:4px 12px;font-size:0.68rem;font-weight:600;margin-bottom:14px;}
-    .status-badge .dot{width:5px;height:5px;border-radius:50%;}
-    .s-waiting{background:rgba(245,200,66,0.08);color:var(--gold);border:1px solid rgba(245,200,66,0.2);}
-    .s-waiting .dot{background:var(--gold);animation:blink 1s infinite;}
-    .s-ready{background:rgba(77,232,136,0.08);color:var(--accent);border:1px solid rgba(77,232,136,0.2);}
-    .s-ready .dot{background:var(--accent);}
-    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
-    .host-controls{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
-    .host-controls-label{font-size:0.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-    .host-btns{display:flex;gap:7px;flex-wrap:wrap;}
-    .host-btns .btn{width:auto;flex:1;margin-top:0;padding:9px 14px;font-size:0.8rem;}
+    .lobby-wrap{display:grid;grid-template-columns:1fr 250px;gap:14px;align-items:start;}
+    @media(max-width:680px){.lobby-wrap{grid-template-columns:1fr;}}
+    .lobby-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;}
+    .code-block{text-align:center;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border);}
+    .code-label{font-size:0.61rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+    .code-big{font-family:var(--font-d);font-size:clamp(1.8rem,6vw,2.8rem);font-weight:800;letter-spacing:.28em;color:var(--accent);cursor:pointer;transition:opacity .15s;line-height:1;}
+    .code-big:hover{opacity:0.7;}
+    .code-hint{font-size:0.65rem;color:var(--muted);margin-top:5px;}
+    .qr-box{margin-top:10px;display:flex;justify-content:center;}
+    .qr-box canvas,.qr-box img{border-radius:7px!important;background:#fff;padding:5px;}
+    .meta-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+    .mpill{background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:3px 9px;font-size:0.66rem;color:var(--muted);}
+    .mpill strong{color:var(--text);}
+    .sbadge{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:3px 11px;font-size:0.66rem;font-weight:600;margin-bottom:12px;}
+    .sbadge .dot{width:5px;height:5px;border-radius:50%;}
+    .sw{background:rgba(245,200,66,0.08);color:var(--gold);border:1px solid rgba(245,200,66,0.18);}
+    .sw .dot{background:var(--gold);animation:blink 1s infinite;}
+    .sg{background:rgba(77,232,136,0.08);color:var(--accent);border:1px solid rgba(77,232,136,0.18);}
+    .sg .dot{background:var(--accent);}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+    .hact{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
+    .hact .btn{width:auto;}
+    .sync-ind{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-left:8px;animation:blink .9s infinite;vertical-align:middle;}
+    .sync-ind.dead{background:var(--red);animation:none;}
 
-    /* PLAYER PANEL */
-    .player-panel{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:16px;animation:fadeUp .3s ease .06s both;}
-    .panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-    .panel-title{font-family:var(--font-d);font-size:0.85rem;font-weight:700;}
-    .player-count-badge{background:var(--accent);color:#071209;border-radius:100px;padding:2px 8px;font-size:0.66rem;font-weight:800;}
-    .player-list{display:flex;flex-direction:column;gap:5px;}
-    .player-row{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:7px 11px;animation:fadeUp .2s ease both;}
-    .player-row.is-host{border-color:rgba(245,200,66,0.25);background:rgba(245,200,66,0.03);}
-    .player-row.is-me{border-color:rgba(77,232,136,0.2);}
-    .player-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;flex-shrink:0;}
-    .player-name{font-size:0.8rem;font-weight:500;flex:1;color:var(--text);}
-    .player-tag{font-size:0.58rem;border-radius:100px;padding:2px 6px;border:1px solid;flex-shrink:0;}
-    .tag-host{color:var(--gold);border-color:rgba(245,200,66,0.3);}
-    .tag-you{color:var(--accent);border-color:rgba(77,232,136,0.3);}
-    .player-empty{text-align:center;padding:18px;color:var(--muted);font-size:0.76rem;}
+    /* PLAYERS */
+    .pp{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:15px;}
+    .pp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+    .pp-ttl{font-family:var(--font-d);font-size:0.84rem;font-weight:700;}
+    .pp-cnt{background:var(--accent);color:#071209;border-radius:100px;padding:2px 8px;font-size:0.64rem;font-weight:800;}
+    .pl{display:flex;flex-direction:column;gap:4px;}
+    .pr{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;}
+    .pr.ph{border-color:rgba(245,200,66,0.18);background:rgba(245,200,66,0.02);}
+    .pr.pm{border-color:rgba(77,232,136,0.15);}
+    .pav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;flex-shrink:0;}
+    .pnm{font-size:0.78rem;font-weight:500;flex:1;}
+    .ptg{font-size:0.56rem;border-radius:100px;padding:2px 6px;border:1px solid;flex-shrink:0;}
+    .ptg-h{color:var(--gold);border-color:rgba(245,200,66,0.28);}
+    .ptg-y{color:var(--accent);border-color:rgba(77,232,136,0.28);}
+    .pempty{text-align:center;padding:14px;color:var(--muted);font-size:0.73rem;}
 
     /* WARMUP */
-    .warmup-wrap{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
-    .warmup-label{font-size:0.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-    .warmup-q{font-size:0.8rem;font-weight:600;margin-bottom:7px;line-height:1.4;color:var(--text);}
-    .warmup-opts{display:flex;flex-direction:column;gap:4px;}
-    .warmup-btn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 11px;font-size:0.74rem;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;font-family:var(--font-b);}
-    .warmup-btn:hover:not(:disabled){border-color:var(--border-hi);}
-    .warmup-btn.correct{background:rgba(77,232,136,0.12);border-color:rgba(77,232,136,0.4);color:var(--accent);}
-    .warmup-btn.wrong{background:rgba(255,107,107,0.08);border-color:rgba(255,107,107,0.3);color:var(--red);}
-    .warmup-btn.reveal{background:rgba(77,232,136,0.05);border-color:rgba(77,232,136,0.15);color:var(--muted);}
-    .warmup-score{font-size:0.68rem;color:var(--muted);margin-top:6px;text-align:right;}
+    .wu{margin-top:13px;border-top:1px solid var(--border);padding-top:13px;}
+    .wu-lbl{font-size:0.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+    .wu-q{font-size:0.78rem;font-weight:600;margin-bottom:6px;line-height:1.4;}
+    .wu-opts{display:flex;flex-direction:column;gap:3px;}
+    .wu-btn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:0.72rem;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;font-family:var(--font-b);}
+    .wu-btn:hover:not(:disabled){border-color:var(--border-hi);}
+    .wu-btn.c{background:rgba(77,232,136,0.1);border-color:rgba(77,232,136,0.38);color:var(--accent);}
+    .wu-btn.w{background:rgba(255,107,107,0.07);border-color:rgba(255,107,107,0.28);color:var(--red);}
+    .wu-btn.r{background:rgba(77,232,136,0.04);border-color:rgba(77,232,136,0.1);color:var(--muted);}
 
-    /* CONNECTING */
-    .connecting{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;text-align:center;}
-    .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+    /* SPINNER */
+    .spinwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:12px;}
+    .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
+    /* TOAST */
     .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300;white-space:nowrap;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
     .dq-watermark{position:fixed;bottom:8px;left:12px;font-family:var(--font-d);font-size:.57rem;font-weight:600;letter-spacing:.1em;color:#1a5c36;text-transform:uppercase;pointer-events:none;z-index:998;}
     .fab2-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:999;}
@@ -161,19 +187,14 @@
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="toast" id="toast"></div>
-
 <nav>
   <a class="nav-logo" href="index.html"><div class="nav-dot"></div>DQtrivia</a>
   <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
   <div class="nav-links" id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="categories.html">Categories</a>
-    <a href="play.html">Play</a>
-    <a href="stats.html">Stats</a>
-    <a href="history.html">History</a>
-    <a href="shop.html">🛒 Shop</a>
+    <a href="index.html">Home</a><a href="categories.html">Categories</a><a href="play.html">Play</a>
+    <a href="stats.html">Stats</a><a href="history.html">History</a><a href="shop.html">🛒 Shop</a>
     <a href="settings.html">⚙️</a>
-    <a href="lobby.html" class="active" style="background:var(--blue);color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;font-size:0.75rem;">Join Game</a>
+    <a href="lobby.html" class="active" style="background:var(--blue);color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;font-size:0.75rem;">Multiplayer</a>
   </div>
   <div class="nav-right">
     <span id="navBadge" style="font-size:0.95rem;flex-shrink:0;"></span>
@@ -182,11 +203,7 @@
     </button>
   </div>
 </nav>
-
-<main id="mainContent">
-  <div class="connecting"><div class="spinner"></div><div style="font-size:0.85rem;color:var(--muted);">Connecting…</div></div>
-</main>
-
+<main id="mainContent"><div class="spinwrap"><div class="spinner"></div></div></main>
 <div class="dq-watermark">© 2026 DQtools by E. S.</div>
 <div class="fab2-wrap">
   <div class="fab2-items" id="fab2menu">
@@ -199,475 +216,463 @@
   <button class="fab2-toggle" id="fab2btn" onclick="(function(){var m=document.getElementById('fab2menu'),b=document.getElementById('fab2btn');m.classList.toggle('open');b.classList.toggle('open');b.textContent=b.classList.contains('open')?'✕':'☰';})()">☰</button>
 </div>
 <script>
-var BADGE_EMOJIS={rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
-var COLORS=['#4de888','#3a7fff','#f5c842','#ff8c5a','#a78bfa','#f472b6','#3ae8ff','#39ff14'];
+// ── CONSTANTS ──
+var COLORS=['#4de888','#3a7fff','#f5c842','#ff8c5a','#a78bfa','#f472b6','#3ae8ff'];
+var BADGES={rookie:'🥉',scholar:'📖',champion:'🏆',legend:'🐉',ghost:'👻',wizard:'🧙'};
 var CAT_NAMES={0:'All Categories',9:'General Knowledge',10:'Books',11:'Film',12:'Music',13:'Musicals & Theatre',14:'Television',15:'Video Games',16:'Board Games',17:'Science & Nature',18:'Computers',19:'Mathematics',20:'Mythology',21:'Sports',22:'Geography',23:'History',24:'Politics',25:'Art',26:'Celebrities',27:'Animals',28:'Vehicles',29:'Comics',30:'Gadgets',31:'Anime & Manga',32:'Cartoons & Animation'};
-
-var WARMUP_QS=[
-  {q:'What is the capital of France?',a:'Paris',opts:['London','Paris','Berlin','Madrid']},
-  {q:'How many sides does a hexagon have?',a:'6',opts:['5','6','7','8']},
-  {q:'What planet is closest to the Sun?',a:'Mercury',opts:['Venus','Earth','Mars','Mercury']},
-  {q:'Who wrote Romeo and Juliet?',a:'Shakespeare',opts:['Dickens','Shakespeare','Austen','Poe']},
-  {q:'What is 12 x 12?',a:'144',opts:['124','132','144','148']},
-  {q:'What is the chemical symbol for gold?',a:'Au',opts:['Go','Gd','Au','Ag']},
-  {q:'Which ocean is the largest?',a:'Pacific',opts:['Atlantic','Indian','Pacific','Arctic']},
-  {q:'How many strings does a standard guitar have?',a:'6',opts:['4','5','6','7']},
-  {q:'What year did WW2 end?',a:'1945',opts:['1943','1944','1945','1946']},
-  {q:'What is the hardest natural substance?',a:'Diamond',opts:['Quartz','Titanium','Diamond','Obsidian']}
+var WU=[
+  {q:'Capital of France?',a:'Paris',o:['London','Paris','Berlin','Madrid']},
+  {q:'Sides on a hexagon?',a:'6',o:['5','6','7','8']},
+  {q:'Closest planet to the Sun?',a:'Mercury',o:['Venus','Earth','Mars','Mercury']},
+  {q:'Who wrote Romeo and Juliet?',a:'Shakespeare',o:['Dickens','Shakespeare','Austen','Poe']},
+  {q:'12 x 12?',a:'144',o:['124','132','144','148']},
+  {q:'Chemical symbol for gold?',a:'Au',o:['Go','Gd','Au','Ag']},
+  {q:'Largest ocean?',a:'Pacific',o:['Atlantic','Indian','Pacific','Arctic']},
+  {q:'WW2 ended?',a:'1945',o:['1943','1944','1945','1946']},
+  {q:'Hardest natural substance?',a:'Diamond',o:['Quartz','Titanium','Diamond','Obsidian']}
 ];
 
 // ── STATE ──
-var sb=null, currentUser=null, playerStats={}, myDisplayName='Guest', myUserId='';
-var roomCode='', isHost=false, roomChannel=null, roomData=null, playerRows=[];
-var warmupIdx=0, warmupScore=0;
-var gameConfig={cat:0,catName:'All Categories',qcount:10,diff:'any',timer:20};
-var urlParams=new URLSearchParams(window.location.search);
-var paramCode=(urlParams.get('code')||urlParams.get('room')||'').toUpperCase().trim();
+var sb=null, myUser=null, myUserId='', myName='';
+var roomCode='', isHost=false, roomData=null, players=[];
+var gCfg={cat:0,catName:'All Categories',qcount:10,diff:'any',timer:20};
+var pollTmr=null, rtCh=null;
+var wuIdx=0, wuScore=0;
+var urlCode=(new URLSearchParams(location.search).get('code')||new URLSearchParams(location.search).get('room')||'').toUpperCase().trim();
 
-// ── AUTH ──
+// ── AUTH (guests welcome) ──
 window.addEventListener('dq:authready',function(e){
   var user=e.detail&&e.detail.user;
-  sb=DQAuth.getSupabase();
+  if(typeof DQAuth!=='undefined')sb=DQAuth.getSupabase();
   if(user){
-    currentUser=user;
-    myUserId=user.id;
-    DQAuth.loadData('dqtrivia_stats').then(function(saved){
-      playerStats=saved||{};
-      var eq=playerStats.equippedItems||{};
+    myUser=user; myUserId=user.id;
+    DQAuth.loadData('dqtrivia_stats').then(function(s){
+      var eq=(s&&s.equippedItems)||{};
       if(eq.theme){localStorage.setItem('dqt_theme',eq.theme);document.documentElement.setAttribute('data-theme',eq.theme);}
-      var nb=document.getElementById('navBadge');
-      if(nb)nb.textContent=BADGE_EMOJIS[eq.badge||'rookie']||'';
-      var profile=DQAuth.getProfile();
-      myDisplayName=((profile&&profile.displayName)||user.email.split('@')[0]||'Player').substring(0,20);
-      gameConfig.qcount=parseInt(localStorage.getItem('dqt_qcount')||'10');
-      gameConfig.diff=localStorage.getItem('dqt_difficulty')||'any';
-      gameConfig.timer=parseInt(localStorage.getItem('dqt_timer')||'20');
-      init();
+      var nb=document.getElementById('navBadge');if(nb)nb.textContent=BADGES[eq.badge||'rookie']||'';
+      var p=DQAuth.getProfile();
+      myName=((p&&p.displayName)||user.email.split('@')[0]||'Player').substring(0,20);
+      gCfg.qcount=parseInt(localStorage.getItem('dqt_qcount')||'10');
+      gCfg.diff=localStorage.getItem('dqt_difficulty')||'any';
+      gCfg.timer=parseInt(localStorage.getItem('dqt_timer')||'20');
+      boot();
     });
   } else {
-    // Guest — can join but not host
-    var gid=localStorage.getItem('dqt_guest_id');
-    if(!gid){gid='g_'+Date.now().toString(36);localStorage.setItem('dqt_guest_id',gid);}
+    var gid=localStorage.getItem('dqt_gid');
+    if(!gid){gid='g'+Date.now().toString(36);localStorage.setItem('dqt_gid',gid);}
     myUserId=gid;
-    myDisplayName=localStorage.getItem('dqt_guest_name')||'Guest';
-    init();
+    myName=localStorage.getItem('dqt_gname')||'';
+    boot();
   }
 });
 
-function init(){
-  if(paramCode){joinRoom(paramCode);}
-  else{showEntryScreen();}
-}
+function boot(){if(urlCode)joinRoom(urlCode);else showHome();}
 
-// ═══════════════════════════════════════════
-// ENTRY SCREEN
-// ═══════════════════════════════════════════
-function showEntryScreen(){
-  var isGuest=!currentUser;
+// ── HOME ──
+function showHome(){
+  var guest=!myUser;
   var catOpts=Object.entries(CAT_NAMES).map(function(e){return '<option value="'+e[0]+'">'+e[1]+'</option>';}).join('');
 
   document.getElementById('mainContent').innerHTML=
+  '<div style="text-align:center;margin-bottom:18px;animation:fadeUp .3s ease both;">'+
+    '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:5px;">Multiplayer</div>'+
+    '<div style="font-family:var(--font-d);font-size:clamp(1.5rem,5vw,2.2rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;">Play with friends</div>'+
+    '<div style="font-size:0.82rem;color:var(--muted);">Pick a mode below</div>'+
+  '</div>'+
+  '<div class="tabs">'+
+    '<button class="tab on" onclick="showTab(\'join\',this)"><span class="ti">🎮</span><span class="tn">Join a Game</span><span class="td">Enter a code</span></button>'+
+    '<button class="tab" onclick="showTab(\'live\',this)"><span class="ti">🎙️</span><span class="tn">Live Mode</span><span class="td">All play on own device</span></button>'+
+    '<button class="tab" onclick="showTab(\'tv\',this)"><span class="ti">📺</span><span class="tn">TV Mode</span><span class="td">Big screen + phones</span></button>'+
+  '</div>'+
 
-  // ── HOW IT WORKS banner ──
-  '<div style="background:rgba(58,127,255,0.08);border:1px solid rgba(58,127,255,0.18);border-radius:14px;padding:16px 20px;margin-bottom:20px;animation:fadeUp .3s ease both;">' +
-    '<div style="font-size:0.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;">How multiplayer works</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">'+
-      '<div style="display:flex;gap:10px;align-items:flex-start;">'+
-        '<div style="font-size:1.3rem;flex-shrink:0">🎙️</div>'+
-        '<div><div style="font-size:0.8rem;font-weight:600;margin-bottom:2px;">1. Host creates room</div><div style="font-size:0.72rem;color:var(--muted);">Pick category &amp; settings, get a 6-letter code</div></div>'+
+  // JOIN PANEL
+  '<div class="panel on" id="panel-join">'+
+    '<div class="two-col">'+
+    '<div class="join-card">'+
+      '<div class="join-title">Join a game</div>'+
+      '<div class="join-sub">No account needed. Get the room code from whoever is hosting and enter it here.</div>'+
+      '<label style="display:block;font-size:0.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Room Code</label>'+
+      '<input class="code-inp" id="joinCode" placeholder="e.g. AB3X9Z" maxlength="6" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,\'\')" onkeydown="if(event.key===\'Enter\')doJoin()">'+
+      '<input class="name-inp" id="joinName" placeholder="Your display name" maxlength="20" value="'+h(myName)+'" onkeydown="if(event.key===\'Enter\')doJoin()">'+
+      '<button class="btn btn-b" style="margin-top:10px;" onclick="doJoin()">→ Join Game</button>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;">What happens when you join</div>'+
+      '<div class="how-list">'+
+        step('1','Enter the 6-letter code from the host\'s screen.')+
+        step('2','Type your display name — no account needed.')+
+        step('3','Wait in the lobby until the host starts the game.')+
+        step('4','Questions appear on your screen. Answer before the timer runs out.')+
       '</div>'+
-      '<div style="display:flex;gap:10px;align-items:flex-start;">'+
-        '<div style="font-size:1.3rem;flex-shrink:0">📱</div>'+
-        '<div><div style="font-size:0.8rem;font-weight:600;margin-bottom:2px;">2. Players join</div><div style="font-size:0.72rem;color:var(--muted);">Enter the code on this page to join the lobby</div></div>'+
+      '<div class="wu" style="border-top:none;padding-top:0;margin-top:14px;">'+
+        '<div class="wu-lbl">Warm-up trivia while you wait</div>'+
+        '<div id="wuArea"></div>'+
+        '<div id="wuScore" style="font-size:0.67rem;color:var(--muted);margin-top:4px;text-align:right;"></div>'+
       '</div>'+
-      '<div style="display:flex;gap:10px;align-items:flex-start;">'+
-        '<div style="font-size:1.3rem;flex-shrink:0">📺</div>'+
-        '<div><div style="font-size:0.8rem;font-weight:600;margin-bottom:2px;">3. Host starts &amp; presents</div><div style="font-size:0.72rem;color:var(--muted);">Host gets the TV screen. Players answer on their phones</div></div>'+
-      '</div>'+
-      '<div style="display:flex;gap:10px;align-items:flex-start;">'+
-        '<div style="font-size:1.3rem;flex-shrink:0">🏆</div>'+
-        '<div><div style="font-size:0.8rem;font-weight:600;margin-bottom:2px;">4. Live leaderboard</div><div style="font-size:0.72rem;color:var(--muted);">Scores update in real time after each question</div></div>'+
-      '</div>'+
+    '</div>'+
     '</div>'+
   '</div>'+
 
-  // ── TWO CARDS ──
-  '<div class="entry-grid">'+
-
-  // HOST card
-  (isGuest
-    ? '<div class="entry-card" style="opacity:0.55;">'+
-        '<div class="ec-icon">🎙️</div>'+
-        '<div class="ec-title">Host a Game</div>'+
-        '<div class="ec-sub">Sign in to create a room and host a game.</div>'+
-        '<a href="landing.html" style="display:block;padding:11px;background:var(--accent);color:#071209;border:none;border-radius:10px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;font-size:0.85rem;margin-top:8px;">Sign in to host →</a>'+
-      '</div>'
-    : '<div class="entry-card">'+
-        '<div class="ec-icon">🎙️</div>'+
-        '<div class="ec-title">Host a Game</div>'+
-        '<div class="ec-sub">You control the pace. Players answer on their devices.</div>'+
-        '<div class="field"><div class="field-label">Category</div><select class="field-input" id="hostCat">'+catOpts+'</select></div>'+
-        '<div class="field"><div class="field-label">Questions</div><div class="chip-row">'+
-          [5,10,15,20].map(function(n){return '<div class="chip'+(n===gameConfig.qcount?' active':'')+'" onclick="hostChip(\'qcount\','+n+',this)">'+n+'</div>';}).join('')+
-        '</div></div>'+
-        '<div class="field"><div class="field-label">Difficulty</div><div class="chip-row">'+
-          [{v:'any',l:'Any'},{v:'easy',l:'Easy'},{v:'medium',l:'Med'},{v:'hard',l:'Hard'}].map(function(d){return '<div class="chip'+(d.v===gameConfig.diff?' active':'')+'" onclick="hostChip(\'diff\',\''+d.v+'\',this)">'+d.l+'</div>';}).join('')+
-        '</div></div>'+
-        '<div class="field"><div class="field-label">Timer per question</div><div class="chip-row">'+
-          [{v:0,l:'None'},{v:10,l:'10s'},{v:20,l:'20s'},{v:30,l:'30s'}].map(function(t){return '<div class="chip'+(t.v===gameConfig.timer?' active':'')+'" onclick="hostChip(\'timer\','+t.v+',this)">'+t.l+'</div>';}).join('')+
-        '</div></div>'+
-        '<button class="btn btn-g" onclick="createRoom()" id="createBtn">🎙️ Create Room &amp; Get Code</button>'+
-      '</div>'
-  )+
-
-  // JOIN card
-  '<div class="entry-card">'+
-    '<div class="ec-icon">🎮</div>'+
-    '<div class="ec-title">Join a Game</div>'+
-    '<div class="ec-sub">Got a code from the host? Enter it below.</div>'+
-    '<div class="field"><div class="field-label">Room Code</div>'+
-      '<input class="field-input" id="joinCodeInput" placeholder="e.g. AB3XYZ" maxlength="6" style="text-transform:uppercase;font-family:var(--font-d);letter-spacing:.2em;font-size:1.1rem;text-align:center;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key===\'Enter\')joinFromInput()">'+
+  // LIVE MODE PANEL
+  '<div class="panel" id="panel-live">'+
+  (guest?guestCard('host a Live Mode game'):'<div class="two-col">'+
+    '<div class="card">'+
+      '<div class="card-title">🎙️ Live Mode</div>'+
+      '<div class="card-sub">Everyone plays on their own device. You create a room, share the code, and all players get the same questions at the same time. No big screen needed — just phones or laptops.</div>'+
+      '<div class="fl"><label>Category</label><select class="fi" id="liveCat">'+catOpts+'</select></div>'+
+      '<div class="fl"><label>Questions</label><div class="cr">'+chips('lQ',[5,10,15,20],gCfg.qcount,'qcount')+'</div></div>'+
+      '<div class="fl"><label>Difficulty</label><div class="cr">'+dchips('lD',gCfg.diff)+'</div></div>'+
+      '<div class="fl"><label>Timer per question</label><div class="cr">'+tchips('lT',gCfg.timer)+'</div></div>'+
+      '<button class="btn btn-g" onclick="createRoom(\'live\')">Create Live Room →</button>'+
     '</div>'+
-    '<div class="field"><div class="field-label">Your Display Name</div>'+
-      '<input class="field-input" id="joinNameInput" placeholder="Your name" maxlength="20" value="'+escHtml(myDisplayName)+'">'+
+    '<div class="card">'+
+      '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;">How Live Mode works</div>'+
+      '<div class="how-list">'+
+        step('1','You create a room and get a 6-letter code + QR code.')+
+        step('2','Friends enter the code on this page on their own phones or laptops.')+
+        step('3','You start the game — everyone sees the same question simultaneously on their own screen.')+
+        step('4','Everyone answers independently. Real-time leaderboard updates after each question.')+
+      '</div>'+
+      '<div style="margin-top:12px;padding:9px 12px;background:var(--bg3);border-radius:9px;font-size:0.73rem;color:var(--muted);">No projector needed. Everyone just uses their own device.</div>'+
     '</div>'+
-    '<button class="btn btn-b" onclick="joinFromInput()" id="joinBtn">→ Join Game</button>'+
-    '<div class="warmup-wrap">'+
-      '<div class="warmup-label">Warm-up trivia while you wait</div>'+
-      '<div id="warmupArea"></div>'+
-      '<div class="warmup-score" id="warmupScore"></div>'+
-    '</div>'+
+  '</div>')+
   '</div>'+
 
+  // TV MODE PANEL
+  '<div class="panel" id="panel-tv">'+
+  (guest?guestCard('use TV Mode'):'<div class="two-col">'+
+    '<div class="card">'+
+      '<div class="card-title">📺 TV Mode</div>'+
+      '<div class="card-sub">The question shows on one big screen — a TV, projector, or laptop. Players scan a QR code and answer on their phones. You control when to reveal answers and advance. Great for parties.</div>'+
+      '<div class="fl"><label>Category</label><select class="fi" id="tvCat">'+catOpts+'</select></div>'+
+      '<div class="fl"><label>Questions</label><div class="cr">'+chips('tQ',[5,10,15,20],gCfg.qcount,'qcount')+'</div></div>'+
+      '<div class="fl"><label>Difficulty</label><div class="cr">'+dchips('tD',gCfg.diff)+'</div></div>'+
+      '<div class="fl"><label>Timer</label><div class="cr">'+tchips('tT',gCfg.timer)+'</div></div>'+
+      '<button class="btn btn-g" onclick="createRoom(\'tv\')">Start TV Mode →</button>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div style="font-size:0.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;">How TV Mode works</div>'+
+      '<div class="how-list">'+
+        step('1','Click Start TV Mode. Your screen becomes the big display — open it on a laptop connected to a TV or projector.')+
+        step('2','A giant QR code and room code appear on the big screen. Players scan or type the code on their phones.')+
+        step('3','The question shows on the big screen only. Players buzz in on their phone.')+
+        step('4','You click Reveal Answer to show results on the big screen, then Next Question.')+
+      '</div>'+
+      '<div style="margin-top:12px;padding:9px 12px;background:var(--bg3);border-radius:9px;font-size:0.73rem;color:var(--muted);">Best on a smart TV browser, Chromecast tab, or laptop connected to HDMI.</div>'+
+    '</div>'+
+  '</div>')+
   '</div>';
 
-  renderWarmup();
+  wuIdx=0;wuScore=0;renderWU();
 }
 
-function hostChip(type,val,el){
-  el.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});
-  el.classList.add('active');
-  gameConfig[type]=val;
+function step(n,t){return '<div class="how-step"><div class="how-n">'+n+'</div><div class="how-t">'+t+'</div></div>';}
+function guestCard(action){
+  return '<div class="card" style="text-align:center;padding:32px 24px;">'+
+    '<div style="font-size:2rem;margin-bottom:10px;">🔒</div>'+
+    '<div style="font-family:var(--font-d);font-size:0.95rem;font-weight:800;margin-bottom:6px;">Sign in to '+action+'</div>'+
+    '<div style="font-size:0.76rem;color:var(--muted);margin-bottom:16px;line-height:1.45;">Hosting requires a free account. Joining is always free with no account needed.</div>'+
+    '<a href="landing.html" style="display:inline-block;padding:10px 22px;background:var(--accent);color:#071209;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.84rem;">Sign in / Create account</a>'+
+  '</div>';
+}
+
+function chips(id,vals,cur,cfg){
+  return vals.map(function(v){return '<div class="ch'+(v===cur?' on':'')+'" onclick="pickChip(\''+id+'\','+v+',\''+cfg+'\',this)">'+v+'</div>';}).join('');
+}
+function dchips(id,cur){
+  return [{v:'any',l:'Any'},{v:'easy',l:'Easy'},{v:'medium',l:'Med'},{v:'hard',l:'Hard'}].map(function(d){
+    return '<div class="ch'+(d.v===cur?' on':'')+'" onclick="pickChip(\''+id+'\',\''+d.v+'\',\'diff\',this)">'+d.l+'</div>';
+  }).join('');
+}
+function tchips(id,cur){
+  return [{v:0,l:'None'},{v:10,l:'10s'},{v:20,l:'20s'},{v:30,l:'30s'}].map(function(t){
+    return '<div class="ch'+(t.v===cur?' on':'')+'" onclick="pickChip(\''+id+'\','+t.v+',\'timer\',this)">'+t.l+'</div>';
+  }).join('');
+}
+function pickChip(id,val,cfg,el){
+  el.parentNode.querySelectorAll('.ch').forEach(function(c){c.classList.remove('on');});
+  el.classList.add('on');
+  gCfg[cfg]=val;
+}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on');
+  var p=document.getElementById('panel-'+name);
+  if(p)p.classList.add('on');
 }
 
 // ── WARMUP ──
-function renderWarmup(){
-  var area=document.getElementById('warmupArea');
-  if(!area)return;
-  var q=WARMUP_QS[warmupIdx%WARMUP_QS.length];
-  area.innerHTML=
-    '<div class="warmup-q">'+escHtml(q.q)+'</div>'+
-    '<div class="warmup-opts">'+
-      q.opts.map(function(o){
-        return '<button class="warmup-btn" onclick="answerWarmup(this,\''+escHtml(o)+'\',\''+escHtml(q.a)+'\')">'+escHtml(o)+'</button>';
-      }).join('')+
-    '</div>';
+function renderWU(){
+  var a=document.getElementById('wuArea');if(!a)return;
+  var q=WU[wuIdx%WU.length];
+  a.innerHTML='<div class="wu-q">'+h(q.q)+'</div><div class="wu-opts">'+
+    q.o.map(function(o){return '<button class="wu-btn" onclick="ansWU(this,\''+h(o)+'\',\''+h(q.a)+'\')">'+h(o)+'</button>';}).join('')+'</div>';
 }
-function answerWarmup(btn,chosen,correct){
-  btn.parentNode.querySelectorAll('.warmup-btn').forEach(function(b){b.disabled=true;});
-  if(chosen===correct){btn.classList.add('correct');warmupScore++;}
-  else{btn.classList.add('wrong');btn.parentNode.querySelectorAll('.warmup-btn').forEach(function(b){if(b.textContent===correct)b.classList.add('reveal');});}
-  var sc=document.getElementById('warmupScore');
-  if(sc)sc.textContent=warmupScore+' correct so far';
-  warmupIdx++;
-  setTimeout(renderWarmup,1300);
+function ansWU(btn,chosen,correct){
+  btn.parentNode.querySelectorAll('.wu-btn').forEach(function(b){b.disabled=true;});
+  if(chosen===correct){btn.classList.add('c');wuScore++;}
+  else{btn.classList.add('w');btn.parentNode.querySelectorAll('.wu-btn').forEach(function(b){if(b.textContent===correct)b.classList.add('r');});}
+  var sc=document.getElementById('wuScore');if(sc)sc.textContent=wuScore+' correct so far';
+  wuIdx++;setTimeout(renderWU,1300);
 }
 
-// ═══════════════════════════════════════════
-// CREATE ROOM
-// ═══════════════════════════════════════════
-function createRoom(){
-  if(!currentUser){showToast('Sign in to host');return;}
-  var btn=document.getElementById('createBtn');
-  if(btn){btn.disabled=true;btn.textContent='Creating room...';}
-  var catSel=document.getElementById('hostCat');
-  if(catSel){gameConfig.cat=parseInt(catSel.value);gameConfig.catName=catSel.options[catSel.selectedIndex].text;}
-  roomCode=randomCode();
-  isHost=true;
-  sb.from('dqtrivia_rooms').insert({
-    id:roomCode,host_id:currentUser.id,host_name:myDisplayName,
-    status:'waiting',cat_id:gameConfig.cat,cat_name:gameConfig.catName,
-    mode:'live',qcount:gameConfig.qcount,difficulty:gameConfig.diff,
-    timer:gameConfig.timer,question_index:0,questions:[]
-  }).then(function(res){
-    if(res.error){
-      console.error('Create room error:',res.error);
-      showToast('Error: '+res.error.message);
-      if(btn){btn.disabled=false;btn.textContent='Create Room & Get Code';}
-      return;
-    }
-    // Add host as first player
-    sb.from('dqtrivia_room_players').insert({
-      room_id:roomCode,user_id:myUserId,display_name:myDisplayName,score:0,answers:[]
-    }).then(function(r2){
-      if(r2.error)console.warn('Host player insert:',r2.error);
-      showLobbyScreen();
-    });
-  });
-}
-
-// ═══════════════════════════════════════════
-// JOIN ROOM
-// ═══════════════════════════════════════════
-function joinFromInput(){
-  var code=(document.getElementById('joinCodeInput').value||'').trim().toUpperCase();
-  var name=(document.getElementById('joinNameInput').value||'').trim();
-  if(!code||code.length<4){showToast('Enter a valid room code');return;}
-  if(!name){showToast('Enter your display name');return;}
-  myDisplayName=name.substring(0,20);
-  if(!currentUser)localStorage.setItem('dqt_guest_name',myDisplayName);
+// ── JOIN ──
+function doJoin(){
+  var code=(document.getElementById('joinCode').value||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var name=(document.getElementById('joinName').value||'').trim();
+  if(!code||code.length<4){toast('Enter a room code');return;}
+  if(!name){toast('Enter your display name');return;}
+  myName=name.substring(0,20);
+  localStorage.setItem('dqt_gname',myName);
   joinRoom(code);
 }
 
 function joinRoom(code){
   roomCode=code.toUpperCase().trim();
-  showConnecting('Finding room '+roomCode+'...');
+  spin('Finding room '+roomCode+'...');
+  if(!sb){toast('Not connected — please refresh');showHome();return;}
   sb.from('dqtrivia_rooms').select('*').eq('id',roomCode).maybeSingle().then(function(res){
-    if(res.error){
-      console.error('Join room error:',res.error);
-      showToast('Database error — try again');
-      showEntryScreen();
-      return;
-    }
-    if(!res.data){
-      showToast('Room "'+roomCode+'" not found');
-      showEntryScreen();
-      return;
-    }
+    if(res.error){toast('Error: '+res.error.message);showHome();return;}
+    if(!res.data){toast('Room "'+roomCode+'" not found');showHome();return;}
     roomData=res.data;
-    if(roomData.status==='ended'){showToast('This game has already ended');showEntryScreen();return;}
+    if(roomData.status==='ended'){toast('That game has already ended');showHome();return;}
     isHost=(roomData.host_id===myUserId);
-    gameConfig.cat=roomData.cat_id||0;
-    gameConfig.catName=roomData.cat_name||'All Categories';
-    gameConfig.qcount=roomData.qcount||10;
-    gameConfig.diff=roomData.difficulty||'any';
-    gameConfig.timer=roomData.timer||20;
-    // If game already in progress, go straight to play
+    gCfg.cat=roomData.cat_id||0; gCfg.catName=roomData.cat_name||'All';
+    gCfg.qcount=roomData.qcount||10; gCfg.diff=roomData.difficulty||'any'; gCfg.timer=roomData.timer||20;
     if(roomData.status==='playing'&&!isHost){
-      showToast('Game in progress — joining now!');
-      setTimeout(function(){
-        window.location.href='play.html?mode=live&room='+roomCode+'&cat='+gameConfig.cat+'&catname='+encodeURIComponent(gameConfig.catName)+'&skip=1';
-      },600);
+      toast('Game already started — joining now!');
+      setTimeout(goPlay,600);
       return;
     }
-    insertMeAsPlayer().then(function(){showLobbyScreen();});
+    insertMe().then(showLobby);
   });
 }
 
-function insertMeAsPlayer(){
-  // Check if already in (handles page refresh)
+function insertMe(){
+  if(!sb)return Promise.resolve();
   return sb.from('dqtrivia_room_players').select('id').eq('room_id',roomCode).eq('user_id',myUserId).maybeSingle()
     .then(function(res){
-      if(res.data){return;} // already joined
+      if(res.data)return;
       return sb.from('dqtrivia_room_players').insert({
-        room_id:roomCode,user_id:myUserId,display_name:myDisplayName,score:0,answers:[]
-      }).then(function(r){
-        if(r.error)console.error('Insert player error:',r.error);
-      });
+        room_id:roomCode,user_id:myUserId,display_name:myName,score:0,answers:[]
+      }).then(function(r){if(r.error)console.error('insertMe:',r.error);});
     });
 }
 
-// ═══════════════════════════════════════════
-// LOBBY SCREEN
-// ═══════════════════════════════════════════
-function showLobbyScreen(){
-  var diffLabel={any:'Any difficulty',easy:'Easy',medium:'Medium',hard:'Hard'}[gameConfig.diff]||gameConfig.diff;
-  var timerLabel=gameConfig.timer===0?'No timer':gameConfig.timer+'s per question';
-
-  var hostSection=isHost
-    ? '<div class="host-controls">'+
-        '<div class="host-controls-label">You are the host</div>'+
-        '<div style="font-size:0.74rem;color:var(--muted);margin-bottom:10px;">When everyone has joined, click Start. You\'ll get the <strong style="color:var(--text)">TV presenter screen</strong> — players answer on their own devices.</div>'+
-        '<div class="host-btns">'+
-          '<button class="btn btn-g" onclick="startGame()" id="startBtn">▶ Start Game</button>'+
-          '<button class="btn btn-red" onclick="endRoom()">✕ End Room</button>'+
-        '</div>'+
-      '</div>'
-    : '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;">'+
-        '<div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;">Waiting for the host to start...</div>'+
-        '<div style="font-size:0.72rem;color:var(--muted);">When the game starts you\'ll automatically be taken to the question screen.</div>'+
-      '</div>';
-
-  document.getElementById('mainContent').innerHTML=
-    '<div class="lobby-layout">'+
-    '<div class="lobby-main">'+
-      '<div class="lobby-code-wrap">'+
-        '<div class="lobby-code-label">Room code — share this with players</div>'+
-        '<div class="lobby-code-big" onclick="copyCode()" title="Click to copy">'+roomCode+'</div>'+
-        '<div class="lobby-code-hint">Players go to lobby.html and enter code <span>'+roomCode+'</span> · click to copy</div>'+
-      '</div>'+
-      '<div class="lobby-meta">'+
-        '<div class="meta-pill">📚 <strong>'+escHtml(gameConfig.catName)+'</strong></div>'+
-        '<div class="meta-pill">❓ <strong>'+gameConfig.qcount+'</strong> Qs</div>'+
-        '<div class="meta-pill">⚡ <strong>'+escHtml(diffLabel)+'</strong></div>'+
-        '<div class="meta-pill">⏱ <strong>'+escHtml(timerLabel)+'</strong></div>'+
-      '</div>'+
-      '<div class="status-badge s-waiting" id="lobbyStatus"><span class="dot"></span><span id="lobbyStatusText">Waiting for players to join</span></div>'+
-      hostSection+
-      '<div class="warmup-wrap">'+
-        '<div class="warmup-label">Warm-up trivia while you wait</div>'+
-        '<div id="warmupArea"></div>'+
-        '<div class="warmup-score" id="warmupScore"></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="player-panel">'+
-      '<div class="panel-hd"><div class="panel-title">Players in room</div><div class="player-count-badge" id="playerCountBadge">0</div></div>'+
-      '<div class="player-list" id="playerList"><div class="player-empty">No players yet...</div></div>'+
-    '</div>'+
-    '</div>';
-
-  try{var u=new URL(window.location);u.searchParams.set('code',roomCode);window.history.replaceState({},'',u);}catch(e){}
-  renderWarmup();
-  loadPlayers();
-  subscribeToRoom();
-}
-
-// ── LOAD PLAYERS ──
-function loadPlayers(){
-  sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
-    .order('joined_at',{ascending:true}).then(function(res){
-      if(res.error){console.error('Load players:',res.error);return;}
-      playerRows=res.data||[];
-      renderPlayerList();
-    });
-}
-
-// ── REALTIME — no filter strings (client-side filter instead) ──
-function subscribeToRoom(){
-  if(roomChannel){try{sb.removeChannel(roomChannel);}catch(e){}}
-  roomChannel=sb.channel('lobby-'+roomCode)
-    .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players'},function(payload){
-      var row=payload.new||payload.old||{};
-      if((row.room_id||'')!==roomCode)return;
-      if(payload.eventType==='INSERT'){
-        if(!playerRows.some(function(p){return p.id===row.id;})){
-          playerRows.push(payload.new);
-          renderPlayerList();
-          if(payload.new.user_id!==myUserId)showToast('👋 '+escHtml(payload.new.display_name)+' joined!');
-        }
-      }
-      if(payload.eventType==='UPDATE'){
-        playerRows=playerRows.map(function(p){return p.id===payload.new.id?payload.new:p;});
-        renderPlayerList();
-      }
-      if(payload.eventType==='DELETE'){
-        playerRows=playerRows.filter(function(p){return p.id!==payload.old.id;});
-        renderPlayerList();
-      }
-    })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms'},function(payload){
-      if((payload.new.id||'')!==roomCode)return;
-      roomData=payload.new;
-      if(payload.new.status==='playing'&&!isHost){
-        showToast('Game starting!');
-        setTimeout(function(){
-          window.location.href='play.html?mode=live&room='+roomCode+'&cat='+gameConfig.cat+'&catname='+encodeURIComponent(gameConfig.catName)+'&skip=1';
-        },500);
-      }
-      if(payload.new.status==='ended'){
-        showToast('Host ended the room');
-        try{sb.removeChannel(roomChannel);}catch(e){}
-        setTimeout(showEntryScreen,1500);
-      }
-    })
-    .subscribe(function(status,err){
-      if(status==='CHANNEL_ERROR')console.error('Realtime error:',err);
-    });
-}
-
-// ── RENDER PLAYERS ──
-function renderPlayerList(){
-  var list=document.getElementById('playerList');
-  var badge=document.getElementById('playerCountBadge');
-  if(!list)return;
-  if(badge)badge.textContent=playerRows.length;
-  var sb2=document.getElementById('lobbyStatus');
-  var st=document.getElementById('lobbyStatusText');
-  if(playerRows.length>=2&&sb2){
-    sb2.className='status-badge s-ready';
-    if(st)st.textContent=playerRows.length+' players ready';
-  } else if(sb2){
-    sb2.className='status-badge s-waiting';
-    if(st)st.textContent='Waiting for players to join';
-  }
-  if(playerRows.length===0){list.innerHTML='<div class="player-empty">No players yet...</div>';return;}
-  list.innerHTML='';
-  var hostId=(roomData&&roomData.host_id)||'';
-  playerRows.forEach(function(p,i){
-    var isMe=p.user_id===myUserId;
-    var isH=p.user_id===hostId;
-    var color=COLORS[i%COLORS.length];
-    var init=(p.display_name||'?').split(' ').map(function(w){return w[0]||'?';}).join('').toUpperCase().substr(0,2);
-    var div=document.createElement('div');
-    div.className='player-row'+(isH?' is-host':'')+(isMe?' is-me':'');
-    div.innerHTML='<div class="player-avatar" style="background:'+color+';color:#0b0c10;">'+escHtml(init)+'</div>'+
-      '<span class="player-name">'+escHtml(p.display_name)+'</span>'+
-      (isH?'<span class="player-tag tag-host">👑 Host</span>':'')+
-      (isMe&&!isH?'<span class="player-tag tag-you">you</span>':'');
-    list.appendChild(div);
+// ── CREATE ROOM ──
+function createRoom(mode){
+  if(!myUser){toast('Sign in to host');return;}
+  var catSel=document.getElementById(mode==='tv'?'tvCat':'liveCat');
+  if(!catSel){toast('Reload and try again');return;}
+  gCfg.cat=parseInt(catSel.value); gCfg.catName=catSel.options[catSel.selectedIndex].text;
+  roomCode=randCode(); isHost=true;
+  spin('Creating room...');
+  sb.from('dqtrivia_rooms').insert({
+    id:roomCode,host_id:myUser.id,host_name:myName,status:'waiting',
+    cat_id:gCfg.cat,cat_name:gCfg.catName,mode:mode,
+    qcount:gCfg.qcount,difficulty:gCfg.diff,timer:gCfg.timer,
+    question_index:0,questions:[]
+  }).then(function(res){
+    if(res.error){console.error('createRoom:',res.error);toast('Error: '+res.error.message);showHome();return;}
+    sb.from('dqtrivia_room_players').insert({room_id:roomCode,user_id:myUserId,display_name:myName,score:0,answers:[]})
+      .then(function(){showLobby();});
   });
 }
 
-function copyCode(){
-  navigator.clipboard.writeText(roomCode).then(function(){showToast('Copied: '+roomCode);}).catch(function(){showToast('Code: '+roomCode);});
+// ── LOBBY ──
+function showLobby(){
+  var rd=roomData||{};
+  var modeLabel=rd.mode==='tv'?'📺 TV Mode':'🎙️ Live Mode';
+  var joinUrl='';
+  try{joinUrl=location.protocol+'//'+location.host+location.pathname+'?code='+roomCode;}catch(e){}
+
+  var hSection='';
+  if(isHost){
+    hSection='<div class="hact">'+
+      '<div style="font-size:0.7rem;color:var(--muted);">When everyone has joined, start the game.</div>'+
+      '<button class="btn btn-g" onclick="startGame()" id="startBtn">▶ Start Game</button>'+
+      (rd.mode==='tv'?'<button class="btn btn-gh" onclick="window.open(\'host.html?room='+roomCode+'\',\'_blank\')">📺 Open TV Screen in new tab</button>':'')+
+      '<button class="btn btn-red" onclick="endRoom()">✕ End Room</button>'+
+    '</div>';
+  } else {
+    hSection='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);text-align:center;">Waiting for the host to start...</div>';
+  }
+
+  document.getElementById('mainContent').innerHTML=
+  '<div class="lobby-wrap">'+
+  '<div class="lobby-card">'+
+    '<div class="code-block">'+
+      '<div class="code-label">Room code — share this with players<span class="sync-ind" id="syncDot" title="Live sync active"></span></div>'+
+      '<div class="code-big" onclick="copyCode()" title="Click to copy">'+roomCode+'</div>'+
+      '<div class="code-hint">Click to copy · Players go to lobby.html and enter this code</div>'+
+      '<div class="qr-box" id="qrBox"></div>'+
+      '<div style="font-size:0.63rem;color:var(--muted);margin-top:5px;">Or scan QR code to join</div>'+
+    '</div>'+
+    '<div class="meta-row">'+
+      '<div class="mpill">'+modeLabel+'</div>'+
+      '<div class="mpill">📚 <strong>'+h(gCfg.catName)+'</strong></div>'+
+      '<div class="mpill">❓ <strong>'+gCfg.qcount+'</strong> Qs</div>'+
+      '<div class="mpill">⏱ <strong>'+(gCfg.timer===0?'No timer':gCfg.timer+'s')+'</strong></div>'+
+    '</div>'+
+    '<div class="sbadge sw" id="sbadge"><span class="dot"></span><span id="stxt">Waiting for players</span></div>'+
+    hSection+
+    '<div class="wu"><div class="wu-lbl">Warm-up while you wait</div><div id="wuArea"></div><div id="wuScore" style="font-size:0.67rem;color:var(--muted);margin-top:4px;text-align:right;"></div></div>'+
+  '</div>'+
+  '<div class="pp">'+
+    '<div class="pp-hd"><div class="pp-ttl">Players</div><div class="pp-cnt" id="ppCnt">0</div></div>'+
+    '<div class="pl" id="pList"><div class="pempty">No one yet...</div></div>'+
+  '</div>'+
+  '</div>';
+
+  try{var u=new URL(location);u.searchParams.set('code',roomCode);history.replaceState({},'',u);}catch(e){}
+
+  // QR code
+  setTimeout(function(){
+    var box=document.getElementById('qrBox');
+    if(box&&typeof QRCode!=='undefined'&&joinUrl){
+      try{new QRCode(box,{text:joinUrl,width:108,height:108,colorDark:'#000000',colorLight:'#ffffff'});}
+      catch(e){box.innerHTML='<div style="font-size:0.65rem;color:var(--muted);word-break:break-all;">'+h(joinUrl)+'</div>';}
+    }
+  },150);
+
+  wuIdx=0;wuScore=0;renderWU();
+  loadPlayers();
+  startPoll();
+  startRT();
 }
 
-// ═══════════════════════════════════════════
-// START GAME (host only)
-// ═══════════════════════════════════════════
+// ── POLLING (primary sync — always runs) ──
+function startPoll(){
+  stopPoll();
+  pollTmr=setInterval(function(){
+    if(!sb||!roomCode)return;
+    // Poll players list
+    sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+      .order('joined_at',{ascending:true}).then(function(res){
+        if(res.error)return;
+        players=res.data||[];
+        renderPlayers();
+      });
+    // Poll room status for non-hosts
+    if(!isHost){
+      sb.from('dqtrivia_rooms').select('status').eq('id',roomCode).maybeSingle().then(function(res){
+        if(!res.data)return;
+        if(res.data.status==='playing'){stopPoll();stopRT();toast('Game starting!');setTimeout(goPlay,400);}
+        if(res.data.status==='ended'){stopPoll();stopRT();toast('Room ended');setTimeout(showHome,1200);}
+      });
+    }
+  },2500);
+}
+function stopPoll(){if(pollTmr)clearInterval(pollTmr);pollTmr=null;}
+
+// ── REALTIME (bonus layer on top of polling) ──
+function startRT(){
+  stopRT();
+  if(!sb)return;
+  try{
+    rtCh=sb.channel('lby-'+roomCode+'-'+Date.now())
+      .on('postgres_changes',{event:'*',schema:'public',table:'dqtrivia_room_players'},function(payload){
+        var r=payload.new||payload.old||{};
+        if(r.room_id!==roomCode)return;
+        // Trigger an immediate poll instead of trusting payload
+        if(sb)sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+          .order('joined_at',{ascending:true}).then(function(res){
+            if(!res.error){players=res.data||[];renderPlayers();}
+          });
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms'},function(payload){
+        if(!payload.new||payload.new.id!==roomCode)return;
+        if(payload.new.status==='playing'&&!isHost){stopPoll();stopRT();toast('Game starting!');setTimeout(goPlay,400);}
+        if(payload.new.status==='ended'){stopPoll();stopRT();toast('Room ended');setTimeout(showHome,1200);}
+      })
+      .subscribe(function(status){
+        var dot=document.getElementById('syncDot');
+        if(dot){
+          if(status==='SUBSCRIBED')dot.classList.remove('dead');
+          else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED')dot.classList.add('dead');
+        }
+      });
+  }catch(e){console.warn('RT setup failed:',e);}
+}
+function stopRT(){if(rtCh&&sb){try{sb.removeChannel(rtCh);}catch(e){}rtCh=null;}}
+
+// ── LOAD + RENDER PLAYERS ──
+function loadPlayers(){
+  if(!sb)return;
+  sb.from('dqtrivia_room_players').select('*').eq('room_id',roomCode)
+    .order('joined_at',{ascending:true}).then(function(res){
+      if(res.error)return;
+      players=res.data||[];renderPlayers();
+    });
+}
+function renderPlayers(){
+  var list=document.getElementById('pList'),cnt=document.getElementById('ppCnt');
+  if(!list)return;
+  if(cnt)cnt.textContent=players.length;
+  var badge=document.getElementById('sbadge'),stxt=document.getElementById('stxt');
+  if(players.length>=2&&badge){badge.className='sbadge sg';if(stxt)stxt.textContent=players.length+' players ready';}
+  else if(badge){badge.className='sbadge sw';if(stxt)stxt.textContent='Waiting for players';}
+  if(!players.length){list.innerHTML='<div class="pempty">No players yet...</div>';return;}
+  list.innerHTML='';
+  var hostId=(roomData&&roomData.host_id)||'';
+  players.forEach(function(p,i){
+    var isMe=p.user_id===myUserId,isH=p.user_id===hostId;
+    var col=COLORS[i%COLORS.length];
+    var init=(p.display_name||'?').split(' ').map(function(w){return w[0]||'?';}).join('').toUpperCase().substr(0,2);
+    var d=document.createElement('div');
+    d.className='pr'+(isH?' ph':'')+(isMe?' pm':'');
+    d.innerHTML='<div class="pav" style="background:'+col+';color:#0b0c10;">'+h(init)+'</div>'+
+      '<span class="pnm">'+h(p.display_name)+'</span>'+
+      (isH?'<span class="ptg ptg-h">👑 host</span>':'')+
+      (isMe&&!isH?'<span class="ptg ptg-y">you</span>':'');
+    list.appendChild(d);
+  });
+}
+
+// ── COPY CODE ──
+function copyCode(){
+  navigator.clipboard.writeText(roomCode).then(function(){toast('Copied: '+roomCode);}).catch(function(){toast('Code: '+roomCode);});
+}
+
+// ── START GAME ──
 function startGame(){
-  if(!isHost||!currentUser)return;
+  if(!isHost||!myUser)return;
   var btn=document.getElementById('startBtn');
   if(btn){btn.disabled=true;btn.textContent='Fetching questions...';}
-  fetchQuestionsForRoom().then(function(qs){
-    if(!qs||qs.length===0){
-      showToast('Could not load questions — check category/difficulty');
-      if(btn){btn.disabled=false;btn.textContent='Start Game';}
-      return;
-    }
-    sb.from('dqtrivia_rooms')
-      .update({status:'playing',question_index:0,questions:qs})
-      .eq('id',roomCode)
+  fetchQs().then(function(qs){
+    if(!qs){toast('Could not load questions — check category');if(btn){btn.disabled=false;btn.textContent='Start Game';}return;}
+    sb.from('dqtrivia_rooms').update({status:'playing',question_index:0,questions:qs}).eq('id',roomCode)
       .then(function(res){
-        if(res.error){
-          console.error('Start game update error:',res.error);
-          showToast('Error starting game: '+res.error.message);
-          if(btn){btn.disabled=false;btn.textContent='Start Game';}
-          return;
-        }
-        // Redirect host to TV/presenter screen
-        window.location.href='host.html?room='+roomCode;
+        if(res.error){console.error('startGame:',res.error);toast('Error: '+res.error.message);if(btn){btn.disabled=false;btn.textContent='Start Game';}return;}
+        stopPoll();stopRT();
+        // TV mode → go to host.html; Live mode → go to play.html
+        if(roomData&&roomData.mode==='tv'){window.location.href='host.html?room='+roomCode;}
+        else{goPlay();}
       });
-  }).catch(function(err){
-    console.error('fetchQuestionsForRoom error:',err);
-    showToast('Network error — try again');
-    if(btn){btn.disabled=false;btn.textContent='Start Game';}
   });
 }
 
 // ── FETCH QUESTIONS ──
-function fetchQuestionsForRoom(){
-  return getOrCreateToken().then(function(token){
-    var url='https://opentdb.com/api.php?amount='+gameConfig.qcount+'&encode=url3986';
-    if(gameConfig.cat&&gameConfig.cat!==0)url+='&category='+gameConfig.cat;
-    if(gameConfig.diff&&gameConfig.diff!=='any')url+='&difficulty='+gameConfig.diff;
-    if(token)url+='&token='+token;
+function fetchQs(){
+  return getToken().then(function(tok){
+    var url='https://opentdb.com/api.php?amount='+gCfg.qcount+'&encode=url3986';
+    if(gCfg.cat&&gCfg.cat!==0)url+='&category='+gCfg.cat;
+    if(gCfg.diff&&gCfg.diff!=='any')url+='&difficulty='+gCfg.diff;
+    if(tok)url+='&token='+tok;
     return fetch(url).then(function(r){return r.json();}).then(function(d){
-      if(d.response_code===5){return new Promise(function(res){setTimeout(function(){fetchQuestionsForRoom().then(res);},5500);});}
+      if(d.response_code===5)return new Promise(function(ok){setTimeout(function(){fetchQs().then(ok);},5500);});
       if(d.response_code!==0||!d.results||!d.results.length)return null;
       return d.results.map(function(q){
-        var dec=decodeURIComponent;
-        var answers=q.incorrect_answers.map(dec);
-        var correct=dec(q.correct_answer);
-        answers.push(correct);
-        for(var i=answers.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=answers[i];answers[i]=answers[j];answers[j]=t;}
-        return{question:dec(q.question),correct:correct,answers:answers,difficulty:dec(q.difficulty),type:q.type};
+        var dec=decodeURIComponent,ans=q.incorrect_answers.map(dec),cor=dec(q.correct_answer);
+        ans.push(cor);
+        for(var i=ans.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=ans[i];ans[i]=ans[j];ans[j]=t;}
+        return{question:dec(q.question),correct:cor,answers:ans,difficulty:dec(q.difficulty),type:q.type};
       });
-    });
+    }).catch(function(){return null;});
   });
 }
-
-function getOrCreateToken(){
+function getToken(){
   var tok=localStorage.getItem('dqt_session_token');
   if(tok)return Promise.resolve(tok);
   return fetch('https://opentdb.com/api_token.php?command=request')
@@ -676,25 +681,23 @@ function getOrCreateToken(){
     .catch(function(){return'';});
 }
 
-// ── END ROOM ──
+// ── NAVIGATION ──
+function goPlay(){
+  window.location.href='play.html?mode=live&room='+roomCode+'&cat='+gCfg.cat+'&catname='+encodeURIComponent(gCfg.catName)+'&skip=1';
+}
 function endRoom(){
-  if(!isHost)return;
-  if(!confirm('End the room for everyone?'))return;
-  sb.from('dqtrivia_rooms').update({status:'ended'}).eq('id',roomCode).then(function(){
-    try{sb.removeChannel(roomChannel);}catch(e){}
-    showEntryScreen();
-  });
+  if(!isHost||!confirm('End room for all players?'))return;
+  stopPoll();stopRT();
+  sb.from('dqtrivia_rooms').update({status:'ended'}).eq('id',roomCode).then(function(){showHome();});
 }
 
 // ── HELPERS ──
-function showConnecting(msg){
-  document.getElementById('mainContent').innerHTML=
-    '<div class="connecting"><div class="spinner"></div><div style="font-size:0.85rem;color:var(--muted);">'+(msg||'Connecting...')+'</div></div>';
-}
-function randomCode(){return Math.random().toString(36).substr(2,6).toUpperCase();}
-function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3000);}
+function spin(msg){document.getElementById('mainContent').innerHTML='<div class="spinwrap"><div class="spinner"></div><div style="font-size:0.8rem;color:var(--muted);margin-top:8px;">'+(msg||'')+'</div></div>';}
+function randCode(){return Math.random().toString(36).substr(2,6).toUpperCase();}
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3000);}
 function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+window.addEventListener('beforeunload',function(){stopPoll();stopRT();});
 </script>
 </body>
 </html>
