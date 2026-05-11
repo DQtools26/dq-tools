@@ -557,61 +557,89 @@ function showError(msg){
 // ══════════════════════════════════════════════
 // LIVE MODE — SUPABASE WIRING
 // ══════════════════════════════════════════════
+var livePollTmr=null, lastSeenQIdx=-1;
+
 function initLiveMode(){
   showLoading('Connecting to room '+ROOM+'...');
-  if(!sb){showError('Not connected to database');return;}
+  if(!sb){showError('Not connected. Please refresh.');return;}
   sb.from('dqtrivia_rooms').select('*').eq('id',ROOM).maybeSingle().then(function(res){
     if(res.error){showError('Database error: '+res.error.message);return;}
-    if(!res.data){showError('Room not found. <a href="lobby.html">Back to Lobby</a>');return;}
+    if(!res.data){showError('Room "'+ROOM+'" not found. <a href="lobby.html">Back to Lobby</a>');return;}
     var room=res.data;
     if(room.status==='ended'){showError('This game has already ended. <a href="lobby.html">Back to Lobby</a>');return;}
     questions=room.questions||[];
     MAX_TIME=room.timer||20;
     if(MAX_TIME===0)MAX_TIME=99999;
     currentQ=room.question_index||0;
+    lastSeenQIdx=currentQ;
     pgConfig.qcount=questions.length;
     sb.from('dqtrivia_room_players').select('*').eq('room_id',ROOM)
       .order('joined_at',{ascending:true}).then(function(pres){
         liveAllPlayers=pres.data||[];
         var myRow=liveAllPlayers.find(function(p){return p.user_id===myUserId;});
         if(myRow)myPlayerId=myRow.id;
+        startLivePoll();
         subscribeLiveRoom();
         startGame();
       });
   });
 }
 
-function subscribeLiveRoom(){
-  if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
-  liveChannel=sb.channel('play-room-'+ROOM)
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms'},function(payload){
-      if(payload.new.id!==ROOM)return;
-      var newRoom=payload.new;
-      if(newRoom.status==='ended'){
-        showToast('Host ended the game');
-        setTimeout(function(){window.location.href='index.html';},2000);
+// Polling: checks room state every 2.5s — catches question advances even if Realtime drops
+function startLivePoll(){
+  stopLivePoll();
+  livePollTmr=setInterval(function(){
+    if(!sb||!ROOM)return;
+    // Poll room for question_index changes (host advancing)
+    sb.from('dqtrivia_rooms').select('status,question_index').eq('id',ROOM).maybeSingle().then(function(res){
+      if(!res.data)return;
+      if(res.data.status==='ended'){
+        stopLivePoll(); showToast('Host ended the game');
+        setTimeout(function(){window.location.href='index.html';},1800);
         return;
       }
-      if(typeof newRoom.question_index==='number'&&newRoom.question_index!==currentQ){
-        currentQ=newRoom.question_index;
-        answered=false;
+      var newIdx=res.data.question_index||0;
+      if(newIdx!==lastSeenQIdx){
+        lastSeenQIdx=newIdx;
+        currentQ=newIdx; answered=false;
         if(currentQ<questions.length){renderQuestion();}else{endGame();}
       }
-    })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_room_players'},function(payload){
-      if(payload.new.room_id!==ROOM)return;
-      liveAllPlayers=liveAllPlayers.map(function(p){return p.id===payload.new.id?payload.new:p;});
-      updateLiveScoreboard();
-    })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'dqtrivia_room_players'},function(payload){
-      if(payload.new.room_id!==ROOM)return;
-      var exists=liveAllPlayers.some(function(p){return p.id===payload.new.id;});
-      if(!exists)liveAllPlayers.push(payload.new);
-      updateLiveScoreboard();
-    })
-    .subscribe(function(status,err){
-      if(err)console.warn('Live realtime error:',err);
     });
+    // Poll players for live scoreboard
+    sb.from('dqtrivia_room_players').select('*').eq('room_id',ROOM)
+      .order('joined_at',{ascending:true}).then(function(res){
+        if(!res.error&&res.data){liveAllPlayers=res.data;updateLiveScoreboard();}
+      });
+  },2500);
+}
+function stopLivePoll(){if(livePollTmr)clearInterval(livePollTmr);livePollTmr=null;}
+
+// Realtime as bonus on top of polling
+function subscribeLiveRoom(){
+  if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
+  try{
+    liveChannel=sb.channel('play-'+ROOM+'-'+Date.now())
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_rooms'},function(payload){
+        if(!payload.new||payload.new.id!==ROOM)return;
+        if(payload.new.status==='ended'){
+          stopLivePoll(); showToast('Host ended the game');
+          setTimeout(function(){window.location.href='index.html';},1800); return;
+        }
+        var newIdx=payload.new.question_index||0;
+        if(newIdx!==lastSeenQIdx){
+          lastSeenQIdx=newIdx; currentQ=newIdx; answered=false;
+          if(currentQ<questions.length){renderQuestion();}else{endGame();}
+        }
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dqtrivia_room_players'},function(payload){
+        if(!payload.new||payload.new.room_id!==ROOM)return;
+        liveAllPlayers=liveAllPlayers.map(function(p){return p.id===payload.new.id?payload.new:p;});
+        updateLiveScoreboard();
+      })
+      .subscribe(function(status,err){
+        if(err)console.warn('Live RT:',status,err);
+      });
+  }catch(e){console.warn('Live RT setup:',e);}
 }
 
 // Write my answer back to Supabase after answering
@@ -965,6 +993,7 @@ function streakGameOver(wasTimeout){
 // ══════════════════════════════════════════════
 function endGame(){
   stopTimer();
+  stopLivePoll();
   gameStarted=false;
   if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}}
   document.getElementById('quitBtn').style.display='none';
@@ -1112,6 +1141,7 @@ function triggerWinEffect(){
 // PLAY AGAIN / QUIT
 // ══════════════════════════════════════════════
 function playAgain(){
+  stopLivePoll();
   if(liveChannel){try{sb.removeChannel(liveChannel);}catch(e){}liveChannel=null;}
   showLoading();
   document.getElementById('quitBtn').style.display='flex';
