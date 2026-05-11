@@ -2452,6 +2452,60 @@ textarea.finp { resize:vertical; min-height:50px; }
         </div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">🧪 Study Behavior</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">Auto-advance flashcards</div>
+            <div class="settings-toggle-sub">Flip to answer automatically when tapping Know/Don't Know</div>
+          </div>
+          <button class="toggle" id="autoadvance-toggle" onclick="toggleAutoAdvance(this)"></button>
+        </div>
+        <div class="settings-toggle-row" style="margin-top:4px;">
+          <div>
+            <div class="settings-toggle-label">Show card count in study modes</div>
+            <div class="settings-toggle-sub">Display "Card 3 of 20" during study</div>
+          </div>
+          <button class="toggle on" id="showcardcount-toggle" onclick="toggleShowCardCount(this)"></button>
+        </div>
+        <div class="settings-toggle-row" style="margin-top:4px;">
+          <div>
+            <div class="settings-toggle-label">Shuffle cards by default</div>
+            <div class="settings-toggle-sub">Randomize card order when starting a study session</div>
+          </div>
+          <button class="toggle" id="defaultshuffle-toggle" onclick="toggleDefaultShuffle(this)"></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">🎨 Customization</div>
+        <div class="settings-toggle-row">
+          <div>
+            <div class="settings-toggle-label">Compact Mode</div>
+            <div class="settings-toggle-sub">Tighter spacing, smaller cards — fits more on screen</div>
+          </div>
+          <button class="toggle" id="compact-toggle-settings" onclick="toggleCompactMode(this)"></button>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="settings-toggle-label" style="margin-bottom:8px;">Home blobs / background animation</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="blob-btn active" data-blob="on" onclick="setBlobSetting('on',this)" style="flex:1;min-width:80px;padding:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all var(--transition);">🫧 Blobs On</button>
+            <button class="blob-btn" data-blob="off" onclick="setBlobSetting('off',this)" style="flex:1;min-width:80px;padding:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all var(--transition);">🚫 Blobs Off</button>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="settings-toggle-label" style="margin-bottom:6px;">Default study mode</div>
+          <select class="finp" id="default-mode-sel" onchange="setDefaultMode(this.value)" style="font-size:.8rem;padding:8px 12px;">
+            <option value="">None (always ask)</option>
+            <option value="flashcards">Flashcards</option>
+            <option value="quiz">Quiz</option>
+            <option value="learn">Learn</option>
+            <option value="smart">Smart Review</option>
+            <option value="fillin">Fill-in</option>
+            <option value="spelling">Spelling</option>
+            <option value="matching">Matching</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">ℹ️ About & Version</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
           <div style="font-size:1.1rem;font-weight:900;">DQstudy</div>
@@ -2875,13 +2929,29 @@ textarea.finp { resize:vertical; min-height:50px; }
         <!-- Context-specific input (shown for certain actions) -->
         <div id="ai-context-input" style="display:none;margin-bottom:12px;"></div>
 
-        <!-- Notes toggle -->
-        <div id="ai-notes-toggle-row" style="margin-bottom:8px;">
-          <button class="btn btn-ghost btn-sm" id="ai-notes-btn" onclick="aiToggleNotes()" style="font-size:.75rem;color:var(--text2);padding:4px 10px;">📎 Add notes for better results</button>
+        <!-- Notes toggle + sources -->
+        <div id="ai-notes-toggle-row" style="margin-bottom:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" id="ai-notes-btn" onclick="aiToggleNotes()" style="font-size:.75rem;color:var(--text2);padding:4px 10px;">📎 Add notes</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiOpenSourcesPanel()" style="font-size:.75rem;color:var(--text2);padding:4px 10px;">📁 Saved sources</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiToggleHistory()" style="font-size:.75rem;color:var(--text2);padding:4px 10px;">🕓 History</button>
         </div>
+
+        <!-- Sources panel -->
+        <div id="ai-sources-panel" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">📁 Saved Sources (session only)</div>
+          <div id="ai-sources-list"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:.72rem;" onclick="aiSaveCurrentNotes()">💾 Save current notes as source</button>
+        </div>
+
+        <!-- History panel -->
+        <div id="ai-history-panel" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">🕓 Recent AI Responses (session only)</div>
+          <div id="ai-history-list"></div>
+        </div>
+
         <div id="ai-notes-area" style="display:none;margin-bottom:12px;">
           <textarea class="finp" id="ai-notes-inp" style="min-height:80px;font-size:.8rem;resize:none;" placeholder="Paste your class notes, a textbook paragraph, or any source material — AI will use your actual content instead of guessing…"></textarea>
-          <div style="font-size:.65rem;color:var(--text3);margin-top:3px;">Notes are only used for this request and never saved.</div>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:3px;">Notes are used for this request only. Use 📁 Saved sources to reuse them later.</div>
         </div>
 
         <!-- Copy-paste notice -->
@@ -2893,10 +2963,10 @@ textarea.finp { resize:vertical; min-height:50px; }
       <!-- SCREEN 2: Result -->
       <div id="ai-screen-result" style="display:none;">
         <!-- Result header with back button -->
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
           <button onclick="aiBackToPick()" style="background:none;border:none;cursor:pointer;font-size:.9rem;color:var(--text2);padding:4px 6px;">←</button>
           <div id="ai-result-title" style="font-size:.85rem;font-weight:800;flex:1;"></div>
-          <div id="ai-result-actions" style="display:flex;gap:6px;"></div>
+          <div id="ai-result-actions" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
         </div>
         <!-- Result body — rendered per action type -->
         <div id="ai-result-body" style="padding:16px 18px;max-height:400px;overflow-y:auto;"></div>
@@ -2913,6 +2983,7 @@ textarea.finp { resize:vertical; min-height:50px; }
     <div class="modal-foot" id="ai-modal-foot" style="display:flex;align-items:center;gap:8px;">
       <button class="btn btn-ghost" onclick="closeModal('ai-modal')" style="flex-shrink:0;">Close</button>
       <div style="flex:1;"></div>
+      <button class="btn btn-ghost btn-sm" id="ai-try-again-btn" onclick="aiTryAgain()" style="display:none;font-size:.78rem;">🔄 Try Again</button>
       <button class="btn btn-primary" id="ai-go-btn" onclick="runAI()" style="min-width:100px;">✨ Go</button>
     </div>
   </div>
@@ -3497,6 +3568,10 @@ let homeBlobsEnabled = true;
 let gamEnabled = true;
 let dailyEnabled = true;
 let aiSeenPrompt = false;
+let autoAdvance = false;
+let showCardCount = true;
+let defaultShuffle = false;
+let defaultMode = '';
 let bgAnim = 'none';
 let bgAnimFrame = null;
 let shareAccess = 'private';
@@ -3617,6 +3692,10 @@ function loadSettings() {
     if (s.homeBlobsEnabled !== undefined) homeBlobsEnabled = s.homeBlobsEnabled;
     if (s.gamEnabled !== undefined) gamEnabled = s.gamEnabled;
     if (s.dailyEnabled !== undefined) dailyEnabled = s.dailyEnabled;
+    if (s.autoAdvance !== undefined) autoAdvance = s.autoAdvance;
+    if (s.showCardCount !== undefined) showCardCount = s.showCardCount;
+    if (s.defaultShuffle !== undefined) defaultShuffle = s.defaultShuffle;
+    if (s.defaultMode) defaultMode = s.defaultMode;
     aiSeenPrompt = !!localStorage.getItem('dqstudy-ai-seen');
   } catch(_) {}
   document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
@@ -3631,9 +3710,10 @@ function loadSettings() {
   applyHomeBlobsEnabled();
   applyGamVisibility();
   applyAIModeUI();
+  setTimeout(applySettingsUI, 100); // run after DOM ready
 }
 function saveSettings() {
-  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, aiMode, aiProvider, aiUserKey, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled, dailyEnabled};
+  const s = {theme:currentTheme, soundEnabled, volume, bgAnim, aiEnabled, aiMode, aiProvider, aiUserKey, sharingEnabled, cardFontSize, compactMode, homeBlobsEnabled, gamEnabled, dailyEnabled, autoAdvance, showCardCount, defaultShuffle, defaultMode};
   localStorage.setItem('dqstudy-settings', JSON.stringify(s));
   if (isLoggedIn && typeof DQAuth !== 'undefined') {
     DQAuth.saveData('dqstudy-settings', s);
@@ -4851,7 +4931,7 @@ function showView(id) {
     const main = document.getElementById('main');
     if (main) main.scrollTop = 0;
     window.scrollTo(0, 0);
-    if (id === 'settings') { renderThemeGrid(); resetAIUsageDisplay(); }
+    if (id === 'settings') { renderThemeGrid(); resetAIUsageDisplay(); applySettingsUI(); }
     // Remove animation class after it fires so re-renders don't re-animate
     el.addEventListener('animationend', () => el.classList.remove('view-nav-anim'), { once: true });
     // Fallback removal in case view has no animation (e.g. landing)
@@ -10957,6 +11037,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ─────────────────────────────────────────────────
 // AI ENGINE
+// ── NEW SETTINGS TOGGLES ───────────────────────────────────────────────────
+
+function toggleAutoAdvance(btn) {
+  autoAdvance = !autoAdvance;
+  if (btn) btn.classList.toggle('on', autoAdvance);
+  saveSettings();
+}
+function toggleShowCardCount(btn) {
+  showCardCount = !showCardCount;
+  if (btn) btn.classList.toggle('on', showCardCount);
+  saveSettings();
+}
+function toggleDefaultShuffle(btn) {
+  defaultShuffle = !defaultShuffle;
+  if (btn) btn.classList.toggle('on', defaultShuffle);
+  saveSettings();
+}
+function setDefaultMode(val) {
+  defaultMode = val;
+  saveSettings();
+}
+function setBlobSetting(val, btn) {
+  homeBlobsEnabled = val === 'on';
+  document.querySelectorAll('.blob-btn').forEach(b => b.classList.toggle('active', b.dataset.blob === val));
+  // Update blob btn active style
+  document.querySelectorAll('.blob-btn').forEach(b => {
+    b.style.borderColor = b.dataset.blob === val ? 'var(--accent)' : 'var(--border)';
+    b.style.color = b.dataset.blob === val ? 'var(--accent2)' : 'var(--text)';
+  });
+  saveSettings();
+  sndClick();
+}
+
+function applySettingsUI() {
+  // Blob buttons
+  document.querySelectorAll('.blob-btn').forEach(b => {
+    const active = (b.dataset.blob === 'on') === homeBlobsEnabled;
+    b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+    b.style.color = active ? 'var(--accent2)' : 'var(--text)';
+  });
+  // Study behavior toggles
+  const aat = document.getElementById('autoadvance-toggle');
+  if (aat) aat.classList.toggle('on', autoAdvance);
+  const sct = document.getElementById('showcardcount-toggle');
+  if (sct) sct.classList.toggle('on', showCardCount);
+  const dst = document.getElementById('defaultshuffle-toggle');
+  if (dst) dst.classList.toggle('on', defaultShuffle);
+  // Compact toggle in settings
+  const cst = document.getElementById('compact-toggle-settings');
+  if (cst) cst.classList.toggle('on', compactMode);
+  // Default mode select
+  const dms = document.getElementById('default-mode-sel');
+  if (dms) dms.value = defaultMode || '';
+}
+
 // ─────────────────────────────────────────────────
 
 // Rate limiting — stored per day in localStorage
@@ -11220,6 +11355,10 @@ function aiShowScreen(name) {
   });
   const foot = document.getElementById('ai-modal-foot');
   if (foot) foot.style.display = name === 'loading' ? 'none' : '';
+  const goBtn = document.getElementById('ai-go-btn');
+  const tryBtn = document.getElementById('ai-try-again-btn');
+  if (goBtn) goBtn.style.display = name === 'result' ? 'none' : '';
+  if (tryBtn && name !== 'result') tryBtn.style.display = 'none';
 }
 
 function aiPickAction(id, btn) {
@@ -11265,10 +11404,187 @@ function aiToggleNotes() {
   btn.textContent = open ? '📎 Add notes for better results' : '📎 Hide notes';
 }
 
+// ── AI SESSION STORAGE (browser-only, lost on tab close) ────────────────────
+
+function aiStoreResponse(actionId, setName, raw) {
+  try {
+    const hist = JSON.parse(sessionStorage.getItem('dqs-ai-history') || '[]');
+    hist.unshift({ id: Date.now(), action: actionId, set: setName, raw, ts: Date.now() });
+    sessionStorage.setItem('dqs-ai-history', JSON.stringify(hist.slice(0, 20)));
+  } catch(e) {}
+}
+
+function aiGetHistory() {
+  try { return JSON.parse(sessionStorage.getItem('dqs-ai-history') || '[]'); } catch(e) { return []; }
+}
+
+function aiClearHistory() {
+  sessionStorage.removeItem('dqs-ai-history');
+  aiRenderHistoryPanel();
+  DQAuth.toast('AI history cleared');
+}
+
+// Saved sources — persist across actions in this session
+function aiSaveSource(label, text) {
+  try {
+    const sources = JSON.parse(sessionStorage.getItem('dqs-ai-sources') || '[]');
+    sources.unshift({ id: Date.now(), label: label || 'Source ' + (sources.length + 1), text });
+    sessionStorage.setItem('dqs-ai-sources', JSON.stringify(sources.slice(0, 10)));
+  } catch(e) {}
+}
+
+function aiGetSources() {
+  try { return JSON.parse(sessionStorage.getItem('dqs-ai-sources') || '[]'); } catch(e) { return []; }
+}
+
+function aiDeleteSource(id) {
+  try {
+    const sources = aiGetSources().filter(s => s.id != id);
+    sessionStorage.setItem('dqs-ai-sources', JSON.stringify(sources));
+    aiRenderSourcesPicker();
+  } catch(e) {}
+}
+
+// ── MARKDOWN → PLAIN (strip symbols, keep structure) ────────────────────────
+
+function aiCleanProse(raw) {
+  return raw
+    .replace(/^#{1,6}\s+/gm, '')           // ## headings
+    .replace(/\*\*(.+?)\*\*/g, '$1')       // **bold**
+    .replace(/\*(.+?)\*/g, '$1')           // *italic*
+    .replace(/__(.+?)__/g, '$1')           // __bold__
+    .replace(/_(.+?)_/g, '$1')             // _italic_
+    .replace(/`(.+?)`/g, '$1')             // `code`
+    .replace(/^\s*[-*+]\s+/gm, '• ')      // bullet lists → bullet
+    .trim();
+}
+
+function aiRenderProse(raw) {
+  const clean = aiCleanProse(raw);
+  // Split on double newline for paragraphs, single newline preserved
+  return clean.split(/\n{2,}/).map(para =>
+    `<p style="margin:0 0 10px;line-height:1.8;">${para.replace(/\n/g,'<br>')}</p>`
+  ).join('');
+}
+
+// ── SOURCES PICKER UI ────────────────────────────────────────────────────────
+
+function aiOpenSourcesPanel() {
+  const panel = document.getElementById('ai-sources-panel');
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
+  if (panel.style.display !== 'none') aiRenderSourcesPicker();
+}
+
+function aiRenderSourcesPicker() {
+  const el = document.getElementById('ai-sources-list');
+  if (!el) return;
+  const sources = aiGetSources();
+  if (!sources.length) {
+    el.innerHTML = '<div style="font-size:.75rem;color:var(--text3);padding:6px 0;">No saved sources yet. Paste notes below and save them.</div>';
+    return;
+  }
+  el.innerHTML = sources.map(s =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.75rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(s.label)}</div>
+        <div style="font-size:.68rem;color:var(--text3);">${s.text.length} chars</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="font-size:.65rem;padding:3px 8px;" onclick="aiInjectSource(${s.id})">Use</button>
+      <button class="btn btn-ghost btn-sm" style="font-size:.65rem;padding:3px 8px;color:var(--red2);" onclick="aiDeleteSource(${s.id})">✕</button>
+    </div>`
+  ).join('');
+}
+
+function aiInjectSource(id) {
+  const s = aiGetSources().find(x => x.id == id);
+  if (!s) return;
+  const notesArea = document.getElementById('ai-notes-area');
+  const notesInp = document.getElementById('ai-notes-inp');
+  if (!notesArea || !notesInp) return;
+  notesArea.style.display = '';
+  document.getElementById('ai-notes-btn').textContent = '📎 Hide notes';
+  notesInp.value = s.text;
+  document.getElementById('ai-sources-panel').style.display = 'none';
+  DQAuth.toast('Source loaded into notes!');
+}
+
+function aiSaveCurrentNotes() {
+  const notesInp = document.getElementById('ai-notes-inp');
+  const text = (notesInp?.value || '').trim();
+  if (!text) { DQAuth.toast('Nothing to save'); return; }
+  const label = prompt('Label for this source?') || 'Source';
+  aiSaveSource(label, text);
+  DQAuth.toast('✓ Source saved for this session');
+}
+
+// ── AI HISTORY PANEL ────────────────────────────────────────────────────────
+
+function aiToggleHistory() {
+  const panel = document.getElementById('ai-history-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : '';
+  if (!isOpen) aiRenderHistoryPanel();
+}
+
+function aiRenderHistoryPanel() {
+  const el = document.getElementById('ai-history-list');
+  if (!el) return;
+  const hist = aiGetHistory();
+  if (!hist.length) {
+    el.innerHTML = '<div style="font-size:.75rem;color:var(--text3);padding:8px 0;">No history yet — responses appear here after each AI request.</div>';
+    return;
+  }
+  const actionLabels = {
+    'add-cards':'Add Cards','improve':'Improve','harder':'Harder','study-guide':'Study Guide',
+    'mnemonics':'Memory Tricks','merge':'Merge','ask':'Ask','explain':'Explain','study-tips':'Tips','more-cards':'Practice'
+  };
+  el.innerHTML = hist.map(h => {
+    const ago = _timeAgo(h.ts);
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="aiLoadHistoryItem(${h.id})">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:.72rem;font-weight:800;background:var(--accent-dim);color:var(--accent2);padding:2px 8px;border-radius:100px;">${actionLabels[h.action]||h.action}</span>
+        <span style="font-size:.65rem;color:var(--text3);">${esc(h.set||'')} · ${ago}</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--text2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(h.raw.slice(0,100))}</div>
+    </div>`;
+  }).join('') + `<button class="btn btn-ghost btn-sm" style="margin-top:10px;font-size:.7rem;" onclick="aiClearHistory()">🗑 Clear history</button>`;
+}
+
+function aiLoadHistoryItem(id) {
+  const h = aiGetHistory().find(x => x.id == id);
+  if (!h) return;
+  document.getElementById('ai-history-panel').style.display = 'none';
+  const action = Object.values(AI_ACTIONS).flat().find(a => a.id === h.action) || { id: h.action, icon:'💬', label: h.action, type:'prose' };
+  aiSelectedAction = h.action;
+  aiRenderResult(h.action, action, h.raw);
+}
+
+function _timeAgo(ts) {
+  const mins = Math.floor((Date.now() - ts) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  return Math.floor(mins/60) + 'h ago';
+}
+
+// ── BACK + TRY AGAIN ────────────────────────────────────────────────────────
+
 function aiBackToPick() {
   aiShowScreen('pick');
-  document.getElementById('ai-go-btn').disabled = false;
-  document.getElementById('ai-go-btn').textContent = aiMode === 'copypaste' ? '📋 Build Prompt' : '✨ Go';
+  const goBtn = document.getElementById('ai-go-btn');
+  goBtn.disabled = false;
+  goBtn.textContent = aiMode === 'copypaste' ? '📋 Build Prompt' : '✨ Go';
+}
+
+function aiTryAgain() {
+  aiBackToPick();
+  // re-select the chip
+  document.querySelectorAll('.ai-chip').forEach(b => {
+    if (b.dataset.action === aiSelectedAction) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  setTimeout(() => runAI(), 80);
 }
 
 async function runAI() {
@@ -11278,7 +11594,7 @@ async function runAI() {
   if (aiMode === 'live' && aiIsOverLimit()) {
     aiShowResult('⚠️ Daily limit reached',
       `<div class="ai-error-card">You've used all ${aiGetLimit()} AI requests today. Resets at midnight.<br><br>💡 Tip: add your own API key in Settings → AI Assistant for more usage.</div>`,
-      []);
+      [], { hideTryAgain: true });
     return;
   }
 
@@ -11290,23 +11606,25 @@ async function runAI() {
   const prompt = buildAIPromptV2(aiSelectedAction, notes, askQ);
 
   if (aiMode === 'copypaste') {
-    const action = (AI_ACTIONS[aiContext] || AI_ACTIONS.set).find(a => a.id === aiSelectedAction);
     const isCardAction = action && (action.type === 'cards');
+    const isProseAction = !isCardAction;
     aiShowResult('📋 Your Prompt',
       `<div style="font-size:.75rem;color:var(--text2);margin-bottom:6px;">Copy this and paste into any AI tool:</div>
        <textarea class="finp" id="ai-cp-prompt-out" style="min-height:120px;font-size:.74rem;font-family:var(--mono);resize:none;" readonly>${esc(prompt)}</textarea>
        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-         <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ai-cp-prompt-out').value).then(()=>DQAuth.toast('Copied!'))">📋 Copy prompt</button>
+         <button class="btn btn-primary btn-sm" onclick="aiCopyAndToast('ai-cp-prompt-out')">📋 Copy prompt</button>
          <button class="btn btn-ghost btn-sm" onclick="window.open('https://claude.ai','_blank')">↗ Claude</button>
          <button class="btn btn-ghost btn-sm" onclick="window.open('https://chat.openai.com','_blank')">↗ ChatGPT</button>
        </div>
-       ${isCardAction ? `
        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
-         <div style="font-size:.75rem;font-weight:800;margin-bottom:6px;">Got a response? Paste it here to import cards:</div>
-         <textarea class="finp" id="ai-cp-paste-back" style="min-height:80px;font-size:.74rem;font-family:var(--mono);resize:none;" placeholder="Paste the AI's response here…"></textarea>
-         <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="aiImportCopyPasteResult()">➕ Import cards</button>
-       </div>` : ''}`,
-      []);
+         <div style="font-size:.75rem;font-weight:800;margin-bottom:6px;">Got a response? Paste it here:</div>
+         <textarea class="finp" id="ai-cp-paste-back" style="min-height:80px;font-size:.74rem;font-family:var(--mono);resize:none;" placeholder="Paste the AI's full response here…"></textarea>
+         <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+           ${isCardAction ? `<button class="btn btn-primary btn-sm" onclick="aiImportCopyPasteResult()">➕ Import cards</button>` : ''}
+           <button class="btn btn-ghost btn-sm" onclick="aiImportCopyPasteAsText()">📄 View response</button>
+         </div>
+       </div>`,
+      [], { hideTryAgain: true });
     return;
   }
 
@@ -11332,7 +11650,9 @@ async function runAI() {
     const used2 = aiGetUsage(), lim2 = aiGetLimit();
     const badge = document.getElementById('ai-usage-badge');
     if (badge) badge.textContent = used2 + ' / ' + lim2 + ' today';
-
+    // Save to session history
+    const s = getSet(currentSetId) || getCurrentSet();
+    aiStoreResponse(aiSelectedAction, s?.name || '', resp);
     // Render result based on action type
     aiRenderResult(aiSelectedAction, action, resp);
 
@@ -11356,132 +11676,176 @@ function aiRenderResult(actionId, action, raw) {
       aiShowResult('No cards found', `<div class="ai-error-card">AI didn't return cards in the expected format. Try again.</div>`, []);
       return;
     }
-    aiSelectedCards = cards.map((_, i) => i); // all selected by default
-    const bodyHtml = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:.78rem;color:var(--text2);">${cards.length} cards generated — tap to deselect any</div>
-        <button class="btn btn-ghost btn-sm" onclick="aiToggleAllCards(${cards.length})" style="font-size:.7rem;">Deselect all</button>
-      </div>
-      ${cards.map((c, i) => `
-        <div class="ai-card-preview selected" id="ai-cp-${i}" onclick="aiToggleCard(${i})">
-          <div class="ai-card-check" id="ai-ck-${i}">✓</div>
-          <div><div class="ai-card-front">${esc(c.front)}</div><div class="ai-card-back">${esc(c.back)}</div></div>
-        </div>`).join('')}`;
-    aiShowResult(`➕ ${cards.length} new cards ready`,
-      bodyHtml,
-      [
-        { label: `➕ Add to this set`, primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` },
-        { label: `📦 Save as new set`, onclick: `aiSaveAsNewSet(${JSON.stringify(cards).replace(/"/g,"'")})` },
-      ]);
+    aiSelectedCards = cards.map((_, i) => i);
+    const key = _aiStoreCards(cards);
+    aiShowResult(`➕ ${cards.length} new cards ready`, _aiCardPreviewHtml(cards), [
+      { label: `➕ Add to this set`, primary: true, onclick: `aiAddSelectedCards('${key}')` },
+      { label: `📦 New set`, onclick: `aiSaveAsNewSet('${key}')` },
+    ]);
 
   } else if (actionId === 'merge') {
     if (!cards.length) {
-      aiShowResult('Merge result', `<div class="ai-prose">${esc(raw)}</div>`, []);
+      aiShowResult('Merge result', `<div class="ai-prose">${aiRenderProse(raw)}</div>`, []);
       return;
     }
     aiSelectedCards = cards.map((_, i) => i);
-    const bodyHtml = `
-      <div style="font-size:.78rem;color:var(--text2);margin-bottom:10px;">${cards.length} merged cards — deselect any you don't want</div>
-      ${cards.map((c, i) => `
-        <div class="ai-card-preview selected" id="ai-cp-${i}" onclick="aiToggleCard(${i})">
-          <div class="ai-card-check" id="ai-ck-${i}">✓</div>
-          <div><div class="ai-card-front">${esc(c.front)}</div><div class="ai-card-back">${esc(c.back)}</div></div>
-        </div>`).join('')}`;
-    aiShowResult(`🔀 Merged — ${cards.length} cards`,
-      bodyHtml,
-      [
-        { label: '➕ Add to this set', primary: true, onclick: `aiAddSelectedCards(${JSON.stringify(cards).replace(/"/g,"'")})` },
-        { label: '📦 Save as new set', onclick: `aiSaveAsNewSet(${JSON.stringify(cards).replace(/"/g,"'")})` },
-      ]);
+    const key = _aiStoreCards(cards);
+    aiShowResult(`🔀 Merged — ${cards.length} cards`, _aiCardPreviewHtml(cards), [
+      { label: '➕ Add to this set', primary: true, onclick: `aiAddSelectedCards('${key}')` },
+      { label: '📦 New set', onclick: `aiSaveAsNewSet('${key}')` },
+    ]);
 
   } else if (actionId === 'improve') {
-    // Prose improvement suggestions — offer to apply as card replacements if we can parse them
     const improvedCards = aiParseCards(raw);
-    const btns = [
-      { label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` },
-    ];
     if (improvedCards.length) {
-      btns.unshift(
-        { label: `✅ Replace set cards (${improvedCards.length})`, primary: true, onclick: `aiConfirmReplaceCards(${JSON.stringify(improvedCards).replace(/"/g,"'")})` },
-        { label: `📦 Save as new set`, onclick: `aiSaveAsNewSet(${JSON.stringify(improvedCards).replace(/"/g,"'")})` },
-      );
+      aiSelectedCards = improvedCards.map((_, i) => i);
+      const key = _aiStoreCards(improvedCards);
+      const bodyHtml = `<div style="font-size:.75rem;color:var(--text2);margin-bottom:10px;">AI rewrote ${improvedCards.length} cards. Tap to deselect any before replacing.</div>` + _aiCardPreviewHtml(improvedCards);
+      aiShowResult('💎 Improved Cards', bodyHtml, [
+        { label: `✅ Replace set`, primary: true, onclick: `aiConfirmReplaceCards('${key}')` },
+        { label: `📦 New set`, onclick: `aiSaveAsNewSet('${key}')` },
+        { label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` },
+      ]);
+    } else {
+      aiShowResult('💎 Improvements', `<div class="ai-prose">${aiRenderProse(raw)}</div>`, [
+        { label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` },
+      ]);
     }
-    aiShowResult('💎 Improvements', `<div class="ai-prose">${esc(raw)}</div>`, btns);
 
   } else if (actionId === 'explain') {
     aiShowResult('💡 Here\'s what went wrong',
-      `<div class="ai-prose">${esc(raw)}</div>`,
-      [{ label: '📋 Copy explanation', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+      `<div class="ai-prose">${aiRenderProse(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` }]);
 
   } else if (actionId === 'study-guide') {
     aiShowResult('📖 Study Guide',
-      `<div class="ai-prose">${esc(raw)}</div>`,
+      `<div class="ai-prose">${aiRenderProse(raw)}</div>`,
       [
-        { label: '📋 Copy', primary: true, onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` },
-        { label: '💾 Download .txt', onclick: `aiDownloadText(${JSON.stringify(raw)}, 'study-guide.txt')` },
+        { label: '📋 Copy', primary: true, onclick: `aiCopyText(${_jsonAttr(raw)})` },
+        { label: '🖨 Print', onclick: `aiPrintGuide(${_jsonAttr(raw)})` },
+        { label: '💾 .txt', onclick: `aiDownloadText(${_jsonAttr(raw)}, 'study-guide.txt')` },
       ]);
 
   } else if (actionId === 'mnemonics') {
-    aiShowResult('🧠 Memory Tricks',
-      `<div class="ai-prose">${esc(raw)}</div>`,
-      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+    const tricks = _parseMnemonics(raw);
+    let bodyHtml;
+    if (tricks.length) {
+      bodyHtml = tricks.map(t =>
+        `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:.78rem;font-weight:800;color:var(--text);margin-bottom:3px;">🔑 ${esc(t.term)}</div>
+          <div style="font-size:.78rem;color:var(--text2);line-height:1.5;">🧠 ${esc(t.trick)}</div>
+        </div>`
+      ).join('');
+    } else {
+      bodyHtml = `<div class="ai-prose">${aiRenderProse(raw)}</div>`;
+    }
+    aiShowResult('🧠 Memory Tricks', bodyHtml,
+      [{ label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` }]);
 
   } else if (actionId === 'study-tips') {
     aiShowResult('📚 Study Tips',
-      `<div class="ai-prose">${esc(raw)}</div>`,
-      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+      `<div class="ai-prose">${aiRenderProse(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` }]);
 
   } else {
-    // Prose response (ask anything, anything else)
     aiShowResult(action ? action.icon + ' ' + action.label : 'AI Response',
-      `<div class="ai-prose">${esc(raw)}</div>`,
-      [{ label: '📋 Copy', onclick: `navigator.clipboard.writeText(${JSON.stringify(raw)}).then(()=>DQAuth.toast('Copied!'))` }]);
+      `<div class="ai-prose">${aiRenderProse(raw)}</div>`,
+      [{ label: '📋 Copy', onclick: `aiCopyText(${_jsonAttr(raw)})` }]);
   }
 }
 
-function aiShowResult(title, bodyHtml, buttons) {
+// ── AI RESULT HELPERS ────────────────────────────────────────────────────────
+
+// ── TEMP CARD STORE (avoids onclick encoding issues) ─────────────────────────
+var _aiTempCards = {};
+function _aiStoreCards(cards) {
+  const key = 'k' + Date.now();
+  _aiTempCards[key] = cards;
+  return key;
+}
+function _aiGetCards(key) { return _aiTempCards[key] || []; }
+
+function _jsonAttr(val) {
+  // For strings only — used by aiCopyText
+  return JSON.stringify(val).replace(/</g,'\\u003c').replace(/>/g,'\\u003e');
+}
+
+function _aiCardPreviewHtml(cards) {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:.78rem;color:var(--text2);">${cards.length} cards — tap to deselect any</div>
+      <button class="btn btn-ghost btn-sm" onclick="aiToggleAllCards(${cards.length})" style="font-size:.7rem;">Deselect all</button>
+    </div>
+    ${cards.map((c, i) => `
+      <div class="ai-card-preview selected" id="ai-cp-${i}" onclick="aiToggleCard(${i})">
+        <div class="ai-card-check" id="ai-ck-${i}">✓</div>
+        <div><div class="ai-card-front">${esc(c.front)}</div><div class="ai-card-back">${esc(c.back)}</div></div>
+      </div>`).join('')}`;
+}
+
+function _parseMnemonics(raw) {
+  const tricks = [];
+  const blocks = raw.split(/\n(?=TERM:)/i);
+  for (const block of blocks) {
+    const termMatch = block.match(/TERM:\s*(.+)/i);
+    const trickMatch = block.match(/TRICK:\s*(.+)/i);
+    if (termMatch && trickMatch) tricks.push({ term: termMatch[1].trim(), trick: trickMatch[1].trim() });
+  }
+  return tricks;
+}
+
+function aiCopyText(text) {
+  navigator.clipboard.writeText(text).then(() => DQAuth.toast('✓ Copied!'));
+}
+
+function aiCopyAndToast(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => DQAuth.toast('✓ Copied!'));
+}
+
+function aiPrintGuide(raw) {
+  const s = getSet(currentSetId) || getCurrentSet();
+  const title = s ? s.name + ' — Study Guide' : 'Study Guide';
+  const clean = aiCleanProse(raw);
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
+    <style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;line-height:1.8;color:#111;}
+    h1{font-size:1.4rem;border-bottom:2px solid #333;padding-bottom:8px;}
+    p{margin:0 0 14px;}@media print{body{margin:20px;}}</style>
+    </head><body><h1>${title}</h1>${clean.split(/\n{2,}/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+    </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
+}
+
+function aiImportCopyPasteAsText() {
+  const raw = (document.getElementById('ai-cp-paste-back')?.value || '').trim();
+  if (!raw) { DQAuth.toast('Paste the AI response first'); return; }
+  aiLastResponse = raw;
+  aiStoreResponse(aiSelectedAction, '', raw);
+  const action = (AI_ACTIONS[aiContext]||AI_ACTIONS.set).find(a=>a.id===aiSelectedAction);
+  aiRenderResult(aiSelectedAction, action, raw);
+}
+
+function aiShowResult(title, bodyHtml, buttons, opts) {
+  opts = opts || {};
   document.getElementById('ai-result-title').textContent = title;
   document.getElementById('ai-result-body').innerHTML = bodyHtml;
+  // Action buttons in header
   document.getElementById('ai-result-actions').innerHTML = (buttons || []).map(b =>
-    `<button class="btn ${b.primary ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="${b.onclick}" style="font-size:.75rem;">${b.label}</button>`
+    `<button class="btn ${b.primary ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="${b.onclick}" style="font-size:.72rem;">${b.label}</button>`
   ).join('');
+  // Try Again button in footer
+  const tryBtn = document.getElementById('ai-try-again-btn');
+  if (tryBtn) tryBtn.style.display = opts.hideTryAgain ? 'none' : '';
   aiShowScreen('result');
 }
 
-function aiToggleCard(i) {
-  const idx = aiSelectedCards.indexOf(i);
-  const card = document.getElementById('ai-cp-' + i);
-  const check = document.getElementById('ai-ck-' + i);
-  if (idx === -1) {
-    aiSelectedCards.push(i);
-    if (card) card.classList.add('selected');
-    if (check) check.textContent = '✓';
-  } else {
-    aiSelectedCards.splice(idx, 1);
-    if (card) card.classList.remove('selected');
-    if (check) check.textContent = '○';
-  }
-}
 
-function aiToggleAllCards(total) {
-  const btn = event.target;
-  if (aiSelectedCards.length === total) {
-    aiSelectedCards = [];
-    btn.textContent = 'Select all';
-  } else {
-    aiSelectedCards = Array.from({length: total}, (_, i) => i);
-    btn.textContent = 'Deselect all';
-  }
-  for (let i = 0; i < total; i++) {
-    const card = document.getElementById('ai-cp-' + i);
-    const check = document.getElementById('ai-ck-' + i);
-    const sel = aiSelectedCards.includes(i);
-    if (card) card.classList.toggle('selected', sel);
-    if (check) check.textContent = sel ? '✓' : '○';
-  }
-}
-
-function aiAddSelectedCards(cards) {
+function aiAddSelectedCards(keyOrCards) {
+  const cards = typeof keyOrCards === 'string' ? _aiGetCards(keyOrCards) : keyOrCards;
   const toAdd = aiSelectedCards.map(i => cards[i]).filter(Boolean).map(c =>
     ({front: c.front, back: c.back, starred: false, mastery: 'unseen'}));
   if (!toAdd.length) { DQAuth.toast('No cards selected'); return; }
@@ -11496,7 +11860,8 @@ function aiAddSelectedCards(cards) {
   }
 }
 
-function aiSaveAsNewSet(cards) {
+function aiSaveAsNewSet(keyOrCards) {
+  const cards = typeof keyOrCards === 'string' ? _aiGetCards(keyOrCards) : keyOrCards;
   const toAdd = aiSelectedCards.map(i => cards[i]).filter(Boolean).map(c =>
     ({front: c.front, back: c.back, starred: false, mastery: 'unseen'}));
   if (!toAdd.length) { DQAuth.toast('No cards selected'); return; }
@@ -11515,7 +11880,8 @@ function aiSaveAsNewSet(cards) {
   DQAuth.toast('✓ New set created with ' + toAdd.length + ' cards!');
 }
 
-function aiConfirmReplaceCards(cards) {
+function aiConfirmReplaceCards(keyOrCards) {
+  const cards = typeof keyOrCards === 'string' ? _aiGetCards(keyOrCards) : keyOrCards;
   const s = getSet(currentSetId);
   if (!s) { DQAuth.toast('No set open'); return; }
   const sel = aiSelectedCards.map(i => cards[i]).filter(Boolean);
