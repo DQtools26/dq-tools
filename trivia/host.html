@@ -242,10 +242,10 @@ function loadRoom(){
     currentQ=res.data.question_index||0;
     loadPlayers().then(function(){
       subscribeToRoom();
+      startHostPoll();
       if(roomData.status==='playing'){
         renderQuestion();
       } else {
-        // Status is 'waiting' — questions not fetched yet, need to start
         showWaitingToStart();
       }
     });
@@ -546,9 +546,9 @@ function renderLeaderboard(){
 // ── END GAME ──
 function endGame(){
   clearInterval(timerInterval);
-  // Mark room ended
+  stopHostPoll();
   sb.from('dqtrivia_rooms').update({status:'ended'}).eq('id',roomCode);
-  if(roomChannel)sb.removeChannel(roomChannel);
+  if(roomChannel)try{sb.removeChannel(roomChannel);}catch(e){}
 
   var sorted=players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
   var medals=['🥇','🥈','🥉'];
