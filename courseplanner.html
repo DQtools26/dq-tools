@@ -1175,8 +1175,9 @@ function setMode(mode) {
 
 // ── OVERFLOW MENU ──
 function toggleMoreMenu(e) {
-  e.stopPropagation();
-  document.getElementById('nav-more-drop').classList.toggle('open');
+  if (e) e.stopPropagation();
+  const drop = document.getElementById('nav-more-drop');
+  if (drop) drop.classList.toggle('open');
 }
 function closeMoreMenu() {
   const el = document.getElementById('nav-more-drop');
@@ -1385,21 +1386,36 @@ function rebuildSubstepBar(grade, sub, bar) {
 
 // ── WELCOME ──────────────────────────────
 function renderWelcome() {
+  const hasLegacy = true; // courseplanner-legacy.html always exists
+  const legacyBanner = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:16px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:.75rem;font-weight:600;color:var(--text2)">Looking for the old version?</div>
+      <div style="font-size:.68rem;color:var(--text3);margin-top:2px">A legacy version is available — but we recommend staying here for the best experience.</div>
+    </div>
+    <button onclick="window.location.href='courseplanner-legacy.html'" style="padding:6px 14px;border-radius:7px;font-size:.72rem;font-weight:600;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;">Switch to Legacy</button>
+  </div>`;
+
   return `<div class="card">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:2.4rem;margin-bottom:4px;animation:float 3s ease-in-out infinite">🏈</div>
-      <div style="font-size:.65rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--red2)">MOBERLY HIGH SCHOOL</div>
-      <div style="font-size:.58rem;letter-spacing:.1em;color:var(--text3);margin-top:2px">GO SPARTANS</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <div style="flex-shrink:0;width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--red2),var(--blue));display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏫</div>
+      <div>
+        <div style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--red2);">Moberly High School</div>
+        <div style="font-size:.72rem;color:var(--text3);margin-top:1px;">Go Spartans — Class of ${new Date().getFullYear() + (4 - (new Date().getMonth() >= 8 ? 1 : 0))}</div>
+      </div>
     </div>
-    <div class="eyebrow">Moberly High School</div>
-    <div class="screen-title">Plan Your 4-Year<br>High School Journey 🎓</div>
-    <div class="screen-sub">Build your graduation plan step by step. Answer a few setup questions, then pick courses for each grade — we'll track credits, check prerequisites, and make sure you're on track.</div>
-    <div class="callout green"><span class="ci">🎓</span><div>You need <b>24 total credits</b> to graduate, including Language Arts (4), Math (3), Science (3), Social Studies (3), Fine Arts (1), PE (1), Health (½), Practical Arts (1), and Personal Finance (½).</div></div>
-    <div class="callout info"><span class="ci">✨</span><div><b>DC</b> = Dual Credit (earn college credit too). <b>AP</b> = Advanced Placement. <b>Honors</b> = accelerated curriculum. <b>Rigorous courses</b> count toward Latin Honors cords at graduation.</div></div>
-    <div style="display:flex;gap:10px;margin-top:20px">
-      <button class="btn btn-ghost" style="flex:1" onclick="next()">📋 Start Wizard →</button>
-      <button class="btn btn-primary" style="flex:1" onclick="next();setTimeout(()=>togglePlanView(),400)">⊞ Jump to Planning Grid</button>
+
+    <div class="screen-title">Plan Your 4-Year Journey</div>
+    <div class="screen-sub">Build your graduation plan step by step. Pick courses for each grade — we'll track credits, check prerequisites, flag conflicts, and keep you on track for graduation.</div>
+
+    <div class="callout green"><span class="ci">🎓</span><div>You need <b>24 total credits</b> to graduate — Language Arts (4), Math (3), Science (3), Social Studies (3), Fine Arts (1), PE (1), Health (½), Practical Arts (1), Personal Finance (½), and Electives (7).</div></div>
+    <div class="callout info"><span class="ci">ℹ</span><div><b>DC</b> = Dual Credit (earn college credit). <b>AP</b> = Advanced Placement exam eligible. <b>Honors</b> = accelerated curriculum. Rigorous courses count toward Latin Honors cords at graduation.</div></div>
+
+    <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;">
+      <button class="btn btn-primary" style="flex:2;min-width:160px;" onclick="next()">Start Building My Plan →</button>
+      <button class="btn btn-ghost" style="flex:1;min-width:120px;" onclick="setMode('plan')">Jump to Plan Grid</button>
     </div>
+
+    <div style="margin-top:20px;">${legacyBanner}</div>
   </div>`;
 }
 
@@ -2419,21 +2435,7 @@ function buildCompletedBadge(ids) {
 let planOpen = false;
 let activeDrop = null;
 
-function togglePlanView() {
-  planOpen = !planOpen;
-  const overlay = document.getElementById('plan-overlay');
-  const btn = document.getElementById('nav-plan-btn');
-  if (planOpen) {
-    overlay.classList.add('open');
-    btn.classList.add('active');
-    renderPlanGrid();
-  } else {
-    overlay.classList.remove('open');
-    btn.classList.remove('active');
-  }
-  // close any open dropdown
-  closeDropdown();
-}
+function togglePlanView() { setMode(currentMode === 'plan' ? 'wizard' : 'plan'); }
 
 function closeDropdown() {
   if (activeDrop) { activeDrop.remove(); activeDrop = null; }
@@ -2624,18 +2626,7 @@ let activeCareerTab = 'destination';
 let selectedClusters = new Set();
 let selectedDest = '';
 
-function toggleCareerView() {
-  careerOpen = !careerOpen;
-  // close others
-  if (careerOpen) {
-    if (planOpen)  { planOpen=false;  document.getElementById('plan-overlay').classList.remove('open');  document.getElementById('nav-plan-btn').classList.remove('active'); }
-    if (pathsOpen) { pathsOpen=false; document.getElementById('paths-overlay').classList.remove('open'); document.getElementById('nav-paths-btn').classList.remove('active'); }
-  }
-  const overlay = document.getElementById('career-overlay');
-  const btn = document.getElementById('nav-career-btn');
-  if (careerOpen) { overlay.classList.add('open'); btn.classList.add('active'); renderCareer(); }
-  else { overlay.classList.remove('open'); btn.classList.remove('active'); }
-}
+function toggleCareerView() { setMode(currentMode === 'career' ? 'wizard' : 'career'); }
 
 function switchCareerTab(tab) { activeCareerTab = tab; renderCareer(); }
 
@@ -3054,18 +3045,7 @@ function buildAssociateTab() {
 let pathsOpen = false;
 let activePathTab = 'math';
 
-function togglePathsView() {
-  pathsOpen = !pathsOpen;
-  if (pathsOpen && planOpen) {
-    planOpen = false;
-    document.getElementById('plan-overlay').classList.remove('open');
-    document.getElementById('nav-plan-btn').classList.remove('active');
-  }
-  const overlay = document.getElementById('paths-overlay');
-  const btn = document.getElementById('nav-paths-btn');
-  if (pathsOpen) { overlay.classList.add('open'); btn.classList.add('active'); renderPaths(); }
-  else { overlay.classList.remove('open'); btn.classList.remove('active'); }
-}
+function togglePathsView() { setMode(currentMode === 'paths' ? 'wizard' : 'paths'); }
 
 function renderPaths() {
   const overlay = document.getElementById('paths-overlay');
@@ -3442,18 +3422,7 @@ function pgFilterDrop(grade, rowId, query) {
 // ── REQUIREMENTS OVERLAY ──────────────────────────────────────
 let reqsOpen = false;
 
-function toggleReqsView() {
-  reqsOpen = !reqsOpen;
-  if (reqsOpen) {
-    if (planOpen) { planOpen = false; document.getElementById('plan-overlay').classList.remove('open'); document.getElementById('nav-plan-btn').classList.remove('active'); }
-    if (pathsOpen) { pathsOpen = false; document.getElementById('paths-overlay').classList.remove('open'); document.getElementById('nav-paths-btn').classList.remove('active'); }
-  }
-  const overlay = document.getElementById('reqs-overlay');
-  const btn = document.getElementById('nav-reqs-btn');
-  if (!overlay || !btn) return;
-  if (reqsOpen) { overlay.classList.add('open'); btn.classList.add('active'); renderReqsPage(); }
-  else { overlay.classList.remove('open'); btn.classList.remove('active'); }
-}
+function toggleReqsView() { setMode(currentMode === 'reqs' ? 'wizard' : 'reqs'); }
 
 function renderReqsPage(searchQuery) {
   const overlay = document.getElementById('reqs-overlay');
