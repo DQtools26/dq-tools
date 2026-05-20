@@ -322,6 +322,39 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
 /* CONFLICT badge */
 .conflict-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(224,48,48,.12);border:1px solid rgba(224,48,48,.35);border-radius:6px;padding:3px 8px;font-size:.65rem;font-weight:700;color:var(--red2);margin-top:4px;}
 .conflict-warn{background:rgba(224,48,48,.07);border:1px solid rgba(224,48,48,.25);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:.78rem;color:var(--red2);}
+/* ── CATALOG ── */
+#catalog-overlay{display:none;position:fixed;inset:0;top:54px;background:var(--bg);z-index:90;overflow:auto;}
+#catalog-overlay.open{display:block;animation:screenIn .3s ease both;}
+.cat-wrap{max-width:900px;margin:0 auto;padding:22px 16px 100px;}
+.cat-search{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:11px 16px;font-size:.88rem;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;margin-bottom:12px;display:block;}
+.cat-search:focus{border-color:var(--blue2);}
+.cat-search::placeholder{color:var(--text3);}
+.cat-filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.cat-filter{padding:5px 13px;border-radius:999px;font-size:.7rem;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;}
+.cat-filter:hover{border-color:var(--border2);color:var(--text2);}
+.cat-filter.on{background:var(--surface2);border-color:var(--blue2);color:var(--blue2);}
+.cat-count{font-size:.7rem;color:var(--text3);margin-bottom:10px;}
+.cat-results{display:flex;flex-direction:column;gap:7px;}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;transition:border-color .15s;}
+.cat-card:hover{border-color:var(--border2);}
+.cat-card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.cat-name{font-size:.9rem;font-weight:700;color:var(--text);flex:1;line-height:1.3;}
+.cat-cr{font-size:.65rem;font-weight:700;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
+.cat-desc{font-size:.78rem;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.cat-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.cat-chip{font-size:.62rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;white-space:nowrap;}
+.cat-chip.grade{color:var(--blue2);border-color:rgba(61,136,255,.2);background:rgba(61,136,255,.06);}
+.cat-chip.prereq{color:var(--amber);border-color:rgba(245,166,35,.2);background:rgba(245,166,35,.06);}
+.cat-chip.dc{color:var(--teal);border-color:rgba(20,212,192,.2);background:rgba(20,212,192,.05);}
+.cat-chip.ap{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.07);}
+.cat-chip.honors{color:#aa88ff;border-color:rgba(136,102,255,.25);background:rgba(136,102,255,.07);}
+.cat-chip.rig{color:var(--green);border-color:rgba(47,214,122,.25);background:rgba(47,214,122,.06);}
+.cat-add{margin-left:auto;padding:5px 14px;border-radius:7px;font-size:.7rem;font-weight:700;border:1px solid var(--blue2);background:transparent;color:var(--blue2);cursor:pointer;font-family:inherit;transition:all .15s;flex-shrink:0;}
+.cat-add:hover{background:rgba(61,136,255,.1);}
+.cat-add.added{border-color:var(--green);color:var(--green);}
+.cat-add.added:hover{background:rgba(47,214,122,.08);}
+.cat-empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.cat-unlock{font-size:.67rem;color:var(--teal);margin-top:4px;}
 .unlock-line{font-size:.67rem;color:var(--teal);margin-top:3px;line-height:1.3;}
 
 .ysb{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:10px;}
@@ -569,6 +602,7 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
   <div class="nav-modes" id="nav-modes">
     <div class="nmode" id="nmode-wizard" onclick="setMode('wizard')">Wizard</div>
     <div class="nmode" id="nmode-plan"   onclick="setMode('plan')">Plan</div>
+    <div class="nmode" id="nmode-catalog" onclick="setMode('catalog')">Catalog</div>
     <div class="nmode" id="nmode-paths"  onclick="setMode('paths')">Paths</div>
     <div class="nmode" id="nmode-reqs"   onclick="setMode('reqs')">Reqs</div>
     <div class="nmode" id="nmode-career" onclick="setMode('career')">Career</div>
@@ -618,6 +652,7 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
     <div class="mm-section">Modes</div>
     <div class="mm-item" onclick="setMode('wizard');closeMobileMenu()">Wizard <span class="mm-sub">Build your plan step by step</span></div>
     <div class="mm-item" onclick="setMode('plan');closeMobileMenu()">Plan <span class="mm-sub">See all 4 years at once</span></div>
+    <div class="mm-item" onclick="setMode('catalog');closeMobileMenu()">Catalog <span class="mm-sub">Browse all courses with descriptions</span></div>
     <div class="mm-item" onclick="setMode('paths');closeMobileMenu()">Paths <span class="mm-sub">Course sequences &amp; flowcharts</span></div>
     <div class="mm-item" onclick="setMode('reqs');closeMobileMenu()">Requirements <span class="mm-sub">Graduation checklist</span></div>
     <div class="mm-item" onclick="setMode('career');closeMobileMenu()">College &amp; Career <span class="mm-sub">Planning &amp; goal setting</span></div>
@@ -646,6 +681,7 @@ textarea.ebox{width:100%;min-height:260px;background:var(--bg2);border:1px solid
 <div id="paths-overlay"></div>
 <div id="reqs-overlay"></div>
 <div id="career-overlay"></div>
+<div id="catalog-overlay"></div>
 
 <script>
 // ══════════════════════════════════════════════════════
@@ -1146,7 +1182,7 @@ function setMode(mode) {
   closeMoreMenu();
 
   // Show/hide overlays
-  const overlays = { plan:'plan-overlay', paths:'paths-overlay', reqs:'reqs-overlay', career:'career-overlay' };
+  const overlays = { plan:'plan-overlay', paths:'paths-overlay', reqs:'reqs-overlay', career:'career-overlay', catalog:'catalog-overlay' };
   Object.entries(overlays).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1158,17 +1194,18 @@ function setMode(mode) {
   if (app) app.style.display = (mode === 'wizard') ? '' : 'none';
 
   // Update mode tab active states
-  ['wizard','plan','paths','reqs','career'].forEach(m => {
+  ['wizard','plan','paths','reqs','career','catalog'].forEach(m => {
     const el = document.getElementById('nmode-'+m);
     if (el) el.classList.toggle('active', m === mode);
   });
 
   // Render the active overlay
-  if (mode === 'plan')   renderPlanGrid();
-  if (mode === 'paths')  renderPaths();
-  if (mode === 'reqs')   renderReqsPage();
-  if (mode === 'career') renderCareer();
-  if (mode === 'wizard') renderStep();
+  if (mode === 'plan')    renderPlanGrid();
+  if (mode === 'paths')   renderPaths();
+  if (mode === 'reqs')    renderReqsPage();
+  if (mode === 'career')  renderCareer();
+  if (mode === 'catalog') renderCatalog();
+  if (mode === 'wizard')  renderStep();
 
   autosave();
 }
@@ -1400,7 +1437,7 @@ function renderWelcome() {
       <div style="flex-shrink:0;width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--red2),var(--blue));display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏫</div>
       <div>
         <div style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--red2);">Moberly High School</div>
-        <div style="font-size:.72rem;color:var(--text3);margin-top:1px;">Go Spartans — Class of ${new Date().getFullYear() + (4 - (new Date().getMonth() >= 8 ? 1 : 0))}</div>
+        <div style="font-size:.72rem;color:var(--text3);margin-top:1px;">Go Spartans</div>
       </div>
     </div>
 
@@ -3039,6 +3076,329 @@ function buildAssociateTab() {
     ${maccRows}
     <div style="margin-top:10px;font-size:.72rem;color:var(--text3)">* Course availability may change. Confirm with your counselor and MACC admissions. Some high school courses (Spanish, Mythology, etc.) may count toward MACC equivalents.</div>
   </div>`;
+}
+
+// ── COURSE CATALOG ───────────────────────────────────────
+let catSearch = '';
+let catFilters = new Set(['all']);
+let catSort = 'subject'; // subject | grade | name | credits
+// Short descriptions sourced from the MHS Course Description & Career Planning Guide
+const COURSE_DESC = {
+  la1:    'A required comprehensive language skills course covering reading, literature, composition, grammar, and research skills. Students read short stories, drama, poetry, and novels.',
+  la1h:   'Accelerated curriculum for freshmen planning to attend college. Same content as LA I but at a faster pace with enrichment activities. Maintain 80%+ to stay enrolled.',
+  la2:    'Required for all sophomores. Covers short stories, poetry, Shakespeare, and novels. Writing skills including prewriting, drafting, revising, and editing are emphasized.',
+  la2h:   'Accelerated curriculum for college-bound sophomores. Builds on LA I Honors. Emphasis on writing, grammar, and research skills with a Shakespearean play.',
+  la3:    'Required for juniors. Instruction in reading, writing, listening, speaking, and research. Includes ACT preparation for the English and reading sections.',
+  la3h:   'Accelerated for juniors planning college. Covers American Literature, research, novels, and writing. Includes ACT prep. 85%+ in LA II Honors required.',
+  la4a:   'Senior elective (Fall). Students read challenging fiction and nonfiction, write persuasively and analytically, and develop communication skills for college and careers.',
+  la4b:   'Senior elective (Spring). Continues the skills from LA IV-A — critical reading, varied writing styles, discussion, and media creation. Either semester can be taken independently.',
+  engcomp:'Senior-level academic writing course equivalent to a first-year college writing course. Covers narrative, argumentative, rhetorical analysis, and synthesis writing. 16+ pages per semester. DC available through MACC.',
+  pubspk: 'Fundamentals of public speaking — theory and practice. Students deliver 5+ speeches including informative, persuasive, and impromptu formats. College-level textbook. DC available (3 MACC credit hours).',
+  multlit:'Introduction to multicultural literature exploring culture, race, ethnicity, and values through autobiographies, short stories, novels, poems, and music.',
+  crwrite:'Introduction to creative writing — short fiction, creative nonfiction, and poetry. Students write every day with at least 40 pages produced per semester. Writing intensive.',
+  myth:   'Survey of classical mythology — major gods, heroes, and their stories. Explores what myths "do" and how they shape modern culture. Includes world myths and archetypes. Writing daily.',
+  journ:  'Students create a digitized monthly school newspaper and weekly broadcast news segment. Deadline-driven; requires writing, editing, photography, and video skills. Teacher rec required.',
+  wh:     'Covers major world history units: The Crusades, Renaissance and Reformation, Age of Exploration, Revolutions, Industrial Revolution, Imperialism, WWI, and WWII.',
+  ush:    'Survey of U.S. history from Reconstruction through the modern era. Covers Westward Expansion, WWI, Great Depression, WWII, Cold War, Civil Rights, and Vietnam.',
+  gov:    'Foundations of Democracy and the role of citizens in government. Covers the U.S. and Missouri Constitutions. Required Constitution and Civics tests for graduation are administered here.',
+  apgov:  'AP-level study of democratic ideas, balance of powers, and national policymaking. Students analyze constitutional principles, rights, institutions, and political processes.',
+  apush:  'Survey of U.S. history from 1492 to the present at AP level. Can be taken for AP exam credit or Dual Credit. AP exam is $98, due by November.',
+  ushdc:  'Dual Credit version of U.S. History — counts as elective credit only (NOT Social Studies credit). Covers the same content as AP US History. MACC requirements apply.',
+  geo:    'Study of the seven continents — physical, human, and cultural geography. Elective credit only, not Social Studies credit. Units cover the Americas, Europe, Africa, Asia, and more.',
+  wc1:    'History of Western civilization from early Middle Eastern cultures through the Renaissance and Reformation. MACC equivalent: HST 101. Elective credit, DC available.',
+  wc2:    'Continues Western Civilization I from the Scientific Revolution through the 20th century. MACC equivalent: HST 102. Elective credit, DC available. Can be taken independently.',
+  coldwar:'Explores the Cold War from its origins through the 1980s — the Red Scare, Cuban Missile Crisis, Vietnam, and Cold War culture. Elective credit only.',
+  ci:     'Critical thinking and analysis of current events and global topics. Curriculum is revised annually to reflect today\'s issues. Students discuss, research, and present multiple perspectives.',
+  psych:  'Broad introduction to psychology — the brain, sensation, consciousness, learning, memory, intelligence, personality, and abnormal psychology. Good for students interested in behavioral sciences.',
+  socio:  'Introduction to sociology — the roles of individuals in society, socialization, deviance, crime, social stratification, race and ethnicity, and social movements.',
+  prealg: 'Introduction to basic algebra concepts and review of arithmetic. Covers rational/linear exponents, ratios, proportions, percentages, and solving equations. Designed for students needing algebra prep.',
+  alg1:   'Covers linear, exponential, and quadratic functions with emphasis on solving equations. Students represent functions verbally, algebraically, in tables, and graphs. Foundation for all further math.',
+  geo_m:  'Discover, explore, and practice geometrical concepts — foundations, angles, triangles, area, polygons, similarity, circles, surface area, volume, and writing proofs.',
+  geoh:   'Honors-level Geometry with higher-level thinking, projects, and interdisciplinary applications. Same topics as standard Geometry but with greater depth and challenge.',
+  alg2:   'Expands Algebra I with more sophisticated mathematical models. Reviews Algebra I skills and introduces methods needed to solve more complex problems.',
+  alg2h:  'Honors Algebra II with advanced-level problems and projects. Students develop deep understanding of function types and their real-life connections. Maintain 80%+ to stay enrolled.',
+  mra:    'Application-oriented algebra using financial contexts — banking, investing, credit, taxes, car ownership, and budgeting. Available as an applied Algebra II or senior math elective.',
+  intcalg:'One-semester bridge between Algebra II and College Algebra. Reviews and expands on Alg II topics. Intended to be paired with College Algebra in the spring semester.',
+  calcalg:'College-level algebra focusing on linear, polynomial, rational, exponential, and logarithmic equations. 3 MACC credit hours. Juniors should pair with Trigonometry to reach Calculus as a senior.',
+  trig:   'College-level trigonometry — trig functions, inverses, identities, arc length, angular velocity, and polar coordinates. Pairs with College Algebra for students pursuing Calculus.',
+  stats:  'Elementary statistics covering probability, descriptive statistics, hypothesis testing, and distributions. 3 MACC credit hours available for qualified students.',
+  apcalc: 'Full-year Calculus covering integration, differentiation, limits, continuity, and applications. Ideal for STEM-bound students. 5 MACC credit hours or AP exam available.',
+  physci: 'Foundational physics and chemistry — motion, Newton\'s Laws, energy, waves, atomic theory, bonding, chemical reactions, and nuclear chemistry. Required for all 9th graders.',
+  physcih:'Accelerated Physical Science with a semester-long project component. Builds a stronger foundation for Biology I and beyond. Qualification criteria apply.',
+  earth1: 'Fall-only semester. Explores Earth\'s composition and processes — scientific methods, Earth\'s layers, minerals, rock resources, and plate tectonics.',
+  earth2: 'Spring-only semester. Covers Earth\'s atmosphere and cycles — weather, climate, natural hazards, human impact, and global climate change.',
+  envchem:'Explores chemical systems in the environment — soil, water, atmospheric chemistry, climate change, and sustainable energy. Take in opposite semester from Ecology.',
+  ecology:'Studies interactions between organisms and their environment with emphasis on Missouri ecosystems. Many outdoor labs and hands-on activities. Take in opposite semester from Environmental Chemistry.',
+  bio1:   'Principles of modern Biology — macromolecules, cell structure, genetics, classification, natural selection, and community ecology. Includes microscope work and dissection.',
+  chem:   'College-level chemistry — atomic structure, chemical bonding, nomenclature, reactions, gas laws, stoichiometry, and acid/base chemistry. Extensive lab component. DC available (5 hrs).',
+  anatomy:'Study of the structure and function of cells, tissues, organs, and major body systems. Lab work and dissection are emphasized and required. DC available (4 hrs).',
+  bio2:   'College-level introductory life science continuing from Biology I. Covers genetics, evolution, microbiology, zoology, and ecology. Research project in spring. DC available (4 hrs).',
+  physics:'Algebra-based physics — Newtonian Mechanics, Work/Energy/Power, Mechanical Waves, and Electric Circuits. For advanced students pursuing STEM careers.',
+  robo1:  'Project-based introduction to robotics using VEX systems. Students build and program increasingly complex autonomous robots working in groups. Elective credit — not Science credit.',
+  intfl:  'Introduction to multiple languages before committing to one. Semester 1: Spanish and German. Semester 2: French and Italian. Can be taken for one or two semesters.',
+  span1:  'Introductory Spanish — culture, grammar, vocabulary, and the four skills (reading, writing, listening, speaking). Goal: novice-high proficiency. B avg in English required.',
+  span2:  'Builds on Spanish I with more grammar tenses, extended vocabulary, and cultural content. Goal: intermediate-mid proficiency. 80%+ in Spanish I and instructor approval required.',
+  span3:  'Advanced Spanish exploring complex grammar, functional vocabulary, and Hispanic culture. Goal: advanced-low proficiency. 90%+ in Spanish II or instructor approval.',
+  kitfund:'Fundamentals of cooking — sanitation, safety, recipe basics, knife skills, and food science. Practical Arts credit.',
+  wfoods: 'Principles of nutrition, meal management, and cuisines of different countries. Prepares students for food service industry or higher education. Practical Arts credit.',
+  chdev1: 'Understanding human reproduction, pregnancy, and growth of newborns and infants. Includes observations with infant simulators. Practical Arts credit.',
+  chdev2: 'Continues Child Development I — toddler through school-age development. Physical, intellectual, emotional, and social growth. Hands-on with simulators.',
+  intdes: 'Principles of safe and healthy living environments — housing styles, design elements, floor plans, furniture arrangements, and the home buying process.',
+  art1:   'Foundation art course introducing basic drawing techniques and media including drawing, paint, and mixed media. Emphasis on technique and composition.',
+  art2:   'Intermediate art — further techniques, personal creativity, and abstract ideas. B+ or higher recommended for advancement to Art III.',
+  art3:   'Advanced art — multimedia, drawing from life, printmaking, and sculpture in varied materials including cardboard and stained glass.',
+  art4:   'For students who have completed Art I–III and plan to continue art in college or as a career. Special interest project focus.',
+  cerscu: 'Introduction to sculptural forms and ceramics — coil forming, slab construction, pinch pots, firing, and glazing. ½ credit per semester.',
+  choir:  'Develops vocal techniques, choral literature, and music literacy. Participates in at least two performances per year. Open to all students.',
+  camch:  'Select choir — advanced vocal techniques, ear training, and choral contest performance. Limited to 32 voices. Audition required.',
+  band:   'Marching Band during football season and parades; Concert Band the rest of the year. Performs at district music festivals. Attendance at performances is mandatory.',
+  jazz:   'Jazz study and ensemble performance. Explores history and theory of jazz alongside live performance. Must be enrolled in Band. Audition required.',
+  musapp: 'Background in music history and development. Covers history, fundamentals, notation, world music, and in-class performances. Can only be taken once.',
+  musth:  'Enhances music skills — melody, harmony, rhythm, form, notation, scales, chord structure, ear training, and composition. Limited to 20 students.',
+  itheat: 'Introduction to theatre disciplines — set, costumes, lights, sound, acting, directing, and playwriting. Emphasis on authentic learning through performance.',
+  tharts: 'Advanced study of acting, directing, and playwriting. In-depth projects and study of plays and playwrights. Completion of Intro to Theatre required.',
+  actmus: 'Techniques used by singer-actor-dancers in musical theatre. Builds a performance portfolio. Includes basic principles of dance and singing simultaneously. Can be taken multiple times.',
+  pe:     'Required freshman PE — team sports (softball, volleyball, basketball) and individual activities (badminton, pickle-ball, aerobics). Co-educational.',
+  health: 'Comprehensive health education covering lifestyle, disease prevention, and wellness. CPR certification is included. Required ½ credit for graduation.',
+  phcon:  'Structured fitness program — flexibility, nutrition, conditioning, and strength training for athletic performance and injury prevention. Teacher approval required.',
+  aero:   'Introduction to basic fitness through walking and light activity. Covers flexibility, muscular balance, target heart rate, and weight management.',
+  lsf:    'Promotes fitness through leisure-time sports with emphasis on recreational activities done individually or in groups.',
+  tsports:'Builds on Lifetime Sport skills with emphasis on team sports, competition, and group play.',
+  let1:   'Introduction to JROTC — responsible citizenship, self-confidence, leadership, teamwork, and communication. Earns 1 elective credit.',
+  let2:   'Continuation of LET 1 — group behavior, respect for authority, and unit operations. Earns 0.5 Health credit + 0.5 elective credit.',
+  let3:   'Selected 3rd-year cadets in leadership and battalion staff positions. Special leadership challenges. Earns 1 elective credit.',
+  let4:   'Capstone JROTC — cadets in responsible leadership roles assisting instructors with other JROTC classes. Earns 1 elective credit.',
+  batst:  'Fourth-year cadets in command and staff positions — planning and executing Battalion events including the Veteran\'s Day assembly, military ball, and Spring Camp.',
+  marks_r:'Theory and practice of Three Position air rifle shooting. Includes sports physiology, Olympic rifle equipment, Missouri Hunter Education, and leadership theory.',
+  marks_a:'Theory and practice of archery using NASP 11-step method. Missouri Hunter Education included. Opportunity to compete on the school Archery Team.',
+  vex_j:  'Design, build, and program robots using VEX V5. Combines engineering, computer science, and hands-on fabrication. Competitive Robotics Team opportunity.',
+  crisis: 'Basic emergency management — GPS, map reading, search and rescue, disaster medical operations, and first aid. Certifications in CPR, AED, and Teen CERT (FEMA).',
+  drill:  'Military drill instruction — individual and unit drill, manual of arms, ceremonies, and command voice. Earns 0.5 Fine Arts credit. Uniform worn once weekly.',
+  maccol: 'Take an online MACC dual credit course during a free period. Options include Personal Finance, General Psychology, Sociology, Mythology, Medical Terminology, and more. Elective credit.',
+  yrbk:   'Create the school yearbook — layout, design software, photography, and advertising sales. Deadline-driven collaborative project.',
+  cadet:  'Seniors explore teaching by working in a classroom under an experienced teacher. Earns A+ tutoring hours. Requires 2.5 GPA, 95% attendance, teacher recommendation.',
+  crecrv: 'Computer-based curriculum to recover credit for a previously failed core course. 30 hours of seat time required per ½ credit. By placement only.',
+  acadsk: 'Study and organizational skills support for students who have failed, are at risk of failing, or need academic intervention. By counselor/admin recommendation.',
+  persfin:'Required for graduation. Covers personal financial decision-making — spending, saving, credit, career choices, and financial planning based on Missouri competencies.',
+  anisci: 'Animal breeding, genetics, nutrition, anatomy, and physiology. Species covered: cattle, horses, sheep, goat, swine, and poultry. FFA is an integral part of the course.',
+  hort:   'Greenhouse management, pest control, propagation, landscaping, lawn and turf management, and floral design. Hands-on greenhouse experience. FFA included.',
+  consrv: 'Conservation, natural resources, wildlife management, ornithology, entomology, and forestry careers. FFA included. Offered every other year (26-27).',
+  agcoop: 'On-the-job training at an instructor-approved agricultural business. 10–19 hrs/wk = 1 credit; 20+ hrs/wk = 2 credits. Paid work with documented hours.',
+  intae:  'Basics of architectural and engineering drawing using AutoCAD. Covers drafting techniques, geometric construction, multi-view drawings, and residential floor plans.',
+  ae1:    'Architectural and engineering drawing using AutoDesk software — 3D modeling, solid modeling, 3D printing, and residential architecture. DC available. 2–3 credit half-day program.',
+  ae2:    'Advanced A&E Design — 3D modeling, rendering, animation, mechanical design, and commercial architecture using AutoDesk Revit. DC available. Industry credentials.',
+  auttech:'NATEF-certified program — engine inspection, powertrain, steering, brakes, electrical systems, and AC. ASE Entry Level Certification available. 3-credit half-day program.',
+  compapp:'Word processing, spreadsheets, desktop publishing, multimedia, and Internet — using Microsoft Office 2019. Students can sit for the Microsoft Office Specialist (MOS) exam.',
+  intbus: 'Fundamentals of business — banking, credit, entrepreneurship, marketing, and social media. DC available. Either semester.',
+  intgraph:'Introduction to graphic arts — publication layout, typography, image management, and print processes using Adobe Photoshop. Prepares for Graphic Arts I.',
+  graphart:'Advanced graphic arts and digital design using Adobe Master Suite. Professional layout and design. 2-credit year program. Adobe Certified Professional credential available.',
+  digmed: 'Create electronic presentations, digital collages, logos, web pages, and video using Adobe Illustrator, Animate, and Premiere.',
+  digmedst:'Advanced multimedia — Adobe Premiere and After Effects. Produces audio and video for presentation in various formats. Rigorous course.',
+  acct1:  'Introduces double-entry accounting — the full accounting cycle, special journals, payroll, inventory, and financial statements. DC available.',
+  acct2:  'In-depth accounting procedures for partnerships and corporations. Uses Excel for the full accounting cycle. Recommended for future CPAs or business students.',
+  acct3:  'For students completing 2 years of Accounting. Advanced business simulation and financial analysis. Excellent for future accounting or bookkeeping careers.',
+  empess: 'Covers professional communication, workplace technology, entrepreneurship, career planning, and interview skills. Broad career interest course.',
+  buspr:  'Understanding of business organization, management, and law. Covers entrepreneurship, marketing, finance, human resources, and business law topics.',
+  bldtech:'Carpentry, masonry, electrical wiring, and plumbing for residential structures. Hand and power tool operation. Certification through Carpentry Career Connections. 3-credit half-day program.',
+  cit:    'Design, build, and troubleshoot PCs, laptops, and network servers. Windows, Ubuntu, Mac OS, LAN/WAN configuration, and cybersecurity basics. CompTIA A+ and Cisco credentials available. 2–3 credit half-day.',
+  collrep:'Repair damaged vehicles — sheet metal, plastic, fiberglass, body filler, refinishing, and frame repair. ASE Entry Level Certification. 3-credit half-day program. Offered 26-27.',
+  ecc:    'Prepares students for entry-level early childhood education employment. Works directly with children birth–age 8. CPR/First Aid certification included. CDA credential possible.',
+  intmt:  'Introduction to machining — basic techniques in a state-of-the-art lab. Students produce their own projects and develop foundational machining skills.',
+  mtools: 'Operates lathes, milling machines, grinders, CNC machines, and waterjet. Second year: Mastercam programming, metallurgy, and precision grinding. 2–3 credit half-day program.',
+  mktg:   'Marketing planning and execution — advertising, personal selling, promotional planning, and public relations. Operates the MATC Cornerstone School Store.',
+  advmktg:'Advanced marketing — distribution, financing, information management, and event planning. Project-based, college-level pace. Rigorous course. Store operations.',
+  advmktg2:'Continues Advanced Marketing with emphasis on research, planning, and problem-solving. Independent study pace. Work cooperative education option.',
+  advsales:'Advertising and promotional strategies — display features, design, media, and ad layout. Works with local businesses. Also operates the school store.',
+  entsp:  'Sports and entertainment marketing — trends, simulation projects, and marketing plans. Leadership, problem-solving, and public speaking skills developed.',
+  medskil:'Basic healthcare skills — CPR, first aid, vital signs, transfers, and infection control. Foundation for medical career pathways.',
+  medterm:'Medical language acquisition — breaking terms into components, body systems, and health profession profiles. Articulated college credit available.',
+  prepmed:'Two-hour block course for students pursuing medical careers. Covers healthcare terminology, vital signs, CPR, career exploration, and facility tours. 2-credit program.',
+  ccma:   'Training for the NHA Certified Clinical Medical Assistant exam. Covers vital signs, EKGs, phlebotomy, scheduling, billing, and medical ethics. 3-credit half-day program.',
+  elec1:  'Introduction to electronics. Practical Arts credit.',
+  elec2:  'Advanced electronics — rigorous continuation of Electronics I. B or better in Electronics I required. Rigorous course.',
+  intweld:'Basic welding — arc, MIG, and oxyacetylene on mild steel. Approximately 80% shop instruction. Develops foundational welding skills.',
+  weldfab:'Advanced welding — SMAW, GMAW, GTAW, plasma arc, and blueprint reading. AWS Level I Certification available. 2–3 credit half-day program.',
+  flex:   'Supervised work-based learning — attend school and apply business knowledge in a real job. Credit earned based on certified hours worked. Seniors only.',
+  landscp:'Landscaping and turf management — plant installation, hand/power tools, site analysis, and design estimates. Hands-on outdoor practical experience. 2-credit year program.',
+  emb_math:'Embedded Career & Technical Math within a 2–3 hour MATC block program. 0.25 credit per semester, max 1.0 credit over 2 years.',
+  emb_ca: 'Embedded Career & Technical Communication Arts within a 2–3 hour MATC block program. 0.25 credit per semester, max 1.0 credit over 2 years.',
+};
+
+const CAT_SUBJECT_LABELS = {
+  LA:'Language Arts', SS:'Social Studies', Math:'Mathematics',
+  Sci:'Science', FL:'Foreign Language', FCS:'Family & Consumer Sci',
+  Arts:'Fine Arts', PE:'Physical Ed & Health', JROTC:'JROTC',
+  Alt:'Alternative', MATC:'MATC / Career & Tech'
+};
+
+const CAT_FILTER_OPTIONS = [
+  {id:'all',    label:'All Courses'},
+  {id:'inplan', label:'In My Plan'},
+  {id:'dc',     label:'Dual Credit'},
+  {id:'ap',     label:'AP'},
+  {id:'honors', label:'Honors'},
+  {id:'rigorous',label:'Rigorous'},
+  {id:'LA',     label:'Language Arts'},
+  {id:'SS',     label:'Social Studies'},
+  {id:'Math',   label:'Math'},
+  {id:'Sci',    label:'Science'},
+  {id:'FL',     label:'Foreign Language'},
+  {id:'Arts',   label:'Fine Arts'},
+  {id:'PE',     label:'PE & Health'},
+  {id:'JROTC',  label:'JROTC'},
+  {id:'MATC',   label:'MATC'},
+];
+
+function isInPlan(id) {
+  return [9,10,11,12].some(g => state.choices[g]?.[id] > 0);
+}
+
+function catMatches(c) {
+  const q = catSearch.toLowerCase();
+  const name = c.name.toLowerCase();
+  const desc = (COURSE_DESC[c.id] || '').toLowerCase();
+  const sub = (c.subject || '').toLowerCase();
+  const prereqNote = (c.prereqNote || '').toLowerCase();
+  if (q && !name.includes(q) && !desc.includes(q) && !sub.includes(q) && !prereqNote.includes(q)) return false;
+  if (catFilters.has('all')) return true;
+  if (catFilters.has('inplan') && isInPlan(c.id)) return true;
+  if (catFilters.has('dc')      && c.tags.includes('dc'))      return true;
+  if (catFilters.has('ap')      && c.tags.includes('ap'))      return true;
+  if (catFilters.has('honors')  && c.tags.includes('honors'))  return true;
+  if (catFilters.has('rigorous')&& c.tags.includes('rigorous'))return true;
+  if (catFilters.has(c.subject)) return true;
+  return false;
+}
+
+function toggleCatFilter(id) {
+  if (id === 'all') {
+    catFilters = new Set(['all']);
+  } else {
+    catFilters.delete('all');
+    if (catFilters.has(id)) catFilters.delete(id);
+    else catFilters.add(id);
+    if (catFilters.size === 0) catFilters.add('all');
+  }
+  renderCatalogResults();
+}
+
+function renderCatalog() {
+  const overlay = document.getElementById('catalog-overlay');
+
+  const filterHtml = CAT_FILTER_OPTIONS.map(f =>
+    `<button class="cat-filter ${catFilters.has(f.id)?'on':''}" onclick="toggleCatFilter('${f.id}')">${f.label}</button>`
+  ).join('');
+
+  const sortHtml = [
+    {id:'subject', label:'By Subject'},
+    {id:'grade',   label:'By Grade'},
+    {id:'name',    label:'A–Z'},
+    {id:'credits', label:'By Credits'},
+  ].map(s => `<button class="cat-filter ${catSort===s.id?'on':''}" onclick="catSort='${s.id}';renderCatalogResults()">${s.label}</button>`).join('');
+
+  overlay.innerHTML = `<div class="cat-wrap">
+    <div style="font-size:1.2rem;font-weight:900;letter-spacing:-.03em;margin-bottom:2px">Course Catalog</div>
+    <div style="font-size:.78rem;color:var(--text3);margin-bottom:16px">${COURSES.length} courses — search, filter, or browse by subject. Locked courses show what you need first.</div>
+
+    <input class="cat-search" id="cat-search-input" placeholder="Search by name, subject, keyword, or description…" value="${catSearch}" oninput="catSearch=this.value;renderCatalogResults()" autocomplete="off">
+
+    <div style="font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Filter</div>
+    <div class="cat-filter-row" style="margin-bottom:10px">${filterHtml}</div>
+
+    <div style="font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Sort</div>
+    <div class="cat-filter-row">${sortHtml}</div>
+
+    <div id="cat-results"></div>
+  </div>`;
+
+  renderCatalogResults();
+}
+
+function renderCatalogResults() {
+  let matched = COURSES.filter(catMatches);
+
+  if (catSort === 'name')    matched = [...matched].sort((a,b) => a.name.localeCompare(b.name));
+  if (catSort === 'grade')   matched = [...matched].sort((a,b) => a.grade[0] - b.grade[0]);
+  if (catSort === 'credits') matched = [...matched].sort((a,b) => {
+    const ac = Array.isArray(a.credits) ? a.credits[a.credits.length-1] : a.credits;
+    const bc = Array.isArray(b.credits) ? b.credits[b.credits.length-1] : b.credits;
+    return bc - ac;
+  });
+
+  const el = document.getElementById('cat-results');
+  if (!el) return;
+
+  if (!matched.length) {
+    el.innerHTML = `<div class="cat-empty"><div style="font-size:2rem;margin-bottom:10px">🔍</div><div style="font-weight:600;color:var(--text2);margin-bottom:4px">No courses found</div><div style="font-size:.78rem">Try a different search or clear filters</div></div>`;
+    return;
+  }
+
+  const buildCard = (c) => {
+    const inPlan = isInPlan(c.id);
+    const crLabel = Array.isArray(c.credits) ? c.credits.join('–') : c.credits;
+    const subLabel = CAT_SUBJECT_LABELS[c.subject] || c.subject;
+    const desc = COURSE_DESC[c.id] || '';
+    const gradeLabel = `Gr ${c.grade.join('/')}`;
+    const prereqIds = c.prereqs || [];
+    const prereqsMet = prereqIds.every(pid => isInPlan(pid));
+    const planGrades = [9,10,11,12].filter(g => state.choices[g]?.[c.id] > 0);
+    const targetGrade = c.grade.find(g => !state.choices[g]?.[c.id]) || c.grade[0];
+    const crToAdd = Array.isArray(c.credits) ? c.credits[0] : c.credits;
+    const dcHrs = DC_COLLEGE_CREDITS[c.id];
+    const dcCost = dcHrs ? `<span class="cat-chip dc" title="${dcHrs} college hrs · ~$${dcHrs*46} in-district">${dcHrs} college hrs · ~$${dcHrs*46}</span>` : '';
+    const tagChips = [
+      c.tags.includes('ap')       ? '<span class="cat-chip ap">AP</span>'        : '',
+      c.tags.includes('dc')       ? '<span class="cat-chip dc">DC</span>'        : '',
+      c.tags.includes('honors')   ? '<span class="cat-chip honors">Honors</span>': '',
+      c.tags.includes('rigorous') ? '<span class="cat-chip rig">★ Rigorous</span>':'',
+    ].filter(Boolean).join('');
+    const prereqNames = prereqIds.map(id => courseMap[id]?.name).filter(Boolean);
+    const prereqChip = prereqNames.length ? `<span class="cat-chip prereq">Needs: ${prereqNames.join(', ')}</span>` : '';
+    const unlockNames = (UNLOCKS[c.id]||[]).map(id => courseMap[id]?.name).filter(Boolean);
+    const unlockLine = unlockNames.length ? `<div class="cat-unlock">Unlocks → ${unlockNames.slice(0,4).join(' · ')}${unlockNames.length>4?` +${unlockNames.length-4} more`:''}</div>` : '';
+    let addBtn;
+    if (inPlan) {
+      addBtn = `<button class="cat-add added" onclick="catAddCourse('${c.id}');renderCatalogResults()">✓ Gr ${planGrades.join('/')} — Remove</button>`;
+    } else if (!prereqsMet && prereqIds.length) {
+      const missing = prereqIds.filter(pid=>!isInPlan(pid)).map(pid=>courseMap[pid]?.name).filter(Boolean);
+      addBtn = `<button class="cat-add" style="opacity:.38;cursor:not-allowed;border-color:var(--border);color:var(--text3)" disabled title="Needs: ${missing.join(', ')}">🔒 Needs prereqs</button>`;
+    } else {
+      addBtn = `<button class="cat-add" onclick="catAddCourse('${c.id}',${targetGrade},${crToAdd});renderCatalogResults()">+ Add to Gr ${targetGrade}</button>`;
+    }
+    return `<div class="cat-card" style="${inPlan?'border-color:rgba(61,136,255,.28);background:rgba(61,136,255,.03)':''}">
+      <div class="cat-card-head">
+        <div style="flex:1"><div class="cat-name">${c.name}</div>
+        <div style="font-size:.67rem;color:var(--text3);margin-top:2px">${subLabel} · ${gradeLabel} · ${crLabel} cr${c.tags.includes('rigorous')?' · <span style="color:var(--green)">Latin Honors</span>':''}</div></div>
+        <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">${tagChips}</div>
+      </div>
+      ${desc ? `<div class="cat-desc">${desc}</div>` : ''}
+      ${unlockLine}
+      <div class="cat-footer">${prereqChip}${dcCost}${addBtn}</div>
+    </div>`;
+  };
+
+  if (catSort === 'subject') {
+    const groups = {};
+    matched.forEach(c => { const g = c.subject||'Other'; if (!groups[g]) groups[g]=[]; groups[g].push(c); });
+    const subjectOrder = ['LA','SS','Math','Sci','FL','FCS','Arts','PE','JROTC','Alt','MATC'];
+    const ordered = [...subjectOrder.filter(s=>groups[s]), ...Object.keys(groups).filter(s=>!subjectOrder.includes(s))];
+    el.innerHTML = `<div style="font-size:.7rem;color:var(--text3);margin-bottom:14px">${matched.length} courses</div>` +
+      ordered.map(subj => {
+        const label = CAT_SUBJECT_LABELS[subj]||subj;
+        return `<div style="margin-bottom:22px"><div style="font-size:.6rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px">${label} (${groups[subj].length})</div><div class="cat-results">${groups[subj].map(buildCard).join('')}</div></div>`;
+      }).join('');
+  } else {
+    el.innerHTML = `<div style="font-size:.7rem;color:var(--text3);margin-bottom:10px">${matched.length} courses</div><div class="cat-results">${matched.map(buildCard).join('')}</div>`;
+  }
+}
+
+function catAddCourse(id, grade, cr) {
+  if (isInPlan(id)) {
+    [9,10,11,12].forEach(g => { if (state.choices[g]?.[id]) state.choices[g][id] = 0; });
+  } else if (grade && cr) {
+    setChoice(grade, id, cr);
+  }
+  autosave();
 }
 
 // ── PATHS VIEW ──────────────────────────────────────────
