@@ -12,7 +12,7 @@
     gtag('config', 'G-TNYF9DN593');
   </script>
   <script src="dq-auth.js" defer></script>
-  <title>MHS Course Planner — Moberly Spartans</title>
+  <title>DQtools CoursePlanner</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -717,7 +717,7 @@ const COURSES = [
   C('crwrite','Creative Writing',             0.5,  [11,12],       'LA','la', [], [], 'If junior: must be in LA III Honors — writing intensive'),
   C('myth',   'Mythology',                    0.5,  [11,12],       'LA','la', [], [], 'If junior: must be in LA III Honors'),
   C('journ',  'Journalism I/II',              1,    [11,12],       'LA','la', [], [], 'Teacher rec from a LA teacher; writing intensive'),
-
+  
   // ── SOCIAL STUDIES ─────────────────────────────
   C('wh',    'World History',                 1,    [9],           'SS','ss'),
   C('ush',   'U.S. History from 1865',        1,    [10,11,12],    'SS','ss'),
@@ -841,6 +841,24 @@ const COURSES = [
   // ── ALTERNATIVE / SCHOOL COURSES ───────────────
   // MACC Online: 0.5 or 1 (semester or year); 10-12
   C('maccol', 'MACC Online (Dual Credit)',    [0.5,1],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+   // MACC Online Offerings: 0.5 or 1 (semester or year); 10-12
+  C('maccacc110', 'Personal Finance - 3cr (Macc Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccart101', 'Art Survey & Appreciation I - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccbhs100', 'Intro to Behavioral Health - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccbio135', 'Human Nutrition - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccbus101', 'Intro to Business - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccecn101', 'Macroeconomics - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccgeo101', 'World Geography I - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('macchsc101', 'Intro to Health Professions - 1cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('macclal255', 'Women in Literature - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('macclal275', 'Mythology - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccmus105', 'Music of America - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccphi152', 'Intro to Ethics - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccphy101', 'Foundation to Physical Science - 4cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccpsy101', 'General Pshychology - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccpsy250', 'Abnormal Pshychology - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+  C('maccsoc101', 'Sociology - 3cr (MACC Online)',    [0.5],[10,11,12],  'Alt',null, ['dc'], [], 'Soph: 3.0 GPA; Jr/Sr: 2.5+ GPA; elective credit', 'MACC requirements'),
+
   // Yearbook: 0.5 or 1 (semester or year)
   C('yrbk',   'Yearbook Production I/II',    [0.5,1],[10,11,12],  'Alt',null),
   C('cadet',  'Cadet Teaching',              1,    [12],          'Alt',null, [], [], '2.5 GPA, 95% attendance, teacher rec; earns A+ hours'),
@@ -3175,6 +3193,18 @@ const COURSE_DESC = {
   crisis: 'Basic emergency management — GPS, map reading, search and rescue, disaster medical operations, and first aid. Certifications in CPR, AED, and Teen CERT (FEMA).',
   drill:  'Military drill instruction — individual and unit drill, manual of arms, ceremonies, and command voice. Earns 0.5 Fine Arts credit. Uniform worn once weekly.',
   maccol: 'Take an online MACC dual credit course during a free period. Options include Personal Finance, General Psychology, Sociology, Mythology, Medical Terminology, and more. Elective credit.',
+  maccacc110: 'This is a MACC ONLINE course in the management of personal finances. It will provide students with opportunities to develop skills for solving “real world” problems. The course will identify the components and sources of income, money management, spending and credit, saving and investment.',
+  maccart101: 'The MACC ONLINE course ART 101 is a slide/lecture course examining the visual arts from prehistoric times through the 17th century. Content includes a study of style, design, technique, iconography, and function of art in Western and non-Western culture..',
+  maccbhs100: 'The MACC ONLINE course introduces the student to the behavioral health care profession. An overview of the programs and services offered by Community Behavioral Health Centers are presented. The skills and ethically considerations needed to work with various clients are discussed. Students are oriented to the most prevalent diagnosis, introduced to the recovery/resiliency model, family systems, population management, and additional philosophies within the community support. The course identifies the population being served as well as the personal and profession requirements in order to be successful working in the field. Introduction to the serious mental illness, SUD, confidentiality, HIPAA, personal/professional boundaries, abuse laws, client rights, guardianship, custody, conservatorship, and involuntary detention are presented...',
+  maccbio135: 'This MACC ONLINE course is an introduction to the basic principles of nutrition. Topics include dietary sources of major nutrients, the physiology of digestion and absorption, metabolism and the key roles nutrients play in the function of the human body. Additional topics will include practical applications of nutrition to a person’s health and well-being as well as a review of published dietary guidelines.',
+  maccbus100: 'This macc online is a survey course designed to provide students with general knowledge of the business world. Topics include economics, management, marketing, accounting, computer information systems, human resource management, finance, and risk management..',
+  maccecn101: 'Economics is a social science concerned with how individuals, institutions and society make optimal choices under conditions of scarcity. Macroeconomics examines the performance and behavior of the economy as a whole. It focuses on economic growth, the business cycle, interest rates, inflation and the behavior of major economic aggregates such as the government, household and business sectors. Macroeconomics seeks to obtain an overview of the economy and the relationships of its major aggregates. Macroeconomics speaks of such economic measures as total output, total employment, total income, aggregate expenditures, and the general level of prices...',
+  maccgeo101: 'GEO 101 is a survey of conditions in Europe, the former Soviet Union, the Middle East, South Asia, and Japan, emphasizing each region’s importance to the world as a whole. The physical, cultural, and economic characteristics of each region are included. Macroeconomics seeks to obtain an overview of the economy and the relationships of its major aggregates.',
+  macchsc101: 'Go to https://www.macc.edu/hsc/',
+  macchsc171: 'Go to https://www.macc.edu/hsc/',
+  macclal255: 'Go to https://www.macc.edu/lal/',
+  macclal275: 'Go to https://www.macc.edu/lal/',
+  othercourse: 'Go to https://www.macc.edu/lal/',
   yrbk:   'Create the school yearbook — layout, design software, photography, and advertising sales. Deadline-driven collaborative project.',
   cadet:  'Seniors explore teaching by working in a classroom under an experienced teacher. Earns A+ tutoring hours. Requires 2.5 GPA, 95% attendance, teacher recommendation.',
   crecrv: 'Computer-based curriculum to recover credit for a previously failed core course. 30 hours of seat time required per ½ credit. By placement only.',
